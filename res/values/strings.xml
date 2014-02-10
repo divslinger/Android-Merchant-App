@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Blockchain Merchant</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_about">About</string>
+    <string name="hello_world">Hello world!</string>
+
+    <string name="tab_settings">Settings</string>
+    <string name="tab_payment">Payment</string>
+    <string name="tab_transactions">Transactions</string>
+    
+    <string name="receive_coins_fragment_name">Name</string>
+    <string name="receive_coins_fragment_receiving_address_hint">Wallet address</string>
+    <string name="receive_coins_fragment_receiving_address_error">Invalid address</string>
+    <string name="receive_coins_fragment_default_currency_hint">Default currency</string>
+    <string name="receive_coins_fragment_email_address_hint">E-mail address</string>
+    <string name="receive_coins_activity_title">Send Bitcoins</string>
+    <string name="receive_coins_install_qr_scanner_msg">Please install ZXing QR-code scanner or Goggles!</string>
+    <string name="receive_coins_uri_parse_error_title">Invalid Bitcoin URI</string>
+    <string name="receive_coins_parse_address_error_msg">Got invalid bitcoin address!\n(Mixing up Testnet/Prodnet?)</string>
+    <string name="receive_coins_fragment_push_notifications">Push notifications</string>
+    <string name="receive_coins_fragment_email_receipts">E-mail receipts</string>
+    <string name="use_btc">Enter price in Bitcoins (BTC)</string>
+    <string name="payment_note">Description...</string>
+    <string name="payment_clear">Clear</string>
+    <string name="payment_new">Start Payment</string>
+    <string name="payment_ready">Confirm Payment</string>
+    <string name="payment_executed">Payment Executed</string>
+    <string name="no_data">No data</string>
+    <string name="content_description">Thank you. Hope to see you soon.</string>
+    
+    <string name="toggle_on">On</string>
+    <string name="toggle_off">Off</string>
+
+    <string name="pull_to_refresh_pull_label">Pull to refresh...</string>
+    <string name="pull_to_refresh_release_label">Release to refresh...</string>
+    <string name="pull_to_refresh_refreshing_label">Loading...</string>
+    <string name="pull_to_refresh_tap_label">Tap to refresh...</string>
+    
+</resources>
