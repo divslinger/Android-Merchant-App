@@ -2,94 +2,120 @@ package info.blockchain.merchant;
 
 import java.util.HashMap;
 
-import org.xml.sax.SAXException;
-
-import android.util.Xml;
+import android.content.Context;
+import android.preference.PreferenceManager;
+import android.content.SharedPreferences;
 import android.util.Log;
+
+import info.blockchain.api.ExchangeRates;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.softmachines.pocketchange.bitcoin.markets.*;
 
 public class CurrencyExchange	{
 
+	public static String CNY = "CNY";
 	public static String EUR = "EUR";
 	public static String GBP = "GBP";
+	public static String JPY = "JPY";
 	public static String USD = "USD";
 
     private static CurrencyExchange instance = null;
-    private static BTCExchange btc = null;
     
-    private static String strBitstampPrice = null;
-    private static String strUSDGBP = null;
-    private static String strUSDEUR = null;
+    private static ExchangeRates fxRates = null;
 
+    private static Double priceCNY = 3450.0;
+    private static Double priceEUR = 430.0;
+    private static Double priceGBP = 400.0;
+    private static Double priceJPY = 61130.0;
+    private static Double priceUSD = 565.0;
+
+    private static Context context = null;
+    
     private CurrencyExchange()	{ ; }
 
-	public static CurrencyExchange getInstance() {
+	public static CurrencyExchange getInstance(Context ctx) {
 		
-		getBitstamp();
-		getUSDFX(EUR);
-		getUSDFX(GBP);
+		context = ctx;
+
+		fxRates = new ExchangeRates();
+		getExchangeRates();
 
 		if (instance == null) {
+
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+			priceCNY = Double.longBitsToDouble(prefs.getLong(CNY, Double.doubleToLongBits(0.0)));
+			priceEUR = Double.longBitsToDouble(prefs.getLong(EUR, Double.doubleToLongBits(0.0)));
+			priceGBP = Double.longBitsToDouble(prefs.getLong(GBP, Double.doubleToLongBits(0.0)));
+			priceJPY = Double.longBitsToDouble(prefs.getLong(JPY, Double.doubleToLongBits(0.0)));
+			priceUSD = Double.longBitsToDouble(prefs.getLong(USD, Double.doubleToLongBits(0.0)));
+
 	    	instance = new CurrencyExchange();
 		}
 		
 		return instance;
 	}
 	
-    public String getBitstampPrice()	{ return strBitstampPrice; }
+    public Double getCurrencyPrice(String currency)	{
+    	
+    	if(currency.equals("CNY"))	{
+    		return priceCNY;
+    	}
+    	else if(currency.equals("EUR"))	{
+    		return priceEUR;
+    	}
+    	else if(currency.equals("GBP"))	{
+    		return priceGBP;
+    	}
+    	else if(currency.equals("JPY"))	{
+    		return priceJPY;
+    	}
+    	else if(currency.equals("USD"))	{
+    		return priceUSD;
+    	}
+    	else	{
+    		return 0.0;
+    	}
 
-    public String getUSDEUR()	{ return strUSDEUR; }
-    
-    public String getUSDGBP()	{ return strUSDGBP; }
+    }
 
-	private static void getBitstamp() {
-		btc = BTCExchangeFactory.getInstance().getExchange(BTCExchangeFactory.BITSTAMP, USD);
+	private static void getExchangeRates() {
 
     	AsyncHttpClient client = new AsyncHttpClient();
-        client.get(btc.getUrl(), new AsyncHttpResponseHandler() {
+        client.get(fxRates.getUrl(), new AsyncHttpResponseHandler() {
 
         	@Override
             public void onSuccess(String response) {
-        		btc.setData(response);
-        		btc.parseData();
-        		strBitstampPrice = btc.getPrice();
-        		Log.d("Currency Exchange", "Bitstamp:" + strBitstampPrice);
+        		fxRates.setData(response);
+        		fxRates.parse();
+        		
+        		priceCNY = fxRates.getLastPrice(CNY);
+        		priceEUR = fxRates.getLastPrice(EUR);
+        		priceGBP = fxRates.getLastPrice(GBP);
+        		priceJPY = fxRates.getLastPrice(JPY);
+        		priceUSD = fxRates.getLastPrice(USD);
+        		
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                SharedPreferences.Editor editor = prefs.edit();
+
+                if(priceCNY > 0.0) {
+                    editor.putLong(CNY, Double.doubleToRawLongBits(priceCNY));
+                }
+                if(priceEUR > 0.0) {
+                    editor.putLong(EUR, Double.doubleToRawLongBits(priceEUR));
+                }
+                if(priceGBP > 0.0) {
+                    editor.putLong(GBP, Double.doubleToRawLongBits(priceGBP));
+                }
+                if(priceJPY > 0.0) {
+                    editor.putLong(JPY, Double.doubleToRawLongBits(priceJPY));
+                }
+                if(priceUSD > 0.0) {
+                    editor.putLong(USD, Double.doubleToRawLongBits(priceUSD));
+                }
+
+                editor.commit();
             }
-
-            @Override
-            public void onFailure(Throwable arg0) {
-        		Log.d("Currency Exchange", "failure:" + arg0.toString());
-            }
-
-        });
-	}
-
-	private static void getUSDFX(final String currency) {
-
-    	AsyncHttpClient client = new AsyncHttpClient();
-        client.get("http://themoneyconverter.com/rss-feed/" + currency + "/rss.xml", new AsyncHttpResponseHandler() {
-
-        	@Override
-            public void onSuccess(String response) {
-
-        		USDXML mcx = new USDXML(currency);
-            	try {
-            		Xml.parse(response, mcx);
-            		if(currency.equals(EUR)) {
-            			strUSDEUR = mcx.getPrice();
-                		Log.d("Currency Exchange", "USDEUR:" + strUSDEUR);
-            		}
-            		else {
-            			strUSDGBP = mcx.getPrice();
-                		Log.d("Currency Exchange", "USDGBP:" + strUSDGBP);
-            		}
-            	} catch (SAXException e) {
-            		e.printStackTrace();
-            	}
-        	}
 
             @Override
             public void onFailure(Throwable arg0) {

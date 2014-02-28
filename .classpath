@@ -9,5 +9,6 @@
 	<classpathentry exported="true" kind="lib" path="/Users/WilliamHill/Documents/workspace/android/BlockchainMerchantTerminal/libs/zbar.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/WilliamHill/Documents/workspace/android/BlockchainMerchantTerminal/libs/commons-io-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="/Users/WilliamHill/Documents/workspace/android/BlockchainMerchantTerminal/libs/android-async-http-1.4.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/WilliamHill/Documents/workspace/android/BlockchainMerchantTerminal/libs/guava-16.0.1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -5,6 +5,8 @@
    <item>US Dollar - USD</item>
    <item>Euro - EUR</item>
    <item>Pound Sterling - GBP</item>
+   <item>China Yuan - CNY</item>
+   <item>Japan Yen - JPY</item>
 </string-array>
 
 </resources>

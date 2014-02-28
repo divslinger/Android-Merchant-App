@@ -15,10 +15,8 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
  
         switch (index) {
         	case 0:
-        		return new SettingsFragment();
-        	case 1:
         		return new PaymentFragment();
-        	case 2:
+        	case 1:
         		return new TransactionsFragment();
         }
  
@@ -27,7 +25,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
  
     @Override
     public int getCount() {
-        return 3;
+        return 2;
     }
  
 }
