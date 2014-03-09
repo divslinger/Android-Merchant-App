@@ -6,15 +6,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 
-/*
-
-                              			if(notification != null) {
-                             	    		notification.clearNotification();
-                             	    	}
-                                		notification = new NotificationData(context, contentTitle, contentMarquee, contentText, R.drawable.ic_launcher, BitcoinAlerts.class, 1001);
-                                		notification.setNotification();
-
- */
 public class NotificationData {
 
     public static NotificationManager mNotificationManager;

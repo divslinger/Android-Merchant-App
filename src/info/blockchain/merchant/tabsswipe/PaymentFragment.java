@@ -2,6 +2,7 @@ package info.blockchain.merchant.tabsswipe;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;
+import java.util.Locale;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -9,29 +10,27 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.InputType;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.view.View.OnFocusChangeListener;
-import android.support.v4.view.ViewPager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Button;
 import android.widget.Toast;
+//import android.widget.Toast;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+//import android.util.Log;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -56,8 +55,6 @@ public class PaymentFragment extends Fragment   {
 	private ProgressBar progressBar = null;
 	private EditText posInput = null;
 	private EditText posMessage = null;
-	private Button bClear = null;
-//	private Button bConfirm = null;
 	private ImageButton imageConfirm = null;
     private TextView tvCurrency = null;
     private TextView tvCurrencySymbol = null;
@@ -76,7 +73,8 @@ public class PaymentFragment extends Fragment   {
     private boolean doBTC = false;
     private boolean doContinue = true;
 
-    private Typeface font = null;
+    private Typeface btc_font = null;
+    private Typeface default_font = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -85,9 +83,7 @@ public class PaymentFragment extends Fragment   {
         editor = prefs.edit();
 
         rootView = inflater.inflate(R.layout.fragment_payment, container, false);
-        
-        font = Typeface.createFromAsset(getActivity().getAssets(), "fontawesome-webfont.ttf" );
-
+                
         doBTC = prefs.getBoolean("use_btc", false);
 
         imageView = (ImageView)rootView.findViewById(R.id.qr);
@@ -99,6 +95,8 @@ public class PaymentFragment extends Fragment   {
 
         tvSendingAddress = (TextView)rootView.findViewById(R.id.sending_address);
         tvCurrencySymbol = (TextView)rootView.findViewById(R.id.currencySymbol);
+        default_font = tvCurrencySymbol.getTypeface();
+        btc_font = Typeface.createFromAsset(getActivity().getAssets(), "fontawesome-webfont.ttf");
         tvCurrencySymbol.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,7 +126,6 @@ public class PaymentFragment extends Fragment   {
                 System.gc();
             }
         });
-        tvCurrencySymbol.setTypeface(font);
 
         tvCurrency = (TextView)rootView.findViewById(R.id.curr_display);
 
@@ -144,7 +141,6 @@ public class PaymentFragment extends Fragment   {
 		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 		        if (actionId == EditorInfo.IME_ACTION_DONE) {
                 	if(BitcoinAddressCheck.isValid(strBTCReceivingAddress)) {
-                    	Log.d("PaymentFragment", strBTCReceivingAddress);
                         makeNewPayment();
                         doContinue = false;
                     	imageConfirm.setImageResource(R.drawable.clear_button);
@@ -168,14 +164,19 @@ public class PaymentFragment extends Fragment   {
             public void onClick(View v) {
             	
             	if(doContinue) {
-                	if(BitcoinAddressCheck.isValid(strBTCReceivingAddress)) {
-                    	Log.d("PaymentFragment", strBTCReceivingAddress);
+                    if(strCurrency != null && CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency) == 0.0) {
+            			;
+                    }
+                    else if(BitcoinAddressCheck.isValid(strBTCReceivingAddress)) {
                         makeNewPayment();
                         doContinue = false;
                     	imageConfirm.setImageResource(R.drawable.clear_button);
                     	imageConfirm.setBackgroundResource(R.drawable.balance_bg);
                     	tvCurrencySymbol.setClickable(false);
                 	}
+                    else {
+                    	;
+                    }
             	}
             	else {
                 	initValues();
@@ -185,7 +186,7 @@ public class PaymentFragment extends Fragment   {
         });
 
         initValues();
-        
+
         return rootView;
     }
 
@@ -206,7 +207,7 @@ public class PaymentFragment extends Fragment   {
     @Override
     public void onResume() {
     	super.onResume();
-     
+
     	initValues();
 
     }
@@ -233,7 +234,6 @@ public class PaymentFragment extends Fragment   {
         
         EditText posNote = (EditText)rootView.findViewById(R.id.note);
         strMessage = posNote.getText().toString();
-//        tvSendingAddress.setText(input_address);
         
         dbVals = new ContentValues();
         dbVals.put("amt", longValue);
@@ -249,6 +249,11 @@ public class PaymentFragment extends Fragment   {
     private class POSTextWatcher implements TextWatcher {
 
         public void afterTextChanged(Editable arg0) {
+        	
+            if(posInput.getText().toString() != null && !posInput.getText().toString().equals("0") && strCurrency != null && CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency) == 0.0) {
+    			Toast.makeText(PaymentFragment.this.getActivity(), R.string.no_exchange_rate, Toast.LENGTH_LONG).show();
+            }
+
         	if(setAmount() > 0L) {
         		imageConfirm.setBackgroundResource(R.drawable.continue_bg);
         		imageConfirm.setClickable(true);
@@ -262,6 +267,8 @@ public class PaymentFragment extends Fragment   {
     }
     
     private void initValues() {
+    	
+    	CurrencyExchange.getInstance(getActivity());
 
         if(prefs != null) {
         	strLabel = prefs.getString("receiving_name", "");
@@ -281,6 +288,7 @@ public class PaymentFragment extends Fragment   {
 
         if(tvSendingAddress != null) {
             tvSendingAddress.setText("");
+            tvSendingAddress.setVisibility(View.INVISIBLE);
         }
 
         if(posMessage != null) {
@@ -322,7 +330,7 @@ public class PaymentFragment extends Fragment   {
 
     	final ReceivePayments receive_payments = new ReceivePayments(strBTCReceivingAddress);
     	
-    	Log.d("makeNewPayments", receive_payments.getUrl());
+//    	Log.d("makeNewPayments", receive_payments.getUrl());
     	
     	AsyncHttpClient client = new AsyncHttpClient();
         client.get(receive_payments.getUrl(), new AsyncHttpResponseHandler() {
@@ -330,14 +338,11 @@ public class PaymentFragment extends Fragment   {
         	@Override
             public void onSuccess(String response) {
 
-        		Log.d("makeNewPayment", response);
                 receive_payments.setData(response);
                 receive_payments.parse();
                 input_address = receive_payments.getInputAddress();
-        		Log.d("makeNewPayment", input_address);
 
         		Bitmap bm = generateQRCode(generateURI());
-        		Log.d("makeNewPayment", "bitmap is " +  ((bm == null) ? "null" :  "not null"));
                 progressBar.setVisibility(View.GONE);
                 imageView.setVisibility(View.VISIBLE);
                 imageView.setImageBitmap(bm);
@@ -350,10 +355,17 @@ public class PaymentFragment extends Fragment   {
         		// get fiat
         		String fiat_amount = null;
         		if(doBTC) {
-        			fiat_amount = (String)tvCurrency.getText();
+        			String fiat = (String)tvCurrency.getText();
+        			int idx = fiat.indexOf(" ");
+        			if(idx != -1) {
+        				fiat_amount = getFiatCurrencySymbol() + fiat.substring(0, idx); 
+        			}
+        			else {
+        				fiat_amount = getFiatCurrencySymbol() + "0"; 
+        			}
         		}
         		else {
-        			fiat_amount = posInput.getEditableText().toString() + " " + strCurrency;
+        			fiat_amount = getFiatCurrencySymbol() + posInput.getEditableText().toString();
         		}
         		dbVals.put("famt", fiat_amount);
 
@@ -365,7 +377,7 @@ public class PaymentFragment extends Fragment   {
 
             @Override
             public void onFailure(Throwable arg0) {
-        		Log.d("makeNewPayment", "failure:" + arg0.toString());
+				Toast.makeText(PaymentFragment.this.getActivity(), arg0.toString(), Toast.LENGTH_LONG).show();
             }
 
         });
@@ -373,7 +385,12 @@ public class PaymentFragment extends Fragment   {
     }
 
     private long setAmount() {
+    	long longValue = 0L;
     	double amount = 0.0;
+
+        if(strCurrency != null && CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency) == 0.0) {
+        	return longValue;
+        }
 
     	if(doBTC) {
     		try {
@@ -388,13 +405,14 @@ public class PaymentFragment extends Fragment   {
     	}
 
     	double value = Math.round(amount * 100000000.0);
-    	long longValue = (Double.valueOf(value)).longValue();
+    	longValue = (Double.valueOf(value)).longValue();
         if(!doBTC) {
         	tvCurrency.setText(BitcoinURI.bitcoinValueToPlainString(BigInteger.valueOf(longValue)) + " BTC");
         }
         else {
-        	String amt = Double.toString(xlatBTC2Fiat(posInput.getText().toString()));
-        	if(amt.equals("0.0")) {
+        	DecimalFormat df2 = new DecimalFormat("######0.00");
+        	String amt = df2.format(xlatBTC2Fiat(posInput.getText().toString()));
+        	if(amt.equals("0.00")) {
         		amt = "0";
         	}
         	tvCurrency.setText(amt + " " + strCurrency);
@@ -406,27 +424,75 @@ public class PaymentFragment extends Fragment   {
     private void setCurrencySymbol() {
         if(tvCurrencySymbol != null) {
             if(doBTC) {
+            	tvCurrencySymbol.setTypeface(btc_font);
             	tvCurrencySymbol.setText(R.string.bitcoin_currency_symbol);
             }
             else if(strCurrency.equals("CNY")) {
+            	tvCurrencySymbol.setTypeface(default_font);
             	tvCurrencySymbol.setText("¥");
             }
             else if(strCurrency.equals("EUR")) {
+            	tvCurrencySymbol.setTypeface(default_font);
             	tvCurrencySymbol.setText("€");
             }
             else if(strCurrency.equals("GBP")) {
+            	tvCurrencySymbol.setTypeface(default_font);
             	tvCurrencySymbol.setText("£");
             }
             else if(strCurrency.equals("JPY")) {
+            	tvCurrencySymbol.setTypeface(default_font);
             	tvCurrencySymbol.setText("¥");
             }
             else {
+            	tvCurrencySymbol.setTypeface(default_font);
             	tvCurrencySymbol.setText("$");
             }
         }
     }
 
+    private String getCurrencySymbol() {
+        if(doBTC) {
+        	return getActivity().getResources().getString(R.string.bitcoin_currency_symbol);
+        }
+        else if(strCurrency.equals("CNY")) {
+        	return "¥";
+        }
+        else if(strCurrency.equals("EUR")) {
+        	return "€";
+        }
+        else if(strCurrency.equals("GBP")) {
+        	return "£";
+        }
+        else if(strCurrency.equals("JPY")) {
+        	return "¥";
+        }
+        else {
+        	return "$";
+        }
+    }
+
+    private String getFiatCurrencySymbol() {
+        if(strCurrency.equals("CNY")) {
+        	return "¥";
+        }
+        else if(strCurrency.equals("EUR")) {
+        	return "€";
+        }
+        else if(strCurrency.equals("GBP")) {
+        	return "£";
+        }
+        else if(strCurrency.equals("JPY")) {
+        	return "¥";
+        }
+        else {
+        	return "$";
+        }
+    }
+
     private double xlatBTC2Fiat(String strAmount) {
+
+    	Locale locale = new Locale("en", "US");
+        Locale.setDefault(locale);
 
     	if(strAmount.length() < 1) {
     		strAmount = "0";
@@ -457,14 +523,17 @@ public class PaymentFragment extends Fragment   {
     }
     
     private double xlatFiat2BTC(String strAmount) {
-    	
+
+    	Locale locale = new Locale("en", "US");
+        Locale.setDefault(locale);
+
     	if(strAmount.length() < 1) {
     		strAmount = "0";
     	}
     	if(strAmount.equals(".")) {
     		strAmount = "0";
     	}
-    	
+
     	double amount = 0;
 
 		if(strCurrency.equals("EUR")) {
@@ -505,7 +574,7 @@ public class PaymentFragment extends Fragment   {
 
             @Override
             public void onFailure(Throwable arg0) {
-//        		Log.d(TAG, "failure:" + arg0.toString());
+				Toast.makeText(PaymentFragment.this.getActivity(), arg0.toString(), Toast.LENGTH_LONG).show();
             }
 
         });

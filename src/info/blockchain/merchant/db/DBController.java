@@ -1,15 +1,13 @@
 package info.blockchain.merchant.db;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import android.util.Log;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+//import android.util.Log;
 
 public class DBController extends SQLiteOpenHelper {
 
@@ -19,7 +17,6 @@ public class DBController extends SQLiteOpenHelper {
 	
 	public DBController(Context context) {
         super(context, DB, null, 1);
-        Log.d(LOGCAT, "Database created");
     }
 	
 	@Override
@@ -27,8 +24,8 @@ public class DBController extends SQLiteOpenHelper {
 		String query;
 		query = "CREATE TABLE " + TABLE + " ( _id INTEGER PRIMARY KEY, ts integer, iad text, amt integer, famt text, cfm integer, msg text)";
         database.execSQL(query);
-        Log.d(LOGCAT, "payment table created");
 	}
+
 	@Override
 	public void onUpgrade(SQLiteDatabase database, int version_old, int current_version) {
 		String query;
@@ -62,18 +59,24 @@ public class DBController extends SQLiteOpenHelper {
 	public void deleteConfirmed() {
 		SQLiteDatabase database = this.getWritableDatabase();	 
 		String deleteQuery = "DELETE FROM " + TABLE + " where cfm > 0";
-		Log.d(LOGCAT, deleteQuery);		
 		database.execSQL(deleteQuery);
-		Log.d(LOGCAT, "delete");
 		database.close();
 	}
 
 	public void deleteIncomingAddress(String address) {
 		SQLiteDatabase database = this.getWritableDatabase();	 
 		String deleteQuery = "DELETE FROM " + TABLE + " where iad='" + address + "'";
-		Log.d(LOGCAT, deleteQuery);		
 		database.execSQL(deleteQuery);
-		Log.d(LOGCAT, "delete");
+		database.close();
+	}
+
+	public void deleteExpired() {
+		long now = System.currentTimeMillis() / 1000;
+		long then = now - (60 * 30);
+		
+		SQLiteDatabase database = this.getWritableDatabase();	 
+		String deleteQuery = "DELETE FROM " + TABLE + " where cfm = -1 and ts < " + then;
+		database.execSQL(deleteQuery);
 		database.close();
 	}
 
@@ -95,7 +98,7 @@ public class DBController extends SQLiteOpenHelper {
                 data.add(vals);
 	        } while (cursor.moveToNext());
 	    }
-
+	    cursor.close();
 		database.close();
 
 	    return data;
@@ -119,7 +122,7 @@ public class DBController extends SQLiteOpenHelper {
                 data.add(vals);
 	        } while (cursor.moveToNext());
 	    }
-
+	    cursor.close();
 		database.close();
 
 	    return data;
@@ -143,12 +146,11 @@ public class DBController extends SQLiteOpenHelper {
                 data.add(vals);
 	        } while (cursor.moveToNext());
 	    }
-
+	    cursor.close();
 		database.close();
 
 	    return data;
 	}
-
 
 	public ArrayList<String> getConfirmedPaymentIncomingAddresses() {
 		ArrayList<String> data = new ArrayList<String>();
@@ -160,7 +162,7 @@ public class DBController extends SQLiteOpenHelper {
 	        	data.add(cursor.getString(0));
 	        } while (cursor.moveToNext());
 	    }
-
+	    cursor.close();
 		database.close();
 
 	    return data;
@@ -185,7 +187,7 @@ public class DBController extends SQLiteOpenHelper {
                 data.add(vals);
 	        } while (cursor.moveToNext());
 	    }
-
+	    cursor.close();
 		database.close();
 
 	    return data;

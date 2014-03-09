@@ -15,10 +15,10 @@ public final class R {
 		public static final int ic_launcher = 0x7f020020;
 	}
 	public static final class id {
-		public static final int action_settings = 0x7f09001d;
+		public static final int action_settings = 0x7f090021;
 	}
 	public static final class layout {
-		public static final int activity_harness = 0x7f030000;
+		public static final int activity_harness = 0x7f030001;
 	}
 	public static final class menu {
 		public static final int harness = 0x7f080000;

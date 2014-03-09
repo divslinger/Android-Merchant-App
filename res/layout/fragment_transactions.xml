@@ -29,7 +29,7 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="@dimen/transaction_height"
 	    android:orientation="vertical"
-	    android:layout_marginLeft="10dp"
+	    android:layout_marginLeft="5dp"
     >
 
     	<TextView
@@ -40,41 +40,42 @@
         	android:textSize="@dimen/transaction_date_size"
 		/>
 
-    <LinearLayout
-	    android:layout_width="@dimen/transaction_column_width"
-	    android:layout_height="@dimen/transaction_height"
-	    android:orientation="horizontal"
-    	>
+		<!-- currency sign, amount column -->
+    		<LinearLayout
+	    	android:layout_width="wrap_content"
+	    	android:layout_height="@dimen/transaction_height"
+	    	android:orientation="horizontal"
+	    	android:layout_marginLeft="5dp"
+	    	>
     	
-    	<TextView
-        	android:id="@+id/tv_btc"
-        	android:layout_width="wrap_content"
-        	android:layout_height="@dimen/transaction_height_half"
-        	android:gravity="center_vertical"
-        	android:layout_gravity="left"
-        	android:textStyle="bold"
-			android:textColor="#FF000000"
-        	android:textSize="@dimen/transaction_amount_size_superscript"
-        />
+    		<TextView
+        		android:id="@+id/tv_btc"
+        		android:layout_width="wrap_content"
+        		android:layout_height="@dimen/transaction_height_half"
+        		android:layout_gravity="left|top"
+        		android:textSize="@dimen/transaction_amount_size"
+	        />
     	
-    	<TextView
-        	android:id="@+id/tv_amount"
-        	android:layout_width="fill_parent"
-        	android:layout_height="@dimen/transaction_height_half"
-        	android:gravity="center_vertical"
-        	android:layout_marginLeft="3sp"
-        	android:layout_gravity="left"
-        	android:textStyle="bold"
-			android:textColor="#FF29A432"
-        	android:textSize="@dimen/transaction_amount_size"
-        />
-    			
+    		<TextView
+        		android:id="@+id/tv_amount"
+        		android:layout_width="fill_parent"
+        		android:layout_height="@dimen/transaction_height_half"
+        		android:gravity="center_vertical"
+        		android:layout_gravity="left"
+        		android:textStyle="bold"
+        		android:textSize="@dimen/transaction_amount_size"
+        		android:textColor="#FF29A432"
+		        android:lines="1"
+				android:singleLine="true"
+	        />
+    	</LinearLayout>
+    				
 	</LinearLayout>
-	</LinearLayout>
-    
+
 	<!-- description column -->
 	<LinearLayout
-    	android:layout_width="wrap_content"
+    	android:layout_width="0dp"
+    	android:layout_weight="1"
     	android:layout_height="@dimen/transaction_height"
     	android:orientation="horizontal"
 	    android:layout_marginLeft="5dp"
@@ -101,7 +102,7 @@
 	<!-- status column -->
 	<LinearLayout
         android:id="@+id/tv_status_bkg"
-    	android:layout_width="wrap_content"
+    	android:layout_width="80dp"
     	android:layout_height="@dimen/transaction_height"
     	android:orientation="horizontal"
         android:gravity="center"

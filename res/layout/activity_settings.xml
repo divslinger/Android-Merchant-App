@@ -32,6 +32,8 @@
 	            android:textColor="#ff000000"
                 android:lines="1"
                 android:padding="7dp"
+		        android:imeOptions="actionDone"
+				android:singleLine="true"
 				/>
 
 </LinearLayout>
@@ -71,6 +73,8 @@
 	            android:textColor="#ff000000"
                 android:lines="1"
                 android:padding="7dp"
+		        android:imeOptions="actionDone"
+				android:singleLine="true"
 				/>
 
 </LinearLayout>

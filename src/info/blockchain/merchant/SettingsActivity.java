@@ -1,16 +1,15 @@
 package info.blockchain.merchant;
 
-import java.nio.charset.Charset;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.AutoCompleteTextView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.EditText;
@@ -19,11 +18,10 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Toast;
-import android.util.Log;
+//import android.util.Log;
 
 import com.dm.zbar.android.scanner.ZBarConstants;
 import com.dm.zbar.android.scanner.ZBarScannerActivity;
-import com.google.common.hash.Hashing;
 
 import net.sourceforge.zbar.Symbol;
 
@@ -34,8 +32,6 @@ public class SettingsActivity extends Activity	{
 	private Spinner spCurrencies = null;
 	private Switch sPushNotifications = null;
 	private String[] currencies = null;
-//	private AutoCompleteTextView receivingNameView = null;
-//	private AutoCompleteTextView receivingAddressView = null;
 	private EditText receivingAddressView = null;
 	private EditText receivingNameView = null;
 	private ImageButton imageScan = null;
@@ -126,7 +122,7 @@ public class SettingsActivity extends Activity	{
 		if(resultCode == Activity.RESULT_OK && requestCode == ZBAR_SCANNER_REQUEST)	{
 			// Scan result is available by making a call to data.getStringExtra(ZBarConstants.SCAN_RESULT)
 			// Type of the scan result is available by making a call to data.getStringExtra(ZBarConstants.SCAN_RESULT_TYPE)
-			Toast.makeText(this, "Scan Result = " + data.getStringExtra(ZBarConstants.SCAN_RESULT), Toast.LENGTH_SHORT).show();
+//			Toast.makeText(this, "Scan Result = " + data.getStringExtra(ZBarConstants.SCAN_RESULT), Toast.LENGTH_SHORT).show();
 //			Toast.makeText(this, "Scan Result Type = " + data.getIntExtra(ZBarConstants.SCAN_RESULT_TYPE, 0), Toast.LENGTH_SHORT).show();
 			// The value of type indicates one of the symbols listed in Advanced Options below.
 			
@@ -139,7 +135,7 @@ public class SettingsActivity extends Activity	{
 			}
 
         } else if(resultCode == Activity.RESULT_CANCELED && requestCode == ZBAR_SCANNER_REQUEST) {
-            Toast.makeText(this, "Camera unavailable", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.camera_unavailable, Toast.LENGTH_SHORT).show();
         }
         else {
         	;
@@ -172,5 +168,18 @@ public class SettingsActivity extends Activity	{
     		}
     	}
     }
+
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+	    Rect dialogBounds = new Rect();
+	    getWindow().getDecorView().getHitRect(dialogBounds);
+
+	    if(!dialogBounds.contains((int) event.getX(), (int) event.getY()) && event.getAction() == MotionEvent.ACTION_DOWN) {
+	    	return false;
+	    }
+	    else {
+		    return super.dispatchTouchEvent(event);
+	    }
+	}
 
 }

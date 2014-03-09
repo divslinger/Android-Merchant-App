@@ -1,11 +1,9 @@
 package info.blockchain.merchant.tabsswipe;
 
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.math.BigInteger;
@@ -17,7 +15,6 @@ import android.content.SharedPreferences;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.AsyncTask;
@@ -28,26 +25,23 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ImageView;
-import android.widget.Toast;
+//import android.widget.Toast;
 import android.view.LayoutInflater;
 import android.app.AlertDialog;
 import android.text.SpannableStringBuilder;
-import android.text.style.SuperscriptSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.Spannable;
-import android.util.Log;
+import android.graphics.Typeface;
+//import android.util.Log;
 
 import com.google.bitcoin.uri.BitcoinURI;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.encode.QRCodeEncoder;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.markupartist.android.widget.PullToRefreshListView;
 import com.markupartist.android.widget.PullToRefreshListView.OnRefreshListener;
 
@@ -69,8 +63,9 @@ public class TransactionsFragment extends ListFragment	{
     private boolean push_notifications = false;
 	private Timer timer = null;
     private PullToRefreshListView listView = null;
-
     private Typeface font = null;
+
+    private boolean doBTC = false;
 
     private static int DARK_BG = 0xFFF7F7F7;
     private static int LIGHT_BG = 0xFFFFFFFF;
@@ -110,9 +105,10 @@ public class TransactionsFragment extends ListFragment	{
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         receiving_address = prefs.getString("receiving_address", "");
         push_notifications = prefs.getBoolean("push_notifications", false);
+        doBTC = prefs.getBoolean("use_btc", false);
         
-        font = Typeface.createFromAsset(getActivity().getAssets(), "fontawesome-webfont.ttf" );
-
+        font = Typeface.createFromAsset(getActivity().getAssets(), "fontawesome-webfont.ttf");
+        
 	    return viewGroup;
 	}
 
@@ -124,6 +120,7 @@ public class TransactionsFragment extends ListFragment	{
 
         	receiving_address = prefs.getString("receiving_address", "");
             push_notifications = prefs.getBoolean("push_notifications", false);
+            doBTC = prefs.getBoolean("use_btc", false);
 
             if(push_notifications) {
                 if(timer == null) {
@@ -153,12 +150,13 @@ public class TransactionsFragment extends ListFragment	{
      
     	receiving_address = prefs.getString("receiving_address", "");
         push_notifications = prefs.getBoolean("push_notifications", false);
+        doBTC = prefs.getBoolean("use_btc", false);
 
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        Log.i("TransactionsFragment", "Item clicked: " + id);
+//        Log.i("TransactionsFragment", "Item clicked: " + id);
         doTxTap(id);
     }
 
@@ -181,22 +179,23 @@ public class TransactionsFragment extends ListFragment	{
                 }
 
                 DBController pdb = new DBController(getActivity());
+                pdb.deleteExpired();
                 List<String> confirmedAddresses = pdb.getConfirmedPaymentIncomingAddresses();
 
                 List<Tx> txs = wallet.getTxs();
                 if(txs != null && txs.size() > 0) {
-                    Log.i("Update confirmed", "txs returned:" + txs.size());
+//                    Log.i("Update confirmed", "txs returned:" + txs.size());
                     for (Tx t : txs) {
                     	if(t.getIncomingAddresses().size() > 0) {
-                            Log.i("Update confirmed", "addresses for this tx:" + t.getIncomingAddresses().size());
+//                            Log.i("Update confirmed", "addresses for this tx:" + t.getIncomingAddresses().size());
                     		List<String> incoming_addresses = t.getIncomingAddresses();
                             for (String incoming : incoming_addresses) {
-                                Log.i("Update confirmed", incoming + ", confirmed:" + t.isConfirmed());
+//                                Log.i("Update confirmed", incoming + ", confirmed:" + t.isConfirmed());
                         		if(t.isConfirmed()) {
-                                    Log.i("Update confirmed", "updating database for incoming (confirmed):" + incoming);
+//                                    Log.i("Update confirmed", "updating database for incoming (confirmed):" + incoming);
                                     if(pdb.updateConfirmed(incoming, 1) > 0) {
                                     	if(push_notifications && !confirmedAddresses.contains(incoming)) {
-                                            Log.i("Update confirmed", "push notification:" + incoming);
+//                                            Log.i("Update confirmed", "push notification:" + incoming);
                                   			String strMarquee = getActivity().getResources().getString(R.string.marquee_start) + " " + incoming;
                                   			String strText = BitcoinURI.bitcoinValueToPlainString(BigInteger.valueOf(t.getAmount())) + " " + getActivity().getResources().getString(R.string.notification_end);
                                   			if(notification != null) {
@@ -208,7 +207,7 @@ public class TransactionsFragment extends ListFragment	{
                                     }
                         		}
                         		else {
-                                    Log.i("Update confirmed", "updating database for incoming (received):" + incoming);
+//                                    Log.i("Update confirmed", "updating database for incoming (received):" + incoming);
                             		pdb.updateConfirmed(incoming, 0);
                         		}
                             }
@@ -218,13 +217,13 @@ public class TransactionsFragment extends ListFragment	{
                 
                 // get updated list from database
                 ArrayList<ContentValues> vals = pdb.getAllPayments();
-                pdb.close();
+//                pdb.close();
                 
                 if(vals.size() > 0) {
                 	mListItems.clear();
                 	mListItems.addAll(vals);
                 }
-
+                
         	}
 
             return null;
@@ -294,14 +293,41 @@ public class TransactionsFragment extends ListFragment	{
 	        ((TextView)view.findViewById(R.id.tv_date)).setText(ds);
 
 	        ((TextView)view.findViewById(R.id.tv_note)).setText(vals.getAsString("msg"));
-	
-	        TextView btc_view = (TextView)view.findViewById(R.id.tv_btc);
-	        btc_view.setTypeface(font);
-	        SpannableStringBuilder cs = new SpannableStringBuilder(bitcoinCurrencySymbol());
-	        cs.setSpan(new SuperscriptSpan(), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-	        btc_view.setText(cs);
 
-	        ((TextView)view.findViewById(R.id.tv_amount)).setText(BitcoinURI.bitcoinValueToPlainString(BigInteger.valueOf(vals.getAsLong("amt"))));
+	        if(doBTC) {
+	        	String displayValue = null;
+        		String value = BitcoinURI.bitcoinValueToPlainString(BigInteger.valueOf(vals.getAsLong("amt")));
+        		int idx = value.indexOf(".");
+        		if(idx != -1) {
+        			String tmp = value.substring(idx + 1, value.length());
+        			if(vals.getAsLong("amt") < 100000000 && tmp.length() > 4) {
+        				displayValue = value.substring(0, idx + 1) + tmp.substring(0, 4);
+        			}
+        			else if(vals.getAsLong("amt") >= 100000000 && tmp.length() > 3) {
+        				displayValue = value.substring(0, idx + 1) + tmp.substring(0, 3);
+        			}
+        			else {
+        				displayValue = value;
+        			}
+        		}
+    			else {
+    				displayValue = value;
+    			}
+
+    	        TextView btc_view = (TextView)view.findViewById(R.id.tv_btc);
+    	        btc_view.setTypeface(font);
+    	        SpannableStringBuilder cs = new SpannableStringBuilder(getActivity().getResources().getString(R.string.bitcoin_currency_symbol));
+    	        cs.setSpan(new RelativeSizeSpan((float)0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    	        btc_view.setText(cs);
+    	        ((TextView)view.findViewById(R.id.tv_amount)).setText(displayValue);
+	        }
+	        else {
+    	        TextView btc_view = (TextView)view.findViewById(R.id.tv_btc);
+    	        SpannableStringBuilder cs = new SpannableStringBuilder(vals.getAsString("famt").subSequence(0, 1));
+    	        cs.setSpan(new RelativeSizeSpan((float)0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    	        btc_view.setText(cs);
+       	        ((TextView)view.findViewById(R.id.tv_amount)).setText(vals.getAsString("famt").substring(1));
+	        }
 
 	        if(vals.getAsInteger("cfm") > 0) {
 		        ((ImageView)view.findViewById(R.id.tv_status)).setImageResource(R.drawable.filled_checkmark);
@@ -392,7 +418,6 @@ public class TransactionsFragment extends ListFragment	{
     		.setIcon(R.drawable.ic_launcher)
     		.setTitle(dateStr + ": " + BitcoinURI.bitcoinValueToPlainString(BigInteger.valueOf(val.getAsLong("amt"))) + " BTC, " + val.getAsString("famt"))
     		.setView(image)
-//    		.setMessage(strAmount + "\n" + strMessage)
     		.setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
 //          @Override
     		public void onClick(DialogInterface dialog, int which) {
@@ -421,9 +446,13 @@ public class TransactionsFragment extends ListFragment	{
     				DBController pdb = new DBController(getActivity());
     				pdb.deleteIncomingAddress(val.getAsString("iad"));
     				pdb.close();
-
-    				mListItems.remove(item);
-    				adapter.notifyDataSetChanged();
+    				
+    				if(mListItems.size() > 1) {
+        				mListItems.remove(item);
+    				}
+    				else {
+        				mListItems.clear();
+    				}
 
     	            new GetDataTask().execute();
     			}
@@ -436,10 +465,6 @@ public class TransactionsFragment extends ListFragment	{
     		}
     	).show();
 
-    }
-
-    private String bitcoinCurrencySymbol()	{
-    	return (String)getActivity().getResources().getText(R.string.bitcoin_currency_symbol);
     }
 
 }

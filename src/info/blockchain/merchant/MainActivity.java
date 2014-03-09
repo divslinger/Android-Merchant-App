@@ -1,16 +1,9 @@
 package info.blockchain.merchant;
 
-import net.sourceforge.zbar.Symbol;
-
-import com.dm.zbar.android.scanner.ZBarConstants;
-import com.dm.zbar.android.scanner.ZBarScannerActivity;
-
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
-import android.content.DialogInterface;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,17 +12,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.text.Html;
-import android.widget.Toast;
 
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
 
@@ -38,19 +27,28 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	private ViewPager viewPager;
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
+    /*
     private String[] tabs = {
     		"Payment",
     		"Transactions"
     		};
-    
+    */
+
+    private String[] tabs = null;
+
     private static int SETTINGS_ACTIVITY 	= 1;
     private static int PIN_ACTIVITY 		= 2;
     private static int RESET_PIN_ACTIVITY 	= 3;
+    private static int ABOUT_ACTIVITY 	= 4;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_main);
+	    
+	    tabs = new String[2];
+	    tabs[0] = getString(R.string.tab_payment);
+	    tabs[1] = getString(R.string.tab_transactions);
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         actionBar = getActionBar();
@@ -88,7 +86,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         if(pin.equals("")) {
         	doPIN();
         }
-        
+
+        /*
+        // BLE check
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, "BLE not supported", Toast.LENGTH_SHORT).show();
+        }
+        */
+
 	}
 
 	@Override
@@ -207,21 +212,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     }
 
     private void doAbout()	{
-
-    	String msg = this.getString(R.string.about) + "\n" + this.getString(R.string.support) + Html.fromHtml("<a href=\"mailto:support@blockchain.zendesk.com \">support@blockchain.zendesk.com </a>");
-
-    	new AlertDialog.Builder(this)
-    		.setIcon(R.drawable.ic_launcher)
-    		.setTitle(R.string.action_about)
-    		.setMessage(msg)
-    		.setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
-//          @Override
-    		public void onClick(DialogInterface dialog, int which) {
-        		return;
-    		}
-    	}
-    	).show();
-
+    	Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+		startActivityForResult(intent, ABOUT_ACTIVITY);
     }
 
 }

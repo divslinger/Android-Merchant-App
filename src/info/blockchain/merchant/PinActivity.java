@@ -7,14 +7,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
+import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
-import android.text.InputType;
-import android.text.method.NumberKeyListener;
-import android.util.Log;
+import android.graphics.Rect;
+//import android.util.Log;
 
 import java.nio.charset.Charset;
 
@@ -22,8 +20,6 @@ import com.google.common.hash.Hashing;
 
 public class PinActivity extends Activity	{
 
-//	private AutoCompleteTextView pinView1 = null;
-//	private AutoCompleteTextView pinView2 = null;
 	private EditText pinView1 = null;
 	private EditText pinView2 = null;
 	private Button bOK = null;
@@ -40,7 +36,7 @@ public class PinActivity extends Activity	{
 	    setContentView(R.layout.activity_pin);
 	    
 	    setTitle(R.string.action_pincode);
-
+	    
         Bundle extras = getIntent().getExtras();
         if(extras != null)	{
             if(extras.getBoolean("create"))	{
@@ -70,7 +66,7 @@ public class PinActivity extends Activity	{
                 	if(pin1 != null && pin2 != null && pin1.length() == 4 && pin2.length() == 4 && pin1.equals(pin2)) {
                 		
                 		String hashed = Hashing.sha256().hashString(pin1, Charset.forName("UTF8")).toString();
-                        Toast.makeText(PinActivity.this, hashed, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(PinActivity.this, hashed, Toast.LENGTH_LONG).show();
         	            editor.putString("pin", hashed);
         	            editor.commit();
         	            
@@ -78,28 +74,28 @@ public class PinActivity extends Activity	{
         	            finish();
                 	}
                 	else {
-                		// error message here
+    					Toast.makeText(PinActivity.this, R.string.pin_code_create_error, Toast.LENGTH_LONG).show();
                 	}
             	}
             	else {
                 	String pin1 = pinView1.getEditableText().toString();
-                	Log.d("PinActivity", "pin1 == " + pin1);
             		String hashed = Hashing.sha256().hashString(pin1, Charset.forName("UTF8")).toString();
-                	Log.d("PinActivity", "hashed == " + hashed);
                 	String stored = prefs.getString("pin", "");
-                	Log.d("PinActivity", "stored == " + stored);
                 	if(stored.equals(hashed)) {
                     	setResult(RESULT_OK);
                     	finish();
                 	}
                 	else {
-                		// ko
+    					Toast.makeText(PinActivity.this, R.string.pin_code_enter_error, Toast.LENGTH_LONG).show();
                 	}
             	}
             }
         });
 
         bCancel = (Button)findViewById(R.id.cancel);
+        if(doCreate)	{
+        	bCancel.setVisibility(View.GONE);
+        }
         bCancel.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
             	finish();
@@ -107,13 +103,6 @@ public class PinActivity extends Activity	{
         });
 
     }
-
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		
-
-
-	}
 
 	@Override
     public boolean onKeyDown(int keyCode, KeyEvent event) { 
@@ -126,5 +115,18 @@ public class PinActivity extends Activity	{
 
         return false;
     }
+
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+	    Rect dialogBounds = new Rect();
+	    getWindow().getDecorView().getHitRect(dialogBounds);
+
+	    if(!dialogBounds.contains((int) event.getX(), (int) event.getY()) && event.getAction() == MotionEvent.ACTION_DOWN) {
+	    	return false;
+	    }
+	    else {
+		    return super.dispatchTouchEvent(event);
+	    }
+	}
 
 }

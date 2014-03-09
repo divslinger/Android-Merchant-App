@@ -14,9 +14,10 @@
 
 	<dimen name="amount_entry_height">80dp</dimen>
 	<dimen name="amount_entry_size">68sp</dimen>
-	<dimen name="amount_entry_width">420sp</dimen>
+	<dimen name="amount_entry_width">450sp</dimen>
 	<dimen name="currency_symbol_size">68sp</dimen>
 	<dimen name="currency_symbol_width">70sp</dimen>
+	<dimen name="continue_width">70sp</dimen>
 	<dimen name="note_entry_width">400sp</dimen>
 	<dimen name="vertical_margin">12dp</dimen>
 	<dimen name="vertical_margin_large">44dp</dimen>
@@ -27,7 +28,8 @@
 	<dimen name="transaction_height">100dp</dimen>
 	<dimen name="transaction_height_half">50dp</dimen>
 	<dimen name="transaction_incoming_btc_height">100dp</dimen>
-	<dimen name="transaction_column_width">180dp</dimen>
+	<dimen name="transaction_column_width">200dp</dimen>
+	<dimen name="transaction_note_width">160dp</dimen>
 	<dimen name="transaction_text_size">20sp</dimen>
 	<dimen name="transaction_amount_size">28sp</dimen>
 	<dimen name="transaction_amount_size_superscript">22sp</dimen>

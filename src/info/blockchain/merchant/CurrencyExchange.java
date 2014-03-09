@@ -5,7 +5,7 @@ import java.util.HashMap;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences;
-import android.util.Log;
+//import android.util.Log;
 
 import info.blockchain.api.ExchangeRates;
 
@@ -24,11 +24,11 @@ public class CurrencyExchange	{
     
     private static ExchangeRates fxRates = null;
 
-    private static Double priceCNY = 3450.0;
-    private static Double priceEUR = 430.0;
-    private static Double priceGBP = 400.0;
-    private static Double priceJPY = 61130.0;
-    private static Double priceUSD = 565.0;
+    private static Double priceCNY = 0.0;
+    private static Double priceEUR = 0.0;
+    private static Double priceGBP = 0.0;
+    private static Double priceJPY = 0.0;
+    private static Double priceUSD = 0.0;
 
     private static Context context = null;
     
@@ -39,7 +39,6 @@ public class CurrencyExchange	{
 		context = ctx;
 
 		fxRates = new ExchangeRates();
-		getExchangeRates();
 
 		if (instance == null) {
 
@@ -52,7 +51,9 @@ public class CurrencyExchange	{
 
 	    	instance = new CurrencyExchange();
 		}
-		
+
+		getExchangeRates();
+
 		return instance;
 	}
 	
@@ -90,10 +91,15 @@ public class CurrencyExchange	{
         		fxRates.parse();
         		
         		priceCNY = fxRates.getLastPrice(CNY);
+//        		Log.d("CNY", Double.toString(priceCNY));
         		priceEUR = fxRates.getLastPrice(EUR);
+//        		Log.d("EUR", Double.toString(priceEUR));
         		priceGBP = fxRates.getLastPrice(GBP);
+//        		Log.d("GBP", Double.toString(priceGBP));
         		priceJPY = fxRates.getLastPrice(JPY);
+//        		Log.d("JPY", Double.toString(priceJPY));
         		priceUSD = fxRates.getLastPrice(USD);
+//        		Log.d("USD", Double.toString(priceUSD));
         		
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                 SharedPreferences.Editor editor = prefs.edit();
@@ -119,7 +125,7 @@ public class CurrencyExchange	{
 
             @Override
             public void onFailure(Throwable arg0) {
-        		Log.d("Currency Exchange", "failure:" + arg0.toString());
+//        		Log.d("Currency Exchange", "failure:" + arg0.toString());
             }
 
         });

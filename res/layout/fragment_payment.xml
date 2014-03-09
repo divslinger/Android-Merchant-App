@@ -12,11 +12,10 @@
     	android:layout_height="@dimen/payment_amount_height"
     	android:gravity="center_horizontal"
     	android:orientation="horizontal"
-        android:background="#FFFFFFFF"
-        android:padding="10dp"
+        android:padding="0dp"
         android:layout_marginTop="10dp"
     	>
-        
+
     <TextView
         android:id="@+id/currencySymbol"
         android:layout_width="@dimen/currency_symbol_width"
@@ -32,9 +31,9 @@
     
     <EditText
         android:id="@+id/posInput"
-        android:layout_width="@dimen/amount_entry_width"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginLeft="0dp"
+        android:layout_marginLeft="2dp"
         android:ems="10"
         android:textSize="@dimen/amount_entry_size"
         android:textStyle="bold"
@@ -45,14 +44,16 @@
         android:inputType="numberDecimal"
         android:maxLength="10"
         android:background="@drawable/balance_bg"
+        android:layout_weight="1"
         />
 
     <ImageButton
         android:id="@+id/confirm"
+        android:gravity="center_horizontal"
         android:layout_gravity="center_horizontal"
-        android:layout_width="fill_parent"
+        android:layout_width="@dimen/continue_width"
         android:layout_height="match_parent"
-        android:layout_marginLeft="0dp"
+        android:layout_marginLeft="2dp"
         android:src="@drawable/continue_button"
         android:background="@drawable/balance_bg"
 		/>
@@ -92,6 +93,8 @@
         android:hint="@string/payment_note"
         android:textColorHint="#FF3a3a3a"
         android:ems="10"
+        android:lines="1"
+		android:singleLine="true"
         />
 
     <ImageView
@@ -104,7 +107,7 @@
         android:padding="0dp"
 		android:contentDescription="@string/content_description"
 		/>
-    
+
     <ProgressBar
 		android:id="@+id/progress"
         android:layout_gravity="center_horizontal"

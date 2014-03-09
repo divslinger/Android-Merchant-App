@@ -24,8 +24,8 @@
             android:padding="7dp"
 		    android:maxLength="4"
         	android:inputType="numberPassword"
-        	android:imeOptions="actionNext"
-        	android:singleLine="true"
+		    android:imeOptions="actionDone"
+			android:singleLine="true"
 			/>
 
         <EditText
@@ -45,8 +45,8 @@
             android:padding="7dp"
 		    android:maxLength="4"
         	android:inputType="numberPassword"
-        	android:imeOptions="actionNext"
-        	android:singleLine="true"
+		    android:imeOptions="actionDone"
+			android:singleLine="true"
 			/>
 
     <LinearLayout
