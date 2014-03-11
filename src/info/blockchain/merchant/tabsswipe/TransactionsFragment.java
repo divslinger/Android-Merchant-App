@@ -8,6 +8,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.math.BigInteger;
 import java.net.URL;
+import java.net.MalformedURLException;
+import java.io.IOException;
 
 import android.content.Context;
 import android.content.ContentValues;
@@ -132,7 +134,10 @@ public class TransactionsFragment extends ListFragment	{
                             }
                     	}, 500L, 1000L * 60L * 10L);	// poll every 10 minutes
                     }
-                    catch(Exception e) {
+                    catch(IllegalStateException ise) {
+                    	;
+                    }
+                    catch(IllegalArgumentException iae) {
                     	;
                     }
                 }
@@ -174,8 +179,11 @@ public class TransactionsFragment extends ListFragment	{
                     wallet.setData(json);
                     wallet.parse();
                 }
-                catch(Exception e) {
-                	e.printStackTrace();
+                catch(MalformedURLException mue) {
+                	mue.printStackTrace();
+                }
+                catch(IOException ioe) {
+                	ioe.printStackTrace();
                 }
 
                 DBController pdb = new DBController(getActivity());

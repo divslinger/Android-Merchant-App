@@ -27,12 +27,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	private ViewPager viewPager;
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
-    /*
-    private String[] tabs = {
-    		"Payment",
-    		"Transactions"
-    		};
-    */
 
     private String[] tabs = null;
 
@@ -86,13 +80,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         if(pin.equals("")) {
         	doPIN();
         }
-
-        /*
-        // BLE check
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, "BLE not supported", Toast.LENGTH_SHORT).show();
-        }
-        */
 
 	}
 

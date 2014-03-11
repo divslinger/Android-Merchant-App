@@ -106,7 +106,7 @@ public class PaymentFragment extends Fragment   {
                 editor.commit();
                 
             	// swap amounts
-                String swap = (String)tvCurrency.getText().subSequence(0, tvCurrency.getText().length() - 4);
+                String swap = tvCurrency.getText().subSequence(0, tvCurrency.getText().length() - 4).toString();
                 tvCurrency.setText(posInput.getText().toString());
                 posInput.setText(swap);
 
@@ -396,7 +396,7 @@ public class PaymentFragment extends Fragment   {
     		try {
             	amount = Double.valueOf(posInput.getText().toString().length() == 0 ? "0" : posInput.getText().toString());
     		}
-    		catch(Exception e) {
+    		catch(NumberFormatException e) {
     			amount = 0.0;
     		}
     	}
@@ -422,26 +422,19 @@ public class PaymentFragment extends Fragment   {
     }
 
     private void setCurrencySymbol() {
+    	
+//    	Log.d("setCurrencySymbol()", "strCurrency ==" + strCurrency);
+//    	Log.d("CurrencyExchange get symbol", CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency) == null ? "null" : CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency));
+
         if(tvCurrencySymbol != null) {
             if(doBTC) {
+            	// use 'Ƀ' as soon as it is available in an Android font
             	tvCurrencySymbol.setTypeface(btc_font);
             	tvCurrencySymbol.setText(R.string.bitcoin_currency_symbol);
             }
-            else if(strCurrency.equals("CNY")) {
+            else if(CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency) != null) {
             	tvCurrencySymbol.setTypeface(default_font);
-            	tvCurrencySymbol.setText("¥");
-            }
-            else if(strCurrency.equals("EUR")) {
-            	tvCurrencySymbol.setTypeface(default_font);
-            	tvCurrencySymbol.setText("€");
-            }
-            else if(strCurrency.equals("GBP")) {
-            	tvCurrencySymbol.setTypeface(default_font);
-            	tvCurrencySymbol.setText("£");
-            }
-            else if(strCurrency.equals("JPY")) {
-            	tvCurrencySymbol.setTypeface(default_font);
-            	tvCurrencySymbol.setText("¥");
+            	tvCurrencySymbol.setText(CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency).substring(0, 1));
             }
             else {
             	tvCurrencySymbol.setTypeface(default_font);
@@ -454,17 +447,8 @@ public class PaymentFragment extends Fragment   {
         if(doBTC) {
         	return getActivity().getResources().getString(R.string.bitcoin_currency_symbol);
         }
-        else if(strCurrency.equals("CNY")) {
-        	return "¥";
-        }
-        else if(strCurrency.equals("EUR")) {
-        	return "€";
-        }
-        else if(strCurrency.equals("GBP")) {
-        	return "£";
-        }
-        else if(strCurrency.equals("JPY")) {
-        	return "¥";
+        else if(CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency) != null) {
+        	return CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency).substring(0, 1);
         }
         else {
         	return "$";
@@ -472,17 +456,8 @@ public class PaymentFragment extends Fragment   {
     }
 
     private String getFiatCurrencySymbol() {
-        if(strCurrency.equals("CNY")) {
-        	return "¥";
-        }
-        else if(strCurrency.equals("EUR")) {
-        	return "€";
-        }
-        else if(strCurrency.equals("GBP")) {
-        	return "£";
-        }
-        else if(strCurrency.equals("JPY")) {
-        	return "¥";
+        if(CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency) != null) {
+        	return CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency).substring(0, 1);
         }
         else {
         	return "$";
@@ -503,17 +478,8 @@ public class PaymentFragment extends Fragment   {
 
     	double amount = 0;
 
-		if(strCurrency.equals("EUR")) {
-        	amount = Double.valueOf(strAmount) * CurrencyExchange.getInstance(getActivity()).getCurrencyPrice("EUR");
-		}
-		else if(strCurrency.equals("GBP")) {
-        	amount = Double.valueOf(strAmount) * CurrencyExchange.getInstance(getActivity()).getCurrencyPrice("GBP");
-		}
-		else if(strCurrency.equals("JPY")) {
-        	amount = Double.valueOf(strAmount) * CurrencyExchange.getInstance(getActivity()).getCurrencyPrice("JPY");
-		}
-		else if(strCurrency.equals("CNY")) {
-        	amount = Double.valueOf(strAmount) * CurrencyExchange.getInstance(getActivity()).getCurrencyPrice("CNY");
+		if(CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency) != 0.0) {
+        	amount = Double.valueOf(strAmount) * CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency);
 		}
 		else {
         	amount = Double.valueOf(strAmount) * CurrencyExchange.getInstance(getActivity()).getCurrencyPrice("USD");
@@ -536,17 +502,8 @@ public class PaymentFragment extends Fragment   {
 
     	double amount = 0;
 
-		if(strCurrency.equals("EUR")) {
-        	amount = Double.valueOf(strAmount) / CurrencyExchange.getInstance(getActivity()).getCurrencyPrice("EUR");
-		}
-		else if(strCurrency.equals("GBP")) {
-        	amount = Double.valueOf(strAmount) / CurrencyExchange.getInstance(getActivity()).getCurrencyPrice("GBP");
-		}
-		else if(strCurrency.equals("JPY")) {
-        	amount = Double.valueOf(strAmount) / CurrencyExchange.getInstance(getActivity()).getCurrencyPrice("JPY");
-		}
-		else if(strCurrency.equals("CNY")) {
-        	amount = Double.valueOf(strAmount) / CurrencyExchange.getInstance(getActivity()).getCurrencyPrice("CNY");
+		if(CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency) != 0.0) {
+        	amount = Double.valueOf(strAmount) / CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency);
 		}
 		else {
         	amount = Double.valueOf(strAmount) / CurrencyExchange.getInstance(getActivity()).getCurrencyPrice("USD");

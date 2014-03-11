@@ -14,21 +14,11 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 
 public class CurrencyExchange	{
 
-	public static String CNY = "CNY";
-	public static String EUR = "EUR";
-	public static String GBP = "GBP";
-	public static String JPY = "JPY";
-	public static String USD = "USD";
-
     private static CurrencyExchange instance = null;
     
     private static ExchangeRates fxRates = null;
-
-    private static Double priceCNY = 0.0;
-    private static Double priceEUR = 0.0;
-    private static Double priceGBP = 0.0;
-    private static Double priceJPY = 0.0;
-    private static Double priceUSD = 0.0;
+    private static HashMap<String,Double> prices = null;
+    private static HashMap<String,String> symbols = null;
 
     private static Context context = null;
     
@@ -42,12 +32,15 @@ public class CurrencyExchange	{
 
 		if (instance == null) {
 
+		    prices = new HashMap<String,Double>();
+		    symbols = new HashMap<String,String>();
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-			priceCNY = Double.longBitsToDouble(prefs.getLong(CNY, Double.doubleToLongBits(0.0)));
-			priceEUR = Double.longBitsToDouble(prefs.getLong(EUR, Double.doubleToLongBits(0.0)));
-			priceGBP = Double.longBitsToDouble(prefs.getLong(GBP, Double.doubleToLongBits(0.0)));
-			priceJPY = Double.longBitsToDouble(prefs.getLong(JPY, Double.doubleToLongBits(0.0)));
-			priceUSD = Double.longBitsToDouble(prefs.getLong(USD, Double.doubleToLongBits(0.0)));
+			String[] currencies = fxRates.getCurrencies();
+	    	for(int i = 0; i < currencies.length; i++)	 {
+//	    		Log.d("CurrencyExchange created instance", currencies[i] + "," + Double.longBitsToDouble(prefs.getLong(currencies[i], Double.doubleToLongBits(0.0))));
+		    	prices.put(currencies[i], Double.longBitsToDouble(prefs.getLong(currencies[i], Double.doubleToLongBits(0.0))));
+		    	symbols.put(currencies[i], prefs.getString(currencies[i] + "-SYM", null));
+	    	}
 
 	    	instance = new CurrencyExchange();
 		}
@@ -59,23 +52,22 @@ public class CurrencyExchange	{
 	
     public Double getCurrencyPrice(String currency)	{
     	
-    	if(currency.equals("CNY"))	{
-    		return priceCNY;
-    	}
-    	else if(currency.equals("EUR"))	{
-    		return priceEUR;
-    	}
-    	else if(currency.equals("GBP"))	{
-    		return priceGBP;
-    	}
-    	else if(currency.equals("JPY"))	{
-    		return priceJPY;
-    	}
-    	else if(currency.equals("USD"))	{
-    		return priceUSD;
+    	if(prices.containsKey(currency) && prices.get(currency) != 0.0)	{
+    		return prices.get(currency);
     	}
     	else	{
     		return 0.0;
+    	}
+
+    }
+
+    public String getCurrencySymbol(String currency)	{
+    	
+    	if(symbols.containsKey(currency) && symbols.get(currency) != null)	{
+    		return symbols.get(currency);
+    	}
+    	else	{
+    		return null;
     	}
 
     }
@@ -89,37 +81,23 @@ public class CurrencyExchange	{
             public void onSuccess(String response) {
         		fxRates.setData(response);
         		fxRates.parse();
-        		
-        		priceCNY = fxRates.getLastPrice(CNY);
-//        		Log.d("CNY", Double.toString(priceCNY));
-        		priceEUR = fxRates.getLastPrice(EUR);
-//        		Log.d("EUR", Double.toString(priceEUR));
-        		priceGBP = fxRates.getLastPrice(GBP);
-//        		Log.d("GBP", Double.toString(priceGBP));
-        		priceJPY = fxRates.getLastPrice(JPY);
-//        		Log.d("JPY", Double.toString(priceJPY));
-        		priceUSD = fxRates.getLastPrice(USD);
-//        		Log.d("USD", Double.toString(priceUSD));
-        		
+
+    			String[] currencies = fxRates.getCurrencies();
+    	    	for(int i = 0; i < currencies.length; i++)	 {
+//		    		Log.d("CurrencyExchange put hashmap", currencies[i] + "," + fxRates.getLastPrice(currencies[i]));
+    		    	prices.put(currencies[i], fxRates.getLastPrice(currencies[i]));
+    		    	symbols.put(currencies[i], fxRates.getSymbol(currencies[i]));
+    	    	}
+
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                 SharedPreferences.Editor editor = prefs.edit();
-
-                if(priceCNY > 0.0) {
-                    editor.putLong(CNY, Double.doubleToRawLongBits(priceCNY));
-                }
-                if(priceEUR > 0.0) {
-                    editor.putLong(EUR, Double.doubleToRawLongBits(priceEUR));
-                }
-                if(priceGBP > 0.0) {
-                    editor.putLong(GBP, Double.doubleToRawLongBits(priceGBP));
-                }
-                if(priceJPY > 0.0) {
-                    editor.putLong(JPY, Double.doubleToRawLongBits(priceJPY));
-                }
-                if(priceUSD > 0.0) {
-                    editor.putLong(USD, Double.doubleToRawLongBits(priceUSD));
-                }
-
+    	    	for(int i = 0; i < currencies.length; i++)	 {
+    		    	if(prices.containsKey(currencies[i]) && prices.get(currencies[i]) != 0.0)	{
+//    		    		Log.d("CurrencyExchange put long", currencies[i] + "," + Double.longBitsToDouble(prefs.getLong(currencies[i], Double.doubleToLongBits(0.0))));
+                        editor.putLong(currencies[i], Double.doubleToRawLongBits(prices.get(currencies[i])));
+                        editor.putString(currencies[i] + "-SYM", symbols.get(currencies[i]));
+    		    	}
+    	    	}
                 editor.commit();
             }
 
