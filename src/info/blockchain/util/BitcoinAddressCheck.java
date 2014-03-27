@@ -8,8 +8,19 @@ public class BitcoinAddressCheck {
 
 		String ret = null;
 
-		if(btcaddress.startsWith("bitcoin:")) {
+		if(btcaddress.startsWith("bitcoin://")) {
+			ret = btcaddress.substring(10);
+			int idx = ret.indexOf("?");
+			if(idx != -1) {
+				ret = ret.substring(0, idx);
+			}
+		}
+		else if(btcaddress.startsWith("bitcoin:")) {
 			ret = btcaddress.substring(8);
+			int idx = ret.indexOf("?");
+			if(idx != -1) {
+				ret = ret.substring(0, idx);
+			}
 		}
 		else {
 			ret = btcaddress;
@@ -19,8 +30,6 @@ public class BitcoinAddressCheck {
 	}
 
 	public static boolean isValid(final String btcaddress) {
-
-		System.out.println("BTC address check:" + btcaddress);
 
 		boolean ret = false;
 		

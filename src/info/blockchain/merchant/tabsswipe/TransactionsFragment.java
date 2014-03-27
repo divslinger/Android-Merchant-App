@@ -54,6 +54,7 @@ import info.blockchain.merchant.NotificationData;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.R;
 import info.blockchain.util.DateUtil;
+import info.blockchain.util.TypefaceUtil;
 
 public class TransactionsFragment extends ListFragment	{
     
@@ -65,7 +66,7 @@ public class TransactionsFragment extends ListFragment	{
     private boolean push_notifications = false;
 	private Timer timer = null;
     private PullToRefreshListView listView = null;
-    private Typeface font = null;
+    private Typeface btc_font = null;
 
     private boolean doBTC = false;
 
@@ -109,7 +110,7 @@ public class TransactionsFragment extends ListFragment	{
         push_notifications = prefs.getBoolean("push_notifications", false);
         doBTC = prefs.getBoolean("use_btc", false);
         
-        font = Typeface.createFromAsset(getActivity().getAssets(), "fontawesome-webfont.ttf");
+        btc_font = TypefaceUtil.getInstance(getActivity()).getTypeface();
         
 	    return viewGroup;
 	}
@@ -187,7 +188,7 @@ public class TransactionsFragment extends ListFragment	{
                 }
 
                 DBController pdb = new DBController(getActivity());
-                pdb.deleteExpired();
+//                pdb.deleteExpired();
                 List<String> confirmedAddresses = pdb.getConfirmedPaymentIncomingAddresses();
 
                 List<Tx> txs = wallet.getTxs();
@@ -323,7 +324,7 @@ public class TransactionsFragment extends ListFragment	{
     			}
 
     	        TextView btc_view = (TextView)view.findViewById(R.id.tv_btc);
-    	        btc_view.setTypeface(font);
+    	        btc_view.setTypeface(btc_font);
     	        SpannableStringBuilder cs = new SpannableStringBuilder(getActivity().getResources().getString(R.string.bitcoin_currency_symbol));
     	        cs.setSpan(new RelativeSizeSpan((float)0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     	        btc_view.setText(cs);

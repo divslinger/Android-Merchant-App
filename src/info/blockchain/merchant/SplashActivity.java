@@ -25,13 +25,14 @@ public class SplashActivity extends Activity	{
     			Looper.getMainLooper().prepare();
     			
     			try {
-        			sleep(2 * 1000);
+        			sleep(3 * 1000);
     			}
     			catch(InterruptedException ie) {
     				;
     			}
 
     		    CurrencyExchange.getInstance(SplashActivity.this);
+    		    OtherCurrencyExchange.getInstance(SplashActivity.this);
     			Intent intent = new Intent(SplashActivity.this, MainActivity.class);
     			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
     			startActivity(intent);

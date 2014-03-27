@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+//import android.util.Log;
 
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
 
@@ -122,8 +123,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			;
 		}
 		else if(requestCode == PIN_ACTIVITY && resultCode == RESULT_OK) {
+    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            String strOtherCurrency = prefs.getString("ocurrency", "");
     		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-    		startActivity(intent);
+    		intent.putExtra("ocurrency", strOtherCurrency);
+    		startActivityForResult(intent, SETTINGS_ACTIVITY);
 		}
 		else if(requestCode == RESET_PIN_ACTIVITY && resultCode == RESULT_OK) {
 			doPIN();
@@ -172,7 +176,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     private void doSettings(final boolean create)	{
     	if(create)	{
+    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            String strOtherCurrency = prefs.getString("ocurrency", "");
     		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+    		intent.putExtra("ocurrency", strOtherCurrency);
     		startActivityForResult(intent, SETTINGS_ACTIVITY);
     	}
     	else	{

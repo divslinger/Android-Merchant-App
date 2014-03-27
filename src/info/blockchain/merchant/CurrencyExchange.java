@@ -55,6 +55,15 @@ public class CurrencyExchange	{
     	if(prices.containsKey(currency) && prices.get(currency) != 0.0)	{
     		return prices.get(currency);
     	}
+    	else if(OtherCurrencyExchange.getInstance(context).getCurrencyPrices().containsKey(currency) && OtherCurrencyExchange.getInstance(context).getCurrencyPrices().get(currency) != 0.0)	{
+    		
+    		double usd_curr = OtherCurrencyExchange.getInstance(context).getCurrencyPrices().get(currency);
+//    		Log.d("OC rate", "" + usd_curr);
+    		double btc_usd = prices.get("USD");
+//    		Log.d("USD rate", "" + btc_usd);
+
+    		return 1.0 / ((1.0 / usd_curr) * (1.0 / btc_usd));
+    	}
     	else	{
     		return 0.0;
     	}
@@ -65,6 +74,9 @@ public class CurrencyExchange	{
     	
     	if(symbols.containsKey(currency) && symbols.get(currency) != null)	{
     		return symbols.get(currency);
+    	}
+    	else if(OtherCurrencyExchange.getInstance(context).getCurrencyNames().containsKey(currency))	{
+    		return currency.substring(currency.length() - 1, currency.length());
     	}
     	else	{
     		return null;
@@ -84,7 +96,6 @@ public class CurrencyExchange	{
 
     			String[] currencies = fxRates.getCurrencies();
     	    	for(int i = 0; i < currencies.length; i++)	 {
-//		    		Log.d("CurrencyExchange put hashmap", currencies[i] + "," + fxRates.getLastPrice(currencies[i]));
     		    	prices.put(currencies[i], fxRates.getLastPrice(currencies[i]));
     		    	symbols.put(currencies[i], fxRates.getSymbol(currencies[i]));
     	    	}
@@ -93,7 +104,6 @@ public class CurrencyExchange	{
                 SharedPreferences.Editor editor = prefs.edit();
     	    	for(int i = 0; i < currencies.length; i++)	 {
     		    	if(prices.containsKey(currencies[i]) && prices.get(currencies[i]) != 0.0)	{
-//    		    		Log.d("CurrencyExchange put long", currencies[i] + "," + Double.longBitsToDouble(prefs.getLong(currencies[i], Double.doubleToLongBits(0.0))));
                         editor.putLong(currencies[i], Double.doubleToRawLongBits(prices.get(currencies[i])));
                         editor.putString(currencies[i] + "-SYM", symbols.get(currencies[i]));
     		    	}

@@ -12,6 +12,7 @@
    <item>€ - EUR</item>
    <item>£ - GBP</item>
    <item>$ - HKD</item>
+   <item>kr - ISK</item>
    <item>¥ - JPY</item>
    <item>₩ - KRW</item>
    <item>$ - NZD</item>
@@ -20,7 +21,9 @@
    <item>kr - SEK</item>
    <item>$ - SGD</item>
    <item>฿ - THB</item>
+   <item>$ - TWD</item>
    <item>$ - USD</item>
+   <item>Other   </item>
 </string-array>
 
 </resources>

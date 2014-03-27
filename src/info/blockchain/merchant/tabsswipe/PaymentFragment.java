@@ -3,12 +3,18 @@ package info.blockchain.merchant.tabsswipe;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.Locale;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,11 +31,13 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Button;
 import android.widget.Toast;
-//import android.widget.Toast;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Typeface;
+import android.net.Uri;
 //import android.util.Log;
 
 import com.google.zxing.BarcodeFormat;
@@ -47,6 +55,7 @@ import info.blockchain.merchant.CurrencyExchange;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.R;
 import info.blockchain.util.BitcoinAddressCheck;
+import info.blockchain.util.TypefaceUtil;
 
 public class PaymentFragment extends Fragment   {
 
@@ -89,14 +98,54 @@ public class PaymentFragment extends Fragment   {
         imageView = (ImageView)rootView.findViewById(R.id.qr);
         imageView.setImageResource(android.R.color.transparent);
         imageView.setVisibility(View.GONE);
+        imageView.setOnLongClickListener(new View.OnLongClickListener() {
+        	  public boolean onLongClick(View view) {
+      			Toast.makeText(PaymentFragment.this.getActivity(), "Address copied:" + input_address, Toast.LENGTH_LONG).show();
+      			
+      			android.content.ClipboardManager clipboard = (android.content.ClipboardManager)getActivity().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+      		    android.content.ClipData clip = android.content.ClipData.newPlainText("Send address", input_address);
+      		    clipboard.setPrimaryClip(clip);
+      			
+            	String strFileName = getActivity().getCacheDir() + File.separator + "qr.png";
+            	File file = new File(strFileName);
+            	file.setReadable(true, false);
+      			FileOutputStream fos = null;
+      			try {
+          			fos = new FileOutputStream(file);
+      			}
+      			catch(FileNotFoundException fnfe) {
+      				;
+      			}
+      			
+      			if(file != null && fos != null) {
+          			Bitmap bitmap = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
+          	        bitmap.compress(CompressFormat.PNG, 0, fos);
+          	        
+          			try {
+              			fos.close();
+          			}
+          			catch(IOException ioe) {
+          				;
+          			}
 
+          	        Intent intent = new Intent(); 
+          	        intent.setAction(Intent.ACTION_SEND); 
+          	        intent.setType("*/*"); 
+          	        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+          	        startActivity(Intent.createChooser(intent, "Send payment code"));
+      			}
+      	        
+        	    return true;
+        	  }
+        	});
+        
         progressBar = (ProgressBar)rootView.findViewById(R.id.progress);
         progressBar.setVisibility(View.GONE);
 
         tvSendingAddress = (TextView)rootView.findViewById(R.id.sending_address);
         tvCurrencySymbol = (TextView)rootView.findViewById(R.id.currencySymbol);
         default_font = tvCurrencySymbol.getTypeface();
-        btc_font = Typeface.createFromAsset(getActivity().getAssets(), "fontawesome-webfont.ttf");
+        btc_font = TypefaceUtil.getInstance(getActivity()).getTypeface();
         tvCurrencySymbol.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -274,6 +323,9 @@ public class PaymentFragment extends Fragment   {
         	strLabel = prefs.getString("receiving_name", "");
         	strBTCReceivingAddress = prefs.getString("receiving_address", "");
             strCurrency = prefs.getString("currency", "USD");
+            if(strCurrency.equals("ZZZ")) {
+                strCurrency = prefs.getString("ocurrency", "USD");
+            }
         }
 
         if(tvCurrency != null) {
@@ -338,9 +390,13 @@ public class PaymentFragment extends Fragment   {
         	@Override
             public void onSuccess(String response) {
 
+//                Log.d("Receive payments API", response);
+
                 receive_payments.setData(response);
                 receive_payments.parse();
                 input_address = receive_payments.getInputAddress();
+                
+//                Log.d("Receive payments API", input_address);
 
         		Bitmap bm = generateQRCode(generateURI());
                 progressBar.setVisibility(View.GONE);
@@ -457,6 +513,9 @@ public class PaymentFragment extends Fragment   {
 
     private String getFiatCurrencySymbol() {
         if(CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency) != null) {
+        	return CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency).substring(0, 1);
+        }
+        else if(CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency) != null) {
         	return CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency).substring(0, 1);
         }
         else {

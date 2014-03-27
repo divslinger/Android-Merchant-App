@@ -23,6 +23,7 @@
     <string name="receive_coins_fragment_receiving_address_error">Invalid address</string>
     <string name="receive_coins_fragment_default_currency_hint">Default currency</string>
     <string name="receive_coins_fragment_email_address_hint">E-mail address</string>
+    <string name="receive_coins_fragment_other_currency">Other currency code (3 letter code, ex.: MXP)</string>
     <string name="receive_coins_activity_title">Send Bitcoins</string>
     <string name="receive_coins_install_qr_scanner_msg">Please install ZXing QR-code scanner or Goggles!</string>
     <string name="receive_coins_uri_parse_error_title">Invalid Bitcoin URI</string>
@@ -65,6 +66,7 @@
     <string name="pull_to_refresh_refreshing_label">Loading...</string>
     <string name="pull_to_refresh_tap_label">Tap to refresh...</string>
 
-    <string name="bitcoin_currency_symbol">&#xf15a;</string>
+<!-- <string name="bitcoin_currency_symbol">&#xf15a;</string> -->
+    <string name="bitcoin_currency_symbol">&#x0243;</string>
 
 </resources>

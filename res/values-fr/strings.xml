@@ -30,6 +30,7 @@
     <string name="receive_coins_parse_address_error_msg">Got invalid bitcoin address!\n(Mixing up Testnet/Prodnet?)</string>
     <string name="receive_coins_fragment_push_notifications">Notifications</string>
     <string name="receive_coins_fragment_email_receipts">Récipissés e-mail</string>
+    <string name="receive_coins_fragment_other_currency">Autre code devise (3 caractères, ex.: MXP)</string>
     <string name="use_btc">Entrez le prix en Bitcoins (BTC)</string>
     <string name="payment_note">Descriptif (facultatif)...</string>
     <string name="payment_clear">EFFACER</string>
@@ -66,6 +67,7 @@
     <string name="pull_to_refresh_refreshing_label">Chargement...</string>
     <string name="pull_to_refresh_tap_label">Tapez pour actualiser...</string>
 
-    <string name="bitcoin_currency_symbol">&#xf15a;</string>
-
+<!-- <string name="bitcoin_currency_symbol">&#xf15a;</string> -->
+    <string name="bitcoin_currency_symbol">&#x0243;</string>
+    
 </resources>
