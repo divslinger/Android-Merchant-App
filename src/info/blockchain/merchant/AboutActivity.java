@@ -30,7 +30,7 @@ public class AboutActivity extends Activity	{
 	    this.setContentView(R.layout.activity_about);
 
         tvAbout = (TextView)findViewById(R.id.about);
-        tvAbout.setText(getString(R.string.about, "1.2.3", "2014"));
+        tvAbout.setText(getString(R.string.about, "1.2.4", "2014"));
 
         bRate = (Button)findViewById(R.id.rate_us);
         bRate.setOnClickListener(new Button.OnClickListener() {

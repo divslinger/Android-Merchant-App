@@ -98,7 +98,7 @@ public class OtherCurrencyExchange	{
 
             @Override
             public void onFailure(Throwable arg0) {
-        		Log.d("Currency Exchange", "failure:" + arg0.toString());
+//        		Log.d("Currency Exchange", "failure:" + arg0.toString());
             }
 
         });

@@ -38,7 +38,6 @@ public class OtherCurrencyActivity extends Activity	{
         Bundle extras = getIntent().getExtras();
         if(extras != null)	{
         	strOtherCurrency = extras.getString("ocurrency");
-    		Log.d("ocurrency in", strOtherCurrency);
         }
         if(strOtherCurrency == null)	{
         	strOtherCurrency = "";
@@ -69,11 +68,8 @@ public class OtherCurrencyActivity extends Activity	{
         	int i = 0;
         	for (String key : keys) { 
         	    otherCurrencies.add(otherCurrencyNames.get(key) + " - " + key);
-        	    Log.d("Key", "" + i + "," + key);
         	    if(key.equals(strOtherCurrency)) {
-            	    Log.d("Key", "Key matched:" + i);
         	    	sel = i;
-        	    	break;
         	    }
         	    ++i;
         	}

@@ -100,7 +100,7 @@ public class PaymentFragment extends Fragment   {
         imageView.setVisibility(View.GONE);
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
         	  public boolean onLongClick(View view) {
-      			Toast.makeText(PaymentFragment.this.getActivity(), "Address copied:" + input_address, Toast.LENGTH_LONG).show();
+//      			Toast.makeText(PaymentFragment.this.getActivity(), "Address copied:" + input_address, Toast.LENGTH_LONG).show();
       			
       			android.content.ClipboardManager clipboard = (android.content.ClipboardManager)getActivity().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
       		    android.content.ClipData clip = android.content.ClipData.newPlainText("Send address", input_address);
