@@ -66,7 +66,6 @@
     <string name="pull_to_refresh_refreshing_label">Lädt...</string>
     <string name="pull_to_refresh_tap_label">Berühre um zu aktualisieren...</string>
 
-<!-- <string name="bitcoin_currency_symbol">&#xf15a;</string> -->
     <string name="bitcoin_currency_symbol">&#x0243;</string>
 
 </resources>
