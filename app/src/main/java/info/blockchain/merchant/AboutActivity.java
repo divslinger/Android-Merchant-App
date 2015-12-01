@@ -16,9 +16,9 @@ import android.net.Uri;
 public class AboutActivity extends Activity	{
 	
 	private TextView tvAbout = null;
-	private Button bRate = null;
-	private Button bSupport = null;
-	private Button bDownload = null;
+	private TextView bRate = null;
+	private TextView bSupport = null;
+	private TextView bDownload = null;
 	private String strWalletPackage = "piuk.blockchain.android";
 
     @Override
@@ -30,9 +30,9 @@ public class AboutActivity extends Activity	{
 	    this.setContentView(R.layout.activity_about);
 
         tvAbout = (TextView)findViewById(R.id.about);
-        tvAbout.setText(getString(R.string.about, "1.2.4", "2014"));
+        tvAbout.setText(getString(R.string.about, getString(R.string.version_name), "2015"));
 
-        bRate = (Button)findViewById(R.id.rate_us);
+        bRate = (TextView)findViewById(R.id.rate_us);
         bRate.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
             	String appPackageName = getPackageName();
@@ -41,17 +41,17 @@ public class AboutActivity extends Activity	{
             	startActivity(marketIntent);
             }
         });
-    
-        bSupport = (Button)findViewById(R.id.support);
+
+        bSupport = (TextView)findViewById(R.id.support);
         bSupport.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-            	Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","support@blockchain.zendesk.com", null));
-            	emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Blockchain Merchant Tech Support");
-            	startActivity(Intent.createChooser(emailIntent, AboutActivity.this.getResources().getText(R.string.email_chooser)));
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "support@blockchain.zendesk.com", null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Blockchain Merchant Tech Support");
+                startActivity(Intent.createChooser(emailIntent, AboutActivity.this.getResources().getText(R.string.email_chooser)));
             }
         });
 
-        bDownload = (Button)findViewById(R.id.free_wallet);
+        bDownload = (TextView)findViewById(R.id.free_wallet);
         if(hasWallet())	{
         	bDownload.setVisibility(View.GONE);
         }

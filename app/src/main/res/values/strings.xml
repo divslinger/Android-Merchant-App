@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="version_name">1.2.4</string>
+
     <string name="app_name">Blockchain Merchant</string>
     <string name="action_settings">Settings</string>
     <string name="action_settings_title">Merchant Settings</string>
@@ -12,7 +14,7 @@
     <string name="rate_us">Rate us</string>
     <string name="email_chooser">Send e-mail...</string>
     <string name="about">Blockchain Merchant %1$s\n©%2$s Blockchain.info</string>
-    <string name="wallet_download">Get a free Bitcoin Wallet</string>
+    <string name="wallet_download">Free Bitcoin Wallet</string>
     
     <string name="tab_settings">Settings</string>
     <string name="tab_payment">Payment</string>
