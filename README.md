@@ -7,3 +7,4 @@ Just set up the Blockchain Merchant app with your bitcoin wallet address and you
 
 ## Contributing
 There are still many translations needed. [How to translate Android Apps.](https://developer.android.com/training/basics/supporting-devices/languages.html#CreateDirs)
+
