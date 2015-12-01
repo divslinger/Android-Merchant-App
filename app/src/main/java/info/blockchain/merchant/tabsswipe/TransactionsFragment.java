@@ -353,13 +353,6 @@ public class TransactionsFragment extends ListFragment	{
 
     }
 
-    private class TxComparator implements Comparator<Tx> {
-        @Override
-        public int compare(Tx o1, Tx o2) {
-            return (o1.getTime() < o2.getTime()) ? 1 : 0;
-        }
-    }
-    
     private void doTxTap(final long item)	{
     	
         final ContentValues val = mListItems.get((int)item);
