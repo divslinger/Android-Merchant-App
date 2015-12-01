@@ -499,18 +499,6 @@ public class PaymentFragment extends Fragment   {
         }
     }
 
-    private String getCurrencySymbol() {
-        if(doBTC) {
-        	return getActivity().getResources().getString(R.string.bitcoin_currency_symbol);
-        }
-        else if(CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency) != null) {
-        	return CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency).substring(0, 1);
-        }
-        else {
-        	return "$";
-        }
-    }
-
     private String getFiatCurrencySymbol() {
         if(CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency) != null) {
         	return CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency).substring(0, 1);
@@ -569,32 +557,6 @@ public class PaymentFragment extends Fragment   {
 		}
 		
 		return amount;
-    }
-
-    private void confirmPurchase() {
-
-    	final ReceivePayments receive_payments = new ReceivePayments(strBTCReceivingAddress);
-    	
-    	AsyncHttpClient client = new AsyncHttpClient();
-        client.get(receive_payments.getUrl(), new AsyncHttpResponseHandler() {
-
-        	@Override
-            public void onSuccess(String response) {
-
-                receive_payments.setData(response);
-                receive_payments.parse();
-                input_address = receive_payments.getInputAddress();
-
-                imageView.setImageBitmap(generateQRCode(generateURI()));
-            }
-
-            @Override
-            public void onFailure(Throwable arg0) {
-				Toast.makeText(PaymentFragment.this.getActivity(), arg0.toString(), Toast.LENGTH_LONG).show();
-            }
-
-        });
-
     }
 
 }
