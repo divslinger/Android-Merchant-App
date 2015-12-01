@@ -1,0 +1,33 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "info.blockchain.merchant"
+        minSdkVersion 14
+        targetSdkVersion 18
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.google.guava:guava:16.0.1'
+    compile 'com.madgag.spongycastle:core:1.52.0.0'
+    compile files('libs/android-async-http-1.4.4.jar')
+    compile files('libs/commons-io-2.4.jar')
+    compile files('libs/core.jar')
+    compile files('libs/java-api-0.90.jar')
+    compile files('libs/zbar.jar')
+    compile files('libs/MyWalletHD.jar')
+    compile files('libs/bitcoinj-core-0.13.3.jar')
+    compile files('libs/slf4j-api-1.6.2.jar')
+}

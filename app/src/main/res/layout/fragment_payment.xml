@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#d6d6d6"
+    android:orientation="vertical"
+    android:padding="4dp"
+    >
+
+    <LinearLayout
+    	android:layout_width="match_parent"
+    	android:layout_height="@dimen/payment_amount_height"
+    	android:gravity="center_horizontal"
+    	android:orientation="horizontal"
+        android:padding="0dp"
+        android:layout_marginTop="10dp"
+    	>
+
+    <TextView
+        android:id="@+id/currencySymbol"
+        android:layout_width="@dimen/currency_symbol_width"
+        android:layout_height="match_parent"
+        android:textSize="@dimen/currency_symbol_size"
+        android:textStyle="bold"
+        android:padding="0dp"
+		android:layout_gravity="center_horizontal|center_vertical"
+        android:gravity="center_horizontal|center_vertical"
+        android:text=""
+        android:background="@drawable/balance_bg"
+        />
+    
+    <EditText
+        android:id="@+id/posInput"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="2dp"
+        android:ems="10"
+        android:textSize="@dimen/amount_entry_size"
+        android:textStyle="bold"
+        android:layout_gravity="right|center_vertical"
+        android:gravity="right|center_vertical"
+        android:padding="4dp"
+        android:imeOptions="actionDone"
+        android:inputType="numberDecimal"
+        android:maxLength="10"
+        android:background="@drawable/balance_bg"
+        android:layout_weight="1"
+        />
+
+    <ImageButton
+        android:id="@+id/confirm"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="@dimen/continue_width"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="2dp"
+        android:src="@drawable/continue_button"
+        android:background="@drawable/balance_bg"
+		/>
+    
+    </LinearLayout>
+    
+    <LinearLayout
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+	    android:background="#d6d6d6"
+    	android:gravity="center_horizontal"
+    	android:orientation="horizontal"
+    	>
+    
+    <TextView
+        android:id="@+id/curr_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/vertical_margin"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="@dimen/vertical_margin"
+        android:textColor="#606060"
+        android:textSize="@dimen/currency_display_size"
+        />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/vertical_margin_large"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:textStyle="bold"
+        android:hint="@string/payment_note"
+        android:textColorHint="#FF3a3a3a"
+        android:ems="10"
+        android:lines="1"
+		android:singleLine="true"
+        />
+
+    <ImageView
+        android:id="@+id/qr"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="@dimen/qr_code_size"
+        android:layout_height="@dimen/qr_code_size"
+        android:layout_marginTop="@dimen/vertical_margin"
+        android:layout_marginBottom="@dimen/vertical_margin"
+        android:padding="0dp"
+		android:contentDescription="@string/content_description"
+		/>
+
+    <ProgressBar
+		android:id="@+id/progress"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="@dimen/qr_code_size"
+        android:layout_height="@dimen/qr_code_size"
+        android:layout_marginTop="@dimen/vertical_margin"
+        android:layout_marginBottom="@dimen/vertical_margin"
+        android:padding="4dp"
+        android:indeterminate="true"
+		/>
+
+    <TextView
+        android:id="@+id/sending_address"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/vertical_margin"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="@dimen/vertical_margin"
+        android:textSize="@dimen/sending_address_size"
+        android:textColor="#606060"
+        android:textStyle="bold"
+        />
+    
+    <LinearLayout
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:gravity="center"
+    	>
+
+	</LinearLayout>
+
+</LinearLayout>

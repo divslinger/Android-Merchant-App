@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="420dp"
+    android:background="#FFFFFF"
+    android:orientation="vertical"
+    >
+
+<LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+        		android:layout_marginLeft="20dp"
+        		android:layout_marginRight="20dp"
+        		android:layout_marginTop="10dp"
+    >
+    
+            <EditText
+		        android:id="@+id/receive_coins_receiving_address"
+		        android:layout_width="fill_parent"
+        		android:layout_height="wrap_content"
+        		android:layout_marginLeft="20dp"
+        		android:layout_marginRight="20dp"
+        		android:layout_marginTop="10dp"
+        		android:layout_gravity="center_horizontal"
+        		android:layout_margin="4dp"
+                android:background="@drawable/edittext_states"
+                android:ems="10"
+		        android:hint="@string/receive_coins_fragment_receiving_address_hint"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+	            android:textColor="#ff000000"
+                android:lines="1"
+                android:padding="7dp"
+		        android:imeOptions="actionDone"
+				android:singleLine="true"
+			    android:drawableRight="@drawable/ic_input_qrcode"
+				/>
+
+</LinearLayout>
+            
+<LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+        		android:layout_marginLeft="20dp"
+        		android:layout_marginRight="20dp"
+        		android:layout_marginTop="10dp"
+    >
+            
+            <EditText
+		        android:id="@+id/receive_coins_name"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginLeft="20dp"
+		        android:layout_marginRight="20dp"
+		        android:layout_marginTop="30dp"
+		        android:layout_gravity="center_horizontal"
+        		android:layout_margin="4dp"
+                android:background="@drawable/edittext_states"
+		        android:hint="@string/receive_coins_fragment_name"
+                android:ems="10"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+	            android:textColor="#ff000000"
+                android:lines="1"
+                android:padding="7dp"
+		        android:imeOptions="actionDone"
+				android:singleLine="true"
+				/>
+
+</LinearLayout>
+    
+    <info.blockchain.merchant.SelectedSpinner
+        android:id="@+id/receive_coins_default_currency"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center_horizontal"
+        android:hint="@string/receive_coins_fragment_default_currency_hint"
+        android:entries="@array/currencies"
+        android:textStyle="bold"
+        android:prompt="@string/receive_coins_fragment_default_currency_hint" />
+
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_marginLeft="20dp"
+    	android:layout_marginRight="20dp"
+    	android:layout_gravity="center_horizontal"
+    	android:orientation="horizontal"
+    	>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="30dp"
+        android:text="@string/receive_coins_fragment_push_notifications"
+        android:textColor="#FF000000"
+        android:textSize="@dimen/font_size_small"
+        android:textStyle="bold"
+        />
+        
+    <Switch
+        android:id="@+id/push_notifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="20dp"
+        android:textOn="@string/toggle_on"
+        android:textOff="@string/toggle_off"
+        android:checked="false" />
+
+    </LinearLayout>
+
+    <LinearLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_marginLeft="20dp"
+    	android:layout_marginRight="20dp"
+    	android:layout_marginTop="30dp"
+    	android:layout_gravity="center_horizontal"
+    	android:orientation="horizontal"
+    	>
+    
+    	<Button
+            android:id="@+id/cancel"
+            android:layout_width="160dp"
+            android:layout_height="50dp"
+            android:layout_marginRight="5dp"
+	        android:layout_marginBottom="20dp"
+            android:background="@drawable/button_generic"
+        	android:text="@string/prompt_ko"
+			android:textSize="22sp"
+			android:textColor="#FF000000"
+    	 	android:shadowColor="#191919"
+			android:shadowDx="1"
+			android:shadowDy="1"
+			android:shadowRadius="1"
+        />
+
+        <Button
+            android:id="@+id/confirm"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
+	        android:layout_marginBottom="20dp"
+            android:background="@drawable/button_blue"
+        	android:text="@string/prompt_save"
+			android:textSize="22sp"
+			android:textColor="#FFFFFFFF"
+    	 	android:shadowColor="#191919"
+			android:shadowDx="1"
+			android:shadowDy="1"
+			android:shadowRadius="1"
+        />
+    	
+    </LinearLayout>
+    
+</LinearLayout>
