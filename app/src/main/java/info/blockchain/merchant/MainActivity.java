@@ -51,14 +51,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         viewPager.setAdapter(mAdapter);
 
         actionBar = getActionBar();
-//        actionBar.hide();
-//        actionBar.setTitle("");
         actionBar.setDisplayOptions(actionBar.getDisplayOptions() ^ ActionBar.DISPLAY_SHOW_TITLE);
         actionBar.setLogo(R.drawable.masthead);
         actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FF1B8AC7")));
-//        actionBar.show();
         
         for (String tab : tabs) {
             actionBar.addTab(actionBar.newTab().setText(tab).setTabListener(this));
