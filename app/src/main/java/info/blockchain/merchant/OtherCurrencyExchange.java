@@ -39,28 +39,6 @@ public class OtherCurrencyExchange	{
 		return instance;
 	}
 	
-    public Double getCurrencyPrice(String currency)	{
-    	
-    	if(prices.containsKey(currency) && prices.get(currency) != 0.0)	{
-    		return prices.get(currency);
-    	}
-    	else	{
-    		return 0.0;
-    	}
-
-    }
-
-    public String getCurrencyName(String currency)	{
-    	
-    	if(names.containsKey(currency) && names.get(currency) != null)	{
-    		return names.get(currency);
-    	}
-    	else	{
-    		return null;
-    	}
-
-    }
-
     public HashMap<String,String> getCurrencyNames()	{
     	return names;
     }
