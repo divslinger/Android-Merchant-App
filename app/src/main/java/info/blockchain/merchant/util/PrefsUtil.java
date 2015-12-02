@@ -8,7 +8,11 @@ import android.preference.PreferenceManager;
 public class PrefsUtil  {
 
     public static final String MERCHANT_KEY_PIN = "pin";
+    public static final String MERCHANT_KEY_CURRENCY = "currency";
     public static final String MERCHANT_KEY_OTHER_CURRENCY = "ocurrency";
+    public static final String MERCHANT_KEY_CURRENCY_DISPLAY = "use_btc";
+    public static final String MERCHANT_KEY_RECEIVING_NAME = "receiving_name";
+    public static final String MERCHANT_KEY_RECEIVING_ADDRESS = "receiving_address";
 
     private static Context context  = null;
     private static PrefsUtil instance = null;

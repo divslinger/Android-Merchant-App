@@ -9,10 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.SharedPreferences;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -54,6 +52,7 @@ import info.blockchain.merchant.CurrencyExchange;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.R;
 import info.blockchain.merchant.util.BitcoinAddressCheck;
+import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.TypefaceUtil;
 
 public class PaymentFragment extends Fragment   {
@@ -68,9 +67,7 @@ public class PaymentFragment extends Fragment   {
     private TextView tvCurrencySymbol = null;
     private TextView tvSendingAddress = null;
     private TextWatcher watcher = null;
-    private SharedPreferences prefs = null;
-    private SharedPreferences.Editor editor = null;
-    
+
     private String strCurrency = null;
     private String strLabel = null;
     private String strMessage = null;
@@ -87,12 +84,9 @@ public class PaymentFragment extends Fragment   {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        editor = prefs.edit();
-
         rootView = inflater.inflate(R.layout.fragment_payment, container, false);
                 
-        doBTC = prefs.getBoolean("use_btc", false);
+        doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
 
         imageView = (ImageView)rootView.findViewById(R.id.qr);
         imageView.setImageResource(android.R.color.transparent);
@@ -150,9 +144,8 @@ public class PaymentFragment extends Fragment   {
             public void onClick(View v) {
             	// toggle currency input mode
                 doBTC = doBTC ? false : true;
-                editor.putBoolean("use_btc", doBTC);
-                editor.commit();
-                
+                doBTC = PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, doBTC);
+
             	// swap amounts
                 String swap = tvCurrency.getText().subSequence(0, tvCurrency.getText().length() - 4).toString();
                 tvCurrency.setText(posInput.getText().toString());
@@ -318,13 +311,11 @@ public class PaymentFragment extends Fragment   {
     	
     	CurrencyExchange.getInstance(getActivity());
 
-        if(prefs != null) {
-        	strLabel = prefs.getString("receiving_name", "");
-        	strBTCReceivingAddress = prefs.getString("receiving_address", "");
-            strCurrency = prefs.getString("currency", "USD");
-            if(strCurrency.equals("ZZZ")) {
-                strCurrency = prefs.getString("ocurrency", "USD");
-            }
+        strLabel = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_NAME, "");
+        strBTCReceivingAddress = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_ADDRESS, "");
+        strCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
+        if(strCurrency.equals("ZZZ")) {
+            strCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_OTHER_CURRENCY, "USD");
         }
 
         if(tvCurrency != null) {
