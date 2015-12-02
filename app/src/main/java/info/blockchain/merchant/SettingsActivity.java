@@ -2,10 +2,8 @@ package info.blockchain.merchant;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,7 +22,10 @@ import com.dm.zbar.android.scanner.ZBarScannerActivity;
 
 import net.sourceforge.zbar.Symbol;
 
+import java.util.Set;
+
 import info.blockchain.merchant.util.BitcoinAddressCheck;
+import info.blockchain.merchant.util.PrefsUtil;
 
 public class SettingsActivity extends Activity	{
 
@@ -38,10 +39,7 @@ public class SettingsActivity extends Activity	{
 	private String strOtherCurrency = null;
     private ArrayAdapter<CharSequence> spAdapter = null;
     private static boolean displayOthers = false;
-	
-	private SharedPreferences prefs = null;
-    private SharedPreferences.Editor editor = null;
-	
+
 	private static int OTHER_CURRENCY_ACTIVITY = 1;
 	private static int ZBAR_SCANNER_REQUEST = 2026;
 	
@@ -57,9 +55,6 @@ public class SettingsActivity extends Activity	{
         	strOtherCurrency = extras.getString("ocurrency");
         }
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        editor = prefs.edit();
-        
         OtherCurrencyExchange.getInstance(this);
 
         receivingAddressView = (EditText)findViewById(R.id.receive_coins_receiving_address);
@@ -116,20 +111,20 @@ public class SettingsActivity extends Activity	{
 	        	currencies = getResources().getStringArray(R.array.currencies);
 
 	        	if(BitcoinAddressCheck.isValid(BitcoinAddressCheck.clean(strReceivingAddress))) {
-		            editor.putString("receiving_address", strReceivingAddress);
-		            editor.putString("receiving_name", strReceivingName);
-		            editor.putBoolean("push_notifications", push_notifications);
-		            
+
+					PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_RECEIVING_ADDRESS, strReceivingAddress);
+					PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_RECEIVING_NAME, strReceivingName);
+					PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, push_notifications);
+
 		            if(currency == currencies.length - 1) {
-			            editor.putString("currency", "ZZZ");
+						PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "ZZZ");
 		            }
 		            else {
-			            editor.putString("currency", currencies[currency].substring(currencies[currency].length() - 3));
-			            editor.remove("ocurrency");
+						PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[currency].substring(currencies[currency].length() - 3));
+						PrefsUtil.getInstance(SettingsActivity.this).removeValue(PrefsUtil.MERCHANT_KEY_OTHER_CURRENCY);
 			            strOtherCurrency = null;
 		            }
 
-		            editor.commit();
 	            	finish();
 	        	}
 	        	else {
@@ -172,11 +167,8 @@ public class SettingsActivity extends Activity	{
 			if(data != null && data.getAction() != null && data.getAction().length() > 0) {
 				String ocurrencyMsg = OtherCurrencyExchange.getInstance(this).getCurrencyNames().get(data.getAction()) + " - " + data.getAction();
 	            Toast.makeText(this, ocurrencyMsg, Toast.LENGTH_LONG).show();
-		        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		        editor = prefs.edit();
-	            editor.putString("ocurrency", data.getAction());
-	            editor.commit();
-	            strOtherCurrency = data.getAction();
+				strOtherCurrency = data.getAction();
+				PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_OTHER_CURRENCY, strOtherCurrency);
 			}
 			else {
 				;
@@ -205,11 +197,13 @@ public class SettingsActivity extends Activity	{
     }
 
     private void initValues() {
-        receivingNameView.setText(prefs.getString("receiving_name", ""));
-        receivingAddressView.setText(prefs.getString("receiving_address", ""));
-        sPushNotifications.setChecked(prefs.getBoolean("push_notifications", false));
+        receivingNameView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_NAME, ""));
+        receivingAddressView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_ADDRESS, ""));
+        sPushNotifications.setChecked(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false));
+
     	currencies = getResources().getStringArray(R.array.currencies);
-    	String strCurrency = prefs.getString("currency", "USD");
+    	String strCurrency = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
+
     	int sel = -1;
     	for(int i = 0; i < currencies.length; i++) {
     		if(currencies[i].endsWith(strCurrency)) {
