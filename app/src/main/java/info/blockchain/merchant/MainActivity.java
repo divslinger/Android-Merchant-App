@@ -1,14 +1,13 @@
 package info.blockchain.merchant;
 
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,13 +21,7 @@ import info.blockchain.merchant.util.PrefsUtil;
 
 //import android.util.Log;
 
-public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
-
-	private ViewPager viewPager;
-    private TabsPagerAdapter mAdapter;
-//    private ActionBar actionBar;
-
-    private String[] tabs = null;
+public class MainActivity extends AppCompatActivity {
 
     private static int SETTINGS_ACTIVITY 	= 1;
     private static int PIN_ACTIVITY 		= 2;
@@ -40,43 +33,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_main);
 	    
-	    tabs = new String[2];
-	    tabs[0] = getString(R.string.tab_payment);
-	    tabs[1] = getString(R.string.tab_transactions);
-
-        viewPager = (ViewPager) findViewById(R.id.pager);
-        mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
-
-        viewPager.setAdapter(mAdapter);
-
         Toolbar toolbar = (Toolbar)this.findViewById(R.id.toolbar);
         toolbar.setTitle(getResources().getString(R.string.app_name));
         setSupportActionBar(toolbar);
 
-//        actionBar = getActionBar();
-//        actionBar.setDisplayOptions(actionBar.getDisplayOptions() ^ ActionBar.DISPLAY_SHOW_TITLE);
-//        actionBar.setLogo(R.drawable.masthead);
-//        actionBar.setHomeButtonEnabled(false);
-//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-//        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FF1B8AC7")));
-
-//        for (String tab : tabs) {
-//            actionBar.addTab(actionBar.newTab().setText(tab).setTabListener(this));
-//
-//            viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//
-//                @Override
-//                public void onPageSelected(int position) {
-//                    actionBar.setSelectedNavigationItem(position);
-//                }
-//
-//                @Override
-//                public void onPageScrolled(int arg0, float arg1, int arg2) { ; }
-//
-//                @Override
-//                public void onPageScrollStateChanged(int arg0) { ; }
-//            });
-//        }
+        initTableLayout();
 
         // no PIN ?, then create one
 		String pin = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
@@ -85,6 +46,22 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
 
 	}
+
+    private void initTableLayout(){
+
+        String[] tabs = new String[]{getResources().getString(R.string.tab_payment),getResources().getString(R.string.tab_transactions)};
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        PagerAdapter mAdapter = new TabsPagerAdapter(getSupportFragmentManager(), tabs);
+        viewPager.setAdapter(mAdapter);
+
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setTabTextColors(getResources().getColor(R.color.white_50), getResources().getColor(R.color.white));
+
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setTabsFromPagerAdapter(mAdapter);
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -138,15 +115,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 		
 	}
 
-	@Override
-    public void onTabReselected(Tab tab, FragmentTransaction ft) { ; }
- 
-    @Override
-    public void onTabSelected(Tab tab, FragmentTransaction ft) { viewPager.setCurrentItem(tab.getPosition()); }
- 
-    @Override
-    public void onTabUnselected(Tab tab, FragmentTransaction ft) { ; }
-    
     public static void hideSoftKeyboard(Activity activity) {
         InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);

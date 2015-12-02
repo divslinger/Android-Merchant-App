@@ -2,10 +2,21 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               tools:context=".MainActivity">
 
     <include layout="@layout/toolbar"/>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blockchain_blue"
+        android:minHeight="?attr/actionBarSize"
+        app:tabIndicatorColor="@color/white"
+        app:tabIndicatorHeight="4dp"
+        />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
