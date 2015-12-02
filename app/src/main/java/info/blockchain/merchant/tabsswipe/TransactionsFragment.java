@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.math.BigInteger;
-import java.net.URL;
 import java.net.MalformedURLException;
 import java.io.IOException;
 
@@ -43,8 +42,6 @@ import com.google.zxing.client.android.encode.QRCodeEncoder;
 import com.markupartist.android.widget.PullToRefreshListView;
 import com.markupartist.android.widget.PullToRefreshListView.OnRefreshListener;
 
-import org.apache.commons.io.IOUtils;
-
 import info.blockchain.api.*;
 import info.blockchain.merchant.NotificationData;
 import info.blockchain.merchant.db.DBController;
@@ -52,6 +49,7 @@ import info.blockchain.merchant.R;
 import info.blockchain.merchant.util.DateUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.TypefaceUtil;
+import info.blockchain.wallet.util.WebUtil;
 
 public class TransactionsFragment extends ListFragment	{
     
@@ -171,16 +169,19 @@ public class TransactionsFragment extends ListFragment	{
                 Wallet wallet = new Wallet(receiving_address, 10);
                 String json = null;
                 try {
-                    json = IOUtils.toString(new URL(wallet.getUrl()), "UTF-8");
+					json = WebUtil.getInstance().getURL(wallet.getUrl());
                     wallet.setData(json);
                     wallet.parse();
                 }
                 catch(MalformedURLException mue) {
                 	mue.printStackTrace();
                 }
-                catch(IOException ioe) {
-                	ioe.printStackTrace();
-                }
+				catch(IOException ioe) {
+					ioe.printStackTrace();
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
 
                 DBController pdb = new DBController(getActivity());
 //                pdb.deleteExpired();

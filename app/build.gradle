@@ -26,7 +26,6 @@ dependencies {
     compile 'com.google.guava:guava:16.0.1'
     compile 'com.madgag.spongycastle:core:1.52.0.0'
     compile files('libs/android-async-http-1.4.4.jar')
-    compile files('libs/commons-io-2.4.jar')
     compile files('libs/core.jar')
     compile files('libs/java-api-0.90.jar')
     compile files('libs/zbar.jar')
