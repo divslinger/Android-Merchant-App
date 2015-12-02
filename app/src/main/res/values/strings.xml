@@ -70,5 +70,8 @@
 
 <!-- <string name="bitcoin_currency_symbol">&#xf15a;</string> -->
     <string name="bitcoin_currency_symbol">&#x0243;</string>
+    <string name="enter_pin">Enter Pin</string>
+    <string name="create_pin">Create Pin</string>
+    <string name="confirm_pin">Confirm Pin</string>
 
 </resources>
