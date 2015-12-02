@@ -1,4 +1,4 @@
-package info.blockchain.util;
+package info.blockchain.merchant.util;
 
 import java.util.Date;
 import java.util.Calendar;

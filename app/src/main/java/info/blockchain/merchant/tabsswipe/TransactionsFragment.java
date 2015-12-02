@@ -1,7 +1,6 @@
 package info.blockchain.merchant.tabsswipe;
 
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -53,8 +52,8 @@ import info.blockchain.api.*;
 import info.blockchain.merchant.NotificationData;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.R;
-import info.blockchain.util.DateUtil;
-import info.blockchain.util.TypefaceUtil;
+import info.blockchain.merchant.util.DateUtil;
+import info.blockchain.merchant.util.TypefaceUtil;
 
 public class TransactionsFragment extends ListFragment	{
     

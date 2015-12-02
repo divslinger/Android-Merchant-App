@@ -1,4 +1,4 @@
-package info.blockchain.util;
+package info.blockchain.merchant.util;
 
 import info.blockchain.wallet.util.FormatsUtil;
 

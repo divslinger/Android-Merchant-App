@@ -3,7 +3,6 @@ package info.blockchain.merchant.tabsswipe;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.Locale;
-import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -54,8 +53,8 @@ import info.blockchain.api.ReceivePayments;
 import info.blockchain.merchant.CurrencyExchange;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.R;
-import info.blockchain.util.BitcoinAddressCheck;
-import info.blockchain.util.TypefaceUtil;
+import info.blockchain.merchant.util.BitcoinAddressCheck;
+import info.blockchain.merchant.util.TypefaceUtil;
 
 public class PaymentFragment extends Fragment   {
 

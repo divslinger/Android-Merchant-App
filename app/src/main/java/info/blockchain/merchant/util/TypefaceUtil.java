@@ -1,4 +1,4 @@
-package info.blockchain.util;
+package info.blockchain.merchant.util;
  
 import android.content.Context;
 import android.graphics.Typeface;

@@ -24,7 +24,7 @@ import com.dm.zbar.android.scanner.ZBarScannerActivity;
 
 import net.sourceforge.zbar.Symbol;
 
-import info.blockchain.util.BitcoinAddressCheck;
+import info.blockchain.merchant.util.BitcoinAddressCheck;
 
 public class SettingsActivity extends Activity	{
 
