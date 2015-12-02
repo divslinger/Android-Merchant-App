@@ -78,6 +78,7 @@ public class PinActivity extends Activity	{
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK && !doCreate) {
+            finish();
             return true;
         }
         return false;
