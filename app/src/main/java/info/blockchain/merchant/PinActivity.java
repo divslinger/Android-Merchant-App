@@ -1,10 +1,7 @@
 package info.blockchain.merchant;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.MotionEvent;
@@ -18,6 +15,8 @@ import java.nio.charset.Charset;
 
 import com.google.common.hash.Hashing;
 
+import info.blockchain.merchant.util.PrefsUtil;
+
 public class PinActivity extends Activity	{
 
 	private EditText pinView1 = null;
@@ -26,10 +25,7 @@ public class PinActivity extends Activity	{
 	private Button bCancel = null;
 	
 	private boolean doCreate = false;
-	
-	private SharedPreferences prefs = null;
-    private SharedPreferences.Editor editor = null;
-	
+
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,9 +39,6 @@ public class PinActivity extends Activity	{
             	doCreate = true;
             }
         }
-
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        editor = prefs.edit();
 
         pinView1 = (EditText)findViewById(R.id.pin1);
         pinView2 = (EditText)findViewById(R.id.pin2);
@@ -67,9 +60,8 @@ public class PinActivity extends Activity	{
                 		
                 		String hashed = Hashing.sha256().hashString(pin1, Charset.forName("UTF8")).toString();
 //                        Toast.makeText(PinActivity.this, hashed, Toast.LENGTH_LONG).show();
-        	            editor.putString("pin", hashed);
-        	            editor.commit();
-        	            
+						PrefsUtil.getInstance(PinActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PIN, hashed);
+
                     	setResult(RESULT_OK);
         	            finish();
                 	}
@@ -80,7 +72,7 @@ public class PinActivity extends Activity	{
             	else {
                 	String pin1 = pinView1.getEditableText().toString();
             		String hashed = Hashing.sha256().hashString(pin1, Charset.forName("UTF8")).toString();
-                	String stored = prefs.getString("pin", "");
+					String stored = PrefsUtil.getInstance(PinActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
                 	if(stored.equals(hashed)) {
                     	setResult(RESULT_OK);
                     	finish();
