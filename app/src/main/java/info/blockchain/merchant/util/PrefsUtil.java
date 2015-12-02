@@ -7,6 +7,9 @@ import android.preference.PreferenceManager;
 
 public class PrefsUtil  {
 
+    public static final String MERCHANT_KEY_PIN = "pin";
+    public static final String MERCHANT_KEY_OTHER_CURRENCY = "ocurrency";
+
     private static Context context  = null;
     private static PrefsUtil instance = null;
 

@@ -6,9 +6,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
+import info.blockchain.merchant.util.PrefsUtil;
 
 //import android.util.Log;
 
@@ -80,8 +79,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 //        }
 
         // no PIN ?, then create one
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String pin = prefs.getString("pin", "");
+		String pin = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
         if(pin.equals("")) {
         	doPIN();
         }
@@ -103,8 +101,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 	    		doSettings(false);
 	    		return true;
 	    	case R.id.action_newpin:
-	            final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-	            String pin = prefs.getString("pin", "");
+				String pin = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
 	            if(pin.equals("")) {
 		    		doPIN();
 	            }
@@ -127,8 +124,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 			;
 		}
 		else if(requestCode == PIN_ACTIVITY && resultCode == RESULT_OK) {
-    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String strOtherCurrency = prefs.getString("ocurrency", "");
+			String strOtherCurrency = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
     		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
     		intent.putExtra("ocurrency", strOtherCurrency);
     		startActivityForResult(intent, SETTINGS_ACTIVITY);
@@ -180,8 +176,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     private void doSettings(final boolean create)	{
     	if(create)	{
-    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String strOtherCurrency = prefs.getString("ocurrency", "");
+			String strOtherCurrency = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
     		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
     		intent.putExtra("ocurrency", strOtherCurrency);
     		startActivityForResult(intent, SETTINGS_ACTIVITY);
