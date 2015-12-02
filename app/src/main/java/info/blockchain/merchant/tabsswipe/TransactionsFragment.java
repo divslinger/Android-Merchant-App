@@ -12,14 +12,12 @@ import java.io.IOException;
 
 import android.content.Context;
 import android.content.ContentValues;
-import android.content.SharedPreferences;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +26,6 @@ import android.widget.ListView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.ImageView;
-//import android.widget.Toast;
 import android.view.LayoutInflater;
 import android.app.AlertDialog;
 import android.text.SpannableStringBuilder;
@@ -53,12 +50,12 @@ import info.blockchain.merchant.NotificationData;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.R;
 import info.blockchain.merchant.util.DateUtil;
+import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.TypefaceUtil;
 
 public class TransactionsFragment extends ListFragment	{
     
     private static String receiving_address = null;
-	private SharedPreferences prefs = null;
 	private List<ContentValues> mListItems;
 	private TransactionAdapter adapter = null;
 	private NotificationData notification = null;
@@ -104,10 +101,9 @@ public class TransactionsFragment extends ListFragment	{
         adapter = new TransactionAdapter();
         setListAdapter(adapter);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        receiving_address = prefs.getString("receiving_address", "");
-        push_notifications = prefs.getBoolean("push_notifications", false);
-        doBTC = prefs.getBoolean("use_btc", false);
+        receiving_address = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_ADDRESS, "");
+        push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
+        doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
         
         btc_font = TypefaceUtil.getInstance(getActivity()).getTypeface();
         
@@ -120,11 +116,11 @@ public class TransactionsFragment extends ListFragment	{
 
         if(isVisibleToUser) {
 
-        	receiving_address = prefs.getString("receiving_address", "");
-            push_notifications = prefs.getBoolean("push_notifications", false);
-            doBTC = prefs.getBoolean("use_btc", false);
+			receiving_address = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_ADDRESS, "");
+			push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
+			doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
 
-            if(push_notifications) {
+			if(push_notifications) {
                 if(timer == null) {
                     timer = new Timer();
                     try {
@@ -152,12 +148,12 @@ public class TransactionsFragment extends ListFragment	{
     @Override
     public void onResume() {
     	super.onResume();
-     
-    	receiving_address = prefs.getString("receiving_address", "");
-        push_notifications = prefs.getBoolean("push_notifications", false);
-        doBTC = prefs.getBoolean("use_btc", false);
 
-    }
+		receiving_address = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_ADDRESS, "");
+		push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
+		doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
+
+	}
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
@@ -400,9 +396,9 @@ public class TransactionsFragment extends ListFragment	{
     }
 
     private String generateURI(long item) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		String receiving_name = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_NAME, "");
         ContentValues vals = mListItems.get((int)item);
-        return BitcoinURI.convertToBitcoinURI(vals.getAsString("iad"), BigInteger.valueOf(vals.getAsLong("amt")), prefs.getString("receiving_name", ""), vals.getAsString("msg"));
+        return BitcoinURI.convertToBitcoinURI(vals.getAsString("iad"), BigInteger.valueOf(vals.getAsLong("amt")), receiving_name, vals.getAsString("msg"));
     }
 
     private void doRedo(long item)	{
