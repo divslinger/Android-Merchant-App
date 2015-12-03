@@ -98,7 +98,7 @@ public class PaymentFragment extends Fragment   {
       		    android.content.ClipData clip = android.content.ClipData.newPlainText("Send address", input_address);
       		    clipboard.setPrimaryClip(clip);
       			
-            	String strFileName = getActivity().getCacheDir() + File.separator + "qr.png";
+            	String strFileName = getActivity().getExternalCacheDir() + File.separator + "qr.png";
             	File file = new File(strFileName);
             	file.setReadable(true, false);
       			FileOutputStream fos = null;
