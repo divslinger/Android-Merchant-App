@@ -93,8 +93,7 @@ public class PaymentFragment extends Fragment   {
         imageView.setVisibility(View.GONE);
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
         	  public boolean onLongClick(View view) {
-//      			Toast.makeText(PaymentFragment.this.getActivity(), "Address copied:" + input_address, Toast.LENGTH_LONG).show();
-      			
+
       			android.content.ClipboardManager clipboard = (android.content.ClipboardManager)getActivity().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
       		    android.content.ClipData clip = android.content.ClipData.newPlainText("Send address", input_address);
       		    clipboard.setPrimaryClip(clip);
@@ -144,7 +143,7 @@ public class PaymentFragment extends Fragment   {
             public void onClick(View v) {
             	// toggle currency input mode
                 doBTC = doBTC ? false : true;
-                doBTC = PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, doBTC);
+                PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, doBTC);
 
             	// swap amounts
                 String swap = tvCurrency.getText().subSequence(0, tvCurrency.getText().length() - 4).toString();
@@ -161,10 +160,6 @@ public class PaymentFragment extends Fragment   {
             	// display correct currency symbol
                 setCurrencySymbol();
 
-                //
-                // in case someone toggle 15x fast ;)
-                //
-                System.gc();
             }
         });
 
@@ -468,9 +463,6 @@ public class PaymentFragment extends Fragment   {
     }
 
     private void setCurrencySymbol() {
-    	
-//    	Log.d("setCurrencySymbol()", "strCurrency ==" + strCurrency);
-//    	Log.d("CurrencyExchange get symbol", CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency) == null ? "null" : CurrencyExchange.getInstance(getActivity()).getCurrencySymbol(strCurrency));
 
         if(tvCurrencySymbol != null) {
             if(doBTC) {
