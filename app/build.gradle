@@ -33,4 +33,5 @@ dependencies {
     compile files('libs/bitcoinj-core-0.13.3.jar')
     compile files('libs/slf4j-api-1.6.2.jar')
     compile 'com.android.support:design:22.2.0'
+    compile files('libs/api-1.0.3.jar')
 }
