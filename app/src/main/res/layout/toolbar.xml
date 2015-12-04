@@ -9,7 +9,7 @@
     android:minHeight="?attr/actionBarSize"
     app:navigationContentDescription="@string/abc_action_bar_up_description"
     android:background="?attr/colorPrimary"
-    app:navigationIcon="@drawable/_ic_launcher"
+    app:navigationIcon="@drawable/ic_launcher"
     app:contentInsetLeft="72dp"
     app:contentInsetStart="72dp"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
