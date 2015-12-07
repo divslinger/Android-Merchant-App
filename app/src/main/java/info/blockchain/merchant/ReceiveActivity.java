@@ -86,11 +86,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
     }
 
     private String getCurrency(){
-        String strCurrency = PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
-        if(strCurrency.equals("ZZZ")) {
-            strCurrency = PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_OTHER_CURRENCY, "USD");
-        }
-        return strCurrency;
+        return PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
     }
 
     private double getBtcAmountFromFiat(double fiat, String strCurrency){
@@ -189,16 +185,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
     private String getHDReceiveAddress() {
 
-        //TODO new receive address
-        String receivingAddress = "17k7jQsewpru3uxMkaUMxahyvACVc7fjjb";
-//        try {
-//            receivingAddress = HDPayloadBridge.getInstance(this).getReceiveAddress(0).getAddress();
-//        }
-//        catch(IOException | MnemonicException.MnemonicLengthException | MnemonicException.MnemonicChecksumException
-//                | MnemonicException.MnemonicWordException | AddressFormatException
-//                | DecoderException e) {
-//            e.printStackTrace();
-//        }
+        // stub address
+        String receivingAddress = "1FmQJPvp9BQo4qswcUhRrBGj4CcATLfdmr";
 
         return receivingAddress;
     }
