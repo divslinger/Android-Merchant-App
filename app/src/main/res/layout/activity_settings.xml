@@ -1,163 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:minWidth="420dp"
-    android:background="#FFFFFF"
-    android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:background="@color/blockchain_pearl_white"
+              android:minWidth="420dp"
+              android:orientation="vertical"
     >
-
-<LinearLayout
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-        		android:layout_marginLeft="20dp"
-        		android:layout_marginRight="20dp"
-        		android:layout_marginTop="10dp"
-    >
-    
-            <EditText
-		        android:id="@+id/receive_coins_receiving_address"
-		        android:layout_width="fill_parent"
-        		android:layout_height="wrap_content"
-        		android:layout_marginLeft="20dp"
-        		android:layout_marginRight="20dp"
-        		android:layout_marginTop="10dp"
-        		android:layout_gravity="center_horizontal"
-        		android:layout_margin="4dp"
-                android:background="@drawable/edittext_states"
-                android:ems="10"
-		        android:hint="@string/receive_coins_fragment_receiving_address_hint"
-				android:textAppearance="?android:attr/textAppearanceMedium"
-	            android:textColor="#ff000000"
-                android:lines="1"
-                android:padding="7dp"
-		        android:imeOptions="actionDone"
-				android:singleLine="true"
-			    android:drawableRight="@drawable/ic_input_qrcode"
-				/>
-
-</LinearLayout>
-            
-<LinearLayout
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-        		android:layout_marginLeft="20dp"
-        		android:layout_marginRight="20dp"
-        		android:layout_marginTop="10dp"
-    >
-            
-            <EditText
-		        android:id="@+id/receive_coins_name"
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_marginLeft="20dp"
-		        android:layout_marginRight="20dp"
-		        android:layout_marginTop="30dp"
-		        android:layout_gravity="center_horizontal"
-        		android:layout_margin="4dp"
-                android:background="@drawable/edittext_states"
-		        android:hint="@string/receive_coins_fragment_name"
-                android:ems="10"
-				android:textAppearance="?android:attr/textAppearanceMedium"
-	            android:textColor="#ff000000"
-                android:lines="1"
-                android:padding="7dp"
-		        android:imeOptions="actionDone"
-				android:singleLine="true"
-				/>
-
-</LinearLayout>
-    
-    <info.blockchain.merchant.SelectedSpinner
-        android:id="@+id/receive_coins_default_currency"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="30dp"
-        android:layout_gravity="center_horizontal"
-        android:hint="@string/receive_coins_fragment_default_currency_hint"
-        android:entries="@array/currencies"
-        android:textStyle="bold"
-        android:prompt="@string/receive_coins_fragment_default_currency_hint" />
-
-    <LinearLayout
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:layout_marginLeft="20dp"
-    	android:layout_marginRight="20dp"
-    	android:layout_gravity="center_horizontal"
-    	android:orientation="horizontal"
-    	>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="12dp"
-        android:layout_marginTop="30dp"
-        android:text="@string/receive_coins_fragment_push_notifications"
-        android:textColor="#FF000000"
-        android:textSize="@dimen/font_size_small"
-        android:textStyle="bold"
-        />
-        
-    <Switch
-        android:id="@+id/push_notifications"
-        android:layout_width="wrap_content"
+        android:padding="16dp"
+        android:text="@string/action_settings_title"
+        android:textColor="@color/primary_text_default_material_light"
+        android:textSize="24sp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="20dp"
-        android:textOn="@string/toggle_on"
-        android:textOff="@string/toggle_off"
-        android:checked="false" />
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp">
+
+        <EditText
+            android:id="@+id/receive_coins_receiving_address"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="@string/receive_coins_fragment_receiving_address_hint"
+            android:imeOptions="actionDone"
+            android:lines="1"
+            android:singleLine="true"
+            android:textColor="@color/textColorPrimary"
+            android:textColorHint="@color/blockchain_grey"
+            android:textCursorDrawable="@null"
+            android:textSize="16sp"
+            />
+
+        <ImageView
+            android:id="@+id/iv_QR"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_qrcode_black_36dp"/>
 
     </LinearLayout>
 
     <LinearLayout
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:layout_marginLeft="20dp"
-    	android:layout_marginRight="20dp"
-    	android:layout_marginTop="30dp"
-    	android:layout_gravity="center_horizontal"
-    	android:orientation="horizontal"
-    	>
-    
-    	<Button
-            android:id="@+id/cancel"
-            android:layout_width="160dp"
-            android:layout_height="50dp"
-            android:layout_marginRight="5dp"
-	        android:layout_marginBottom="20dp"
-            android:background="@drawable/button_generic"
-        	android:text="@string/prompt_ko"
-			android:textSize="22sp"
-			android:textColor="#FF000000"
-    	 	android:shadowColor="#191919"
-			android:shadowDx="1"
-			android:shadowDy="1"
-			android:shadowRadius="1"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp">
 
-        <Button
-            android:id="@+id/confirm"
+        <EditText
+            android:id="@+id/receive_coins_name"
             android:layout_width="fill_parent"
-            android:layout_height="50dp"
-            android:layout_marginLeft="5dp"
-	        android:layout_marginBottom="20dp"
-            android:background="@drawable/button_blue"
-        	android:text="@string/prompt_save"
-			android:textSize="22sp"
-			android:textColor="#FFFFFFFF"
-    	 	android:shadowColor="#191919"
-			android:shadowDx="1"
-			android:shadowDy="1"
-			android:shadowRadius="1"
-        />
-    	
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:ems="10"
+            android:hint="@string/receive_coins_fragment_name"
+            android:imeOptions="actionDone"
+            android:lines="1"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/primary_text_default_material_light"
+            android:textSize="16sp"
+            />
+
     </LinearLayout>
-    
+
+    <include
+        android:id="@+id/receive_coins_default_currency"
+        layout="@layout/include_spinner_compat"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_height="48dp"/>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/receive_coins_fragment_push_notifications"
+            android:textColor="@color/primary_text_default_material_light"
+            android:textSize="16sp"
+            />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+        <CheckBox
+            android:id="@+id/push_notifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical|right"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginRight="8dp"
+            android:gravity="center"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="@string/prompt_ko"
+            android:textColor="@color/primary_text_default_material_light"/>
+
+        <TextView
+            android:id="@+id/confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="@string/prompt_save"
+            android:textColor="@color/blockchain_blue"/>
+
+    </LinearLayout>
+
 </LinearLayout>

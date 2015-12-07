@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="$34.95"
+        android:text=""
         android:textSize="32sp"
         android:textColor="@color/primary_text_default_material_light"
         android:paddingTop="16dp"/>
@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="0.12586884 BTC"
+        android:text=""
         android:textSize="16sp"
         android:textColor="@color/primary_text_default_material_light"
         android:alpha="0.7"/>

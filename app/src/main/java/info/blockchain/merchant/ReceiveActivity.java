@@ -32,7 +32,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
     private TextView tvFiatAmount = null;
     private TextView tvBtcAmount = null;
     private TextView tvReceivingAddress = null;
-    private TextView tvCurrencySymbol = null;
     private ImageView ivReceivingQr = null;
     private ProgressBar progressBar = null;
 
@@ -77,7 +76,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         ivReceivingQr = (ImageView)findViewById(R.id.qr);
         progressBar = (ProgressBar)findViewById(R.id.progress);
         tvReceivingAddress = (TextView)findViewById(R.id.tvAddress);
-        tvCurrencySymbol = (TextView)findViewById(R.id.tv_currency);
 
         ivReceivingQr.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
