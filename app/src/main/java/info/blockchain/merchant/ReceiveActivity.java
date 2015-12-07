@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -34,6 +35,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
     private TextView tvReceivingAddress = null;
     private ImageView ivReceivingQr = null;
     private ProgressBar progressBar = null;
+    private LinearLayout progressLayout = null;
 
     private String receivingAddress = null;
     private DecimalFormat decimalFormat2 = null;
@@ -45,7 +47,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        setContentView(R.layout.fragment_receive);
+        setContentView(R.layout.activity_receive);
 
         initViews();
 
@@ -75,10 +77,11 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvBtcAmount = (TextView)findViewById(R.id.tv_btc_amount);
         ivReceivingQr = (ImageView)findViewById(R.id.qr);
         progressBar = (ProgressBar)findViewById(R.id.progress);
+        progressLayout = (LinearLayout)findViewById(R.id.progressLayout);
         tvReceivingAddress = (TextView)findViewById(R.id.tvAddress);
 
         ivReceivingQr.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
+        progressLayout.setVisibility(View.VISIBLE);
 
         findViewById(R.id.tv_cancel).setOnClickListener(this);
     }
@@ -138,7 +141,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 //Show generating QR message
                 ivReceivingQr.setVisibility(View.GONE);
                 tvReceivingAddress.setText(R.string.generating_qr);
-                progressBar.setVisibility(View.VISIBLE);
+                progressLayout.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -161,7 +164,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
             @Override
             protected void onPostExecute(Bitmap bitmap) {
                 super.onPostExecute(bitmap);
-                progressBar.setVisibility(View.GONE);
+                progressLayout.setVisibility(View.GONE);
                 ivReceivingQr.setVisibility(View.VISIBLE);
                 tvReceivingAddress.setVisibility(View.VISIBLE);
                 tvReceivingAddress.setText(receivingAddress);

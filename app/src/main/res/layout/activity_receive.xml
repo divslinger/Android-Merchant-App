@@ -43,14 +43,20 @@
             android:layout_gravity="center_horizontal"
             />
 
-        <ProgressBar
-            android:id="@+id/progress"
-            android:layout_gravity="center_horizontal"
+        <LinearLayout
+            android:id="@+id/progressLayout"
             android:layout_width="@dimen/qr_code_size"
             android:layout_height="@dimen/qr_code_size"
-            android:indeterminate="true"
             android:visibility="gone"
-            />
+            android:gravity="center">
+
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvAddress"
