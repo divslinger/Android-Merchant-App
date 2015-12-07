@@ -98,5 +98,6 @@
     <orderEntry type="library" exported="" name="java-api-0.90" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.2.0" level="project" />
     <orderEntry type="library" exported="" name="zbar" level="project" />
+    <orderEntry type="library" exported="" name="gson-2.5" level="project" />
   </component>
 </module>

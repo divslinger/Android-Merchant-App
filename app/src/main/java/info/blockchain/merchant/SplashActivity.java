@@ -32,14 +32,13 @@ public class SplashActivity extends Activity	{
     			}
 
     		    CurrencyExchange.getInstance(SplashActivity.this);
-    		    OtherCurrencyExchange.getInstance(SplashActivity.this);
     			Intent intent = new Intent(SplashActivity.this, MainActivity.class);
     			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
     			startActivity(intent);
 
     			Looper.getMainLooper().loop();
     		}
-        }.start();
+		        }.start();
 
     }
 }

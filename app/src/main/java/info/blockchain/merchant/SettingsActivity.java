@@ -36,11 +36,8 @@ public class SettingsActivity extends Activity	{
 	private EditText receivingNameView = null;
 	private Button bOK = null;
 	private Button bCancel = null;
-	private String strOtherCurrency = null;
     private ArrayAdapter<CharSequence> spAdapter = null;
-    private static boolean displayOthers = false;
 
-	private static int OTHER_CURRENCY_ACTIVITY = 1;
 	private static int ZBAR_SCANNER_REQUEST = 2026;
 	
     @Override
@@ -50,13 +47,6 @@ public class SettingsActivity extends Activity	{
 	    
 	    setTitle(R.string.action_settings_title);
 	    
-        Bundle extras = getIntent().getExtras();
-        if(extras != null)	{
-        	strOtherCurrency = extras.getString("ocurrency");
-        }
-
-        OtherCurrencyExchange.getInstance(this);
-
         receivingAddressView = (EditText)findViewById(R.id.receive_coins_receiving_address);
         receivingAddressView.setOnTouchListener(new OnTouchListener() {
             @Override
@@ -86,20 +76,6 @@ public class SettingsActivity extends Activity	{
     	spAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); 
     	spCurrencies.setAdapter(spAdapter);
 
-    	spCurrencies.setOnItemSelectedListener(new OnItemSelectedListener()	{
-	    	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3)	{
-	    		if(!displayOthers && arg2 == spAdapter.getCount() - 1)	{
-	    			displayOthers = true;
-	        		Intent intent = new Intent(SettingsActivity.this, OtherCurrencyActivity.class);
-	        		intent.putExtra("ocurrency", strOtherCurrency);
-	        		startActivityForResult(intent, OTHER_CURRENCY_ACTIVITY);
-	    		}
-	    	}
-	        public void onNothingSelected(AdapterView<?> arg0) {
-	        	;
-	        }
-    	});
-
         bOK = (Button)findViewById(R.id.confirm);
         bOK.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
@@ -116,14 +92,7 @@ public class SettingsActivity extends Activity	{
 					PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_RECEIVING_NAME, strReceivingName);
 					PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, push_notifications);
 
-		            if(currency == currencies.length - 1) {
-						PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "ZZZ");
-		            }
-		            else {
-						PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[currency].substring(currencies[currency].length() - 3));
-						PrefsUtil.getInstance(SettingsActivity.this).removeValue(PrefsUtil.MERCHANT_KEY_OTHER_CURRENCY);
-			            strOtherCurrency = null;
-		            }
+					PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[currency].substring(currencies[currency].length() - 3));
 
 	            	finish();
 	        	}
@@ -160,24 +129,6 @@ public class SettingsActivity extends Activity	{
 			}
 
         }
-		else if(resultCode == Activity.RESULT_CANCELED && requestCode == ZBAR_SCANNER_REQUEST) {
-//            Toast.makeText(this, R.string.camera_unavailable, Toast.LENGTH_SHORT).show();
-        }
-		else if(resultCode == Activity.RESULT_OK && requestCode == OTHER_CURRENCY_ACTIVITY) {
-			if(data != null && data.getAction() != null && data.getAction().length() > 0) {
-				String ocurrencyMsg = OtherCurrencyExchange.getInstance(this).getCurrencyNames().get(data.getAction()) + " - " + data.getAction();
-	            Toast.makeText(this, ocurrencyMsg, Toast.LENGTH_LONG).show();
-				strOtherCurrency = data.getAction();
-				PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_OTHER_CURRENCY, strOtherCurrency);
-			}
-			else {
-				;
-			}
-			displayOthers = false;
-        }
-		else if(resultCode == Activity.RESULT_CANCELED && requestCode == OTHER_CURRENCY_ACTIVITY) {
-			displayOthers = false;
-		}
         else {
         	;
         }
