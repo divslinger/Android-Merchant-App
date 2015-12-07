@@ -2,10 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="@color/blockchain_light_grey"
+              android:minWidth="420dp"
+              android:background="@color/white"
               android:orientation="vertical">
 
-    <include layout="@layout/toolbar"/>
+    <!--<include layout="@layout/toolbar"/>-->
+
+    <TextView
+        android:id="@+id/tv_fiat_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="$34.95"
+        android:textSize="32sp"
+        android:textColor="@color/primary_text_default_material_light"
+        android:paddingTop="16dp"/>
+
+    <TextView
+        android:id="@+id/tv_btc_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="0.12586884 BTC"
+        android:textSize="16sp"
+        android:textColor="@color/primary_text_default_material_light"
+        android:alpha="0.7"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,38 +43,42 @@
             android:layout_gravity="center_horizontal"
             />
 
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="@dimen/qr_code_size"
+            android:layout_height="@dimen/qr_code_size"
+            android:indeterminate="true"
+            android:visibility="gone"
+            />
+
         <TextView
+            android:id="@+id/tvAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="16dp"
-            android:text="17k7jQsewpru3uxMkaUMxahyvACVc7fjjb"/>
+            android:text=""/>
 
     </LinearLayout>
 
-    <LinearLayout
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Waiting For Payment"
+        android:textSize="16sp"
         android:gravity="center"
-        android:orientation="vertical">
+        android:textColor="@color/primary_text_default_material_light"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:padding="4dp"
-            android:text="Total"
-            android:textSize="16sp"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:padding="4dp"
-            android:text="0.02321 BTC ($25.43)"
-            android:textSize="16sp"/>
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:text="@string/prompt_ko"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_margin="16dp"
+        android:background="@color/blockchain_send_red"/>
 
 </LinearLayout>

@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
-public class PrefsUtil  {
+import info.blockchain.wallet.util.PersistantPrefs;
+
+public class PrefsUtil  implements PersistantPrefs {
 
     public static final String MERCHANT_KEY_PIN = "pin";
     public static final String MERCHANT_KEY_CURRENCY = "currency";

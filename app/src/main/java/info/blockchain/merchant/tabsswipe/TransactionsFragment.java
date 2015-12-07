@@ -1,38 +1,28 @@
 package info.blockchain.merchant.tabsswipe;
 
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.io.IOException;
-
-import android.content.Context;
+import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.FrameLayout;
-import android.widget.TextView;
-import android.widget.ImageView;
-import android.view.LayoutInflater;
-import android.app.AlertDialog;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.text.Spannable;
-import android.graphics.Typeface;
-//import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.bitcoin.uri.BitcoinURI;
 import com.google.zxing.BarcodeFormat;
@@ -42,14 +32,26 @@ import com.google.zxing.client.android.encode.QRCodeEncoder;
 import com.markupartist.android.widget.PullToRefreshListView;
 import com.markupartist.android.widget.PullToRefreshListView.OnRefreshListener;
 
-import info.blockchain.api.*;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import info.blockchain.api.Tx;
+import info.blockchain.api.Wallet;
 import info.blockchain.merchant.NotificationData;
-import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.R;
+import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.util.DateUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.TypefaceUtil;
 import info.blockchain.wallet.util.WebUtil;
+
+//import android.util.Log;
 
 public class TransactionsFragment extends ListFragment	{
     
@@ -324,14 +326,14 @@ public class TransactionsFragment extends ListFragment	{
     	        SpannableStringBuilder cs = new SpannableStringBuilder(getActivity().getResources().getString(R.string.bitcoin_currency_symbol));
     	        cs.setSpan(new RelativeSizeSpan((float)0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     	        btc_view.setText(cs);
-    	        ((TextView)view.findViewById(R.id.tv_amount)).setText(displayValue);
+    	        ((TextView)view.findViewById(R.id.tv_fiat_amount)).setText(displayValue);
 	        }
 	        else {
     	        TextView btc_view = (TextView)view.findViewById(R.id.tv_btc);
     	        SpannableStringBuilder cs = new SpannableStringBuilder(vals.getAsString("famt").subSequence(0, 1));
     	        cs.setSpan(new RelativeSizeSpan((float)0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     	        btc_view.setText(cs);
-       	        ((TextView)view.findViewById(R.id.tv_amount)).setText(vals.getAsString("famt").substring(1));
+       	        ((TextView)view.findViewById(R.id.tv_fiat_amount)).setText(vals.getAsString("famt").substring(1));
 	        }
 
 	        if(vals.getAsInteger("cfm") > 0) {
@@ -440,11 +442,11 @@ public class TransactionsFragment extends ListFragment	{
     		.setPositiveButton(R.string.prompt_yes, new DialogInterface.OnClickListener() {
 //          	@Override
     			public void onClick(DialogInterface dialog, int which) {
-    				
+
     				DBController pdb = new DBController(getActivity());
     				pdb.deleteIncomingAddress(val.getAsString("iad"));
     				pdb.close();
-    				
+
     				if(mListItems.size() > 1) {
         				mListItems.remove(item);
     				}

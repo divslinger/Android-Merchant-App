@@ -73,5 +73,6 @@
     <string name="enter_pin">Enter Pin</string>
     <string name="create_pin">Create Pin</string>
     <string name="confirm_pin">Confirm Pin</string>
+    <string name="NEW_TRANSACTION">NEW TRANSACTION</string>
 
 </resources>
