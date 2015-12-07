@@ -54,7 +54,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         double amountPayable = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE, 0.0);
         decimalFormat2 = new DecimalFormat("######0.00");
         decimalFormat8 = new DecimalFormat("######0.00000000");
-        tvFiatAmount.setText(decimalFormat2.format(amountPayable) + " " + getCurrencySymbol());
+        tvFiatAmount.setText(getCurrencySymbol()+" "+decimalFormat2.format(amountPayable));
         tvBtcAmount.setText(decimalFormat8.format(getBtcAmountFromFiat(amountPayable, getCurrencySymbol()))+" BTC");
 
         //Generate new address/QR code for receive
@@ -122,16 +122,13 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
             }
             if(!bamount.equals(BigInteger.ZERO)) {
                 generateQRCode(BitcoinURI.convertToBitcoinURI(receivingAddress, Coin.valueOf(bamount.longValue()), "", ""));
-//                write2NFC(BitcoinURI.convertToBitcoinURI(receivingAddress, Coin.valueOf(bamount.longValue()), "", ""));
             }
             else {
                 generateQRCode("bitcoin:" + receivingAddress);
-//                write2NFC("bitcoin:" + receivingAddress);
             }
         }
         catch(NumberFormatException e) {
             generateQRCode("bitcoin:" + receivingAddress);
-//            write2NFC("bitcoin:" + receivingAddress);
         }
 
     }
