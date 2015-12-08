@@ -37,6 +37,26 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if(tvCurrency != null)    {
+            tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD"));
+        }
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(tvCurrency != null)    {
+            tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD"));
+        }
+
+    }
+
     private void initPadClickListeners(){
         rootView.findViewById(R.id.button0).setOnClickListener(this);
         rootView.findViewById(R.id.button1).setOnClickListener(this);
