@@ -10,12 +10,14 @@ import android.widget.TextView;
 
 import info.blockchain.merchant.R;
 import info.blockchain.merchant.ReceiveActivity;
+import info.blockchain.merchant.util.PrefsUtil;
 
 public class PaymentFragment extends Fragment implements View.OnClickListener {
 
     private View rootView = null;
     private TextView tvAmount = null;
     private TextView tvCharge = null;
+    private TextView tvCurrency = null;
     public static String AMOUNT_PAYABLE = "AMOUNT_PAYABLE";
 
     private final int DECIMAL_PLACES = 2;
@@ -26,6 +28,9 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
         tvAmount = (TextView)rootView.findViewById(R.id.tv_fiat_amount);
         tvCharge = (TextView)rootView.findViewById(R.id.tv_charge);
+        tvCurrency = (TextView)rootView.findViewById(R.id.tv_currency);
+
+        tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD"));
 
         initPadClickListeners();
 
