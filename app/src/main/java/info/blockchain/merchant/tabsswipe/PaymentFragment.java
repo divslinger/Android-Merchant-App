@@ -52,7 +52,6 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
         //Start off with fiat
         isBtc = false;
-        tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
 
         initPadClickListeners();
 
@@ -62,21 +61,20 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-
-        if(tvCurrency != null)    {
-            tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
-        }
-
+        initValues();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        initValues();
+    }
 
-        if(tvCurrency != null)    {
+    private void initValues(){
+        if(tvCurrency != null && !isBtc)    {
             tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
         }
-
+        updateAmounts();
     }
 
     private void initPadClickListeners(){
@@ -135,12 +133,12 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             tvCharge.setTextColor(getResources().getColor(R.color.white_50));
         }
 
-        getFiatBtcAmounts();
+        updateAmounts();
     }
 
     public void chargeClicked() {
 
-        getFiatBtcAmounts();
+        updateAmounts();
         Intent intent = new Intent(getActivity(), ReceiveActivity.class);
         intent.putExtra(AMOUNT_PAYABLE_FIAT,amountPayableFiat);
         intent.putExtra(AMOUNT_PAYABLE_BTC,amountPayableBtc);
@@ -218,8 +216,10 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         isBtc = !isBtc;
     }
 
-    private void getFiatBtcAmounts(){
+    private void updateAmounts(){
 
+        if(tvAmount==null)return;
+        
         double amount = Double.parseDouble(tvAmount.getText().toString());
 
         Locale locale = new Locale("en", "US");
