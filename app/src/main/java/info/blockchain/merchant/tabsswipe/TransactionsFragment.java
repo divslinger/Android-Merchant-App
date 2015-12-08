@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import info.blockchain.api.Tx;
-import info.blockchain.api.Wallet;
+import info.blockchain.merchant.api.Tx;
+import info.blockchain.merchant.api.Wallet;
 import info.blockchain.merchant.NotificationData;
 import info.blockchain.merchant.R;
 import info.blockchain.merchant.db.DBController;
