@@ -175,19 +175,19 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
     private String getCurrencySymbol() {
 
-        String strCurrency = "$";
+        String strCurrencySymbol = "$";
 
-        if(CurrencyExchange.getInstance(this).getCurrencySymbol(strCurrency) != null) {
-            strCurrency = CurrencyExchange.getInstance(this).getCurrencySymbol(strCurrency).substring(0, 1);
+        if(CurrencyExchange.getInstance(this).getCurrencySymbol(PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD")) != null) {
+            strCurrencySymbol = CurrencyExchange.getInstance(this).getCurrencySymbol(PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD")).substring(0, 1);
         }
 
-        return strCurrency;
+        return strCurrencySymbol;
     }
 
     private String getHDReceiveAddress() {
 
         // stub address
-        String receivingAddress = "1FmQJPvp9BQo4qswcUhRrBGj4CcATLfdmr";
+        String receivingAddress = "15ZtXsKk6P9UMquo9qs1oTX7okRday9pv6";
 
         return receivingAddress;
     }
