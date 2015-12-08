@@ -124,15 +124,18 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         // Back clicked
         if(pad == null){
             String e1 = tvAmount.getText().toString();
-            if (e1.length() > 0)
+            if (e1.length() > 1) {
                 tvAmount.setText(e1.substring(0, e1.length() - 1));
+            }else {
+                tvAmount.setText("0");
+            }
             return;
         }
 
         String amountText = tvAmount.getText().toString();
 
         //initial input
-        if(amountText.equals("0.00") || amountText.equals("")){
+        if(amountText.equals("0.00") || amountText.equals("0") || amountText.equals("")){
 
             if(pad.equals(".")){
                 tvAmount.setText("0.");
