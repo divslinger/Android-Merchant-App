@@ -6,8 +6,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+import java.util.Locale;
+
+import info.blockchain.merchant.CurrencyExchange;
 import info.blockchain.merchant.R;
 import info.blockchain.merchant.ReceiveActivity;
 import info.blockchain.merchant.util.PrefsUtil;
@@ -18,9 +23,22 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     private TextView tvAmount = null;
     private TextView tvCharge = null;
     private TextView tvCurrency = null;
-    public static String AMOUNT_PAYABLE = "AMOUNT_PAYABLE";
+    private LinearLayout llAmountContainer = null;
+    public static String AMOUNT_PAYABLE_FIAT = "AMOUNT_PAYABLE_FIAT";
+    public static String AMOUNT_PAYABLE_BTC = "AMOUNT_PAYABLE_BTC";
 
-    private final int DECIMAL_PLACES = 2;
+    public double amountPayableFiat = 0.0;
+    public double amountPayableBtc = 0.0;
+
+    private final int DECIMAL_PLACES_FIAT = 2;
+    private final int DECIMAL_PLACES_BTC = 8;
+    public static final String DEFAULT_CURRENCY_FIAT = "USD";
+    public static final String DEFAULT_CURRENCY_BTC = "BTC";
+
+    private boolean isBtc = false;
+    private int allowedDecimalPlaces = DECIMAL_PLACES_FIAT;
+    private DecimalFormat dfBtc = new DecimalFormat("######0.00000000");
+    private DecimalFormat dfFiat = new DecimalFormat("######0.00");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -29,8 +47,12 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         tvAmount = (TextView)rootView.findViewById(R.id.tv_fiat_amount);
         tvCharge = (TextView)rootView.findViewById(R.id.tv_charge);
         tvCurrency = (TextView)rootView.findViewById(R.id.tv_currency);
+        llAmountContainer = (LinearLayout)rootView.findViewById(R.id.amount_container);
+        llAmountContainer.setOnClickListener(this);
 
-        tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD"));
+        //Start off with fiat
+        isBtc = false;
+        tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
 
         initPadClickListeners();
 
@@ -42,7 +64,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         super.setUserVisibleHint(isVisibleToUser);
 
         if(tvCurrency != null)    {
-            tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD"));
+            tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
         }
 
     }
@@ -52,7 +74,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         super.onResume();
 
         if(tvCurrency != null)    {
-            tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD"));
+            tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
         }
 
     }
@@ -90,6 +112,8 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             case R.id.button0:padClicked(v.getTag().toString().substring(0, 1));break;
             case R.id.buttonDeleteBack:padClicked(null);break;
 
+            case R.id.amount_container: toggleAmount();break;
+
             case R.id.tv_charge:chargeClicked(); return;
         }
 
@@ -110,12 +134,16 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             tvCharge.setOnClickListener(null);
             tvCharge.setTextColor(getResources().getColor(R.color.white_50));
         }
+
+        getFiatBtcAmounts();
     }
 
     public void chargeClicked() {
 
+        getFiatBtcAmounts();
         Intent intent = new Intent(getActivity(), ReceiveActivity.class);
-        intent.putExtra("AMOUNT_PAYABLE",Double.parseDouble(tvAmount.getText().toString()));
+        intent.putExtra(AMOUNT_PAYABLE_FIAT,amountPayableFiat);
+        intent.putExtra(AMOUNT_PAYABLE_BTC,amountPayableBtc);
         startActivity(intent);
     }
 
@@ -135,7 +163,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         String amountText = tvAmount.getText().toString();
 
         //initial input
-        if(amountText.equals("0.00") || amountText.equals("0") || amountText.equals("")){
+        if((!isBtc && amountText.equals("0.00")) || (isBtc && amountText.equals("0.00000000")) || amountText.equals("0") || amountText.equals("")){
 
             if(pad.equals(".")){
                 tvAmount.setText("0.");
@@ -166,12 +194,46 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             if(result.length >= 2)
                 decimalPlaces = result[1].length();
 
-            if(decimalPlaces > DECIMAL_PLACES)return;
+            if(decimalPlaces > allowedDecimalPlaces)return;
         }
 
         if(pad!=null) {
             // Append tapped #
             tvAmount.append(pad);
+        }
+    }
+
+    private void toggleAmount(){
+
+        if(isBtc) {
+            tvAmount.setText(dfFiat.format(amountPayableFiat));
+            tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
+            allowedDecimalPlaces = DECIMAL_PLACES_FIAT;
+        }else {
+            tvAmount.setText(dfBtc.format(amountPayableBtc));
+            tvCurrency.setText(DEFAULT_CURRENCY_BTC);
+            allowedDecimalPlaces = DECIMAL_PLACES_BTC;
+        }
+
+        isBtc = !isBtc;
+    }
+
+    private void getFiatBtcAmounts(){
+
+        double amount = Double.parseDouble(tvAmount.getText().toString());
+
+        Locale locale = new Locale("en", "US");
+        Locale.setDefault(locale);
+
+        String strCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT);
+        Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency);
+
+        if(isBtc) {
+            amountPayableFiat = Double.parseDouble(dfFiat.format(amount * currencyPrice));
+            amountPayableBtc = amount;
+        }else {
+            amountPayableFiat = amount;
+            amountPayableBtc = Double.parseDouble(dfBtc.format(amount / currencyPrice));
         }
     }
 }

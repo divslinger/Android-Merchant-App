@@ -21,7 +21,6 @@ import org.bitcoinj.uri.BitcoinURI;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;
-import java.util.Locale;
 
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 import info.blockchain.merchant.util.MonetaryUtil;
@@ -38,8 +37,9 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
     private LinearLayout progressLayout = null;
 
     private String receivingAddress = null;
-    private DecimalFormat decimalFormat2 = null;
-    private DecimalFormat decimalFormat8 = null;
+
+    private DecimalFormat dfBtc = new DecimalFormat("######0.0######");
+    private DecimalFormat dfFiat = new DecimalFormat("######0.00");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +52,14 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         initViews();
 
         //Incoming intent value
-        double amountPayable = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE, 0.0);
-        decimalFormat2 = new DecimalFormat("######0.00");
-        decimalFormat8 = new DecimalFormat("######0.00000000");
-        tvFiatAmount.setText(getCurrencySymbol()+" "+decimalFormat2.format(amountPayable));
-        tvBtcAmount.setText(decimalFormat8.format(getBtcAmountFromFiat(amountPayable))+" BTC");
+        double amountFiat = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, 0.0);
+        double amountBtc = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, 0.0);
+        tvFiatAmount.setText(getCurrencySymbol()+" "+dfFiat.format(amountFiat));
+        tvBtcAmount.setText(dfBtc.format(amountBtc)+" "+PaymentFragment.DEFAULT_CURRENCY_BTC);
 
         //Generate new address/QR code for receive
         receivingAddress = getHDReceiveAddress();
-        long lAmount = getLongAmount(amountPayable);
+        long lAmount = getLongAmount(amountBtc);
         displayQRCode(lAmount);
     }
 
@@ -84,29 +83,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         progressLayout.setVisibility(View.VISIBLE);
 
         findViewById(R.id.tv_cancel).setOnClickListener(this);
-    }
-
-    private String getCurrency(){
-        return PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
-    }
-
-    private double getBtcAmountFromFiat(double fiat){
-
-        String strCurrency = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
-
-        Locale locale = new Locale("en", "US");
-        Locale.setDefault(locale);
-
-        double result = 0;
-
-        if(CurrencyExchange.getInstance(this).getCurrencyPrice(strCurrency) != 0.0) {
-            result = fiat / CurrencyExchange.getInstance(this).getCurrencyPrice(strCurrency);
-        }
-        else {
-            result = fiat / CurrencyExchange.getInstance(this).getCurrencyPrice("USD");
-        }
-
-        return result;
     }
 
     private void displayQRCode(long lamount) {
@@ -196,21 +172,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
     private long getLongAmount(double amountPayable) {
 
-        String strCurrency = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
-
-        Locale locale = new Locale("en", "US");
-        Locale.setDefault(locale);
-
-        double amount = 0;
-
-        if(CurrencyExchange.getInstance(this).getCurrencyPrice(strCurrency) != 0.0) {
-            amount = amountPayable / CurrencyExchange.getInstance(this).getCurrencyPrice(strCurrency);
-        }
-        else {
-            amount = amountPayable / CurrencyExchange.getInstance(this).getCurrencyPrice("USD");
-        }
-
-        double value = Math.round(amount * 100000000.0);
+        double value = Math.round(amountPayable * 100000000.0);
         long longValue = (Double.valueOf(value)).longValue();
 
         return longValue;
