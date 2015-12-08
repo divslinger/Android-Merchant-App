@@ -56,11 +56,11 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         decimalFormat2 = new DecimalFormat("######0.00");
         decimalFormat8 = new DecimalFormat("######0.00000000");
         tvFiatAmount.setText(getCurrencySymbol()+" "+decimalFormat2.format(amountPayable));
-        tvBtcAmount.setText(decimalFormat8.format(getBtcAmountFromFiat(amountPayable, getCurrencySymbol()))+" BTC");
+        tvBtcAmount.setText(decimalFormat8.format(getBtcAmountFromFiat(amountPayable))+" BTC");
 
         //Generate new address/QR code for receive
         receivingAddress = getHDReceiveAddress();
-        long lAmount = getLongAmount(amountPayable, getCurrency());
+        long lAmount = getLongAmount(amountPayable);
         displayQRCode(lAmount);
     }
 
@@ -90,7 +90,9 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         return PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
     }
 
-    private double getBtcAmountFromFiat(double fiat, String strCurrency){
+    private double getBtcAmountFromFiat(double fiat){
+
+        String strCurrency = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
 
         Locale locale = new Locale("en", "US");
         Locale.setDefault(locale);
@@ -192,7 +194,9 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         return receivingAddress;
     }
 
-    private long getLongAmount(double amountPayable, String strCurrency) {
+    private long getLongAmount(double amountPayable) {
+
+        String strCurrency = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
 
         Locale locale = new Locale("en", "US");
         Locale.setDefault(locale);
