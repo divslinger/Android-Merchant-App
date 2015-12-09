@@ -22,8 +22,13 @@ import com.dm.zbar.android.scanner.ZBarScannerActivity;
 
 import net.sourceforge.zbar.Symbol;
 
-import info.blockchain.merchant.util.BitcoinAddressCheck;
+import org.bitcoinj.core.AddressFormatException;
+
+import java.nio.ByteBuffer;
+
+import info.blockchain.api.etc.Base58;
 import info.blockchain.merchant.util.PrefsUtil;
+import info.blockchain.merchant.util.ToastCustom;
 
 //import android.util.Log;
 
@@ -32,8 +37,8 @@ public class SettingsActivity extends Activity	{
 	private Spinner spCurrencies = null;
 	private CheckBox sPushNotifications = null;
 	private String[] currencies = null;
-	private EditText receivingAddressView = null;
-	private EditText receivingNameView = null;
+	private EditText merchantXpubView = null;
+	private EditText merchantNameView = null;
 
 	private TextView tvOK = null;
 	private TextView tvCancel = null;
@@ -58,24 +63,38 @@ public class SettingsActivity extends Activity	{
 		
 		if(resultCode == Activity.RESULT_OK && requestCode == ZBAR_SCANNER_REQUEST)	{
 
-			String strResult = BitcoinAddressCheck.clean(data.getStringExtra(ZBarConstants.SCAN_RESULT));
-//        	Log.d("Scan result", strResult);
-			if(BitcoinAddressCheck.isValid(BitcoinAddressCheck.clean(strResult))) {
-	            receivingAddressView.setText(strResult);
-			}
-			else {
-				Toast.makeText(this, R.string.invalid_btc_address, Toast.LENGTH_LONG).show();
-			}
-
+            final String scanResult = data.getStringExtra(ZBarConstants.SCAN_RESULT);
+            if(isValidXpub(scanResult)){
+                merchantXpubView.setText(scanResult);
+            }else{
+                ToastCustom.makeText(this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+            }
         }
 	}
+
+    private boolean isValidXpub(String scanResult){
+
+        try {
+            byte[] xpubBytes = Base58.decodeChecked(scanResult);
+
+            ByteBuffer bb = ByteBuffer.wrap(xpubBytes);
+            if(bb.getInt() != 0x0488B21E)   {
+                throw new AddressFormatException("invalid xpub version");
+            }else{
+                return true;
+            }
+
+        }catch(Exception e)	{
+            return false;
+        }
+    }
 
     private void initValues() {
 
         spCurrencies = (Spinner)findViewById(R.id.receive_coins_default_currency);
-        receivingAddressView = (EditText)findViewById(R.id.receive_coins_receiving_address);
+        merchantXpubView = (EditText)findViewById(R.id.et_merchant_xpub);
         ivQr = (ImageView)findViewById(R.id.iv_QR);
-        receivingNameView = (EditText)findViewById(R.id.receive_coins_name);
+        merchantNameView = (EditText)findViewById(R.id.et_merchant_name);
         tvOK = (TextView)findViewById(R.id.confirm);
         tvCancel = (TextView)findViewById(R.id.cancel);
 
@@ -104,23 +123,23 @@ public class SettingsActivity extends Activity	{
         tvOK.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
 
-                String strReceivingAddress = receivingAddressView.getEditableText().toString();
-                String strReceivingName = receivingNameView.getEditableText().toString();
+                String strMerchantXpub = merchantXpubView.getEditableText().toString();
+                String strMerchantName = merchantNameView.getEditableText().toString();
                 boolean push_notifications = sPushNotifications.isChecked();
                 int currency = spCurrencies.getSelectedItemPosition();
                 currencies = getResources().getStringArray(R.array.currencies);
 
-                if (BitcoinAddressCheck.isValid(BitcoinAddressCheck.clean(strReceivingAddress))) {
+                if (isValidXpub(strMerchantXpub)) {
 
-                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_RECEIVING_ADDRESS, strReceivingAddress);
-                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_RECEIVING_NAME, strReceivingName);
+                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, strMerchantXpub);
+                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, strMerchantName);
                     PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, push_notifications);
 
                     PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[currency].substring(currencies[currency].length() - 3));
 
                     finish();
                 } else {
-                    Toast.makeText(SettingsActivity.this, R.string.invalid_btc_address, Toast.LENGTH_LONG).show();
+                    Toast.makeText(SettingsActivity.this, R.string.unrecognized_xpub, Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -132,8 +151,8 @@ public class SettingsActivity extends Activity	{
             }
         });
 
-        receivingNameView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_NAME, ""));
-        receivingAddressView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_ADDRESS, ""));
+        merchantNameView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
+        merchantXpubView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, ""));
         sPushNotifications.setChecked(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false));
 
     	currencies = getResources().getStringArray(R.array.currencies);

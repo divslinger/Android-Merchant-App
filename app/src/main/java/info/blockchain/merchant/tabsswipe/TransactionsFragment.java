@@ -55,7 +55,7 @@ import info.blockchain.wallet.util.WebUtil;
 
 public class TransactionsFragment extends ListFragment	{
     
-    private static String receiving_address = null;
+    private static String merchantXpub = null;
 	private List<ContentValues> mListItems;
 	private TransactionAdapter adapter = null;
 	private NotificationData notification = null;
@@ -101,7 +101,7 @@ public class TransactionsFragment extends ListFragment	{
         adapter = new TransactionAdapter();
         setListAdapter(adapter);
 
-        receiving_address = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_ADDRESS, "");
+        merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, "");
         push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
         doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
         
@@ -116,7 +116,7 @@ public class TransactionsFragment extends ListFragment	{
 
         if(isVisibleToUser) {
 
-			receiving_address = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_ADDRESS, "");
+			merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, "");
 			push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
 			doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
 
@@ -149,7 +149,7 @@ public class TransactionsFragment extends ListFragment	{
     public void onResume() {
     	super.onResume();
 
-		receiving_address = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_ADDRESS, "");
+		merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, "");
 		push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
 		doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
 
@@ -166,9 +166,9 @@ public class TransactionsFragment extends ListFragment	{
         @Override
         protected String[] doInBackground(Void... params) {
         	
-        	if(receiving_address.length() > 0) {
+        	if(merchantXpub.length() > 0) {
 
-                Wallet wallet = new Wallet(receiving_address, 10);
+                Wallet wallet = new Wallet(merchantXpub, 10);
                 String json = null;
                 try {
 					json = WebUtil.getInstance().getURL(wallet.getUrl());
@@ -399,7 +399,7 @@ public class TransactionsFragment extends ListFragment	{
     }
 
     private String generateURI(long item) {
-		String receiving_name = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_RECEIVING_NAME, "");
+		String receiving_name = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "");
         ContentValues vals = mListItems.get((int)item);
         return BitcoinURI.convertToBitcoinURI(vals.getAsString("iad"), BigInteger.valueOf(vals.getAsLong("amt")), receiving_name, vals.getAsString("msg"));
     }

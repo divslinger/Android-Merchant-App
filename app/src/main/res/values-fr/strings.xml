@@ -18,7 +18,7 @@
     <string name="tab_transactions">Transactions</string>
     
     <string name="receive_coins_fragment_name">Non</string>
-    <string name="receive_coins_fragment_receiving_address_hint">Adresse portefeuille</string>
+    <string name="receive_coins_fragment_merchant_xpub_hint">Adresse portefeuille</string>
     <string name="receive_coins_fragment_receiving_address_error">Adresse incorrecte</string>
     <string name="receive_coins_fragment_default_currency_hint">Devise</string>
     <string name="receive_coins_fragment_email_address_hint">Adresse e-mail</string>

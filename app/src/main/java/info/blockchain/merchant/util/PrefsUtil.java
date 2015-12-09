@@ -13,8 +13,8 @@ public class PrefsUtil  implements PersistantPrefs {
     public static final String MERCHANT_KEY_CURRENCY = "currency";
     public static final String MERCHANT_KEY_OTHER_CURRENCY = "ocurrency";
     public static final String MERCHANT_KEY_CURRENCY_DISPLAY = "use_btc";
-    public static final String MERCHANT_KEY_RECEIVING_NAME = "receiving_name";
-    public static final String MERCHANT_KEY_RECEIVING_ADDRESS = "receiving_address";
+    public static final String MERCHANT_KEY_MERCHANT_NAME = "receiving_name";
+    public static final String MERCHANT_KEY_MERCHANT_XPUB = "receiving_address";
     public static final String MERCHANT_KEY_PUSH_NOTIFS = "push_notifications";
 
     private static Context context  = null;

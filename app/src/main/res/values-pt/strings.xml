@@ -16,7 +16,7 @@
   <string name="tab_payment">Pagamento</string>
   <string name="tab_transactions">Transações</string>
   <string name="receive_coins_fragment_name">Nome</string>
-  <string name="receive_coins_fragment_receiving_address_hint">Endereço da carteira</string>
+  <string name="receive_coins_fragment_merchant_xpub_hint">Endereço da carteira</string>
   <string name="receive_coins_fragment_receiving_address_error">Endereço inválido</string>
   <string name="receive_coins_fragment_default_currency_hint">Moeda predefinida</string>
   <string name="receive_coins_fragment_email_address_hint">Endereço de e-mail</string>

@@ -20,8 +20,8 @@
     <string name="tab_payment">Payment</string>
     <string name="tab_transactions">Transactions</string>
     
-    <string name="receive_coins_fragment_name">Name</string>
-    <string name="receive_coins_fragment_receiving_address_hint">Wallet address</string>
+    <string name="receive_coins_fragment_name">Merchant Name</string>
+    <string name="receive_coins_fragment_merchant_xpub_hint">Your Public Key</string>
     <string name="receive_coins_fragment_receiving_address_error">Invalid address</string>
     <string name="receive_coins_fragment_default_currency_hint">Default currency</string>
     <string name="receive_coins_fragment_email_address_hint">E-mail address</string>
@@ -30,7 +30,7 @@
     <string name="receive_coins_install_qr_scanner_msg">Please install ZXing QR-code scanner or Goggles!</string>
     <string name="receive_coins_uri_parse_error_title">Invalid Bitcoin URI</string>
     <string name="receive_coins_parse_address_error_msg">Got invalid bitcoin address!\n(Mixing up Testnet/Prodnet?)</string>
-    <string name="receive_coins_fragment_push_notifications">Push notifications</string>
+    <string name="receive_coins_fragment_push_notifications">Push Notifications</string>
     <string name="receive_coins_fragment_email_receipts">E-mail receipts</string>
     <string name="use_btc">Enter price in Bitcoins (BTC)</string>
     <string name="payment_note">Description (optional)...</string>
@@ -74,5 +74,6 @@
     <string name="create_pin">Create Pin</string>
     <string name="confirm_pin">Confirm Pin</string>
     <string name="NEW_TRANSACTION">NEW TRANSACTION</string>
+    <string name="unrecognized_xpub">Unrecognized public key format</string>
 
 </resources>

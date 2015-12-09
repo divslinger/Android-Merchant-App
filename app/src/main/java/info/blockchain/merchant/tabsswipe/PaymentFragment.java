@@ -219,7 +219,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     private void updateAmounts(){
 
         if(tvAmount==null)return;
-        
+
         double amount = Double.parseDouble(tvAmount.getText().toString());
 
         Locale locale = new Locale("en", "US");
