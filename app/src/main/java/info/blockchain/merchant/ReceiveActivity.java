@@ -1,9 +1,16 @@
 package info.blockchain.merchant;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
@@ -22,6 +29,7 @@ import org.bitcoinj.uri.BitcoinURI;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 
+import info.blockchain.merchant.service.WebSocketService;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 import info.blockchain.merchant.util.MonetaryUtil;
 import info.blockchain.merchant.util.PrefsUtil;
@@ -35,6 +43,9 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
     private ImageView ivReceivingQr = null;
     private ProgressBar progressBar = null;
     private LinearLayout progressLayout = null;
+    private TextView tvCancel = null;
+    private ImageView ivCheck = null;
+    private TextView tvStatus = null;
 
     private String receivingAddress = null;
 
@@ -51,16 +62,27 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
         initViews();
 
+        //Register receiver (Listen for incoming tx)
+        IntentFilter filter = new IntentFilter(WebSocketService.ACTION_INTENT_INCOMING_TX);
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
+
         //Incoming intent value
         double amountFiat = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, 0.0);
         double amountBtc = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, 0.0);
         tvFiatAmount.setText(getCurrencySymbol()+" "+dfFiat.format(amountFiat));
-        tvBtcAmount.setText(dfBtc.format(amountBtc)+" "+PaymentFragment.DEFAULT_CURRENCY_BTC);
+        tvBtcAmount.setText(dfBtc.format(amountBtc) + " " + PaymentFragment.DEFAULT_CURRENCY_BTC);
 
         //Generate new address/QR code for receive
         receivingAddress = getHDReceiveAddress();
         long lAmount = getLongAmount(amountBtc);
         displayQRCode(lAmount);
+    }
+
+    @Override
+    protected void onDestroy() {
+        //Unregister receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        super.onDestroy();
     }
 
     @Override
@@ -78,11 +100,15 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         progressBar = (ProgressBar)findViewById(R.id.progress);
         progressLayout = (LinearLayout)findViewById(R.id.progressLayout);
         tvReceivingAddress = (TextView)findViewById(R.id.tvAddress);
+        tvCancel = (TextView)findViewById(R.id.tv_cancel);
+        ivCheck = (ImageView)findViewById(R.id.iv_check);
+        tvStatus = (TextView)findViewById(R.id.tv_status);
 
         ivReceivingQr.setVisibility(View.GONE);
+        ivCheck.setVisibility(View.GONE);
         progressLayout.setVisibility(View.VISIBLE);
 
-        findViewById(R.id.tv_cancel).setOnClickListener(this);
+        tvCancel.setOnClickListener(this);
     }
 
     private void displayQRCode(long lamount) {
@@ -165,7 +191,12 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
     private String getHDReceiveAddress() {
 
         // stub address
-        String receivingAddress = "15ZtXsKk6P9UMquo9qs1oTX7okRday9pv6";
+        String receivingAddress = "17k7jQsewpru3uxMkaUMxahyvACVc7fjjb";
+
+        //Subscribe to websocket to new address
+        Intent intent = new Intent(WebSocketService.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
+        intent.putExtra("address",receivingAddress);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
         return receivingAddress;
     }
@@ -176,5 +207,44 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         long longValue = (Double.valueOf(value)).longValue();
 
         return longValue;
+    }
+
+    protected BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+
+            //Catch incoming tx
+            if (WebSocketService.ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
+                soundAlert();
+                onPaymentReceived();
+            }
+        }
+    };
+
+    public void soundAlert(){
+        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        if (audioManager!=null && audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
+            MediaPlayer mp;
+            mp = MediaPlayer.create(this, R.raw.alert);
+            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.reset();
+                    mp.release();
+                }
+            });
+            mp.start();
+        }
+    }
+
+    private void onPaymentReceived(){
+        tvCancel.setBackgroundColor(getResources().getColor(R.color.blockchain_green));
+        tvCancel.setText(getResources().getText(R.string.prompt_ok));
+
+        ivReceivingQr.setVisibility(View.GONE);
+        ivCheck.setVisibility(View.VISIBLE);
+        tvStatus.setText(getResources().getText(R.string.payment_received));
+        tvReceivingAddress.setText("");
     }
 }

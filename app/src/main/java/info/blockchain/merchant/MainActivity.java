@@ -16,7 +16,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import info.blockchain.merchant.service.WebSocketService;
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
+import info.blockchain.merchant.util.OSUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 
 //import android.util.Log;
@@ -45,7 +47,20 @@ public class MainActivity extends AppCompatActivity {
         	doPIN();
         }
 
+        //Start service for websockets
+        if(!OSUtil.getInstance(MainActivity.this).isServiceRunning(WebSocketService.class)) {
+            startService(new Intent(MainActivity.this, WebSocketService.class));
+        }
 	}
+
+    @Override
+    protected void onDestroy() {
+        //Stop service for websockets
+        if(!OSUtil.getInstance(MainActivity.this).isServiceRunning(WebSocketService.class)) {
+            stopService(new Intent(MainActivity.this, WebSocketService.class));
+        }
+        super.onDestroy();
+    }
 
     private void initTableLayout(){
 

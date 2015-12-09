@@ -41,13 +41,26 @@
             android:layout_width="@dimen/qr_code_size"
             android:layout_height="@dimen/qr_code_size"
             android:layout_gravity="center_horizontal"
+            android:visibility="gone"
+            />
+
+        <ImageView
+            android:id="@+id/iv_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="16dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="48dp"
+            android:src="@drawable/ic_done_white_48dp"
+            android:background="@drawable/round_view_green"
+            android:visibility="gone"
             />
 
         <LinearLayout
             android:id="@+id/progressLayout"
             android:layout_width="@dimen/qr_code_size"
             android:layout_height="@dimen/qr_code_size"
-            android:visibility="gone"
             android:gravity="center">
 
             <ProgressBar
@@ -69,6 +82,7 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/tv_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Waiting For Payment"

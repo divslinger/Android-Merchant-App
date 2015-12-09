@@ -62,6 +62,8 @@
             >
         </activity>
 
+        <service android:name="info.blockchain.merchant.service.WebSocketService" />
+
     </application>
 
 </manifest>
