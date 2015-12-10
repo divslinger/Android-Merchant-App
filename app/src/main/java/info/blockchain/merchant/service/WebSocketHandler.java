@@ -17,6 +17,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class WebSocketHandler {
 
@@ -26,6 +28,9 @@ public class WebSocketHandler {
 
     private HashSet<String> sentMessageSet = new HashSet<String>();
     private HashSet<String> addressSet = new HashSet<String>();
+
+    private Timer keepAliveTimer = null;
+    private static final long keepAliveTimerInterval = 10000L;
 
     public WebSocketHandler(Context ctx) {
         this.context = ctx;
@@ -58,6 +63,9 @@ public class WebSocketHandler {
     }
 
     public void stop() {
+
+        if(keepAliveTimer != null) keepAliveTimer.cancel();
+
         if(mConnection != null && mConnection.isOpen()) {
             mConnection.disconnect();
         }
@@ -68,6 +76,17 @@ public class WebSocketHandler {
         try {
             stop();
             connect();
+
+            keepAliveTimer = new Timer();
+            keepAliveTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    if (mConnection != null) {
+                        mConnection.sendPing();
+                    }
+                }
+            }, keepAliveTimerInterval, keepAliveTimerInterval);
+
         }
         catch (IOException | com.neovisionaries.ws.client.WebSocketException e) {
             e.printStackTrace();
