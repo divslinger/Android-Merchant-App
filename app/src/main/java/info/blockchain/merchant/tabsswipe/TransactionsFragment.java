@@ -337,10 +337,10 @@ public class TransactionsFragment extends ListFragment	{
 	        }
 
 	        if(vals.getAsInteger("cfm") > 0) {
-		        ((ImageView)view.findViewById(R.id.tv_status)).setImageResource(R.drawable.filled_checkmark);
+		        ((ImageView)view.findViewById(R.id.tv_status)).setImageResource(R.drawable._ic_launcher);
 	        }
 	        else if(vals.getAsInteger("cfm") == 0) {
-		        ((ImageView)view.findViewById(R.id.tv_status)).setImageResource(R.drawable.hollow_checkmark);
+		        ((ImageView)view.findViewById(R.id.tv_status)).setImageResource(R.drawable._ic_launcher);
 	        }
 	        else {
 		        ((ImageView)view.findViewById(R.id.tv_status)).setImageResource(R.drawable.hourglass);
