@@ -74,7 +74,7 @@ public class WebSocketService extends android.app.Service	{
                     }
                 });
             }
-        }, 0, checkIfNotConnectedDelay);
+        }, 1000, checkIfNotConnectedDelay);
 
     }
 
