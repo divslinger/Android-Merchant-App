@@ -26,7 +26,6 @@ import com.google.zxing.client.android.encode.QRCodeEncoder;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.bip44.Account;
-import org.bitcoinj.core.bip44.WalletFactory;
 import org.bitcoinj.core.bip44.Address;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.uri.BitcoinURI;
@@ -168,7 +167,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                     e.printStackTrace();
                 }
 
-                APIFactory.getInstance(ReceiveActivity.this).setAccountIndex(APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() + 1);
+                int idx = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, APIFactory.getInstance(ReceiveActivity.this).getAccountIndex());
+                PrefsUtil.getInstance(ReceiveActivity.this).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, idx + 1);
 
                 return bitmap;
             }
@@ -202,7 +202,13 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
         try {
             Account account = new Account(MainNetParams.get(), PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, ""), 0);
-            Address addr = account.getReceive().getAddressAt(APIFactory.getInstance(ReceiveActivity.this).getAccountIndex());
+
+            int idx = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, APIFactory.getInstance(ReceiveActivity.this).getAccountIndex());
+            if(idx - APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() >= 20)    {
+                idx = APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() + 19;
+            }
+            PrefsUtil.getInstance(ReceiveActivity.this).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, idx);
+            Address addr = account.getReceive().getAddressAt(idx);
             receivingAddress = addr.getAddressString();
         }
         catch(AddressFormatException afe) {

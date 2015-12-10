@@ -86,6 +86,7 @@ public class APIFactory	{
                     addrObj = (JSONObject)addressesArray.get(i);
                     if(addrObj.has("final_balance") && addrObj.has("address"))  {
                         account_index = addrObj.getInt("account_index");
+                        PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, account_index);
                     }
                 }
             }
