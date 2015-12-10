@@ -28,6 +28,7 @@ public class ToastCustom{
             public void run() {
                 Looper.prepare();
 
+                if(toast!=null)toast.cancel();
                 toast = Toast.makeText(context, text, duration);
 
                 LayoutInflater inflate = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

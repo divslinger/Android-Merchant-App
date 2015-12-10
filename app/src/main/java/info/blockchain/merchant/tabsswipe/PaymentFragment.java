@@ -16,6 +16,7 @@ import info.blockchain.merchant.CurrencyExchange;
 import info.blockchain.merchant.R;
 import info.blockchain.merchant.ReceiveActivity;
 import info.blockchain.merchant.util.PrefsUtil;
+import info.blockchain.merchant.util.ToastCustom;
 
 public class PaymentFragment extends Fragment implements View.OnClickListener {
 
@@ -37,8 +38,9 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
     private boolean isBtc = false;
     private int allowedDecimalPlaces = DECIMAL_PLACES_FIAT;
-    private DecimalFormat dfBtc = new DecimalFormat("######0.00000000");
+    private DecimalFormat dfBtc = new DecimalFormat("######0.0######");
     private DecimalFormat dfFiat = new DecimalFormat("######0.00");
+    private final double bitcoinLimit = 21000000.0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -123,6 +125,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
                 tvCharge.setTextColor(getResources().getColor(R.color.white_50));
             }
         }catch(Exception e){
+            tvAmount.setText("0");
             tvCharge.setOnClickListener(null);
             tvCharge.setTextColor(getResources().getColor(R.color.white_50));
         }
@@ -192,6 +195,30 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         if(pad!=null) {
             // Append tapped #
             tvAmount.append(pad);
+        }
+
+        //Check that we don't exceed bitcoin limit
+        checkBitcoinLimit();
+    }
+
+    private void checkBitcoinLimit(){
+
+        double currentValue = Double.parseDouble(tvAmount.getText().toString());
+        if(isBtc){
+
+            if(currentValue > bitcoinLimit) {
+                tvAmount.setText(dfBtc.format(bitcoinLimit));
+                ToastCustom.makeText(getActivity(), getResources().getString(R.string.btc_limit_reached), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+            }
+        }else if(!isBtc){
+
+            String strCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT);
+            Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency);
+            double btcValue = Double.parseDouble(dfBtc.format(currentValue / currencyPrice));
+            if(btcValue > bitcoinLimit) {
+                tvAmount.setText(dfFiat.format(bitcoinLimit * currencyPrice));
+                ToastCustom.makeText(getActivity(), getResources().getString(R.string.btc_limit_reached), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+            }
         }
     }
 
