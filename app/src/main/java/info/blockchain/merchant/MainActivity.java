@@ -50,27 +50,6 @@ public class MainActivity extends AppCompatActivity {
         	doPIN();
         }
 
-		/*
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-
-				Looper.prepare();
-
-				try	{
-					ReceiveV2Response rr = ReceiveV2.receive ("xpub6CzxonKE1N4uYW9vitjfmL4qHyPUWjdKYQQgsUxZTunbdhXP25iDErn5ZCAWbfMAL4xv7zG6nFg7wK35Uc3PNYba1tPj23puwYTZdUhXtuk", "", "1fc17339-489e-4a56-943e-a68c1a30b4b1");
-					System.out.println("Receiving address:" + rr.getReceivingAddress());
-					System.out.println("Index:" + rr.getIndex());
-				}
-				catch(Exception e)	{
-					System.out.println(e.getMessage());
-					e.printStackTrace();
-				}
-
-				Looper.loop();
-
-			}
-		}).start();
         //Start service for websockets
         if(!OSUtil.getInstance(MainActivity.this).isServiceRunning(WebSocketService.class)) {
             startService(new Intent(MainActivity.this, WebSocketService.class));
