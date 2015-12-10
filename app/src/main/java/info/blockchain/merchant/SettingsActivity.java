@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -77,14 +78,32 @@ public class SettingsActivity extends Activity	{
         try {
             byte[] xpubBytes = Base58.decodeChecked(scanResult);
 
-            ByteBuffer bb = ByteBuffer.wrap(xpubBytes);
-            if(bb.getInt() != 0x0488B21E)   {
-                throw new AddressFormatException("invalid xpub version");
+            ByteBuffer byteBuffer = ByteBuffer.wrap(xpubBytes);
+            if(byteBuffer.getInt() != 0x0488B21E)   {
+                throw new AddressFormatException("invalid version: "+scanResult);
             }else{
-                return true;
-            }
 
+                byte[] chain = new byte[32];
+                byte[] pub = new byte[33];
+                // depth:
+                byteBuffer.get();
+                // parent fingerprint:
+                byteBuffer.getInt();
+                // child no.
+                byteBuffer.getInt();
+                byteBuffer.get(chain);
+                byteBuffer.get(pub);
+
+                ByteBuffer pubBytes = ByteBuffer.wrap(pub);
+                int fitstByte = pubBytes.get();
+                if(fitstByte == 0x02 || fitstByte == 0x03){
+                    return true;
+                }else{
+                    throw new AddressFormatException("invalid format: "+scanResult);
+                }
+            }
         }catch(Exception e)	{
+            Log.e(SettingsActivity.class.getSimpleName(),"Invalid xpub: ",e);
             return false;
         }
     }
