@@ -81,6 +81,10 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
         //Generate new address/QR code for receive
         receivingAddress = getHDReceiveAddress();
+        if(receivingAddress == null)    {
+            ToastCustom.makeText(this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+            finish();
+        }
         long lAmount = getLongAmount(amountBtc);
         displayQRCode(lAmount);
     }
