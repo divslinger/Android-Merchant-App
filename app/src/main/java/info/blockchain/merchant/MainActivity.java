@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -16,6 +17,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import info.blockchain.api.receive2.ReceiveV2;
+import info.blockchain.api.receive2.ReceiveV2Response;
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
 import info.blockchain.merchant.util.PrefsUtil;
 
@@ -44,6 +47,29 @@ public class MainActivity extends AppCompatActivity {
         if(pin.equals("")) {
         	doPIN();
         }
+
+		/*
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+
+				Looper.prepare();
+
+				try	{
+					ReceiveV2Response rr = ReceiveV2.receive ("xpub6CzxonKE1N4uYW9vitjfmL4qHyPUWjdKYQQgsUxZTunbdhXP25iDErn5ZCAWbfMAL4xv7zG6nFg7wK35Uc3PNYba1tPj23puwYTZdUhXtuk", "", "1fc17339-489e-4a56-943e-a68c1a30b4b1");
+					System.out.println("Receiving address:" + rr.getReceivingAddress());
+					System.out.println("Index:" + rr.getIndex());
+				}
+				catch(Exception e)	{
+					System.out.println(e.getMessage());
+					e.printStackTrace();
+				}
+
+				Looper.loop();
+
+			}
+		}).start();
+		*/
 
 	}
 

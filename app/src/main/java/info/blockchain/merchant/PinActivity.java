@@ -118,6 +118,8 @@ public class PinActivity extends Activity	{
 //      ToastCustom.makeText(PinActivity.this, hashed, ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_OK);
         PrefsUtil.getInstance(PinActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PIN, hashed);
 
+        PrefsUtil.getInstance(PinActivity.this).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, 0);
+
         setResult(RESULT_OK);
         finish();
     }

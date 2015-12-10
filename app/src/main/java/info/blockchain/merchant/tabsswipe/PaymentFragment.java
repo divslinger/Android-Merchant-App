@@ -2,6 +2,7 @@ package info.blockchain.merchant.tabsswipe;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import java.util.Locale;
 import info.blockchain.merchant.CurrencyExchange;
 import info.blockchain.merchant.R;
 import info.blockchain.merchant.ReceiveActivity;
+import info.blockchain.merchant.api.APIFactory;
 import info.blockchain.merchant.util.PrefsUtil;
 
 public class PaymentFragment extends Fragment implements View.OnClickListener {
@@ -59,15 +61,33 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        initValues();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         initValues();
+/*
+        if(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, "").length() > 0)    {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    Looper.prepare();
+
+                    try	{
+                        APIFactory.getInstance(getActivity()).getXPUB();
+                        PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, APIFactory.getInstance(getActivity()).getAccountIndex());
+                    }
+                    catch(Exception e)	{
+                        System.out.println(e.getMessage());
+                        e.printStackTrace();
+                    }
+
+                    Looper.loop();
+
+                }
+            }).start();
+
+        }
+*/
     }
 
     private void initValues(){

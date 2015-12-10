@@ -15,6 +15,7 @@ public class PrefsUtil  implements PersistantPrefs {
     public static final String MERCHANT_KEY_MERCHANT_NAME = "receiving_name";
     public static final String MERCHANT_KEY_MERCHANT_XPUB = "receiving_address";
     public static final String MERCHANT_KEY_PUSH_NOTIFS = "push_notifications";
+    public static final String MERCHANT_KEY_ACCOUNT_INDEX = "account_idx";
 
     private static Context context  = null;
     private static PrefsUtil instance = null;
