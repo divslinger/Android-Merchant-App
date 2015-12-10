@@ -76,5 +76,6 @@
     <string name="NEW_TRANSACTION">NEW TRANSACTION</string>
     <string name="unrecognized_xpub">Unrecognized public key format</string>
     <string name="payment_received">Payment Received</string>
+    <string name="unable_to_generate_address">An address cannot be generated at this time. Please check your installation and try again.</string>
 
 </resources>

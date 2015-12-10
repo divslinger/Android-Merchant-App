@@ -1,15 +1,11 @@
 package info.blockchain.merchant.api;
 
 import android.content.Context;
-import android.util.Log;
 //import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.wallet.util.WebUtil;
@@ -55,9 +51,9 @@ public class APIFactory	{
         try {
             StringBuilder url = new StringBuilder(WebUtil.MULTIADDR_URL);
             url.append(PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, ""));
-            Log.i("APIFactory", "XPUB:" + url.toString());
+//            Log.i("APIFactory", "XPUB:" + url.toString());
             String response = WebUtil.getInstance().getURL(url.toString());
-            Log.i("APIFactory", "XPUB response:" + response);
+//            Log.i("APIFactory", "XPUB response:" + response);
             try {
                 jsonObject = new JSONObject(response);
                 parseXPUB(jsonObject);

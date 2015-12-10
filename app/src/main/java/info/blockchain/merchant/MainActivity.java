@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -17,14 +16,10 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import info.blockchain.api.receive2.ReceiveV2;
-import info.blockchain.api.receive2.ReceiveV2Response;
 import info.blockchain.merchant.service.WebSocketService;
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
 import info.blockchain.merchant.util.OSUtil;
 import info.blockchain.merchant.util.PrefsUtil;
-
-//import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
 

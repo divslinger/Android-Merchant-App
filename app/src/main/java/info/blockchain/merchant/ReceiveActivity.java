@@ -54,6 +54,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
     private String receivingAddress = null;
 
+    private static final int ADDRESS_LOOKAHEAD = 20;
+
     private DecimalFormat dfBtc = new DecimalFormat("######0.0######");
     private DecimalFormat dfFiat = new DecimalFormat("######0.00");
 
@@ -79,6 +81,10 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
         //Generate new address/QR code for receive
         receivingAddress = getHDReceiveAddress();
+        if(receivingAddress == null)    {
+            ToastCustom.makeText(this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+            finish();
+        }
         long lAmount = getLongAmount(amountBtc);
         displayQRCode(lAmount);
     }
@@ -204,8 +210,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
             Account account = new Account(MainNetParams.get(), PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, ""), 0);
 
             int idx = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, APIFactory.getInstance(ReceiveActivity.this).getAccountIndex());
-            if(idx - APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() >= 20)    {
-                idx = APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() + 19;
+            if(idx - APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() >= ADDRESS_LOOKAHEAD)    {
+                idx = APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() + (ADDRESS_LOOKAHEAD - 1);
             }
             PrefsUtil.getInstance(ReceiveActivity.this).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, idx);
             Address addr = account.getReceive().getAddressAt(idx);
