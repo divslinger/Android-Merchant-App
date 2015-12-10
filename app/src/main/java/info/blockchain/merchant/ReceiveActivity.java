@@ -23,12 +23,18 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.encode.QRCodeEncoder;
 
+import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.bip44.Account;
+import org.bitcoinj.core.bip44.WalletFactory;
+import org.bitcoinj.core.bip44.Address;
+import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.uri.BitcoinURI;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 
+import info.blockchain.merchant.api.APIFactory;
 import info.blockchain.merchant.service.WebSocketService;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 import info.blockchain.merchant.util.MonetaryUtil;
@@ -162,6 +168,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                     e.printStackTrace();
                 }
 
+                APIFactory.getInstance(ReceiveActivity.this).setAccountIndex(APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() + 1);
+
                 return bitmap;
             }
 
@@ -190,8 +198,16 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
     private String getHDReceiveAddress() {
 
-        // stub address
-        String receivingAddress = "17k7jQsewpru3uxMkaUMxahyvACVc7fjjb";
+        String receivingAddress = null;
+
+        try {
+            Account account = new Account(MainNetParams.get(), PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, ""), 0);
+            Address addr = account.getReceive().getAddressAt(APIFactory.getInstance(ReceiveActivity.this).getAccountIndex());
+            receivingAddress = addr.getAddressString();
+        }
+        catch(AddressFormatException afe) {
+            return null;
+        }
 
         //Subscribe to websocket to new address
         Intent intent = new Intent(WebSocketService.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
