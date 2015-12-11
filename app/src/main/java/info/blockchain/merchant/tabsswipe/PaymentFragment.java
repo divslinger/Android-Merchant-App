@@ -2,6 +2,8 @@ package info.blockchain.merchant.tabsswipe;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +13,13 @@ import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import info.blockchain.merchant.CurrencyExchange;
 import info.blockchain.merchant.R;
 import info.blockchain.merchant.ReceiveActivity;
+import info.blockchain.merchant.api.APIFactory;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.ToastCustom;
 
@@ -42,6 +47,9 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     private DecimalFormat dfFiat = new DecimalFormat("######0.00");
     private final double bitcoinLimit = 21000000.0;
 
+    private static Timer timer = null;
+    private static Handler handler = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_payment, container, false);
@@ -63,6 +71,42 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+
+        if(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, 0L) > APIFactory.getInstance(getActivity()).getAccountIndex())    {
+            if(timer == null) {
+                timer = new Timer();
+                handler = new Handler();
+
+                timer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try	{
+                                    APIFactory.getInstance(getActivity()).getXPUB();
+                                    PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, APIFactory.getInstance(getActivity()).getAccountIndex());
+                                }
+                                catch(Exception e)	{
+                                    System.out.println(e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+
+                    }
+                }, 1000, 60000);
+            }
+        }
+        else if(timer != null)    {
+            timer.cancel();
+            timer = null;
+        }
+        else    {
+            ;
+        }
+
         initValues();
     }
 
@@ -228,10 +272,12 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             tvAmount.setText(dfFiat.format(amountPayableFiat));
             tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
             allowedDecimalPlaces = DECIMAL_PLACES_FIAT;
+            PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
         }else {
             tvAmount.setText(dfBtc.format(amountPayableBtc));
             tvCurrency.setText(DEFAULT_CURRENCY_BTC);
             allowedDecimalPlaces = DECIMAL_PLACES_BTC;
+            PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, true);
         }
 
         isBtc = !isBtc;

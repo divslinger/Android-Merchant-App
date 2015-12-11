@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
@@ -17,6 +18,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -34,6 +39,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 
 import info.blockchain.merchant.api.APIFactory;
+import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.service.WebSocketService;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 import info.blockchain.merchant.util.MonetaryUtil;
@@ -134,14 +140,28 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
             }
             if(!bamount.equals(BigInteger.ZERO)) {
                 generateQRCode(BitcoinURI.convertToBitcoinURI(receivingAddress, Coin.valueOf(bamount.longValue()), "", ""));
+                write2NFC(BitcoinURI.convertToBitcoinURI(receivingAddress, Coin.valueOf(bamount.longValue()), "", ""));
             }
             else {
                 generateQRCode("bitcoin:" + receivingAddress);
+                write2NFC("bitcoin:" + receivingAddress);
             }
         }
         catch(NumberFormatException e) {
             generateQRCode("bitcoin:" + receivingAddress);
+            write2NFC("bitcoin:" + receivingAddress);
         }
+
+        DBController pdb = new DBController(ReceiveActivity.this);
+        pdb.insertPayment(
+                System.currentTimeMillis() / 1000,          // timestamp, Unix time
+                receivingAddress,                           // receiving address
+                bamount.longValue(),                        // BTC amount
+                tvFiatAmount.getText().toString(),          // fiat amount
+                -1,                                         // confirmations
+                ""                                          // note, message
+            );
+        pdb.close();
 
     }
 
@@ -275,4 +295,24 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvStatus.setText(getResources().getText(R.string.payment_received));
         tvReceivingAddress.setText("");
     }
+
+    private void write2NFC(final String uri) {
+
+        if (Build.VERSION.SDK_INT < 16){
+            return;
+        }
+
+        NfcAdapter nfc = NfcAdapter.getDefaultAdapter(ReceiveActivity.this);
+        if (nfc != null && nfc.isNdefPushEnabled() ) {
+            nfc.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
+                @Override
+                public NdefMessage createNdefMessage(NfcEvent event) {
+                    NdefRecord uriRecord = NdefRecord.createUri(uri);
+                    return new NdefMessage(new NdefRecord[]{ uriRecord });
+                }
+            }, ReceiveActivity.this);
+        }
+
+    }
+
 }
