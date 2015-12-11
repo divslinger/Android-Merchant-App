@@ -1,15 +1,13 @@
 package info.blockchain.merchant.service;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
+import com.neovisionaries.ws.client.WebSocketFrame;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,24 +22,85 @@ public class WebSocketHandler {
 
     private WebSocket mConnection = null;
 
-    private static Context context = null;
+    private WebSocketListener webSocketListener = null;
 
     private HashSet<String> sentMessageSet = new HashSet<String>();
     private HashSet<String> addressSet = new HashSet<String>();
 
-    private Timer keepAliveTimer = null;
-    private static final long keepAliveTimerInterval = 10000L;
+    private Timer pingTimer = null;
+    private final long pingInterval = 20000L;//ping every 20 seconds
+    private final long pongTimeout = 5000L;//pong timeout after 5 seconds
+    private boolean pingPongSuccess = false;
 
-    public WebSocketHandler(Context ctx) {
-        this.context = ctx;
+    public WebSocketHandler() {
     }
 
-    public void send(String message) {
+    public void start() {
+        Log.v(WebSocketHandler.class.getSimpleName(),"start");
+        try {
+            stop();
+            connect();
+            startPingTimer();
+
+        } catch (IOException | com.neovisionaries.ws.client.WebSocketException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stop() {
+
+        stopPingTimer();
+
+        if(mConnection != null && mConnection.isOpen()) {
+            mConnection.disconnect();
+        }
+    }
+
+    private void startPingTimer(){
+
+        pingTimer = new Timer();
+        pingTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (mConnection != null) {
+                    pingPongSuccess = false;
+                    mConnection.sendPing();
+                    startPongTimer();
+                }
+            }
+        }, pingInterval, pingInterval);
+    }
+
+    private void stopPingTimer(){
+        if(pingTimer != null) pingTimer.cancel();
+    }
+
+    private void startPongTimer(){
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (!pingPongSuccess) {
+                    //ping pong unsuccessful after x seconds - restart connection
+                    start();
+                }
+            }
+        }, pongTimeout);
+    }
+
+    private void connect() throws IOException, WebSocketException
+    {
+        new ConnectionTask().execute();
+    }
+
+    public void addListener(WebSocketListener webSocketListener) {
+        this.webSocketListener = webSocketListener;
+    }
+
+    private void send(String message) {
         //Make sure each message is only sent once per socket lifetime
         if(!sentMessageSet.contains(message)) {
             try {
                 if (mConnection != null && mConnection.isOpen()) {
-                    Log.i("WebSocketHandler", "Websocket subscribe:" +message);
                     mConnection.sendText(message);
                     sentMessageSet.add(message);
                 }
@@ -58,63 +117,23 @@ public class WebSocketHandler {
         send("{\"op\":\"addr_sub\", \"addr\":\"" + address + "\"}");
     }
 
-    public boolean isConnected() {
-        return  mConnection != null && mConnection.isOpen();
-    }
-
-    public void stop() {
-
-        if(keepAliveTimer != null) keepAliveTimer.cancel();
-
-        if(mConnection != null && mConnection.isOpen()) {
-            mConnection.disconnect();
-        }
-    }
-
-    public void start() {
-
-        try {
-            stop();
-            connect();
-
-            keepAliveTimer = new Timer();
-            keepAliveTimer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    if (mConnection != null) {
-                        mConnection.sendPing();
-                    }
-                }
-            }, keepAliveTimerInterval, keepAliveTimerInterval);
-
-        }
-        catch (IOException | com.neovisionaries.ws.client.WebSocketException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
-     * Connect to the server.
-     */
-    private void connect() throws IOException, WebSocketException
-    {
-        new ConnectionTask().execute();
-    }
-
     private class ConnectionTask extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... args) {
 
             try {
-                //Seems we make a new connection here, so we should clear our HashSet
-//                    Log.d("WebSocketHandler", "Reconnect of websocket..");
                 sentMessageSet.clear();
 
                 mConnection = new WebSocketFactory()
                         .createSocket("wss://ws.blockchain.info/inv")
                         .addHeader("Origin", "https://blockchain.info").recreate()
                         .addListener(new WebSocketAdapter() {
+
+                            @Override
+                            public void onPongFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                                super.onPongFrame(websocket, frame);
+                                pingPongSuccess = true;
+                            }
 
                             public void onTextMessage(WebSocket websocket, String message) {
 //                                    Log.d("WebSocket", message);
@@ -186,11 +205,8 @@ public class WebSocketHandler {
                                         }
 
                                         if (total_value > 0L) {
-
                                             //Incoming tx
-                                            Intent intent = new Intent(WebSocketService.ACTION_INTENT_INCOMING_TX);
-                                            intent.putExtra("total_value",total_value);
-                                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                                            webSocketListener.onIncomingPayment(total_value);
                                         }
                                     }
                                 } catch (Exception e) {
