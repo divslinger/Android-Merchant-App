@@ -1,7 +1,6 @@
 package info.blockchain.merchant.service;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
@@ -36,7 +35,6 @@ public class WebSocketHandler {
     }
 
     public void start() {
-        Log.v(WebSocketHandler.class.getSimpleName(),"start");
         try {
             stop();
             connect();
@@ -90,6 +88,10 @@ public class WebSocketHandler {
     private void connect() throws IOException, WebSocketException
     {
         new ConnectionTask().execute();
+    }
+
+    public boolean isConnected(){
+        return  mConnection != null && mConnection.isOpen();
     }
 
     public void addListener(WebSocketListener webSocketListener) {

@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     public static final String ACTION_INTENT_SUBSCRIBE_TO_ADDRESS = "info.blockchain.merchant.MainActivity.SUBSCRIBE_TO_ADDRESS";
     public static final String ACTION_INTENT_INCOMING_TX = "info.blockchain.merchant.MainActivity.ACTION_INTENT_INCOMING_TX";
+    public static final String ACTION_INTENT_RECONNECT = "info.blockchain.merchant.MainActivity.ACTION_INTENT_RECONNECT";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +61,9 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         }
 
         //Start websockets
-        IntentFilter filter = new IntentFilter(ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
+        filter.addAction(ACTION_INTENT_RECONNECT);
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
 
         webSocketHandler = new WebSocketHandler();
@@ -247,6 +250,13 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
             if (ACTION_INTENT_SUBSCRIBE_TO_ADDRESS.equals(intent.getAction())) {
                 webSocketHandler.subscribeToAddress(intent.getStringExtra("address"));
+            }
+
+            //Connection re-established
+            if (ACTION_INTENT_RECONNECT.equals(intent.getAction())) {
+                if(webSocketHandler != null && !webSocketHandler.isConnected()){
+                    webSocketHandler.start();
+                }
             }
         }
     };
