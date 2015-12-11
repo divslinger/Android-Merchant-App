@@ -40,7 +40,6 @@ import java.text.DecimalFormat;
 
 import info.blockchain.merchant.api.APIFactory;
 import info.blockchain.merchant.db.DBController;
-import info.blockchain.merchant.service.WebSocketService;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 import info.blockchain.merchant.util.MonetaryUtil;
 import info.blockchain.merchant.util.PrefsUtil;
@@ -76,7 +75,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         initViews();
 
         //Register receiver (Listen for incoming tx)
-        IntentFilter filter = new IntentFilter(WebSocketService.ACTION_INTENT_INCOMING_TX);
+        IntentFilter filter = new IntentFilter(MainActivity.ACTION_INTENT_INCOMING_TX);
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
 
         //Incoming intent value
@@ -242,7 +241,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         }
 
         //Subscribe to websocket to new address
-        Intent intent = new Intent(WebSocketService.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
+        Intent intent = new Intent(MainActivity.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
         intent.putExtra("address",receivingAddress);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
@@ -261,11 +260,11 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         @Override
         public void onReceive(Context context, final Intent intent) {
 
-            //Catch incoming tx
-            if (WebSocketService.ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
-                soundAlert();
-                onPaymentReceived();
-            }
+        //Catch incoming tx
+        if (MainActivity.ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
+            soundAlert();
+            onPaymentReceived();
+        }
         }
     };
 

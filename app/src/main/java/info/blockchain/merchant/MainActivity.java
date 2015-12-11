@@ -1,8 +1,10 @@
 package info.blockchain.merchant;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -10,6 +12,7 @@ import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -22,17 +25,22 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import info.blockchain.merchant.service.WebSocketService;
+import info.blockchain.merchant.service.WebSocketHandler;
+import info.blockchain.merchant.service.WebSocketListener;
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
-import info.blockchain.merchant.util.OSUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 
-public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback {
+public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener {
 
     private static int SETTINGS_ACTIVITY 	= 1;
     private static int PIN_ACTIVITY 		= 2;
     private static int RESET_PIN_ACTIVITY 	= 3;
     private static int ABOUT_ACTIVITY 	= 4;
+
+    private WebSocketHandler webSocketHandler = null;
+
+    public static final String ACTION_INTENT_SUBSCRIBE_TO_ADDRESS = "info.blockchain.merchant.MainActivity.SUBSCRIBE_TO_ADDRESS";
+    public static final String ACTION_INTENT_INCOMING_TX = "info.blockchain.merchant.MainActivity.ACTION_INTENT_INCOMING_TX";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +59,13 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         	doPIN();
         }
 
-        //Start service for websockets
-        if(!OSUtil.getInstance(MainActivity.this).isServiceRunning(WebSocketService.class)) {
-            startService(new Intent(MainActivity.this, WebSocketService.class));
-        }
+        //Start websockets
+        IntentFilter filter = new IntentFilter(ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
+
+        webSocketHandler = new WebSocketHandler();
+        webSocketHandler.addListener(this);
+        webSocketHandler.start();
 	}
 
 	@Override
@@ -93,10 +104,10 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
 	@Override
     protected void onDestroy() {
-        //Stop service for websockets
-        if(!OSUtil.getInstance(MainActivity.this).isServiceRunning(WebSocketService.class)) {
-            stopService(new Intent(MainActivity.this, WebSocketService.class));
-        }
+        //Stop websockets
+        webSocketHandler.stop();
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
+
         super.onDestroy();
     }
 
@@ -230,4 +241,22 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 		startActivityForResult(intent, ABOUT_ACTIVITY);
     }
 
+    protected BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+
+            if (ACTION_INTENT_SUBSCRIBE_TO_ADDRESS.equals(intent.getAction())) {
+                webSocketHandler.subscribeToAddress(intent.getStringExtra("address"));
+            }
+        }
+    };
+
+    @Override
+    public void onIncomingPayment(long paymentAmount) {
+
+        //New incoming payment - broadcast message
+        Intent intent = new Intent(MainActivity.ACTION_INTENT_INCOMING_TX);
+        intent.putExtra("payment_amount",paymentAmount);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
 }
