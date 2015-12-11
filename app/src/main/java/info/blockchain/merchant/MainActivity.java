@@ -3,6 +3,11 @@ package info.blockchain.merchant;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
@@ -15,13 +20,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import info.blockchain.merchant.service.WebSocketService;
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
 import info.blockchain.merchant.util.OSUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback {
 
     private static int SETTINGS_ACTIVITY 	= 1;
     private static int PIN_ACTIVITY 		= 2;
@@ -51,7 +57,41 @@ public class MainActivity extends AppCompatActivity {
         }
 	}
 
-    @Override
+	@Override
+	protected void onNewIntent(Intent intent) {
+		setIntent(intent);
+	}
+
+	@Override
+	public void onNdefPushComplete(NfcEvent event) {
+
+		if(Build.VERSION.SDK_INT < 16){
+			return;
+		}
+
+        final String eventString = "onNdefPushComplete\n" + event.toString();
+        runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Toast.makeText(getApplicationContext(), eventString, Toast.LENGTH_SHORT).show();
+			}
+		});
+
+	}
+
+	@Override
+	public NdefMessage createNdefMessage(NfcEvent event) {
+
+		if(Build.VERSION.SDK_INT < 16){
+			return null;
+		}
+
+		NdefRecord rtdUriRecord = NdefRecord.createUri("market://details?id=info.blockchain.merchant");
+		NdefMessage ndefMessageout = new NdefMessage(rtdUriRecord);
+		return ndefMessageout;
+	}
+
+	@Override
     protected void onDestroy() {
         //Stop service for websockets
         if(!OSUtil.getInstance(MainActivity.this).isServiceRunning(WebSocketService.class)) {
