@@ -39,6 +39,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 
 import info.blockchain.merchant.api.APIFactory;
+import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.service.WebSocketService;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 import info.blockchain.merchant.util.MonetaryUtil;
@@ -150,6 +151,17 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
             generateQRCode("bitcoin:" + receivingAddress);
             write2NFC("bitcoin:" + receivingAddress);
         }
+
+        DBController pdb = new DBController(ReceiveActivity.this);
+        pdb.insertPayment(
+                System.currentTimeMillis() / 1000,          // timestamp, Unix time
+                receivingAddress,                           // receiving address
+                bamount.longValue(),                        // BTC amount
+                tvFiatAmount.getText().toString(),          // fiat amount
+                -1,                                         // confirmations
+                ""                                          // note, message
+            );
+        pdb.close();
 
     }
 
