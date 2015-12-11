@@ -272,10 +272,12 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             tvAmount.setText(dfFiat.format(amountPayableFiat));
             tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
             allowedDecimalPlaces = DECIMAL_PLACES_FIAT;
+            PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
         }else {
             tvAmount.setText(dfBtc.format(amountPayableBtc));
             tvCurrency.setText(DEFAULT_CURRENCY_BTC);
             allowedDecimalPlaces = DECIMAL_PLACES_BTC;
+            PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, true);
         }
 
         isBtc = !isBtc;

@@ -35,9 +35,11 @@ import com.markupartist.android.widget.PullToRefreshListView.OnRefreshListener;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -47,6 +49,7 @@ import info.blockchain.merchant.NotificationData;
 import info.blockchain.merchant.R;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.util.DateUtil;
+import info.blockchain.merchant.util.MonetaryUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.TypefaceUtil;
 import info.blockchain.wallet.util.WebUtil;
@@ -128,7 +131,7 @@ public class TransactionsFragment extends ListFragment	{
                             public void run() {
                                 new GetDataTask().execute();
                             }
-                    	}, 500L, 1000L * 60L * 2L);	// poll every 10 minutes
+                    	}, 500L, 1000L * 60L * 2L);
                     }
                     catch(IllegalStateException ise) {
                     	;
@@ -294,23 +297,9 @@ public class TransactionsFragment extends ListFragment	{
 
 	        if(doBTC) {
 	        	String displayValue = null;
-        		String value = BitcoinURI.bitcoinValueToPlainString(BigInteger.valueOf(vals.getAsLong("amt")));
-        		int idx = value.indexOf(".");
-        		if(idx != -1) {
-        			String tmp = value.substring(idx + 1, value.length());
-        			if(vals.getAsLong("amt") < 100000000 && tmp.length() > 4) {
-        				displayValue = value.substring(0, idx + 1) + tmp.substring(0, 4);
-        			}
-        			else if(vals.getAsLong("amt") >= 100000000 && tmp.length() > 3) {
-        				displayValue = value.substring(0, idx + 1) + tmp.substring(0, 3);
-        			}
-        			else {
-        				displayValue = value;
-        			}
-        		}
-    			else {
-    				displayValue = value;
-    			}
+				NumberFormat btcFormat = NumberFormat.getInstance(Locale.getDefault());
+				long amount = vals.getAsLong("amt");
+				displayValue = MonetaryUtil.getInstance(getActivity()).getDisplayAmountWithFormatting(amount);
 
     	        TextView btc_view = (TextView)view.findViewById(R.id.tv_btc);
     	        btc_view.setTypeface(btc_font);
