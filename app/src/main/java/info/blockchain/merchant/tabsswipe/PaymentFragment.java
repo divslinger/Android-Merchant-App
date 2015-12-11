@@ -1,13 +1,16 @@
 package info.blockchain.merchant.tabsswipe;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,7 +30,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
     private View rootView = null;
     private TextView tvAmount = null;
-    private TextView tvCharge = null;
+    private ImageView ivCharge = null;
     private TextView tvCurrency = null;
     private LinearLayout llAmountContainer = null;
     public static String AMOUNT_PAYABLE_FIAT = "AMOUNT_PAYABLE_FIAT";
@@ -55,7 +58,8 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         rootView = inflater.inflate(R.layout.fragment_payment, container, false);
 
         tvAmount = (TextView)rootView.findViewById(R.id.tv_fiat_amount);
-        tvCharge = (TextView)rootView.findViewById(R.id.tv_charge);
+        ivCharge = (ImageView)rootView.findViewById(R.id.iv_charge);
+        ivCharge.setColorFilter(Color.parseColor("#CCCCCC"));//TODO - not working from resource
         tvCurrency = (TextView)rootView.findViewById(R.id.tv_currency);
         llAmountContainer = (LinearLayout)rootView.findViewById(R.id.amount_container);
         llAmountContainer.setOnClickListener(this);
@@ -66,6 +70,12 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         initPadClickListeners();
 
         return rootView;
+    }
+
+    public Drawable convertColorDrawable(int resource, int color) {
+        final Drawable drawable = getActivity().getResources().getDrawable(resource);
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        return drawable.mutate();
     }
 
     @Override
@@ -152,7 +162,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
             case R.id.amount_container: toggleAmount();break;
 
-            case R.id.tv_charge:chargeClicked(); return;
+            case R.id.iv_charge:chargeClicked(); return;
         }
 
         validateAmount();
@@ -162,16 +172,16 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         try {
             double textParsable = Double.parseDouble(tvAmount.getText().toString());
             if (textParsable > 0.0) {
-                tvCharge.setOnClickListener(this);
-                tvCharge.setTextColor(getResources().getColor(R.color.white));
+                ivCharge.setOnClickListener(this);
+                ivCharge.setColorFilter(Color.parseColor("#ffffff"));
             }else{
-                tvCharge.setOnClickListener(null);
-                tvCharge.setTextColor(getResources().getColor(R.color.white_50));
+                ivCharge.setOnClickListener(null);
+                ivCharge.setColorFilter(Color.parseColor("#CCCCCC"));
             }
         }catch(Exception e){
             tvAmount.setText("0");
-            tvCharge.setOnClickListener(null);
-            tvCharge.setTextColor(getResources().getColor(R.color.white_50));
+            ivCharge.setOnClickListener(null);
+            ivCharge.setColorFilter(Color.parseColor("#CCCCCC"));
         }
 
         updateAmounts();

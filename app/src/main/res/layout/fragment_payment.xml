@@ -53,13 +53,13 @@
 
     <include layout="@layout/include_numeric_keypad"/>
 
-    <TextView
-        android:id="@+id/tv_charge"
+    <ImageView
+        android:id="@+id/iv_charge"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:text="@string/NEW_TRANSACTION"
-        android:textColor="@color/white_50"
         android:gravity="center"
+        android:src="@drawable/ic_done_white_48dp"
+        android:scaleType="center"
         android:background="@color/blockchain_green"/>
 
 </LinearLayout>
