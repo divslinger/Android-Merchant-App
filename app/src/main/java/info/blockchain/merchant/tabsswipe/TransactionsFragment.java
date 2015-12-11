@@ -128,7 +128,7 @@ public class TransactionsFragment extends ListFragment	{
                             public void run() {
                                 new GetDataTask().execute();
                             }
-                    	}, 500L, 1000L * 60L * 10L);	// poll every 10 minutes
+                    	}, 500L, 1000L * 60L * 2L);	// poll every 10 minutes
                     }
                     catch(IllegalStateException ise) {
                     	;
@@ -157,7 +157,6 @@ public class TransactionsFragment extends ListFragment	{
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-//        Log.i("TransactionsFragment", "Item clicked: " + id);
         doTxTap(id);
     }
 
@@ -186,23 +185,17 @@ public class TransactionsFragment extends ListFragment	{
 				}
 
                 DBController pdb = new DBController(getActivity());
-//                pdb.deleteExpired();
                 List<String> confirmedAddresses = pdb.getConfirmedPaymentIncomingAddresses();
 
                 List<Tx> txs = wallet.getTxs();
                 if(txs != null && txs.size() > 0) {
-//                    Log.i("Update confirmed", "txs returned:" + txs.size());
                     for (Tx t : txs) {
                     	if(t.getIncomingAddresses().size() > 0) {
-//                            Log.i("Update confirmed", "addresses for this tx:" + t.getIncomingAddresses().size());
                     		List<String> incoming_addresses = t.getIncomingAddresses();
                             for (String incoming : incoming_addresses) {
-//                                Log.i("Update confirmed", incoming + ", confirmed:" + t.isConfirmed());
                         		if(t.isConfirmed()) {
-//                                    Log.i("Update confirmed", "updating database for incoming (confirmed):" + incoming);
                                     if(pdb.updateConfirmed(incoming, 1) > 0) {
                                     	if(push_notifications && !confirmedAddresses.contains(incoming)) {
-//                                            Log.i("Update confirmed", "push notification:" + incoming);
                                   			String strMarquee = getActivity().getResources().getString(R.string.marquee_start) + " " + incoming;
                                   			String strText = BitcoinURI.bitcoinValueToPlainString(BigInteger.valueOf(t.getAmount())) + " " + getActivity().getResources().getString(R.string.notification_end);
                                   			if(notification != null) {
@@ -214,7 +207,6 @@ public class TransactionsFragment extends ListFragment	{
                                     }
                         		}
                         		else {
-//                                    Log.i("Update confirmed", "updating database for incoming (received):" + incoming);
                             		pdb.updateConfirmed(incoming, 0);
                         		}
                             }
@@ -224,8 +216,7 @@ public class TransactionsFragment extends ListFragment	{
                 
                 // get updated list from database
                 ArrayList<ContentValues> vals = pdb.getAllPayments();
-//                pdb.close();
-                
+
                 if(vals.size() > 0) {
                 	mListItems.clear();
                 	mListItems.addAll(vals);
