@@ -33,7 +33,7 @@ public class SettingsActivity extends Activity	{
 	private Spinner spCurrencies = null;
 	private CheckBox sPushNotifications = null;
 	private String[] currencies = null;
-	private EditText merchantXpubView = null;
+	private EditText merchantReceiverView = null;
 	private EditText merchantNameView = null;
 
 	private TextView tvOK = null;
@@ -60,8 +60,8 @@ public class SettingsActivity extends Activity	{
 		if(resultCode == Activity.RESULT_OK && requestCode == ZBAR_SCANNER_REQUEST)	{
 
             final String scanResult = data.getStringExtra(ZBarConstants.SCAN_RESULT);
-            if(FormatsUtil.getInstance().isValidXpub(scanResult)){
-                merchantXpubView.setText(scanResult);
+            if(FormatsUtil.getInstance().isValidXpub(scanResult) || FormatsUtil.getInstance().isValidBitcoinAddress(scanResult)){
+                merchantReceiverView.setText(scanResult);
             }else{
                 ToastCustom.makeText(this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
@@ -71,7 +71,7 @@ public class SettingsActivity extends Activity	{
     private void initValues() {
 
         spCurrencies = (Spinner)findViewById(R.id.receive_coins_default_currency);
-        merchantXpubView = (EditText)findViewById(R.id.et_merchant_xpub);
+        merchantReceiverView = (EditText)findViewById(R.id.et_merchant_receiver);
         ivQr = (ImageView)findViewById(R.id.iv_QR);
         merchantNameView = (EditText)findViewById(R.id.et_merchant_name);
         tvOK = (TextView)findViewById(R.id.confirm);
@@ -102,15 +102,15 @@ public class SettingsActivity extends Activity	{
         tvOK.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
 
-                String strMerchantXpub = merchantXpubView.getEditableText().toString();
+                String strMerchantReceiver = merchantReceiverView.getEditableText().toString();
                 String strMerchantName = merchantNameView.getEditableText().toString();
                 boolean push_notifications = sPushNotifications.isChecked();
                 int currency = spCurrencies.getSelectedItemPosition();
                 currencies = getResources().getStringArray(R.array.currencies);
 
-                if (FormatsUtil.getInstance().isValidXpub(strMerchantXpub)) {
+                if (FormatsUtil.getInstance().isValidXpub(strMerchantReceiver) || FormatsUtil.getInstance().isValidBitcoinAddress(strMerchantReceiver)) {
 
-                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, strMerchantXpub);
+                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, strMerchantReceiver);
                     PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, strMerchantName);
                     PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, push_notifications);
 
@@ -131,7 +131,7 @@ public class SettingsActivity extends Activity	{
         });
 
         merchantNameView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
-        merchantXpubView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""));
+        merchantReceiverView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""));
         sPushNotifications.setChecked(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false));
 
     	currencies = getResources().getStringArray(R.array.currencies);
