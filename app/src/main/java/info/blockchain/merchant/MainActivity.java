@@ -71,6 +71,10 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 			}
 			catch(ClassNotFoundException cnfe) {
 
+				String strCurrency = PrefsUtil.getInstance(MainActivity.this).getValue("currency", "");
+				if(strCurrency.equals("ZZZ"))	{
+					PrefsUtil.getInstance(MainActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
+				}
 				PrefsUtil.getInstance(MainActivity.this).removeValue("ocurrency");
 
 			}
