@@ -125,9 +125,11 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         if(tvCurrency != null)    {
             if(isBtc)    {
                 tvCurrency.setText(DEFAULT_CURRENCY_BTC);
+                allowedDecimalPlaces = DECIMAL_PLACES_BTC;
             }
             else    {
                 tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
+                allowedDecimalPlaces = DECIMAL_PLACES_FIAT;
             }
         }
         updateAmounts();
