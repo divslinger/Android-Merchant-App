@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -47,13 +48,13 @@ import info.blockchain.merchant.util.ToastCustom;
 
 public class ReceiveActivity extends Activity implements View.OnClickListener{
 
+    private TextView tvMerchantName = null;
     private TextView tvFiatAmount = null;
     private TextView tvBtcAmount = null;
-    private TextView tvReceivingAddress = null;
     private ImageView ivReceivingQr = null;
     private ProgressBar progressBar = null;
     private LinearLayout progressLayout = null;
-    private TextView tvCancel = null;
+    private ImageView ivCancel = null;
     private ImageView ivCheck = null;
     private TextView tvStatus = null;
 
@@ -105,18 +106,19 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
     public void onClick(View v) {
 
         switch (v.getId()) {
-            case R.id.tv_cancel:onBackPressed();break;
+            case R.id.iv_cancel:onBackPressed();break;
         }
     }
 
     private void initViews(){
+        tvMerchantName = (TextView)findViewById(R.id.tv_merchant_name);
+        tvMerchantName.setText(PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
         tvFiatAmount = (TextView)findViewById(R.id.tv_fiat_amount);
         tvBtcAmount = (TextView)findViewById(R.id.tv_btc_amount);
         ivReceivingQr = (ImageView)findViewById(R.id.qr);
         progressBar = (ProgressBar)findViewById(R.id.progress);
         progressLayout = (LinearLayout)findViewById(R.id.progressLayout);
-        tvReceivingAddress = (TextView)findViewById(R.id.tvAddress);
-        tvCancel = (TextView)findViewById(R.id.tv_cancel);
+        ivCancel = (ImageView)findViewById(R.id.iv_cancel);
         ivCheck = (ImageView)findViewById(R.id.iv_check);
         tvStatus = (TextView)findViewById(R.id.tv_status);
 
@@ -124,7 +126,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         ivCheck.setVisibility(View.GONE);
         progressLayout.setVisibility(View.VISIBLE);
 
-        tvCancel.setOnClickListener(this);
+        ivCancel.setOnClickListener(this);
     }
 
     private void displayQRCode(long lamount) {
@@ -174,7 +176,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
                 //Show generating QR message
                 ivReceivingQr.setVisibility(View.GONE);
-                tvReceivingAddress.setText(R.string.generating_qr);
                 progressLayout.setVisibility(View.VISIBLE);
             }
 
@@ -203,8 +204,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 super.onPostExecute(bitmap);
                 progressLayout.setVisibility(View.GONE);
                 ivReceivingQr.setVisibility(View.VISIBLE);
-                tvReceivingAddress.setVisibility(View.VISIBLE);
-                tvReceivingAddress.setText(receivingAddress);
                 ivReceivingQr.setImageBitmap(bitmap);
             }
         }.execute();
@@ -286,13 +285,21 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
     }
 
     private void onPaymentReceived(){
-        tvCancel.setBackgroundColor(getResources().getColor(R.color.blockchain_green));
-        tvCancel.setText(getResources().getText(R.string.prompt_ok));
+        ivCancel.setBackgroundColor(getResources().getColor(R.color.white));
+        ivCancel.setColorFilter(Color.parseColor("#FA343A"));
 
         ivReceivingQr.setVisibility(View.GONE);
         ivCheck.setVisibility(View.VISIBLE);
+        ivCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         tvStatus.setText(getResources().getText(R.string.payment_received));
-        tvReceivingAddress.setText("");
+        tvStatus.setTextColor(getResources().getColor(R.color.blockchain_receive_green));
+        tvBtcAmount.setVisibility(View.GONE);
+        tvFiatAmount.setVisibility(View.GONE);
     }
 
     private void write2NFC(final String uri) {
