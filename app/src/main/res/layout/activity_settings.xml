@@ -27,7 +27,7 @@
         android:paddingTop="8dp">
 
         <EditText
-            android:id="@+id/et_merchant_xpub"
+            android:id="@+id/et_merchant_receiver"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
