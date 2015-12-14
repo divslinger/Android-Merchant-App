@@ -99,6 +99,6 @@
         android:textSize="18sp"
         android:gravity="center"
         android:layout_margin="16dp"
-        android:background="@color/blockchain_send_red"/>
+        android:background="@color/blockchain_red"/>
 
 </LinearLayout>

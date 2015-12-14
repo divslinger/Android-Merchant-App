@@ -94,7 +94,7 @@
                 android:gravity="center"
                 android:padding="5dip"
                 android:text=""
-                android:textColor="@color/blockchain_send_red"
+                android:textColor="@color/blockchain_red"
                 android:textSize="20sp"
                 />
 

@@ -12,16 +12,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="@color/blockchain_blue"
+        android:background="@color/blockchain_off_white"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/tv_fiat_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="0.00"
+            android:text="0"
             android:textSize="42sp"
-            android:textColor="@color/white"
+            android:textColor="@color/textColorPrimary"
             android:gravity="center"/>
 
         <TextView
@@ -30,7 +30,8 @@
             android:layout_height="wrap_content"
             android:text="USD"
             android:textSize="16sp"
-            android:textColor="@color/white_50"
+            android:textColor="@color/textColorPrimary"
+            android:alpha="0.5"
             android:gravity="center"/>
 
         <!--<EditText-->
@@ -50,6 +51,8 @@
             <!--/>-->
 
     </LinearLayout>
+
+    <include layout="@layout/include_container_shadow"/>
 
     <include layout="@layout/include_numeric_keypad"/>
 

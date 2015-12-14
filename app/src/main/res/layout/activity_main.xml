@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:background="@color/blockchain_blue"
         android:minHeight="?attr/actionBarSize"
-        app:tabIndicatorColor="@color/white"
+        app:tabIndicatorColor="@color/blockchain_light_blue"
         app:tabIndicatorHeight="4dp"
         app:tabGravity="fill"
         app:tabMaxWidth="0dp"
