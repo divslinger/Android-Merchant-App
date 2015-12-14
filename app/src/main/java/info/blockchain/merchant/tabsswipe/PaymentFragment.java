@@ -48,7 +48,6 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     private final double bitcoinLimit = 21000000.0;
 
     private static Timer timer = null;
-    private static Handler handler = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,10 +59,9 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         llAmountContainer = (LinearLayout)rootView.findViewById(R.id.amount_container);
         llAmountContainer.setOnClickListener(this);
 
-        //Start off with fiat
-        isBtc = false;
-
         initPadClickListeners();
+
+        initValues();
 
         return rootView;
     }
@@ -75,7 +73,6 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         if(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, 0L) > APIFactory.getInstance(getActivity()).getAccountIndex())    {
             if(timer == null) {
                 timer = new Timer();
-                handler = new Handler();
 
                 timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
@@ -107,12 +104,22 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             ;
         }
 
+        isBtc = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
+
         initValues();
     }
 
     private void initValues(){
-        if(tvCurrency != null && !isBtc)    {
-            tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
+
+        isBtc = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
+
+        if(tvCurrency != null)    {
+            if(isBtc)    {
+                tvCurrency.setText(DEFAULT_CURRENCY_BTC);
+            }
+            else    {
+                tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
+            }
         }
         updateAmounts();
     }
