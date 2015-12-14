@@ -29,6 +29,7 @@ import android.widget.Toast;
 import info.blockchain.merchant.service.WebSocketHandler;
 import info.blockchain.merchant.service.WebSocketListener;
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
+import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 
 public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener {
@@ -65,18 +66,12 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 			//
 			// test for v1
 			//
-			try {
-				Class.forName("info.blockchain.merchant.NetworkStateReceiver");
-				// v2, do nothing
-			}
-			catch(ClassNotFoundException cnfe) {
-
+			if(AppUtil.getInstance(MainActivity.this).isLegacy())	{
 				String strCurrency = PrefsUtil.getInstance(MainActivity.this).getValue("currency", "");
 				if(strCurrency.equals("ZZZ"))	{
 					PrefsUtil.getInstance(MainActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
 				}
 				PrefsUtil.getInstance(MainActivity.this).removeValue("ocurrency");
-
 			}
 
 		}
