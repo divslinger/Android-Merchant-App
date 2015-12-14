@@ -50,7 +50,7 @@ public class APIFactory	{
 
         try {
             StringBuilder url = new StringBuilder(WebUtil.MULTIADDR_URL);
-            url.append(PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, ""));
+            url.append(PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""));
 //            Log.i("APIFactory", "XPUB:" + url.toString());
             String response = WebUtil.getInstance().getURL(url.toString());
 //            Log.i("APIFactory", "XPUB response:" + response);

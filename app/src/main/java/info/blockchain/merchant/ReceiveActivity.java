@@ -226,7 +226,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         String receivingAddress = null;
 
         try {
-            Account account = new Account(MainNetParams.get(), PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, ""), 0);
+            Account account = new Account(MainNetParams.get(), PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""), 0);
 
             int idx = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, APIFactory.getInstance(ReceiveActivity.this).getAccountIndex());
             if(idx - APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() >= ADDRESS_LOOKAHEAD)    {
