@@ -62,7 +62,7 @@ public class WebSocketHandler {
             public void run() {
                 if (mConnection != null) {
                     pingPongSuccess = false;
-                    mConnection.sendPing();
+                    if(mConnection.isOpen())mConnection.sendPing();
                     startPongTimer();
                 }
             }
