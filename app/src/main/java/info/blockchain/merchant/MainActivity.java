@@ -17,7 +17,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -132,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     private void initTableLayout(){
 
-        String[] tabs = new String[]{getResources().getString(R.string.tab_payment),getResources().getString(R.string.tab_transactions)};
+        String[] tabs = new String[]{getResources().getString(R.string.tab_payment),getResources().getString(R.string.tab_history)};
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);

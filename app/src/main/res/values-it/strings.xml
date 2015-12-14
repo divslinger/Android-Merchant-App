@@ -14,7 +14,7 @@
   <string name="wallet_download">Crea un portafoglio Bitcoin gratis</string>
   <string name="tab_settings">Impostazioni</string>
   <string name="tab_payment">Pagamento</string>
-  <string name="tab_transactions">Transazioni</string>
+  <string name="tab_history">Transazioni</string>
   <string name="receive_coins_fragment_name">Nome</string>
   <string name="receive_coins_fragment_merchant_xpub_hint">Indirizzo portafoglio</string>
   <string name="receive_coins_fragment_receiving_address_error">Indirizzo non valido!</string>

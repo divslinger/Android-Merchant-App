@@ -16,7 +16,7 @@
     
     <string name="tab_settings">Einstellungen</string>
     <string name="tab_payment">Bezahlung</string>
-    <string name="tab_transactions">Transaktionen</string>
+    <string name="tab_history">Transaktionen</string>
     
     <string name="receive_coins_fragment_name">Name</string>
     <string name="receive_coins_fragment_merchant_xpub_hint">Wallet Adresse</string>

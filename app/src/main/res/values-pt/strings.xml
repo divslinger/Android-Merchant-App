@@ -14,7 +14,7 @@
   <string name="wallet_download">Obter uma carteira de Bitcoin grátis</string>
   <string name="tab_settings">Configurações</string>
   <string name="tab_payment">Pagamento</string>
-  <string name="tab_transactions">Transações</string>
+  <string name="tab_history">Transações</string>
   <string name="receive_coins_fragment_name">Nome</string>
   <string name="receive_coins_fragment_merchant_xpub_hint">Endereço da carteira</string>
   <string name="receive_coins_fragment_receiving_address_error">Endereço inválido</string>

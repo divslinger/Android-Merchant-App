@@ -18,7 +18,7 @@
     
     <string name="tab_settings">Settings</string>
     <string name="tab_payment">Payment</string>
-    <string name="tab_transactions">Transactions</string>
+    <string name="tab_history">History</string>
     
     <string name="receive_coins_fragment_name">Merchant Name</string>
     <string name="receive_coins_fragment_merchant_xpub_hint">Your Public Key</string>
@@ -73,7 +73,6 @@
     <string name="enter_pin">Enter Pin</string>
     <string name="create_pin">Create Pin</string>
     <string name="confirm_pin">Confirm Pin</string>
-    <string name="NEW_TRANSACTION">NEW TRANSACTION</string>
     <string name="unrecognized_xpub">Unrecognized public key format</string>
     <string name="payment_received">Payment Received. Thank you.</string>
     <string name="unable_to_generate_address">An address cannot be generated at this time. Please check your installation and try again.</string>

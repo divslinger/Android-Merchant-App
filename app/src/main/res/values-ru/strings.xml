@@ -14,7 +14,7 @@
   <string name="wallet_download">Получить биткойн-кошелек бесплатно</string>
   <string name="tab_settings">Настройки</string>
   <string name="tab_payment">Оплата</string>
-  <string name="tab_transactions">Транзакции</string>
+  <string name="tab_history">Транзакции</string>
   <string name="receive_coins_fragment_name">Имя</string>
   <string name="receive_coins_fragment_merchant_xpub_hint">Адрес кошелька</string>
   <string name="receive_coins_fragment_receiving_address_error">Неверный адрес</string>

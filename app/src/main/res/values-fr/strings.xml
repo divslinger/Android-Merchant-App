@@ -15,7 +15,7 @@
     <string name="wallet_download">Gratuit: Votre portfeuille Bitcoin</string>
     <string name="tab_settings">Paramètres</string>
     <string name="tab_payment">Paiement</string>
-    <string name="tab_transactions">Transactions</string>
+    <string name="tab_history">Transactions</string>
     
     <string name="receive_coins_fragment_name">Non</string>
     <string name="receive_coins_fragment_merchant_xpub_hint">Adresse portefeuille</string>

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -35,18 +36,16 @@ import com.markupartist.android.widget.PullToRefreshListView.OnRefreshListener;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import info.blockchain.merchant.api.Tx;
-import info.blockchain.merchant.api.Wallet;
 import info.blockchain.merchant.NotificationData;
 import info.blockchain.merchant.R;
+import info.blockchain.merchant.api.Tx;
+import info.blockchain.merchant.api.Wallet;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.util.DateUtil;
 import info.blockchain.merchant.util.MonetaryUtil;
@@ -69,9 +68,6 @@ public class TransactionsFragment extends ListFragment	{
 
     private boolean doBTC = false;
 
-    private static int DARK_BG = 0xFFF7F7F7;
-    private static int LIGHT_BG = 0xFFFFFFFF;
- 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 	    ViewGroup viewGroup = (ViewGroup) super.onCreateView(inflater, container, savedInstanceState);
@@ -82,7 +78,6 @@ public class TransactionsFragment extends ListFragment	{
 	    listView.setId(android.R.id.list);
 	    listView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 	    listView.setDrawSelectorOnTop(false);
-	    listView.setBackgroundColor(DARK_BG);
 	    listView.setDivider(getActivity().getResources().getDrawable(R.drawable.list_divider));
 	    
 	    FrameLayout parent = (FrameLayout)oldView.getParent();
@@ -274,56 +269,43 @@ public class TransactionsFragment extends ListFragment	{
 	            view = convertView;
 	        }
 
-	        boolean bkg = (position % 2 == 0) ? true : false;
-	        if(bkg) {
-	        	view.setBackgroundColor(DARK_BG);
-	        }
-	        else {
-	        	view.setBackgroundColor(LIGHT_BG);
-	        }
-
 	        ContentValues vals = mListItems.get(position);
-	        
+
 	        String date_str = DateUtil.getInstance().formatted(vals.getAsLong("ts"));
 	        SpannableStringBuilder ds = new SpannableStringBuilder(date_str);
 	        if(date_str.indexOf("@") != -1) {
 	        	int idx = date_str.indexOf("@");
-		        ds.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, idx, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        ds.setSpan(new StyleSpan(Typeface.NORMAL), 0, idx, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        ds.setSpan(new RelativeSizeSpan(0.75f), idx, date_str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 	        }
-	        ((TextView)view.findViewById(R.id.tv_date)).setText(ds);
+            TextView tvDate = (TextView)view.findViewById(R.id.tv_date);
+            tvDate.setText(ds);
+            tvDate.setAlpha(0.7f);
 
-	        ((TextView)view.findViewById(R.id.tv_note)).setText(vals.getAsString("msg"));
-
+            TextView tvAmount = (TextView)view.findViewById(R.id.tv_amount);
 	        if(doBTC) {
 	        	String displayValue = null;
-				NumberFormat btcFormat = NumberFormat.getInstance(Locale.getDefault());
 				long amount = vals.getAsLong("amt");
 				displayValue = MonetaryUtil.getInstance(getActivity()).getDisplayAmountWithFormatting(amount);
 
-    	        TextView btc_view = (TextView)view.findViewById(R.id.tv_btc);
-    	        btc_view.setTypeface(btc_font);
     	        SpannableStringBuilder cs = new SpannableStringBuilder(getActivity().getResources().getString(R.string.bitcoin_currency_symbol));
-    	        cs.setSpan(new RelativeSizeSpan((float)0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-    	        btc_view.setText(cs);
-    	        ((TextView)view.findViewById(R.id.tv_fiat_amount)).setText(displayValue);
+    	        cs.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                tvAmount.setText(cs+" "+displayValue);
 	        }
 	        else {
-    	        TextView btc_view = (TextView)view.findViewById(R.id.tv_btc);
     	        SpannableStringBuilder cs = new SpannableStringBuilder(vals.getAsString("famt").subSequence(0, 1));
-    	        cs.setSpan(new RelativeSizeSpan((float)0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-    	        btc_view.setText(cs);
-       	        ((TextView)view.findViewById(R.id.tv_fiat_amount)).setText(vals.getAsString("famt").substring(1));
+    	        cs.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                tvAmount.setText(cs + " " + vals.getAsString("famt").substring(1));
 	        }
 
-	        if(vals.getAsInteger("cfm") > 0) {
-		        ((ImageView)view.findViewById(R.id.tv_status)).setImageResource(R.drawable._ic_launcher);
-	        }
-	        else if(vals.getAsInteger("cfm") == 0) {
-		        ((ImageView)view.findViewById(R.id.tv_status)).setImageResource(R.drawable._ic_launcher);
+            ImageView ivStatus = (ImageView)view.findViewById(R.id.iv_status);
+	        if(vals.getAsInteger("cfm") >= 0) {
+                ivStatus.setImageResource(R.drawable.ic_done_white_24dp);
+                ivStatus.setColorFilter(Color.parseColor("#31c68c"));
 	        }
 	        else {
-		        ((ImageView)view.findViewById(R.id.tv_status)).setImageResource(R.drawable.hourglass);
+                ivStatus.setImageResource(R.drawable.ic_schedule_grey600_24dp);
+                ivStatus.setColorFilter(Color.parseColor("#FF808080"));
 	        }
 	 
 	        return view;
@@ -332,7 +314,7 @@ public class TransactionsFragment extends ListFragment	{
     }
 
     private void doTxTap(final long item)	{
-    	
+
         final ContentValues val = mListItems.get((int)item);
 
 		SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy@HH:mm");
