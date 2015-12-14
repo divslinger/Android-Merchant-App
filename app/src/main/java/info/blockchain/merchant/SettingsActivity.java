@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -23,13 +22,9 @@ import com.dm.zbar.android.scanner.ZBarScannerActivity;
 
 import net.sourceforge.zbar.Symbol;
 
-import org.bitcoinj.core.AddressFormatException;
-
-import java.nio.ByteBuffer;
-
-import info.blockchain.api.etc.Base58;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.ToastCustom;
+import info.blockchain.wallet.util.FormatsUtil;
 
 //import android.util.Log;
 
@@ -65,48 +60,13 @@ public class SettingsActivity extends Activity	{
 		if(resultCode == Activity.RESULT_OK && requestCode == ZBAR_SCANNER_REQUEST)	{
 
             final String scanResult = data.getStringExtra(ZBarConstants.SCAN_RESULT);
-            if(isValidXpub(scanResult)){
+            if(FormatsUtil.getInstance().isValidXpub(scanResult)){
                 merchantXpubView.setText(scanResult);
             }else{
                 ToastCustom.makeText(this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
         }
 	}
-
-    private boolean isValidXpub(String scanResult){
-
-        try {
-            byte[] xpubBytes = Base58.decodeChecked(scanResult);
-
-            ByteBuffer byteBuffer = ByteBuffer.wrap(xpubBytes);
-            if(byteBuffer.getInt() != 0x0488B21E)   {
-                throw new AddressFormatException("invalid version: "+scanResult);
-            }else{
-
-                byte[] chain = new byte[32];
-                byte[] pub = new byte[33];
-                // depth:
-                byteBuffer.get();
-                // parent fingerprint:
-                byteBuffer.getInt();
-                // child no.
-                byteBuffer.getInt();
-                byteBuffer.get(chain);
-                byteBuffer.get(pub);
-
-                ByteBuffer pubBytes = ByteBuffer.wrap(pub);
-                int fitstByte = pubBytes.get();
-                if(fitstByte == 0x02 || fitstByte == 0x03){
-                    return true;
-                }else{
-                    throw new AddressFormatException("invalid format: "+scanResult);
-                }
-            }
-        }catch(Exception e)	{
-            Log.e(SettingsActivity.class.getSimpleName(),"Invalid xpub: ",e);
-            return false;
-        }
-    }
 
     private void initValues() {
 
@@ -148,7 +108,7 @@ public class SettingsActivity extends Activity	{
                 int currency = spCurrencies.getSelectedItemPosition();
                 currencies = getResources().getStringArray(R.array.currencies);
 
-                if (isValidXpub(strMerchantXpub)) {
+                if (FormatsUtil.getInstance().isValidXpub(strMerchantXpub)) {
 
                     PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_XPUB, strMerchantXpub);
                     PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, strMerchantName);
