@@ -102,8 +102,8 @@ public class SettingsActivity extends Activity	{
         tvOK.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
 
-                String strMerchantReceiver = merchantReceiverView.getEditableText().toString();
-                String strMerchantName = merchantNameView.getEditableText().toString();
+                String strMerchantReceiver = merchantReceiverView.getEditableText().toString().trim();
+                String strMerchantName = merchantNameView.getEditableText().toString().trim();
                 boolean push_notifications = sPushNotifications.isChecked();
                 int currency = spCurrencies.getSelectedItemPosition();
                 currencies = getResources().getStringArray(R.array.currencies);
