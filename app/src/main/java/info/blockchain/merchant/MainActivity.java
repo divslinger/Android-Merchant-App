@@ -17,6 +17,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -59,6 +60,22 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         if(pin.equals("")) {
         	doPIN();
         }
+		else	{
+
+			//
+			// test for v1
+			//
+			try {
+				Class.forName("info.blockchain.merchant.NetworkStateReceiver");
+				// v2, do nothing
+			}
+			catch(ClassNotFoundException cnfe) {
+
+				PrefsUtil.getInstance(MainActivity.this).removeValue("ocurrency");
+
+			}
+
+		}
 
         //Start websockets
         IntentFilter filter = new IntentFilter();
@@ -121,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         PagerAdapter mAdapter = new TabsPagerAdapter(getSupportFragmentManager(), tabs);
-        viewPager.setAdapter(mAdapter);
+		viewPager.setAdapter(mAdapter);
 
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabTextColors(getResources().getColor(R.color.white_50), getResources().getColor(R.color.white));
@@ -256,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             if (ACTION_INTENT_RECONNECT.equals(intent.getAction())) {
                 if(webSocketHandler != null && !webSocketHandler.isConnected()){
                     webSocketHandler.start();
-                }
+				}
             }
         }
     };
