@@ -22,6 +22,7 @@ import info.blockchain.merchant.CurrencyExchange;
 import info.blockchain.merchant.R;
 import info.blockchain.merchant.ReceiveActivity;
 import info.blockchain.merchant.api.APIFactory;
+import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.ToastCustom;
 
@@ -196,6 +197,11 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     }
 
     public void chargeClicked() {
+
+        if(!AppUtil.getInstance(getActivity()).isV2API())    {
+            ToastCustom.makeText(getActivity(), "v1 not yet re-implemented", ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+            return;
+        }
 
         updateAmounts();
         Intent intent = new Intent(getActivity(), ReceiveActivity.class);

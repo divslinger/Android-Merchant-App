@@ -42,6 +42,7 @@ import java.text.DecimalFormat;
 import info.blockchain.merchant.api.APIFactory;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
+import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.MonetaryUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.ToastCustom;
@@ -86,11 +87,19 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvBtcAmount.setText(dfBtc.format(amountBtc) + " " + PaymentFragment.DEFAULT_CURRENCY_BTC);
 
         //Generate new address/QR code for receive
-        receivingAddress = getHDReceiveAddress();
+        if(AppUtil.getInstance(ReceiveActivity.this).isV2API())    {
+            receivingAddress = getV2ReceiveAddress();
+        }
+        else    {
+            ToastCustom.makeText(this, "v1 not yet re-implemented", ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+            return;
+        }
+
         if(receivingAddress == null)    {
             ToastCustom.makeText(this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
             finish();
         }
+
         long lAmount = getLongAmount(amountBtc);
         displayQRCode(lAmount);
     }
@@ -193,9 +202,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                     e.printStackTrace();
                 }
 
-                int idx = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, APIFactory.getInstance(ReceiveActivity.this).getAccountIndex());
-                PrefsUtil.getInstance(ReceiveActivity.this).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, idx + 1);
-
                 return bitmap;
             }
 
@@ -220,7 +226,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         return strCurrencySymbol;
     }
 
-    private String getHDReceiveAddress() {
+    private String getV2ReceiveAddress() {
 
         String receivingAddress = null;
 
@@ -231,9 +237,9 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
             if(idx - APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() >= ADDRESS_LOOKAHEAD)    {
                 idx = APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() + (ADDRESS_LOOKAHEAD - 1);
             }
-            PrefsUtil.getInstance(ReceiveActivity.this).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, idx);
             Address addr = account.getReceive().getAddressAt(idx);
             receivingAddress = addr.getAddressString();
+            PrefsUtil.getInstance(ReceiveActivity.this).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, idx + 1);
         }
         catch(AddressFormatException afe) {
             return null;
