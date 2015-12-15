@@ -108,7 +108,7 @@ public class SettingsActivity extends Activity	{
                 int currency = spCurrencies.getSelectedItemPosition();
                 currencies = getResources().getStringArray(R.array.currencies);
 
-                if (FormatsUtil.getInstance().isValidXpub(strMerchantReceiver) || FormatsUtil.getInstance().isValidBitcoinAddress(strMerchantReceiver)) {
+                if(FormatsUtil.getInstance().isValidBitcoinAddress(strMerchantReceiver)) {
 
                     PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, strMerchantReceiver);
                     PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, strMerchantName);
