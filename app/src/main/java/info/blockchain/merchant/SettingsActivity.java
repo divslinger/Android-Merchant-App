@@ -42,6 +42,9 @@ public class SettingsActivity extends Activity	{
     private ArrayAdapter<CharSequence> spAdapter = null;
 
 	private static int ZBAR_SCANNER_REQUEST = 2026;
+
+    private static int PIN_ACTIVITY 		= 2;
+    private static int RESET_PIN_ACTIVITY 	= 3;
 	
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -164,4 +167,9 @@ public class SettingsActivity extends Activity	{
 	    }
 	}
 
+    public void changePinClicked(View view) {
+        Intent intent = new Intent(this, PinActivity.class);
+        intent.putExtra("create", true);
+        startActivityForResult(intent, PIN_ACTIVITY);
+    }
 }

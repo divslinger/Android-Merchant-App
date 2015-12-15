@@ -237,12 +237,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 		startActivityForResult(intent, PIN_ACTIVITY);
     }
 
-    private void resetPIN()	{
-		Intent intent = new Intent(MainActivity.this, PinActivity.class);
-		intent.putExtra("create", false);
-		startActivityForResult(intent, RESET_PIN_ACTIVITY);
-    }
-
     private void doAbout()	{
     	Intent intent = new Intent(MainActivity.this, AboutActivity.class);
 		startActivityForResult(intent, ABOUT_ACTIVITY);
@@ -321,23 +315,13 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             public void run() {
                 switch (menuItem.getItemId()) {
                     case R.id.action_profile:
-//                        doProfile();
+//                        doProfile();//TODO
                         break;
                     case R.id.action_settings:
                         doSettings(false);
                         break;
-                    //moving to settings
-//                    case R.id.action_newpin:
-//                        String pin = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
-//                        if(pin.equals("")) {
-//                            doPIN();
-//                        }
-//                        else {
-//                            resetPIN();
-//                        }
-//                        break;
                     case R.id.action_help:
-//                        doHelp();
+//                        doHelp();//TODO
                         break;
                     case R.id.action_about:
                         doAbout();
