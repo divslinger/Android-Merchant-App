@@ -196,6 +196,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             Intent intent = new Intent(getActivity(), ReceiveActivity.class);
             intent.putExtra(AMOUNT_PAYABLE_FIAT, amountPayableFiat);
             intent.putExtra(AMOUNT_PAYABLE_BTC, amountPayableBtc);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivityForResult(intent, RECEIVE_RESULT);
         }else{
             ToastCustom.makeText(getActivity(),getResources().getString(R.string.invalid_amount),ToastCustom.LENGTH_SHORT,ToastCustom.TYPE_ERROR);

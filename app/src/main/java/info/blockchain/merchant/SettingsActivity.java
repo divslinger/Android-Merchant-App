@@ -184,6 +184,7 @@ public class SettingsActivity extends AppCompatActivity {
     public void changePinClicked(View view) {
         Intent intent = new Intent(this, PinActivity.class);
         intent.putExtra("create", true);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivityForResult(intent, PIN_ACTIVITY);
     }
 }
