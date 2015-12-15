@@ -102,6 +102,11 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
             ToastCustom.makeText(ReceiveActivity.this, receivingAddress, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_OK);
         }
 
+        //Subscribe to websocket to new address
+        Intent intent = new Intent(MainActivity.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
+        intent.putExtra("address",receivingAddress);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
         long lAmount = getLongAmount(amountBtc);
         displayQRCode(lAmount);
     }
@@ -233,11 +238,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         catch(AddressFormatException afe) {
             return null;
         }
-
-        //Subscribe to websocket to new address
-        Intent intent = new Intent(MainActivity.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
-        intent.putExtra("address",receivingAddress);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
         return receivingAddress;
     }
