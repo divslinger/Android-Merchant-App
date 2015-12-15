@@ -83,7 +83,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         //Incoming intent value
         double amountFiat = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, 0.0);
         double amountBtc = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, 0.0);
-        tvFiatAmount.setText(getCurrencySymbol()+" "+dfFiat.format(amountFiat));
+        tvFiatAmount.setText(getCurrencySymbol()+" "+ dfFiat.format(amountFiat));
         tvBtcAmount.setText(dfBtc.format(amountBtc) + " " + PaymentFragment.DEFAULT_CURRENCY_BTC);
 
         //Generate new address/QR code for receive
@@ -91,8 +91,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
             receivingAddress = getV2ReceiveAddress();
         }
         else    {
-            ToastCustom.makeText(this, "v1 not yet re-implemented", ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
-            return;
+            receivingAddress = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
         }
 
         if(receivingAddress == null)    {

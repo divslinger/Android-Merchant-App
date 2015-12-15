@@ -198,8 +198,8 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
     public void chargeClicked() {
 
-        if(!AppUtil.getInstance(getActivity()).isV2API())    {
-            ToastCustom.makeText(getActivity(), "v1 not yet re-implemented", ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+        if(!AppUtil.getInstance(getActivity()).hasValidReceiver())    {
+            ToastCustom.makeText(getActivity(), getActivity().getText(R.string.no_valid_receiver), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
             return;
         }
 

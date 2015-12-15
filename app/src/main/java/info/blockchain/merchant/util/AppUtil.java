@@ -47,4 +47,17 @@ public class AppUtil {
         }
     }
 
+    public boolean hasValidReceiver() {
+
+        String receiver = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+
+        if(FormatsUtil.getInstance().isValidBitcoinAddress(receiver) || FormatsUtil.getInstance().isValidXpub(receiver))    {
+            return true;
+        }
+        else    {
+            return false;
+        }
+
+    }
+
 }

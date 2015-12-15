@@ -78,4 +78,6 @@
     <string name="unable_to_generate_address">An address cannot be generated at this time. Please check your installation and try again.</string>
     <string name="btc_limit_reached">Bitcoin limit reached.</string>
 
+    <string name="no_valid_receiver">Please configure your receiving address in Settings.</string>
+
 </resources>
