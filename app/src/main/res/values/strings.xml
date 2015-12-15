@@ -24,7 +24,6 @@
     <string name="receive_coins_fragment_merchant_xpub_hint">Your Public Key</string>
     <string name="receive_coins_fragment_receiving_address_error">Invalid address</string>
     <string name="receive_coins_fragment_default_currency_hint">Default currency</string>
-    <string name="receive_coins_fragment_email_address_hint">E-mail address</string>
     <string name="receive_coins_fragment_other_currency">Other currency code (3 letter code, ex.: MXP)</string>
     <string name="receive_coins_activity_title">Send Bitcoins</string>
     <string name="receive_coins_install_qr_scanner_msg">Please install ZXing QR-code scanner or Goggles!</string>
@@ -53,20 +52,12 @@
     <string name="pin_code_create_error">Enter two matching 4-digit PIN codes</string>
     <string name="pin_code_enter_error">PIN code incorrect</string>
     <string name="camera_unavailable">Camera unavailable</string>
-    
-    <string name="toggle_on">On</string>
-    <string name="toggle_off">Off</string>
 
     <string name="prompt_yes">Yes</string>
     <string name="prompt_no">No</string>
     <string name="prompt_ok">OK</string>
     <string name="prompt_ko">CANCEL</string>
     <string name="prompt_save">SAVE</string>
-    
-    <string name="pull_to_refresh_pull_label">Pull to refresh...</string>
-    <string name="pull_to_refresh_release_label">Release to refresh...</string>
-    <string name="pull_to_refresh_refreshing_label">Loading...</string>
-    <string name="pull_to_refresh_tap_label">Tap to refresh...</string>
 
 <!-- <string name="bitcoin_currency_symbol">&#xf15a;</string> -->
     <string name="bitcoin_currency_symbol">BTC</string>

@@ -94,6 +94,12 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 	}
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        setMerchantName();
+    }
+
+    @Override
 	protected void onNewIntent(Intent intent) {
 		setIntent(intent);
 	}
@@ -259,6 +265,14 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         }
     };
 
+    private void setMerchantName(){
+        //Update Merchant name
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        TextView tvName = (TextView)navigationView.findViewById(R.id.drawer_title);
+        tvName.setText(PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
+    }
+
     @Override
     public void onIncomingPayment(long paymentAmount) {
 
@@ -277,11 +291,10 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     private void setNavigtionDrawer() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        setMerchantName();
         // listen for navigation events
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
-        TextView tvName = (TextView)navigationView.findViewById(R.id.drawer_title);
-        tvName.setText(PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
     }
 
     @Override
