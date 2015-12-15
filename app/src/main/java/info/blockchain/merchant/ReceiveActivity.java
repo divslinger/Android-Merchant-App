@@ -64,6 +64,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
     private DecimalFormat dfBtc = new DecimalFormat("######0.0######");
     private DecimalFormat dfFiat = new DecimalFormat("######0.00");
+    private BigInteger bamount = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +142,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
     private void displayQRCode(long lamount) {
 
-        BigInteger bamount = null;
         try {
 
             bamount = MonetaryUtil.getInstance(this).getUndenominatedAmount(lamount);
@@ -162,18 +162,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
             generateQRCode("bitcoin:" + receivingAddress);
             write2NFC("bitcoin:" + receivingAddress);
         }
-
-        DBController pdb = new DBController(ReceiveActivity.this);
-        pdb.insertPayment(
-                System.currentTimeMillis() / 1000,          // timestamp, Unix time
-                receivingAddress,                           // receiving address
-                bamount.longValue(),                        // BTC amount
-                tvFiatAmount.getText().toString(),          // fiat amount
-                -1,                                         // confirmations
-                ""                                          // note, message
-            );
-        pdb.close();
-
     }
 
     private void generateQRCode(final String uri) {
@@ -306,6 +294,17 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvStatus.setTextColor(getResources().getColor(R.color.blockchain_receive_green));
         tvBtcAmount.setVisibility(View.GONE);
         tvFiatAmount.setVisibility(View.GONE);
+
+        DBController pdb = new DBController(ReceiveActivity.this);
+        pdb.insertPayment(
+                System.currentTimeMillis() / 1000,          // timestamp, Unix time
+                receivingAddress,                           // receiving address
+                bamount.longValue(),                        // BTC amount
+                tvFiatAmount.getText().toString(),          // fiat amount
+                -1,                                         // confirmations
+                ""                                          // note, message
+        );
+        pdb.close();
     }
 
     private void write2NFC(final String uri) {

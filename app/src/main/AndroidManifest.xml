@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="info.blockchain.merchant"
-    android:versionCode="15"
-    android:versionName="1.2.4" >
+<manifest package="info.blockchain.merchant"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          android:versionCode="15"
+          android:versionName="1.2.4">
 
-    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="21" />
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="21"/>
 
-    <uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.NFC"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-	<uses-feature android:name="android.hardware.camera" android:required="false"/>
-    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="false"/>
 
-	<application
+    <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -24,53 +30,57 @@
         <activity
             android:name="info.blockchain.merchant.SplashActivity"
             android:label="@string/app_name"
-			android:screenOrientation="portrait"  
-          >
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        
+
         <activity
             android:name="info.blockchain.merchant.MainActivity"
             android:label="@string/app_name"
-			android:screenOrientation="portrait"  
-          >
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="bitcoin" />
+                <data android:scheme="bitcoin"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="application/x-btctx" />
+                <data android:mimeType="application/x-btctx"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-                <data android:mimeType="application/bitcoin-paymentrequest" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+                <data android:mimeType="application/bitcoin-paymentrequest"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
 
-        <activity android:name="com.dm.zbar.android.scanner.ZBarScannerActivity"
-        android:screenOrientation="landscape"
-        android:label="@string/app_name" />
+        <activity
+            android:name="com.dm.zbar.android.scanner.ZBarScannerActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape"/>
 
-        <activity android:name=".SettingsActivity"
-			android:label="@string/app_name"
-            android:theme="@android:style/Theme.Dialog" >
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".PinActivity"
-			android:label="@string/app_name"
-            android:theme="@android:style/Theme.Dialog" >
+        <activity
+            android:name=".PinActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Dialog">
         </activity>
 
-        <activity android:name=".AboutActivity"
-			android:label="@string/app_name"
-            android:theme="@android:style/Theme.Dialog" >
+        <activity
+            android:name=".AboutActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Dialog">
         </activity>
 
         <activity
@@ -82,7 +92,7 @@
 
         <receiver android:name="info.blockchain.merchant.NetworkStateReceiver">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
         </receiver>
 

@@ -11,18 +11,22 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import info.blockchain.merchant.service.WebSocketHandler;
@@ -31,7 +35,7 @@ import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
 import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 
-public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener {
+public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static int SETTINGS_ACTIVITY 	= 1;
     private static int PIN_ACTIVITY 		= 2;
@@ -44,14 +48,17 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     public static final String ACTION_INTENT_INCOMING_TX = "info.blockchain.merchant.MainActivity.ACTION_INTENT_INCOMING_TX";
     public static final String ACTION_INTENT_RECONNECT = "info.blockchain.merchant.MainActivity.ACTION_INTENT_RECONNECT";
 
+    //Navigation Drawer
+    private Toolbar toolbar = null;
+    DrawerLayout mDrawerLayout;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_main);
-	    
-        Toolbar toolbar = (Toolbar)this.findViewById(R.id.toolbar);
-        toolbar.setTitle(getResources().getString(R.string.app_name));
-        setSupportActionBar(toolbar);
+
+        setToolbar();
+        setNavigtionDrawer();
 
         initTableLayout();
 
@@ -86,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         webSocketHandler.start();
 	}
 
-	@Override
+    @Override
 	protected void onNewIntent(Intent intent) {
 		setIntent(intent);
 	}
@@ -100,11 +107,11 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
         final String eventString = "onNdefPushComplete\n" + event.toString();
         runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast.makeText(getApplicationContext(), eventString, Toast.LENGTH_SHORT).show();
-			}
-		});
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), eventString, Toast.LENGTH_SHORT).show();
+            }
+        });
 
 	}
 
@@ -146,31 +153,13 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     }
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+
 	    // Handle item selection
 	    switch (item.getItemId()) {
-	    	case R.id.action_settings:
-	    		doSettings(false);
-	    		return true;
-	    	case R.id.action_newpin:
-				String pin = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
-	            if(pin.equals("")) {
-		    		doPIN();
-	            }
-	            else {
-		    		resetPIN();
-	            }
-	    		return true;
-	    	case R.id.action_about:
-	    		doAbout();
-	    		return true;
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
@@ -283,5 +272,80 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         Intent intent = new Intent(MainActivity.ACTION_INTENT_INCOMING_TX);
         intent.putExtra("payment_amount",paymentAmount);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    public void setToolbar() {
+
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_menu_white_24dp));
+        setSupportActionBar(toolbar);
+    }
+
+    private void setNavigtionDrawer() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        // listen for navigation events
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        TextView tvName = (TextView)navigationView.findViewById(R.id.drawer_title);
+        tvName.setText(PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isNavDrawerOpen()) {
+            closeNavDrawer();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    protected boolean isNavDrawerOpen() {
+        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START);
+    }
+
+    protected void closeNavDrawer() {
+        if (mDrawerLayout != null) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(final MenuItem menuItem) {
+
+        // allow some time after closing the drawer before performing real navigation
+        // so the user can see what is happening
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        Handler mDrawerActionHandler = new Handler();
+        mDrawerActionHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                switch (menuItem.getItemId()) {
+                    case R.id.action_profile:
+//                        doProfile();
+                        break;
+                    case R.id.action_settings:
+                        doSettings(false);
+                        break;
+                    //moving to settings
+//                    case R.id.action_newpin:
+//                        String pin = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
+//                        if(pin.equals("")) {
+//                            doPIN();
+//                        }
+//                        else {
+//                            resetPIN();
+//                        }
+//                        break;
+                    case R.id.action_help:
+//                        doHelp();
+                        break;
+                    case R.id.action_about:
+                        doAbout();
+                        break;
+                }
+            }
+        }, 250);
+
+        return false;
     }
 }
