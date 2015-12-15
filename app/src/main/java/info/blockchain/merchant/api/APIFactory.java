@@ -12,7 +12,7 @@ import info.blockchain.wallet.util.WebUtil;
 
 public class APIFactory	{
 
-    private static String RECEIVE_PAYMENTS_API_KEY = "1fc17339-489e-4a56-943e-a68c1a30b4b1";
+    private static String RECEIVE_PAYMENTS_API_KEY = null;
 
     private static int account_index = 0;
 
