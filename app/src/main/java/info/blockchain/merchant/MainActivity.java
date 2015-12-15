@@ -37,7 +37,7 @@ import info.blockchain.merchant.util.PrefsUtil;
 
 public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener, NavigationView.OnNavigationItemSelectedListener {
 
-    private static int SETTINGS_ACTIVITY 	= 1;
+    public static int SETTINGS_ACTIVITY 	= 1;
     private static int PIN_ACTIVITY 		= 2;
     private static int RESET_PIN_ACTIVITY 	= 3;
     private static int ABOUT_ACTIVITY 	= 4;

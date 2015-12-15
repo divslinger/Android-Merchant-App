@@ -17,11 +17,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import info.blockchain.merchant.CurrencyExchange;
+import info.blockchain.merchant.MainActivity;
 import info.blockchain.merchant.R;
 import info.blockchain.merchant.ReceiveActivity;
+import info.blockchain.merchant.SettingsActivity;
 import info.blockchain.merchant.api.APIFactory;
 import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.PrefsUtil;
+import info.blockchain.merchant.util.SnackCustom;
 import info.blockchain.merchant.util.ToastCustom;
 
 public class PaymentFragment extends Fragment implements View.OnClickListener {
@@ -187,7 +190,15 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     public void chargeClicked() {
 
         if(!AppUtil.getInstance(getActivity()).hasValidReceiver())    {
-            ToastCustom.makeText(getActivity(), getActivity().getText(R.string.no_valid_receiver), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+            SnackCustom.make(getActivity(), getView(), getActivity().getText(R.string.no_valid_receiver), getActivity().getResources().getString(R.string.prompt_ok), new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String strOtherCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
+                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                    intent.putExtra("ocurrency", strOtherCurrency);
+                    startActivityForResult(intent, MainActivity.SETTINGS_ACTIVITY);
+                }
+            });
             return;
         }
 
@@ -199,7 +210,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivityForResult(intent, RECEIVE_RESULT);
         }else{
-            ToastCustom.makeText(getActivity(),getResources().getString(R.string.invalid_amount),ToastCustom.LENGTH_SHORT,ToastCustom.TYPE_ERROR);
+            SnackCustom.make(getActivity(), getView(), getActivity().getText(R.string.invalid_amount), getActivity().getResources().getString(R.string.prompt_ok),null);
         }
     }
 
