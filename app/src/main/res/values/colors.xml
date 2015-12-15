@@ -12,6 +12,7 @@
     <color name="blockchain_light_grey">#FFf0f0f0</color>
     <color name="blockchain_navigation_bar">#FF000000</color>
     <color name="blockchain_green">#31c68c</color>
+    <color name="blockchain_dark_green">#239367</color>
     <color name="blockchain_receive_green">#8ab75e</color>
     <color name="textColorPrimary">@color/primary_text_default_material_light</color>
 

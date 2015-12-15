@@ -47,7 +47,8 @@
             android:id="@+id/iv_QR"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_qrcode_black_36dp"/>
+            android:tint="@android:color/black"
+            android:src="@drawable/icon_qrcode"/>
 
     </LinearLayout>
 

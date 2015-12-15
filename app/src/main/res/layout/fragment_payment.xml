@@ -5,7 +5,7 @@
               android:orientation="vertical"
     >
 
-    <!--<include layout="@layout/toolbar"/>-->
+    <include layout="@layout/include_container_shadow_bottom"/>
 
     <LinearLayout
         android:id="@+id/amount_container"
@@ -34,27 +34,13 @@
             android:alpha="0.5"
             android:gravity="center"/>
 
-        <!--<EditText-->
-            <!--android:id="@+id/note"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:layout_marginTop="16dp"-->
-            <!--android:layout_marginLeft="30dp"-->
-            <!--android:layout_marginRight="30dp"-->
-            <!--android:hint="@string/payment_note"-->
-            <!--android:textColorHint="@color/white_50"-->
-            <!--android:ems="10"-->
-            <!--android:lines="1"-->
-            <!--android:singleLine="true"-->
-            <!--android:textColor="@color/white"-->
-            <!--/>-->
-
     </LinearLayout>
 
-    <include layout="@layout/include_container_shadow"/>
+    <include layout="@layout/include_container_shadow_top"/>
 
     <include layout="@layout/include_numeric_keypad"/>
+
+    <include layout="@layout/include_container_shadow_top_green"/>
 
     <ImageView
         android:id="@+id/iv_charge"
