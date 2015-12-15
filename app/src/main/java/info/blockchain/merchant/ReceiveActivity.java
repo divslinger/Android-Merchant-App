@@ -94,8 +94,11 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         }
 
         if(receivingAddress == null)    {
-            ToastCustom.makeText(this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+            ToastCustom.makeText(ReceiveActivity.this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
             finish();
+        }
+        else    {
+            ToastCustom.makeText(ReceiveActivity.this, receivingAddress, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_OK);
         }
 
         long lAmount = getLongAmount(amountBtc);
