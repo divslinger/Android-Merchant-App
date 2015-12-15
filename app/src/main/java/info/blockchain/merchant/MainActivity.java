@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
         TextView tvName = (TextView)navigationView.findViewById(R.id.drawer_title);
-        tvName.setText(PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
+        tvName.setText(PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, getResources().getString(R.string.app_name)));
     }
 
     @Override

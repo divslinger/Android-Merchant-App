@@ -22,7 +22,7 @@
             android:title="Help"/>
         <item
             android:id="@+id/action_about"
-            android:icon="@drawable/logo2x"
+            android:icon="@drawable/ic_blockchainb"
             android:title="About"/>
     </group>
 
