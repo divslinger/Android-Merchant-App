@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:minWidth="420dp"
-    android:background="#FF1B8AC7"
+    android:background="@color/blockchain_pearl_white"
     android:orientation="vertical"
     android:layout_gravity="center_horizontal"
     android:gravity="center_horizontal"
@@ -16,6 +16,7 @@
         android:gravity="center_horizontal"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
+        android:tint="@color/blockchain_blue"
         />
 
     <TextView
@@ -25,8 +26,8 @@
         android:gravity="center_horizontal"
 	    android:layout_gravity="center_horizontal"
     	android:layout_marginTop="10dp"
-    	android:textSize="22sp"
-    	android:textColor="#FFFFFFFF"
+        android:textSize="16sp"
+    	android:textColor="@color/textColorPrimary"
     	/>
 
     <LinearLayout
@@ -48,8 +49,9 @@
             android:layout_marginBottom="20dp"
             android:gravity="center"
             android:text="@string/rate_us"
-            android:textSize="22sp"
-            android:textColor="@color/primary_text_default_material_dark"
+            android:textSize="16sp"
+            android:alpha="0.7"
+            android:textColor="@color/textColorPrimary"
         />
 
         <TextView
@@ -60,8 +62,9 @@
             android:layout_marginBottom="20dp"
             android:gravity="center"
             android:text="@string/support"
-            android:textSize="22sp"
-            android:textColor="@color/primary_text_default_material_dark"
+            android:textSize="16sp"
+            android:alpha="0.7"
+            android:textColor="@color/textColorPrimary"
             />
 
     </LinearLayout>
@@ -74,8 +77,9 @@
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:text="@string/wallet_download"
-        android:textSize="22sp"
-        android:textColor="@color/primary_text_default_material_dark"
+        android:textSize="16sp"
+        android:alpha="0.7"
+        android:textColor="@color/textColorPrimary"
         />
 
 </LinearLayout>
