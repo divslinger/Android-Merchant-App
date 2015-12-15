@@ -4,9 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -28,7 +29,7 @@ import info.blockchain.wallet.util.FormatsUtil;
 
 //import android.util.Log;
 
-public class SettingsActivity extends Activity	{
+public class SettingsActivity extends AppCompatActivity {
 
 	private Spinner spCurrencies = null;
 	private CheckBox sPushNotifications = null;
@@ -50,11 +51,24 @@ public class SettingsActivity extends Activity	{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
 	    setContentView(R.layout.activity_settings);
-	    
+
+        initToolbar();
         initValues();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return super.onSupportNavigateUp();
+    }
+
+    private void initToolbar(){
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setTitle(getResources().getString(R.string.action_settings_title));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
     }
 
 	@Override
