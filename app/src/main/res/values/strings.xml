@@ -70,5 +70,5 @@
     <string name="btc_limit_reached">Bitcoin limit reached.</string>
 
     <string name="no_valid_receiver">Please configure your receiving address in Settings.</string>
-
+    <string name="invalid_amount">Invalid amount.</string>
 </resources>

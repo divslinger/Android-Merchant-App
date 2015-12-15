@@ -2,7 +2,6 @@ package info.blockchain.merchant.tabsswipe;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -59,7 +58,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
         tvAmount = (TextView)rootView.findViewById(R.id.tv_fiat_amount);
         ivCharge = (ImageView)rootView.findViewById(R.id.iv_charge);
-        ivCharge.setColorFilter(Color.parseColor("#CCCCCC"));//TODO - not working from resource
+        ivCharge.setOnClickListener(this);
         tvCurrency = (TextView)rootView.findViewById(R.id.tv_currency);
         llAmountContainer = (LinearLayout)rootView.findViewById(R.id.amount_container);
         llAmountContainer.setOnClickListener(this);
@@ -169,26 +168,20 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             case R.id.iv_charge:chargeClicked(); return;
         }
 
-        validateAmount();
+        updateAmounts();
     }
 
-    private void validateAmount(){
+    private boolean validateAmount(){
         try {
             double textParsable = Double.parseDouble(tvAmount.getText().toString());
             if (textParsable > 0.0) {
-                ivCharge.setOnClickListener(this);
-                ivCharge.setColorFilter(Color.parseColor("#ffffff"));
+                return true;
             }else{
-                ivCharge.setOnClickListener(null);
-                ivCharge.setColorFilter(Color.parseColor("#CCCCCC"));
+                return false;
             }
         }catch(Exception e){
-            tvAmount.setText("0");
-            ivCharge.setOnClickListener(null);
-            ivCharge.setColorFilter(Color.parseColor("#CCCCCC"));
+            return false;
         }
-
-        updateAmounts();
     }
 
     public void chargeClicked() {
@@ -198,11 +191,15 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             return;
         }
 
-        updateAmounts();
-        Intent intent = new Intent(getActivity(), ReceiveActivity.class);
-        intent.putExtra(AMOUNT_PAYABLE_FIAT,amountPayableFiat);
-        intent.putExtra(AMOUNT_PAYABLE_BTC,amountPayableBtc);
-        startActivityForResult(intent, RECEIVE_RESULT);
+        if(validateAmount()) {
+            updateAmounts();
+            Intent intent = new Intent(getActivity(), ReceiveActivity.class);
+            intent.putExtra(AMOUNT_PAYABLE_FIAT, amountPayableFiat);
+            intent.putExtra(AMOUNT_PAYABLE_BTC, amountPayableBtc);
+            startActivityForResult(intent, RECEIVE_RESULT);
+        }else{
+            ToastCustom.makeText(getActivity(),getResources().getString(R.string.invalid_amount),ToastCustom.LENGTH_SHORT,ToastCustom.TYPE_ERROR);
+        }
     }
 
     @Override
