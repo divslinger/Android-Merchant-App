@@ -3,7 +3,7 @@
               android:layout_width="match_parent"
               android:layout_height="72dp"
               android:orientation="vertical"
-              android:background="@color/blockchain_pearl_white"
+              android:background="@drawable/selector_pearl_white"
     >
 
     <LinearLayout

@@ -6,12 +6,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
@@ -19,9 +19,8 @@ import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -30,8 +29,6 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.encode.QRCodeEncoder;
-import com.markupartist.android.widget.PullToRefreshListView;
-import com.markupartist.android.widget.PullToRefreshListView.OnRefreshListener;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -55,7 +52,7 @@ import info.blockchain.wallet.util.WebUtil;
 
 //import android.util.Log;
 
-public class TransactionsFragment extends ListFragment	{
+public class TransactionsFragment extends Fragment {
     
     private static String merchantXpub = null;
 	private List<ContentValues> mListItems;
@@ -63,50 +60,63 @@ public class TransactionsFragment extends ListFragment	{
 	private NotificationData notification = null;
     private boolean push_notifications = false;
 	private Timer timer = null;
-    private PullToRefreshListView listView = null;
+    private ListView listView = null;
     private Typeface btc_font = null;
 
     private boolean doBTC = false;
+    private SwipeRefreshLayout swipeLayout = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-	    ViewGroup viewGroup = (ViewGroup) super.onCreateView(inflater, container, savedInstanceState);
 
-	    View oldView = viewGroup.findViewById(android.R.id.list);
+        View rootView = inflater.inflate(getResources().getLayout(R.layout.fragment_transaction), container, false);
 
-	    listView = new PullToRefreshListView(getActivity());
-	    listView.setId(android.R.id.list);
-	    listView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-	    listView.setDrawSelectorOnTop(false);
-	    listView.setDivider(getActivity().getResources().getDrawable(R.drawable.list_divider));
-	    
-	    FrameLayout parent = (FrameLayout)oldView.getParent();
-
-	    parent.removeView(oldView);
-	    oldView.setVisibility(View.GONE);
-
-	    parent.addView(listView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-	    
-	    // Set a listener to be invoked when the list should be refreshed.
-        ((PullToRefreshListView)listView).setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                new GetDataTask().execute();
-            }
-        });
-
-        mListItems = new ArrayList<ContentValues>();
-        adapter = new TransactionAdapter();
-        setListAdapter(adapter);
+        initListView(rootView);
 
         merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
         push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
         doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
         
         btc_font = TypefaceUtil.getInstance(getActivity()).getTypeface();
-        
-	    return viewGroup;
+
+        swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
+        swipeLayout.setProgressViewEndTarget(false, (int) (getResources().getDisplayMetrics().density * (72 + 20)));
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new GetDataTask().execute();
+            }
+        });
+        swipeLayout.setColorScheme(R.color.blockchain_blue,
+                R.color.blockchain_green,
+                R.color.blockchain_dark_blue);
+
+	    return rootView;
 	}
+
+    private void initListView(View rootView){
+
+        listView = (ListView)rootView.findViewById(R.id.txList);
+        mListItems = new ArrayList<ContentValues>();
+        adapter = new TransactionAdapter();
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                doBTC = !doBTC;
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                doTxTap(id);
+                return true;
+            }
+        });
+    }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
@@ -150,20 +160,22 @@ public class TransactionsFragment extends ListFragment	{
 		merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
 		push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
 		doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
-
+        new GetDataTask().execute();
 	}
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        doTxTap(id);
-    }
 
     private class GetDataTask extends AsyncTask<Void, Void, String[]> {
 
         @Override
         protected String[] doInBackground(Void... params) {
-        	
-        	if(merchantXpub.length() > 0) {
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    swipeLayout.setRefreshing(true);
+                }
+            });
+
+        	if(merchantXpub != null && merchantXpub.length() > 0) {
 
                 Wallet wallet = new Wallet(merchantXpub, 10);
                 String json = null;
@@ -218,6 +230,13 @@ public class TransactionsFragment extends ListFragment	{
                 if(vals.size() > 0) {
                 	mListItems.clear();
                 	mListItems.addAll(vals);
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
                 }
                 
         	}
@@ -228,7 +247,12 @@ public class TransactionsFragment extends ListFragment	{
         @Override
         protected void onPostExecute(String[] result) {
 
-            ((PullToRefreshListView)listView).onRefreshComplete();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    swipeLayout.setRefreshing(false);
+                }
+            });
 
             super.onPostExecute(result);
         }
@@ -264,7 +288,7 @@ public class TransactionsFragment extends ListFragment	{
 			View view;
 	        
 	        if (convertView == null) {
-	            view = inflater.inflate(R.layout.fragment_transactions, parent, false);
+	            view = inflater.inflate(R.layout.list_item_transaction, parent, false);
 	        } else {
 	            view = convertView;
 	        }
@@ -298,16 +322,6 @@ public class TransactionsFragment extends ListFragment	{
                 tvAmount.setText(cs + " " + vals.getAsString("famt").substring(1));
 	        }
 
-            ImageView ivStatus = (ImageView)view.findViewById(R.id.iv_status);
-	        if(vals.getAsInteger("cfm") >= 0) {
-                ivStatus.setImageResource(R.drawable.ic_done_white_24dp);
-                ivStatus.setColorFilter(Color.parseColor("#31c68c"));
-	        }
-	        else {
-                ivStatus.setImageResource(R.drawable.ic_schedule_grey600_24dp);
-                ivStatus.setColorFilter(Color.parseColor("#FF808080"));
-	        }
-	 
 	        return view;
 		}
 
@@ -315,16 +329,12 @@ public class TransactionsFragment extends ListFragment	{
 
     private void doTxTap(final long item)	{
 
-        final ContentValues val = mListItems.get((int)item);
-
-		SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy@HH:mm");
-		String dateStr = sd.format(val.getAsLong("ts") * 1000L);
+        final ContentValues val = mListItems.get((int) item);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(dateStr + ": " + BitcoinURI.bitcoinValueToPlainString(BigInteger.valueOf(val.getAsLong("amt"))) + " BTC, " + val.getAsString("famt"));
         builder.setIcon(R.drawable.ic_launcher);
         builder.setItems(new CharSequence[]
-                { "View transaction", "Redo scan", "Delete from payments" },
+                { "View transaction", "Delete from payments" },
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
@@ -333,9 +343,6 @@ public class TransactionsFragment extends ListFragment	{
                                 startActivity(intent);
                                 break;
                             case 1:
-                                doRedo(item);
-                                break;
-                            case 2:
                                 doDelete(item);
                                 break;
                         }
@@ -364,30 +371,6 @@ public class TransactionsFragment extends ListFragment	{
 		String receiving_name = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "");
         ContentValues vals = mListItems.get((int)item);
         return BitcoinURI.convertToBitcoinURI(vals.getAsString("iad"), BigInteger.valueOf(vals.getAsLong("amt")), receiving_name, vals.getAsString("msg"));
-    }
-
-    private void doRedo(long item)	{
-
-    	ImageView image = new ImageView(getActivity());
-    	image.setImageBitmap(generateQRCode(generateURI(item)));
-
-        ContentValues val = mListItems.get((int)item);
-
-		SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy@HH:mm");
-		String dateStr = sd.format(val.getAsLong("ts") * 1000L);
-
-    	new AlertDialog.Builder(getActivity())
-    		.setIcon(R.drawable.ic_launcher)
-    		.setTitle(dateStr + ": " + BitcoinURI.bitcoinValueToPlainString(BigInteger.valueOf(val.getAsLong("amt"))) + " BTC, " + val.getAsString("famt"))
-    		.setView(image)
-    		.setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
-//          @Override
-    		public void onClick(DialogInterface dialog, int which) {
-        		return;
-    		}
-    	}
-    	).show();
-
     }
 
     private void doDelete(final long item)	{

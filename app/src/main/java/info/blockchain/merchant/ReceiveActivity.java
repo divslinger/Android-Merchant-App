@@ -6,9 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,10 +22,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
-import android.nfc.NfcEvent;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -290,9 +289,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
     }
 
     private void onPaymentReceived(){
-        ivCancel.setBackgroundColor(getResources().getColor(R.color.white));
-        ivCancel.setColorFilter(Color.parseColor("#FA343A"));
 
+        ivCancel.setVisibility(View.GONE);
         ivReceivingQr.setVisibility(View.GONE);
         ivCheck.setVisibility(View.VISIBLE);
         ivCheck.setOnClickListener(new View.OnClickListener() {
