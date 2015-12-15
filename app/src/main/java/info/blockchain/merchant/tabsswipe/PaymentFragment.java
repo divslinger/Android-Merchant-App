@@ -1,9 +1,8 @@
 package info.blockchain.merchant.tabsswipe;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -52,6 +51,8 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
     private static Timer timer = null;
 
+    public static final int RECEIVE_RESULT = 1122;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_payment, container, false);
@@ -68,12 +69,6 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         initValues();
 
         return rootView;
-    }
-
-    public Drawable convertColorDrawable(int resource, int color) {
-        final Drawable drawable = getActivity().getResources().getDrawable(resource);
-        drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
-        return drawable.mutate();
     }
 
     @Override
@@ -207,7 +202,17 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         Intent intent = new Intent(getActivity(), ReceiveActivity.class);
         intent.putExtra(AMOUNT_PAYABLE_FIAT,amountPayableFiat);
         intent.putExtra(AMOUNT_PAYABLE_BTC,amountPayableBtc);
-        startActivity(intent);
+        startActivityForResult(intent, RECEIVE_RESULT);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        //reset amount after receive
+        if(requestCode == RECEIVE_RESULT && resultCode == Activity.RESULT_OK) {
+            tvAmount.setText("0");
+        }
     }
 
     public void padClicked(String pad) {

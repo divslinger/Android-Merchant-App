@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 			doPIN();
 		}
 		else {
-			;
+            super.onActivityResult(requestCode, resultCode, data);
 		}
 		
 	}

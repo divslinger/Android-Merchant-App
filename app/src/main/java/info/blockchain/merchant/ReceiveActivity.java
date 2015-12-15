@@ -305,6 +305,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 ""                                          // note, message
         );
         pdb.close();
+
+        setResult(RESULT_OK);
     }
 
     private void write2NFC(final String uri) {
