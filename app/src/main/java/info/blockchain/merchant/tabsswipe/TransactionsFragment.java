@@ -314,7 +314,7 @@ public class TransactionsFragment extends Fragment {
 
     	        SpannableStringBuilder cs = new SpannableStringBuilder(getActivity().getResources().getString(R.string.bitcoin_currency_symbol));
     	        cs.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                tvAmount.setText(cs+" "+displayValue);
+                tvAmount.setText(displayValue + " " + cs);
 	        }
 	        else {
     	        SpannableStringBuilder cs = new SpannableStringBuilder(vals.getAsString("famt").subSequence(0, 1));
@@ -369,7 +369,7 @@ public class TransactionsFragment extends Fragment {
 
     private String generateURI(long item) {
 		String receiving_name = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "");
-        ContentValues vals = mListItems.get((int)item);
+        ContentValues vals = mListItems.get((int) item);
         return BitcoinURI.convertToBitcoinURI(vals.getAsString("iad"), BigInteger.valueOf(vals.getAsLong("amt")), receiving_name, vals.getAsString("msg"));
     }
 
