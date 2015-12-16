@@ -292,7 +292,6 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
     private void checkBitcoinLimit(){
 
-        NumberFormat nf = NumberFormat.getInstance(Locale.getDefault());
         double currentValue = 0.0;
 
         try {
