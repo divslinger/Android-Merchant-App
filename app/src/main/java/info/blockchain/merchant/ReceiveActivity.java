@@ -214,7 +214,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 //Generate new address/QR code for receive
                 if(AppUtil.getInstance(ReceiveActivity.this).isV2API())    {
                     try {
-                        ReceiveV2Response response = ReceiveV2.receive(PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""), APIFactory.getInstance(ReceiveActivity.this).getCallback(), APIFactory.getInstance(ReceiveActivity.this).getAPIKey());
+                        ReceiveV2Response response = ReceiveV2.receive(PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""), APIFactory.getInstance().getCallback(), APIFactory.getInstance().getAPIKey());
                         receivingAddress = response.getReceivingAddress();
                     }
                     catch(Exception e) {
