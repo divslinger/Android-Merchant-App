@@ -196,29 +196,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
         return strCurrencySymbol;
     }
-/*
-    private String getHDReceiveAddress() {
 
-        String receivingAddress = null;
-
-        try {
-            Account account = new Account(MainNetParams.get(), PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""), 0);
-
-            int idx = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, APIFactory.getInstance(ReceiveActivity.this).getAccountIndex());
-            if(idx - APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() >= ADDRESS_LOOKAHEAD)    {
-                idx = APIFactory.getInstance(ReceiveActivity.this).getAccountIndex() + (ADDRESS_LOOKAHEAD - 1);
-            }
-            Address addr = account.getReceive().getAddressAt(idx);
-            receivingAddress = addr.getAddressString();
-            PrefsUtil.getInstance(ReceiveActivity.this).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, idx + 1);
-        }
-        catch(AddressFormatException afe) {
-            return null;
-        }
-
-        return receivingAddress;
-    }
-*/
     private void getReceiveAddress(final double amountBtc) {
 
         new AsyncTask<Void, Void, String>(){

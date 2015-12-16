@@ -166,56 +166,6 @@ public class TransactionsFragment extends Fragment {
 
         	if(merchantXpub != null && merchantXpub.length() > 0) {
 
-                /*
-                Wallet wallet = new Wallet(merchantXpub, 10);
-
-                String json = null;
-                try {
-					json = WebUtil.getInstance().getURL(wallet.getUrl());
-                    wallet.setData(json);
-                    wallet.parse();
-                }
-                catch(MalformedURLException mue) {
-                	mue.printStackTrace();
-                }
-				catch(IOException ioe) {
-					ioe.printStackTrace();
-				}
-				catch(Exception e) {
-					e.printStackTrace();
-				}
-
-                DBController pdb = new DBController(getActivity());
-                List<String> confirmedAddresses = pdb.getConfirmedPaymentIncomingAddresses();
-
-                List<Tx> txs = wallet.getTxs();
-                if(txs != null && txs.size() > 0) {
-                    for (Tx t : txs) {
-                    	if(t.getIncomingAddresses().size() > 0) {
-                    		List<String> incoming_addresses = t.getIncomingAddresses();
-                            for (String incoming : incoming_addresses) {
-                        		if(t.isConfirmed()) {
-                                    if(pdb.updateConfirmed(incoming, 1) > 0) {
-                                    	if(push_notifications && !confirmedAddresses.contains(incoming)) {
-                                  			String strMarquee = getActivity().getResources().getString(R.string.marquee_start) + " " + incoming;
-                                  			String strText = BitcoinURI.bitcoinValueToPlainString(BigInteger.valueOf(t.getAmount())) + " " + getActivity().getResources().getString(R.string.notification_end);
-                                  			if(notification != null) {
-                                 	    		notification.clearNotification();
-                                 	    	}
-                                    		notification = new NotificationData(getActivity(), strMarquee, strMarquee, strText, R.drawable.ic_launcher, info.blockchain.merchant.MainActivity.class, 1001);
-                                    		notification.setNotification();
-                                    	}
-                                    }
-                        		}
-                        		else {
-                            		pdb.updateConfirmed(incoming, 0);
-                        		}
-                            }
-                    	}
-                    }
-                }
-                */
-
                 // get updated list from database
                 DBController pdb = new DBController(getActivity());
                 ArrayList<ContentValues> vals = pdb.getAllPayments();
