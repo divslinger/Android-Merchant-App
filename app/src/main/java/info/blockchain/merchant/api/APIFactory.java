@@ -7,12 +7,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
+
+import info.blockchain.api.receive2.ReceiveV2;
+import info.blockchain.api.receive2.ReceiveV2Response;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.wallet.util.WebUtil;
 
 public class APIFactory	{
-
-    private static String RECEIVE_PAYMENTS_API_KEY = null;
 
     private static int account_index = 0;
 
@@ -33,7 +35,11 @@ public class APIFactory	{
     }
 
     public String getAPIKey()    {
-        return RECEIVE_PAYMENTS_API_KEY;
+        return APIKey.getInstance().getKey();
+    }
+
+    public String getCallback()    {
+        return APIKey.getInstance().getCallback();
     }
 
     public int getAccountIndex() {

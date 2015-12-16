@@ -36,9 +36,13 @@ import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.uri.BitcoinURI;
 
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 
+import info.blockchain.api.receive2.ReceiveV2;
+import info.blockchain.api.receive2.ReceiveV2Response;
 import info.blockchain.merchant.api.APIFactory;
+import info.blockchain.merchant.api.APIKey;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 import info.blockchain.merchant.util.AppUtil;
@@ -86,29 +90,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvFiatAmount.setText(getCurrencySymbol()+" "+ dfFiat.format(amountFiat));
         tvBtcAmount.setText(dfBtc.format(amountBtc) + " " + PaymentFragment.DEFAULT_CURRENCY_BTC);
 
-        //Generate new address/QR code for receive
-        if(AppUtil.getInstance(ReceiveActivity.this).isV2API())    {
-            receivingAddress = getV2ReceiveAddress();
-        }
-        else    {
-            receivingAddress = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-        }
+        getReceiveAddress(amountBtc);
 
-        if(receivingAddress == null)    {
-            ToastCustom.makeText(ReceiveActivity.this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
-            finish();
-        }
-        else    {
-            ToastCustom.makeText(ReceiveActivity.this, receivingAddress, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_OK);
-        }
-
-        //Subscribe to websocket to new address
-        Intent intent = new Intent(MainActivity.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
-        intent.putExtra("address",receivingAddress);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-
-        long lAmount = getLongAmount(amountBtc);
-        displayQRCode(lAmount);
     }
 
     @Override
@@ -220,7 +203,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         return strCurrencySymbol;
     }
 
-    private String getV2ReceiveAddress() {
+    private String getHDReceiveAddress() {
 
         String receivingAddress = null;
 
@@ -240,6 +223,63 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         }
 
         return receivingAddress;
+    }
+
+    private void getReceiveAddress(final double amountBtc) {
+
+        new AsyncTask<Void, Void, String>(){
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+                progressLayout.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            protected String doInBackground(Void... params) {
+
+                //Generate new address/QR code for receive
+                if(AppUtil.getInstance(ReceiveActivity.this).isV2API())    {
+                    try {
+                        ReceiveV2Response response = ReceiveV2.receive(PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""), APIKey.getInstance().getCallback(), APIKey.getInstance().getKey());
+                        receivingAddress = response.getReceivingAddress();
+                    }
+                    catch(Exception e) {
+                        e.getMessage();
+                        e.printStackTrace();
+                    }
+                }
+                else    {
+                    receivingAddress = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+                }
+
+                if(receivingAddress == null)    {
+                    ToastCustom.makeText(ReceiveActivity.this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+                    return null;
+                }
+                else    {
+                    ToastCustom.makeText(ReceiveActivity.this, receivingAddress, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_OK);
+                }
+
+                //Subscribe to websocket to new address
+                Intent intent = new Intent(MainActivity.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
+                intent.putExtra("address",receivingAddress);
+                LocalBroadcastManager.getInstance(ReceiveActivity.this).sendBroadcast(intent);
+
+                long lAmount = getLongAmount(amountBtc);
+                displayQRCode(lAmount);
+
+                return receivingAddress;
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                super.onPostExecute(result);
+                progressLayout.setVisibility(View.GONE);
+            }
+        }.execute();
+
     }
 
     private long getLongAmount(double amountPayable) {
