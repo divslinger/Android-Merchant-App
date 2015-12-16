@@ -12,6 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -51,6 +53,8 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     private DecimalFormat dfFiat = new DecimalFormat("######0.00");
     private final double bitcoinLimit = 21000000.0;
 
+    private NumberFormat nf = null;
+
     private static Timer timer = null;
 
     public static final int RECEIVE_RESULT = 1122;
@@ -58,6 +62,8 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_payment, container, false);
+
+        nf = NumberFormat.getInstance(Locale.getDefault());
 
         tvAmount = (TextView)rootView.findViewById(R.id.tv_fiat_amount);
         ivCharge = (ImageView)rootView.findViewById(R.id.iv_charge);
@@ -175,8 +181,9 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     }
 
     private boolean validateAmount(){
+
         try {
-            double textParsable = Double.parseDouble(tvAmount.getText().toString());
+            double textParsable = nf.parse(tvAmount.getText().toString()).doubleValue();
             if (textParsable > 0.0) {
                 return true;
             }else{
@@ -285,7 +292,16 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
     private void checkBitcoinLimit(){
 
-        double currentValue = Double.parseDouble(tvAmount.getText().toString());
+        NumberFormat nf = NumberFormat.getInstance(Locale.getDefault());
+        double currentValue = 0.0;
+
+        try {
+            currentValue = nf.parse(tvAmount.getText().toString()).doubleValue();
+        }
+        catch(ParseException pe) {
+            pe.printStackTrace();
+        }
+
         if(isBtc){
 
             if(currentValue > bitcoinLimit) {
@@ -296,7 +312,15 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
             String strCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT);
             Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency);
-            double btcValue = Double.parseDouble(dfBtc.format(currentValue / currencyPrice));
+
+            double btcValue = 0.0;
+            try {
+                btcValue = nf.parse(dfBtc.format(currentValue / currencyPrice)).doubleValue();
+            }
+            catch(ParseException pe) {
+                pe.printStackTrace();
+            }
+
             if(btcValue > bitcoinLimit) {
                 tvAmount.setText(dfFiat.format(bitcoinLimit * currencyPrice));
                 ToastCustom.makeText(getActivity(), getResources().getString(R.string.btc_limit_reached), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
@@ -325,21 +349,27 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
         if(tvAmount==null)return;
 
-        double amount = Double.parseDouble(tvAmount.getText().toString());
+        try {
 
-        Locale locale = new Locale("en", "US");
-        Locale.setDefault(locale);
+            double amount = nf.parse(tvAmount.getText().toString()).doubleValue();
 
-        String strCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT);
-        Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency);
+            String strCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT);
+            Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency);
 
-        if(isBtc) {
-            amountPayableFiat = Double.parseDouble(dfFiat.format(amount * currencyPrice));
-            amountPayableBtc = amount;
-        }else {
-            amountPayableFiat = amount;
-            amountPayableBtc = Double.parseDouble(dfBtc.format(amount / currencyPrice));
+            if(isBtc) {
+                amountPayableFiat = nf.parse(dfFiat.format(amount * currencyPrice)).doubleValue();
+                amountPayableBtc = amount;
+            }
+            else {
+                amountPayableFiat = amount;
+                amountPayableBtc = nf.parse(dfBtc.format(amount / currencyPrice)).doubleValue();
+            }
         }
+        catch(ParseException pe) {
+            pe.printStackTrace();
+        }
+
     }
+
 }
 
