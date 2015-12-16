@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -23,16 +22,11 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+//import android.util.Log;
 
 import com.google.bitcoin.uri.BitcoinURI;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.android.Contents;
-import com.google.zxing.client.android.encode.QRCodeEncoder;
 
-import java.io.IOException;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,16 +35,11 @@ import java.util.TimerTask;
 
 import info.blockchain.merchant.NotificationData;
 import info.blockchain.merchant.R;
-import info.blockchain.merchant.api.Tx;
-import info.blockchain.merchant.api.Wallet;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.util.DateUtil;
 import info.blockchain.merchant.util.MonetaryUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.TypefaceUtil;
-import info.blockchain.wallet.util.WebUtil;
-
-//import android.util.Log;
 
 public class TransactionsFragment extends Fragment {
     
@@ -177,7 +166,9 @@ public class TransactionsFragment extends Fragment {
 
         	if(merchantXpub != null && merchantXpub.length() > 0) {
 
+                /*
                 Wallet wallet = new Wallet(merchantXpub, 10);
+
                 String json = null;
                 try {
 					json = WebUtil.getInstance().getURL(wallet.getUrl());
@@ -223,8 +214,10 @@ public class TransactionsFragment extends Fragment {
                     	}
                     }
                 }
-                
+                */
+
                 // get updated list from database
+                DBController pdb = new DBController(getActivity());
                 ArrayList<ContentValues> vals = pdb.getAllPayments();
 
                 if(vals.size() > 0) {
@@ -238,7 +231,7 @@ public class TransactionsFragment extends Fragment {
                         }
                     });
                 }
-                
+
         	}
 
             return null;
@@ -349,28 +342,6 @@ public class TransactionsFragment extends Fragment {
                     }
                 });
         builder.create().show();
-    }
-    
-    private Bitmap generateQRCode(String uri) {
-
-        Bitmap bitmap = null;
-        int qrCodeDimension = 380;
-
-        QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(uri, null, Contents.Type.TEXT, BarcodeFormat.QR_CODE.toString(), qrCodeDimension);
-
-    	try {
-            bitmap = qrCodeEncoder.encodeAsBitmap();
-        } catch (WriterException e) {
-            e.printStackTrace();
-        }
-    	
-    	return bitmap;
-    }
-
-    private String generateURI(long item) {
-		String receiving_name = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "");
-        ContentValues vals = mListItems.get((int) item);
-        return BitcoinURI.convertToBitcoinURI(vals.getAsString("iad"), BigInteger.valueOf(vals.getAsLong("amt")), receiving_name, vals.getAsString("msg"));
     }
 
     private void doDelete(final long item)	{

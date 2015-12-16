@@ -3,17 +3,6 @@ package info.blockchain.merchant.api;
 import android.content.Context;
 //import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.URLEncoder;
-
-import info.blockchain.api.receive2.ReceiveV2;
-import info.blockchain.api.receive2.ReceiveV2Response;
-import info.blockchain.merchant.util.PrefsUtil;
-import info.blockchain.wallet.util.WebUtil;
-
 public class APIFactory	{
 
     private static int account_index = 0;
@@ -41,7 +30,7 @@ public class APIFactory	{
     public String getCallback()    {
         return APIKey.getInstance().getCallback();
     }
-
+/*
     public int getAccountIndex() {
         return account_index;
     }
@@ -96,5 +85,5 @@ public class APIFactory	{
         }
 
     }
-
+*/
 }

@@ -16,18 +16,16 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import info.blockchain.merchant.CurrencyExchange;
 import info.blockchain.merchant.MainActivity;
-import info.blockchain.merchant.R;
 import info.blockchain.merchant.ReceiveActivity;
 import info.blockchain.merchant.SettingsActivity;
-import info.blockchain.merchant.api.APIFactory;
 import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.SnackCustom;
 import info.blockchain.merchant.util.ToastCustom;
+import info.blockchain.merchant.R;
 
 public class PaymentFragment extends Fragment implements View.OnClickListener {
 
@@ -82,7 +80,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-
+/*
         if(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, 0L) > APIFactory.getInstance(getActivity()).getAccountIndex())    {
             if(timer == null) {
                 timer = new Timer();
@@ -116,7 +114,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         else    {
             ;
         }
-
+*/
         isBtc = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
 
         initValues();
@@ -365,10 +363,11 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             }
         }
         catch(ParseException pe) {
+            amountPayableFiat = 0.0;
+            amountPayableBtc = 0.0;
             pe.printStackTrace();
         }
 
     }
 
 }
-

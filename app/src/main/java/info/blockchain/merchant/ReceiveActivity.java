@@ -28,21 +28,15 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.encode.QRCodeEncoder;
 
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
-import org.bitcoinj.core.bip44.Account;
-import org.bitcoinj.core.bip44.Address;
-import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.uri.BitcoinURI;
 
 import java.math.BigInteger;
-import java.net.URLEncoder;
 import java.text.DecimalFormat;
 
 import info.blockchain.api.receive2.ReceiveV2;
 import info.blockchain.api.receive2.ReceiveV2Response;
 import info.blockchain.merchant.api.APIFactory;
-import info.blockchain.merchant.api.APIKey;
 import info.blockchain.merchant.db.DBController;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 import info.blockchain.merchant.util.AppUtil;
@@ -202,7 +196,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
         return strCurrencySymbol;
     }
-
+/*
     private String getHDReceiveAddress() {
 
         String receivingAddress = null;
@@ -224,7 +218,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
         return receivingAddress;
     }
-
+*/
     private void getReceiveAddress(final double amountBtc) {
 
         new AsyncTask<Void, Void, String>(){
@@ -242,10 +236,11 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 //Generate new address/QR code for receive
                 if(AppUtil.getInstance(ReceiveActivity.this).isV2API())    {
                     try {
-                        ReceiveV2Response response = ReceiveV2.receive(PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""), APIKey.getInstance().getCallback(), APIKey.getInstance().getKey());
+                        ReceiveV2Response response = ReceiveV2.receive(PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""), APIFactory.getInstance(ReceiveActivity.this).getCallback(), APIFactory.getInstance(ReceiveActivity.this).getAPIKey());
                         receivingAddress = response.getReceivingAddress();
                     }
                     catch(Exception e) {
+                        receivingAddress = null;
                         e.getMessage();
                         e.printStackTrace();
                     }
