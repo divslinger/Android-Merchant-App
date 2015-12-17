@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="version_name">1.2.4</string>
+    <string name="version_name">2.0</string>
 
     <string name="app_name">Blockchain Merchant</string>
     <string name="action_settings">Settings</string>
@@ -71,4 +71,6 @@
 
     <string name="no_valid_receiver">Please configure your receiving address.</string>
     <string name="invalid_amount">Invalid amount.</string>
+
+    <string name="new_version_message">Beautiful new design\n\nFaster and easier input\n\nStability fixes\n\nZero fee direct payments to any bitcoin address\n\nPrivacy support with BIP44 XPUBS</string>
 </resources>

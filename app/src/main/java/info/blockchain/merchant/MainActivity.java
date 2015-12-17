@@ -1,8 +1,10 @@
 package info.blockchain.merchant;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NdefMessage;
@@ -91,7 +93,27 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         webSocketHandler = new WebSocketHandler();
         webSocketHandler.addListener(this);
         webSocketHandler.start();
-	}
+
+        if(PrefsUtil.getInstance(MainActivity.this).getValue("popup_" + getResources().getString(R.string.version_name), false) == false)	{
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle(R.string.app_name);
+            builder.setMessage(R.string.new_version_message).setCancelable(false);
+            AlertDialog alert = builder.create();
+
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    PrefsUtil.getInstance(MainActivity.this).setValue("popup_" + getResources().getString(R.string.version_name), true);
+                }});
+
+            alert.show();
+
+        }
+        else    {
+            ;
+        }
+
+    }
 
     @Override
     protected void onResume() {
