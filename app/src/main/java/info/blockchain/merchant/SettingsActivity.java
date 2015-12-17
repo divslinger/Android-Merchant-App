@@ -55,7 +55,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         initToolbar();
         initValues();
-    }
+
+        }
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -76,10 +77,14 @@ public class SettingsActivity extends AppCompatActivity {
 		
 		if(resultCode == Activity.RESULT_OK && requestCode == ZBAR_SCANNER_REQUEST)	{
 
-            final String scanResult = data.getStringExtra(ZBarConstants.SCAN_RESULT);
+            String scanResult = data.getStringExtra(ZBarConstants.SCAN_RESULT);
+            if(scanResult.startsWith("bitcoin:"))    {
+                scanResult = scanResult.substring(8);
+            }
             if(FormatsUtil.getInstance().isValidXpub(scanResult) || FormatsUtil.getInstance().isValidBitcoinAddress(scanResult)){
                 merchantReceiverView.setText(scanResult);
-            }else{
+            }
+            else{
                 ToastCustom.makeText(this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
         }
