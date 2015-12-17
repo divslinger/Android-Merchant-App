@@ -232,7 +232,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                     return null;
                 }
                 else    {
-                    ToastCustom.makeText(ReceiveActivity.this, receivingAddress, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_OK);
+//                    ToastCustom.makeText(ReceiveActivity.this, receivingAddress, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_OK);
                 }
 
                 //Subscribe to websocket to new address
