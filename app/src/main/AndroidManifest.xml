@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest package="info.blockchain.merchant"
           xmlns:android="http://schemas.android.com/apk/res/android"
-          android:versionCode="15"
-          android:versionName="1.2.4">
+          android:versionCode="17"
+          android:versionName="2.0">
 
     <uses-sdk
         android:minSdkVersion="14"
