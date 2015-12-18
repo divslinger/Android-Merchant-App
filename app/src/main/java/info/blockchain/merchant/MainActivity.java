@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -23,6 +24,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -97,7 +99,11 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         if(PrefsUtil.getInstance(MainActivity.this).getValue("popup_" + getResources().getString(R.string.version_name), false) == false)	{
 
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle(R.string.app_name);
+            TextView title = new TextView(MainActivity.this);
+            title.setText(R.string.app_name);
+            title.setGravity(Gravity.CENTER);
+            title.setTextSize(20);
+            builder.setCustomTitle(title);
             builder.setMessage(R.string.new_version_message).setCancelable(false);
             AlertDialog alert = builder.create();
 

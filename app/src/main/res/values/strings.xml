@@ -72,5 +72,5 @@
     <string name="no_valid_receiver">Please configure your receiving address.</string>
     <string name="invalid_amount">Invalid amount.</string>
 
-    <string name="new_version_message">Beautiful new design\n\nFaster and easier input\n\nStability fixes\n\nZero fee direct payments to any bitcoin address\n\nPrivacy support with BIP44 XPUBS</string>
+    <string name="new_version_message">\u2022 Beautiful new design\n\n\u2022 Faster and easier input\n\n\u2022 Stability fixes\n\n\u2022 Direct payments to any bitcoin address\n\n\u2022 Privacy support with BIP44 XPUBS</string>
 </resources>
