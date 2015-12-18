@@ -45,8 +45,9 @@ public class SettingsActivity extends AppCompatActivity {
 	private static int ZBAR_SCANNER_REQUEST = 2026;
 
     private static int PIN_ACTIVITY 		= 2;
-    private static int RESET_PIN_ACTIVITY 	= 3;
-	
+
+    private static boolean pausedForScan = false;
+
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -87,6 +88,8 @@ public class SettingsActivity extends AppCompatActivity {
             else{
                 ToastCustom.makeText(this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
+
+            pausedForScan = false;
         }
 	}
 
@@ -94,7 +97,9 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        finish();
+        if(!pausedForScan)  {
+            finish();
+        }
     }
 
     private void initValues() {
@@ -109,6 +114,7 @@ public class SettingsActivity extends AppCompatActivity {
         ivQr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                pausedForScan = true;
                 Intent intent = new Intent(SettingsActivity.this, ZBarScannerActivity.class);
                 intent.putExtra(ZBarConstants.SCAN_MODES, new int[]{Symbol.QRCODE});
                 startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
