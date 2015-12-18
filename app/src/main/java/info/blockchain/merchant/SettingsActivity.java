@@ -90,6 +90,13 @@ public class SettingsActivity extends AppCompatActivity {
         }
 	}
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        finish();
+    }
+
     private void initValues() {
 
         spCurrencies = (Spinner)findViewById(R.id.receive_coins_default_currency);
