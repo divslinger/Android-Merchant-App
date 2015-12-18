@@ -42,21 +42,21 @@ import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.TypefaceUtil;
 
 public class TransactionsFragment extends Fragment {
-    
+
     private static String merchantXpub = null;
-	private List<ContentValues> mListItems;
-	private TransactionAdapter adapter = null;
-	private NotificationData notification = null;
+    private List<ContentValues> mListItems;
+    private TransactionAdapter adapter = null;
+    private NotificationData notification = null;
     private boolean push_notifications = false;
-	private Timer timer = null;
+    private Timer timer = null;
     private ListView listView = null;
     private Typeface btc_font = null;
 
     private boolean doBTC = false;
     private SwipeRefreshLayout swipeLayout = null;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(getResources().getLayout(R.layout.fragment_transaction), container, false);
 
@@ -65,7 +65,7 @@ public class TransactionsFragment extends Fragment {
         merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
         push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
         doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
-        
+
         btc_font = TypefaceUtil.getInstance(getActivity()).getTypeface();
 
         swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
@@ -80,8 +80,8 @@ public class TransactionsFragment extends Fragment {
                 R.color.blockchain_green,
                 R.color.blockchain_dark_blue);
 
-	    return rootView;
-	}
+        return rootView;
+    }
 
     private void initListView(View rootView){
 
@@ -113,11 +113,11 @@ public class TransactionsFragment extends Fragment {
 
         if(isVisibleToUser) {
 
-			merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-			push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
-			doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
+            merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+            push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
+            doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
 
-			if(push_notifications) {
+            if(push_notifications) {
                 if(timer == null) {
                     timer = new Timer();
                     try {
@@ -125,32 +125,32 @@ public class TransactionsFragment extends Fragment {
                             public void run() {
                                 new GetDataTask().execute();
                             }
-                    	}, 500L, 1000L * 60L * 2L);
+                        }, 500L, 1000L * 60L * 2L);
                     }
                     catch(IllegalStateException ise) {
-                    	;
+                        ;
                     }
                     catch(IllegalArgumentException iae) {
-                    	;
+                        ;
                     }
                 }
-        	}
+            }
 
         }
         else {
-        	;
+            ;
         }
     }
 
     @Override
     public void onResume() {
-    	super.onResume();
+        super.onResume();
 
-		merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-		push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
-		doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
+        merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+        push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
+        doBTC = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
         new GetDataTask().execute();
-	}
+    }
 
     private class GetDataTask extends AsyncTask<Void, Void, String[]> {
 
@@ -164,15 +164,15 @@ public class TransactionsFragment extends Fragment {
                 }
             });
 
-        	if(merchantXpub != null && merchantXpub.length() > 0) {
+            if(merchantXpub != null && merchantXpub.length() > 0) {
 
                 // get updated list from database
                 DBController pdb = new DBController(getActivity());
                 ArrayList<ContentValues> vals = pdb.getAllPayments();
 
                 if(vals.size() > 0) {
-                	mListItems.clear();
-                	mListItems.addAll(vals);
+                    mListItems.clear();
+                    mListItems.addAll(vals);
 
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -182,7 +182,7 @@ public class TransactionsFragment extends Fragment {
                     });
                 }
 
-        	}
+            }
 
             return null;
         }
@@ -202,71 +202,71 @@ public class TransactionsFragment extends Fragment {
     }
 
     private class TransactionAdapter extends BaseAdapter {
-    	
-		private LayoutInflater inflater = null;
-	    private SimpleDateFormat sdf = null;
 
-	    TransactionAdapter() {
-	        inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		}
+        private LayoutInflater inflater = null;
+        private SimpleDateFormat sdf = null;
 
-		@Override
-		public int getCount() {
-			return mListItems.size();
-		}
+        TransactionAdapter() {
+            inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
 
-		@Override
-		public String getItem(int position) {
-	        return mListItems.get(position).getAsString("iad");
-		}
+        @Override
+        public int getCount() {
+            return mListItems.size();
+        }
 
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-		
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+        @Override
+        public String getItem(int position) {
+            return mListItems.get(position).getAsString("iad");
+        }
 
-			View view;
-	        
-	        if (convertView == null) {
-	            view = inflater.inflate(R.layout.list_item_transaction, parent, false);
-	        } else {
-	            view = convertView;
-	        }
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
 
-	        ContentValues vals = mListItems.get(position);
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
 
-	        String date_str = DateUtil.getInstance().formatted(vals.getAsLong("ts"));
-	        SpannableStringBuilder ds = new SpannableStringBuilder(date_str);
-	        if(date_str.indexOf("@") != -1) {
-	        	int idx = date_str.indexOf("@");
-		        ds.setSpan(new StyleSpan(Typeface.NORMAL), 0, idx, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        ds.setSpan(new RelativeSizeSpan(0.75f), idx, date_str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-	        }
+            View view;
+
+            if (convertView == null) {
+                view = inflater.inflate(R.layout.list_item_transaction, parent, false);
+            } else {
+                view = convertView;
+            }
+
+            ContentValues vals = mListItems.get(position);
+
+            String date_str = DateUtil.getInstance().formatted(vals.getAsLong("ts"));
+            SpannableStringBuilder ds = new SpannableStringBuilder(date_str);
+            if(date_str.indexOf("@") != -1) {
+                int idx = date_str.indexOf("@");
+                ds.setSpan(new StyleSpan(Typeface.NORMAL), 0, idx, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ds.setSpan(new RelativeSizeSpan(0.75f), idx, date_str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
             TextView tvDate = (TextView)view.findViewById(R.id.tv_date);
             tvDate.setText(ds);
             tvDate.setAlpha(0.7f);
 
             TextView tvAmount = (TextView)view.findViewById(R.id.tv_amount);
-	        if(doBTC) {
-	        	String displayValue = null;
-				long amount = vals.getAsLong("amt");
-				displayValue = MonetaryUtil.getInstance(getActivity()).getDisplayAmountWithFormatting(amount);
+            if(doBTC) {
+                String displayValue = null;
+                long amount = vals.getAsLong("amt");
+                displayValue = MonetaryUtil.getInstance(getActivity()).getDisplayAmountWithFormatting(amount);
 
-    	        SpannableStringBuilder cs = new SpannableStringBuilder(getActivity().getResources().getString(R.string.bitcoin_currency_symbol));
-    	        cs.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                SpannableStringBuilder cs = new SpannableStringBuilder(getActivity().getResources().getString(R.string.bitcoin_currency_symbol));
+                cs.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 tvAmount.setText(displayValue + " " + cs);
-	        }
-	        else {
-    	        SpannableStringBuilder cs = new SpannableStringBuilder(vals.getAsString("famt").subSequence(0, 1));
-    	        cs.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            else {
+                SpannableStringBuilder cs = new SpannableStringBuilder(vals.getAsString("famt").subSequence(0, 1));
+                cs.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 tvAmount.setText(cs + " " + vals.getAsString("famt").substring(1));
-	        }
+            }
 
-	        return view;
-		}
+            return view;
+        }
 
     }
 
@@ -277,7 +277,7 @@ public class TransactionsFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setIcon(R.drawable.ic_launcher);
         builder.setItems(new CharSequence[]
-                { "View transaction", "Delete from payments" },
+                        { "View transaction" },
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
@@ -285,52 +285,10 @@ public class TransactionsFragment extends Fragment {
                                 Intent intent = new Intent( Intent.ACTION_VIEW , Uri.parse("https://blockchain.info/address/" + val.getAsString("iad")));
                                 startActivity(intent);
                                 break;
-                            case 1:
-                                doDelete(item);
-                                break;
                         }
                     }
                 });
         builder.create().show();
-    }
-
-    private void doDelete(final long item)	{
-
-        final ContentValues val = mListItems.get((int)item);
-
-		SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy@HH:mm");
-		String dateStr = sd.format(val.getAsLong("ts") * 1000L);
-
-    	new AlertDialog.Builder(getActivity())
-    		.setIcon(R.drawable.ic_launcher)
-    		.setTitle(dateStr + ": " + BitcoinURI.bitcoinValueToPlainString(BigInteger.valueOf(val.getAsLong("amt"))) + " BTC, " + val.getAsString("famt"))
-    		.setMessage(R.string.delete_rec)
-    		.setPositiveButton(R.string.prompt_yes, new DialogInterface.OnClickListener() {
-//          	@Override
-    			public void onClick(DialogInterface dialog, int which) {
-
-    				DBController pdb = new DBController(getActivity());
-    				pdb.deleteIncomingAddress(val.getAsString("iad"));
-    				pdb.close();
-
-    				if(mListItems.size() > 1) {
-        				mListItems.remove(item);
-    				}
-    				else {
-        				mListItems.clear();
-    				}
-
-    	            new GetDataTask().execute();
-    			}
-    		})
-    		.setNegativeButton(R.string.prompt_no, new DialogInterface.OnClickListener() {
-//          	@Override
-    			public void onClick(DialogInterface dialog, int which) {
-    				return;
-    			}
-    		}
-    	).show();
-
     }
 
 }
