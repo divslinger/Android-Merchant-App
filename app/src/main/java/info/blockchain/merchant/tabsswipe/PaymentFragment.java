@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -57,11 +58,16 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
     public static final int RECEIVE_RESULT = 1122;
 
+    private String strDecimal = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_payment, container, false);
 
         nf = NumberFormat.getInstance(Locale.getDefault());
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        strDecimal = Character.toString(symbols.getDecimalSeparator());
+        ((TextView)rootView.findViewById(R.id.decimal)).setText(strDecimal);
 
         tvAmount = (TextView)rootView.findViewById(R.id.tv_fiat_amount);
         ivCharge = (ImageView)rootView.findViewById(R.id.iv_charge);
@@ -80,41 +86,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-/*
-        if(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, 0L) > APIFactory.getInstance(getActivity()).getAccountIndex())    {
-            if(timer == null) {
-                timer = new Timer();
 
-                timer.scheduleAtFixedRate(new TimerTask() {
-                    @Override
-                    public void run() {
-
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try	{
-                                    APIFactory.getInstance(getActivity()).getXPUB();
-                                    PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, APIFactory.getInstance(getActivity()).getAccountIndex());
-                                }
-                                catch(Exception e)	{
-                                    System.out.println(e.getMessage());
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).start();
-
-                    }
-                }, 1000, 60000);
-            }
-        }
-        else if(timer != null)    {
-            timer.cancel();
-            timer = null;
-        }
-        else    {
-            ;
-        }
-*/
         isBtc = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
 
         initValues();
@@ -166,7 +138,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             case R.id.button7:padClicked(v.getTag().toString().substring(0, 1));break;
             case R.id.button8:padClicked(v.getTag().toString().substring(0, 1));break;
             case R.id.button9:padClicked(v.getTag().toString().substring(0, 1));break;
-            case R.id.button10:padClicked(".");break;
+            case R.id.button10:padClicked(strDecimal);break;
             case R.id.button0:padClicked(v.getTag().toString().substring(0, 1));break;
             case R.id.buttonDeleteBack:padClicked(null);break;
 
@@ -215,7 +187,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivityForResult(intent, RECEIVE_RESULT);
         }else{
-            SnackCustom.make(getActivity(), getView(), getActivity().getText(R.string.invalid_amount), getActivity().getResources().getString(R.string.prompt_ok),null);
+            SnackCustom.make(getActivity(), getView(), getActivity().getText(R.string.invalid_amount), getActivity().getResources().getString(R.string.prompt_ok), null);
         }
     }
 
@@ -244,20 +216,27 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
         String amountText = tvAmount.getText().toString();
 
-        //initial input
-        if((!isBtc && amountText.equals("0.00")) || (isBtc && amountText.equals("0.00000000")) || amountText.equals("0") || amountText.equals("")){
+        if(amountText.length() == 1 && amountText.charAt(0) == '0' && !pad.equals(strDecimal))    {
+            tvAmount.setText(pad);
+            return;
+        }
 
-            if(pad.equals(".")){
-                tvAmount.setText("0.");
-                return;
-            }else{
-                tvAmount.setText(pad);
-                return;
-            }
+        //initial input
+        double amount = 0.0;
+        try {
+            amount = nf.parse(amountText).doubleValue();
+        }
+        catch(ParseException pe) {
+            amount = 0.0;
+        }
+
+        if(amount == 0.0 && pad.equals(strDecimal))    {
+            tvAmount.setText("0" + strDecimal);
+            return;
         }
 
         //Don't allow multiple decimal separators
-        if(amountText.contains(".") && pad.equals(".")){
+        if(amountText.contains(strDecimal) && pad.equals(strDecimal)){
             return;
         }
 
@@ -267,11 +246,11 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         }
 
         //Get decimal places
-        if(amountText.contains(".")) {
+        if(amountText.contains(strDecimal)) {
 
             int decimalPlaces = 0;
             amountText += pad;
-            String[] result = amountText.split("\\.");
+            String[] result = amountText.split(strDecimal);
 
             if(result.length >= 2)
                 decimalPlaces = result[1].length();
