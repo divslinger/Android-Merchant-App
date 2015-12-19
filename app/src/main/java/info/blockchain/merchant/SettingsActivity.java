@@ -41,6 +41,7 @@ public class SettingsActivity extends AppCompatActivity {
 	private TextView tvCancel = null;
     private ImageView ivQr = null;
     private ArrayAdapter<CharSequence> spAdapter = null;
+    private TextView tvChangePin = null;
 
 	private static int ZBAR_SCANNER_REQUEST = 2026;
 
@@ -110,6 +111,19 @@ public class SettingsActivity extends AppCompatActivity {
         merchantNameView = (EditText)findViewById(R.id.et_merchant_name);
         tvOK = (TextView)findViewById(R.id.confirm);
         tvCancel = (TextView)findViewById(R.id.cancel);
+        tvChangePin = (TextView)findViewById(R.id.tv_change_pin);
+
+        tvChangePin.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+
+                Intent intent = new Intent(SettingsActivity.this, PinActivity.class);
+                intent.putExtra("create", true);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivityForResult(intent, PIN_ACTIVITY);
+
+                return false;
+            }
+        });
 
         ivQr.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -199,10 +213,4 @@ public class SettingsActivity extends AppCompatActivity {
 	    }
 	}
 
-    public void changePinClicked(View view) {
-        Intent intent = new Intent(this, PinActivity.class);
-        intent.putExtra("create", true);
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivityForResult(intent, PIN_ACTIVITY);
-    }
 }
