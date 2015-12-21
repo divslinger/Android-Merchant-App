@@ -1,7 +1,7 @@
 package info.blockchain.merchant.service;
 
 import android.os.AsyncTask;
-import android.util.Log;
+//import android.util.Log;
 
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
@@ -180,10 +180,10 @@ public class WebSocketHandler {
                                                 else if (outObj.has("addr")) {
                                                     if (ExpectedIncoming.getInstance().getBTC().containsKey((String) outObj.get("addr"))) {
                                                         foundAddr = (String) outObj.get("addr");
-                                                        Log.d("WebSocketHandler", "incoming address:" + foundAddr);
+//                                                        Log.d("WebSocketHandler", "incoming address:" + foundAddr);
                                                         txValue = value;
-                                                        Log.d("WebSocketHandler", "incoming value:" + txValue);
-                                                        Log.d("WebSocketHandler", "expected value:" + ExpectedIncoming.getInstance().getBTC().get(foundAddr));
+//                                                        Log.d("WebSocketHandler", "incoming value:" + txValue);
+//                                                        Log.d("WebSocketHandler", "expected value:" + ExpectedIncoming.getInstance().getBTC().get(foundAddr));
                                                         total_value += value;
                                                         break;
                                                     }

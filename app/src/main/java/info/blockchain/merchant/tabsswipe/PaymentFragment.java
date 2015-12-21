@@ -4,13 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+//import android.util.Log;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -152,15 +152,12 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         try {
             double textParsable = nf.parse(tvAmount.getText().toString()).doubleValue();
             if (textParsable > 0.0) {
-                Log.d("PaymentFragment", "textParseable:" + textParsable);
                 return true;
             }else{
-                Log.d("PaymentFragment", "textParseable <= 0.0");
                 return false;
             }
         }catch(Exception e){
-            Log.d("PaymentFragment", e.getMessage());
-            e.printStackTrace();
+//            e.printStackTrace();
             return false;
         }
     }
