@@ -302,10 +302,11 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     }
 
     @Override
-    public void onIncomingPayment(long paymentAmount) {
+    public void onIncomingPayment(String addr, long paymentAmount) {
 
         //New incoming payment - broadcast message
         Intent intent = new Intent(MainActivity.ACTION_INTENT_INCOMING_TX);
+        intent.putExtra("payment_address",addr);
         intent.putExtra("payment_amount",paymentAmount);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }

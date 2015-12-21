@@ -1,8 +1,10 @@
 package info.blockchain.merchant;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -33,11 +35,15 @@ import org.bitcoinj.uri.BitcoinURI;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 import info.blockchain.api.receive2.ReceiveV2;
 import info.blockchain.api.receive2.ReceiveV2Response;
 import info.blockchain.merchant.api.APIFactory;
 import info.blockchain.merchant.db.DBController;
+import info.blockchain.merchant.service.ExpectedIncoming;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.MonetaryUtil;
@@ -84,7 +90,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvFiatAmount.setText(getCurrencySymbol()+" "+ dfFiat.format(amountFiat));
         tvBtcAmount.setText(dfBtc.format(amountBtc) + " " + PaymentFragment.DEFAULT_CURRENCY_BTC);
 
-        getReceiveAddress(amountBtc);
+        getReceiveAddress(amountBtc, tvFiatAmount.getText().toString());
 
     }
 
@@ -197,7 +203,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         return strCurrencySymbol;
     }
 
-    private void getReceiveAddress(final double amountBtc) {
+    private void getReceiveAddress(final double amountBtc, final String strFiat) {
 
         new AsyncTask<Void, Void, String>(){
 
@@ -241,6 +247,9 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 LocalBroadcastManager.getInstance(ReceiveActivity.this).sendBroadcast(intent);
 
                 long lAmount = getLongAmount(amountBtc);
+                ExpectedIncoming.getInstance().getBTC().put(receivingAddress, lAmount);
+                ExpectedIncoming.getInstance().getFiat().put(receivingAddress, strFiat);
+
                 displayQRCode(lAmount);
 
                 return receivingAddress;
@@ -270,7 +279,75 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         //Catch incoming tx
         if (MainActivity.ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
             soundAlert();
-            onPaymentReceived();
+
+            String addr = intent.getStringExtra("payment_address");
+            long paymentAmount = intent.getLongExtra("payment_amount", 0L);
+
+            if(paymentAmount >= ExpectedIncoming.getInstance().getBTC().get(addr))    {
+                onPaymentReceived(addr);
+            }
+            else    {
+
+                final long remainder = ExpectedIncoming.getInstance().getBTC().get(addr) - paymentAmount;
+                ToastCustom.makeText(ReceiveActivity.this, "Remainder:" + remainder, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+
+                final double btcAmount = Double.valueOf(remainder / 1e8);
+
+                String strCurrency = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, PaymentFragment.DEFAULT_CURRENCY_FIAT);
+                Double currencyPrice = CurrencyExchange.getInstance(ReceiveActivity.this).getCurrencyPrice(strCurrency);
+                NumberFormat nf = NumberFormat.getInstance(Locale.getDefault());
+                double fiatAmount = 0.0;
+                try {
+                    fiatAmount = nf.parse(PaymentFragment.dfFiat.format(btcAmount * currencyPrice)).doubleValue();
+                } catch (ParseException pe) {
+                    fiatAmount = 0.0;
+                }
+                final double _fiatAmount = fiatAmount;
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(ReceiveActivity.this.getText(R.string.insufficient_payment));
+                sb.append("\n");
+                sb.append(ReceiveActivity.this.getText(R.string.re_payment_requested));
+                sb.append(": ");
+                sb.append(MonetaryUtil.getInstance(ReceiveActivity.this).getDisplayAmount(ExpectedIncoming.getInstance().getBTC().get(addr)));
+                sb.append(" BTC");
+                sb.append("\n");
+                sb.append(ReceiveActivity.this.getText(R.string.re_payment_received));
+                sb.append(": ");
+                sb.append(MonetaryUtil.getInstance(ReceiveActivity.this).getDisplayAmount(paymentAmount));
+                sb.append(" BTC");
+                sb.append("\n");
+                sb.append(ReceiveActivity.this.getText(R.string.insufficient_payment_continue));
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ReceiveActivity.this, R.style.AppTheme);
+                builder.setTitle(R.string.app_name);
+                builder.setMessage(sb.toString()).setCancelable(false);
+                AlertDialog alert = builder.create();
+
+                alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        dialog.dismiss();
+
+                        Intent intent = new Intent(ReceiveActivity.this, ReceiveActivity.class);
+                        intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, _fiatAmount);
+                        intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, btcAmount);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+
+                    }
+                });
+
+                alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.prompt_ko), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+
+                alert.show();
+
+            }
+
         }
         }
     };
@@ -292,7 +369,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         }
     }
 
-    private void onPaymentReceived(){
+    private void onPaymentReceived(String addr){
 
         ivCancel.setVisibility(View.GONE);
         ivReceivingQr.setVisibility(View.GONE);
@@ -312,8 +389,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         pdb.insertPayment(
                 System.currentTimeMillis() / 1000,          // timestamp, Unix time
                 receivingAddress,                           // receiving address
-                bamount.longValue(),                        // BTC amount
-                tvFiatAmount.getText().toString(),          // fiat amount
+                ExpectedIncoming.getInstance().getBTC().get(addr),  // BTC amount
+                ExpectedIncoming.getInstance().getFiat().get(addr), // fiat amount
                 -1,                                         // confirmations
                 ""                                          // note, message
         );

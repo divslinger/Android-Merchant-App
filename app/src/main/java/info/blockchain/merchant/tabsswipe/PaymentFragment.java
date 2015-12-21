@@ -48,8 +48,8 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
     private boolean isBtc = false;
     private int allowedDecimalPlaces = DECIMAL_PLACES_FIAT;
-    private DecimalFormat dfBtc = new DecimalFormat("######0.0######");
-    private DecimalFormat dfFiat = new DecimalFormat("######0.00");
+    public static DecimalFormat dfBtc = new DecimalFormat("######0.0######");
+    public static DecimalFormat dfFiat = new DecimalFormat("######0.00");
     private final double bitcoinLimit = 21000000.0;
 
     private NumberFormat nf = null;
@@ -284,7 +284,8 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
                 tvAmount.setText(dfBtc.format(bitcoinLimit));
                 ToastCustom.makeText(getActivity(), getResources().getString(R.string.btc_limit_reached), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
-        }else if(!isBtc){
+        }
+        else if(!isBtc){
 
             String strCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT);
             Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency);

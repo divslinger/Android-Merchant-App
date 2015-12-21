@@ -1,6 +1,7 @@
 package info.blockchain.merchant.service;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
@@ -13,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,7 +26,6 @@ public class WebSocketHandler {
     private WebSocketListener webSocketListener = null;
 
     private HashSet<String> sentMessageSet = new HashSet<String>();
-    private HashSet<String> addressSet = new HashSet<String>();
 
     private Timer pingTimer = null;
     private final long pingInterval = 20000L;//ping every 20 seconds
@@ -115,7 +116,6 @@ public class WebSocketHandler {
     }
 
     public synchronized void subscribeToAddress(String address) {
-        addressSet.add(address);
         send("{\"op\":\"addr_sub\", \"addr\":\"" + address + "\"}");
     }
 
@@ -138,7 +138,7 @@ public class WebSocketHandler {
                             }
 
                             public void onTextMessage(WebSocket websocket, String message) {
-//                                    Log.d("WebSocket", message);
+                                    Log.d("WebSocket", message);
 
                                 try {
                                     JSONObject jsonObject = null;
@@ -163,31 +163,9 @@ public class WebSocketHandler {
 
                                         long value = 0L;
                                         long total_value = 0L;
-                                        String in_addr = null;
 
-                                        if (objX.has("inputs")) {
-                                            JSONArray inputArray = (JSONArray) objX.get("inputs");
-                                            JSONObject inputObj = null;
-                                            for (int j = 0; j < inputArray.length(); j++) {
-                                                inputObj = (JSONObject) inputArray.get(j);
-                                                if (inputObj.has("prev_out")) {
-                                                    JSONObject prevOutObj = (JSONObject) inputObj.get("prev_out");
-                                                    if (prevOutObj.has("value")) {
-                                                        value = prevOutObj.getLong("value");
-                                                    }
-                                                    if (prevOutObj.has("xpub")) {
-                                                        total_value -= value;
-                                                    } else if (prevOutObj.has("addr")) {
-                                                        if (addressSet.contains((String) prevOutObj.get("addr"))) {
-                                                            total_value -= value;
-                                                        } else if (in_addr == null) {
-                                                            in_addr = (String) prevOutObj.get("addr");
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
+                                        String foundAddr = null;
+                                        long txValue = 0L;
                                         if (objX.has("out")) {
                                             JSONArray outArray = (JSONArray) objX.get("out");
                                             JSONObject outObj = null;
@@ -198,17 +176,24 @@ public class WebSocketHandler {
                                                 }
                                                 if (outObj.has("xpub")) {
                                                     total_value += value;
-                                                } else if (outObj.has("addr")) {
-                                                    if (addressSet.contains((String) outObj.get("addr"))) {
+                                                }
+                                                else if (outObj.has("addr")) {
+                                                    if (ExpectedIncoming.getInstance().getBTC().containsKey((String) outObj.get("addr"))) {
+                                                        foundAddr = (String) outObj.get("addr");
+                                                        Log.d("WebSocketHandler", "incoming address:" + foundAddr);
+                                                        txValue = value;
+                                                        Log.d("WebSocketHandler", "incoming value:" + txValue);
+                                                        Log.d("WebSocketHandler", "expected value:" + ExpectedIncoming.getInstance().getBTC().get(foundAddr));
                                                         total_value += value;
+                                                        break;
                                                     }
                                                 }
                                             }
                                         }
 
-                                        if (total_value > 0L) {
+                                        if (txValue > 0L) {
                                             //Incoming tx
-                                            webSocketListener.onIncomingPayment(total_value);
+                                            webSocketListener.onIncomingPayment(foundAddr, txValue);
                                         }
                                     }
                                 } catch (Exception e) {
