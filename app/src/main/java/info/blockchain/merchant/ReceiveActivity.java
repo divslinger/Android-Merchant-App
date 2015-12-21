@@ -34,7 +34,6 @@ import org.bitcoinj.core.Coin;
 import org.bitcoinj.uri.BitcoinURI;
 
 import java.math.BigInteger;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -66,8 +65,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
     private static final int ADDRESS_LOOKAHEAD = 20;
 
-    private DecimalFormat dfBtc = new DecimalFormat("######0.0######");
-    private DecimalFormat dfFiat = new DecimalFormat("######0.00");
     private BigInteger bamount = null;
 
     @Override
@@ -87,8 +84,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         //Incoming intent value
         double amountFiat = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, 0.0);
         double amountBtc = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, 0.0);
-        tvFiatAmount.setText(getCurrencySymbol()+" "+ dfFiat.format(amountFiat));
-        tvBtcAmount.setText(dfBtc.format(amountBtc) + " " + PaymentFragment.DEFAULT_CURRENCY_BTC);
+        tvFiatAmount.setText(getCurrencySymbol()+" "+ MonetaryUtil.getInstance().getFiatDecimalFormat().format(amountFiat));
+        tvBtcAmount.setText(MonetaryUtil.getInstance().getBTCDecimalFormat().format(amountBtc) + " " + PaymentFragment.DEFAULT_CURRENCY_BTC);
 
         getReceiveAddress(amountBtc, tvFiatAmount.getText().toString());
 
@@ -298,7 +295,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 NumberFormat nf = NumberFormat.getInstance(Locale.getDefault());
                 double fiatAmount = 0.0;
                 try {
-                    fiatAmount = nf.parse(PaymentFragment.dfFiat.format(btcAmount * currencyPrice)).doubleValue();
+                    fiatAmount = nf.parse(MonetaryUtil.getInstance().getFiatDecimalFormat().format(btcAmount * currencyPrice)).doubleValue();
                 } catch (ParseException pe) {
                     fiatAmount = 0.0;
                 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +12,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -23,6 +22,7 @@ import info.blockchain.merchant.MainActivity;
 import info.blockchain.merchant.ReceiveActivity;
 import info.blockchain.merchant.SettingsActivity;
 import info.blockchain.merchant.util.AppUtil;
+import info.blockchain.merchant.util.MonetaryUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.SnackCustom;
 import info.blockchain.merchant.util.ToastCustom;
@@ -48,8 +48,6 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
     private boolean isBtc = false;
     private int allowedDecimalPlaces = DECIMAL_PLACES_FIAT;
-    public static DecimalFormat dfBtc = new DecimalFormat("######0.0######");
-    public static DecimalFormat dfFiat = new DecimalFormat("######0.00");
     private final double bitcoinLimit = 21000000.0;
 
     private NumberFormat nf = null;
@@ -65,8 +63,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         rootView = inflater.inflate(R.layout.fragment_payment, container, false);
 
         nf = NumberFormat.getInstance(Locale.getDefault());
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        strDecimal = Character.toString(symbols.getDecimalSeparator());
+        strDecimal = Character.toString(MonetaryUtil.getInstance().getDecimalFormatSymbols().getDecimalSeparator());
         ((TextView)rootView.findViewById(R.id.decimal)).setText(strDecimal);
 
         tvAmount = (TextView)rootView.findViewById(R.id.tv_fiat_amount);
@@ -155,11 +152,15 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         try {
             double textParsable = nf.parse(tvAmount.getText().toString()).doubleValue();
             if (textParsable > 0.0) {
+                Log.d("PaymentFragment", "textParseable:" + textParsable);
                 return true;
             }else{
+                Log.d("PaymentFragment", "textParseable <= 0.0");
                 return false;
             }
         }catch(Exception e){
+            Log.d("PaymentFragment", e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
@@ -281,7 +282,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         if(isBtc){
 
             if(currentValue > bitcoinLimit) {
-                tvAmount.setText(dfBtc.format(bitcoinLimit));
+                tvAmount.setText(MonetaryUtil.getInstance().getBTCDecimalFormat().format(bitcoinLimit));
                 ToastCustom.makeText(getActivity(), getResources().getString(R.string.btc_limit_reached), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
         }
@@ -292,14 +293,14 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
             double btcValue = 0.0;
             try {
-                btcValue = nf.parse(dfBtc.format(currentValue / currencyPrice)).doubleValue();
+                btcValue = nf.parse(MonetaryUtil.getInstance().getBTCDecimalFormat().format(currentValue / currencyPrice)).doubleValue();
             }
             catch(ParseException pe) {
                 pe.printStackTrace();
             }
 
             if(btcValue > bitcoinLimit) {
-                tvAmount.setText(dfFiat.format(bitcoinLimit * currencyPrice));
+                tvAmount.setText(MonetaryUtil.getInstance().getFiatDecimalFormat().format(bitcoinLimit * currencyPrice));
                 ToastCustom.makeText(getActivity(), getResources().getString(R.string.btc_limit_reached), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
         }
@@ -308,12 +309,12 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     private void toggleAmount(){
 
         if(isBtc) {
-            tvAmount.setText(dfFiat.format(amountPayableFiat));
+            tvAmount.setText(MonetaryUtil.getInstance().getFiatDecimalFormat().format(amountPayableFiat));
             tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
             allowedDecimalPlaces = DECIMAL_PLACES_FIAT;
             PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
         }else {
-            tvAmount.setText(dfBtc.format(amountPayableBtc));
+            tvAmount.setText(MonetaryUtil.getInstance().getBTCDecimalFormat().format(amountPayableBtc));
             tvCurrency.setText(DEFAULT_CURRENCY_BTC);
             allowedDecimalPlaces = DECIMAL_PLACES_BTC;
             PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, true);
@@ -334,12 +335,12 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency);
 
             if(isBtc) {
-                amountPayableFiat = nf.parse(dfFiat.format(amount * currencyPrice)).doubleValue();
+                amountPayableFiat = nf.parse(MonetaryUtil.getInstance().getFiatDecimalFormat().format(amount * currencyPrice)).doubleValue();
                 amountPayableBtc = amount;
             }
             else {
                 amountPayableFiat = amount;
-                amountPayableBtc = nf.parse(dfBtc.format(amount / currencyPrice)).doubleValue();
+                amountPayableBtc = nf.parse(MonetaryUtil.getInstance().getBTCDecimalFormat().format(amount / currencyPrice)).doubleValue();
             }
         }
         catch(ParseException pe) {

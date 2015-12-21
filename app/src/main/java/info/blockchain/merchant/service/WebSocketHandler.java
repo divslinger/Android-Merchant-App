@@ -138,7 +138,7 @@ public class WebSocketHandler {
                             }
 
                             public void onTextMessage(WebSocket websocket, String message) {
-                                    Log.d("WebSocket", message);
+//                                    Log.d("WebSocket", message);
 
                                 try {
                                     JSONObject jsonObject = null;

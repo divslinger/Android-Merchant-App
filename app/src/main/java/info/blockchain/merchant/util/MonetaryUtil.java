@@ -1,10 +1,10 @@
 package info.blockchain.merchant.util;
 
-
 import android.content.Context;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Currency;
 import java.util.Locale;
 import java.text.NumberFormat;
@@ -28,6 +28,10 @@ public class MonetaryUtil {
     private static NumberFormat btcFormat = null;
     private static NumberFormat fiatFormat = null;
 
+    private static DecimalFormat dfBtc = new DecimalFormat("######0.0######");
+    private static DecimalFormat dfFiat = new DecimalFormat("######0.00");
+    private static DecimalFormatSymbols symbols = null;
+
     private MonetaryUtil() { ; }
 
     public static MonetaryUtil getInstance() {
@@ -40,6 +44,10 @@ public class MonetaryUtil {
             btcFormat = NumberFormat.getInstance(Locale.getDefault());
             btcFormat.setMaximumFractionDigits(8);
             btcFormat.setMinimumFractionDigits(1);
+
+            symbols = new DecimalFormatSymbols();
+            dfBtc.setDecimalFormatSymbols(symbols);
+            dfFiat.setDecimalFormatSymbols(symbols);
 
             instance = new MonetaryUtil();
         }
@@ -59,6 +67,10 @@ public class MonetaryUtil {
             btcFormat = NumberFormat.getInstance(Locale.getDefault());
             btcFormat.setMaximumFractionDigits(8);
             btcFormat.setMinimumFractionDigits(1);
+
+            symbols = new DecimalFormatSymbols();
+            dfBtc.setDecimalFormatSymbols(symbols);
+            dfFiat.setDecimalFormatSymbols(symbols);
 
             instance = new MonetaryUtil();
         }
@@ -209,6 +221,18 @@ public class MonetaryUtil {
         }
 
         return strAmount;
+    }
+
+    public DecimalFormat getBTCDecimalFormat() {
+        return dfBtc;
+    }
+
+    public DecimalFormat getFiatDecimalFormat() {
+        return dfFiat;
+    }
+
+    public DecimalFormatSymbols getDecimalFormatSymbols()   {
+        return symbols;
     }
 
 }
