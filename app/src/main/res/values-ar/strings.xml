@@ -14,9 +14,9 @@
 <string name="wallet_download">احصل علي محفظة بيتكوين مجانا</string>
 <string name="tab_settings">الاعدادات</string>
 <string name="tab_payment">الدفعيه</string>
-<string name="tab_transactions">الإجراءات</string>
+<string name="tab_history">الإجراءات</string>
 <string name="receive_coins_fragment_name">الاسم</string>
-<string name="receive_coins_fragment_receiving_address_hint">عنوان المحفظة</string>
+<string name="receive_coins_fragment_merchant_xpub_hint">عنوان المحفظة</string>
 <string name="receive_coins_fragment_receiving_address_error">عنوان غير صالح</string>
 <string name="receive_coins_fragment_default_currency_hint">العملة التلقائية</string>
 <string name="receive_coins_fragment_email_address_hint">عُنوان البريد الإلكتروني</string>

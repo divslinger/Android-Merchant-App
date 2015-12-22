@@ -14,9 +14,9 @@
   <string name="wallet_download">注册免费的比特币钱包</string>
   <string name="tab_settings">设置</string>
   <string name="tab_payment">开单</string>
-  <string name="tab_transactions">查单</string>
+  <string name="tab_history">查单</string>
   <string name="receive_coins_fragment_name">收款方</string>
-  <string name="receive_coins_fragment_receiving_address_hint">收款用地址</string>
+  <string name="receive_coins_fragment_merchant_xpub_hint">收款用地址</string>
   <string name="receive_coins_fragment_receiving_address_error">地址无效</string>
   <string name="receive_coins_fragment_default_currency_hint">默认币种</string>
   <string name="receive_coins_fragment_email_address_hint">电子邮件地址</string>

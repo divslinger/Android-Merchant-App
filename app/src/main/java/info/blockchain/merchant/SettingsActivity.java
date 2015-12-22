@@ -2,152 +2,76 @@ package info.blockchain.merchant;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.KeyEvent;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
-import android.widget.Button;
-import android.widget.Switch;
-import android.widget.EditText;
-import android.widget.AdapterView; 
-import android.widget.AdapterView.OnItemSelectedListener; 
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
-//import android.util.Log;
 
 import com.dm.zbar.android.scanner.ZBarConstants;
 import com.dm.zbar.android.scanner.ZBarScannerActivity;
 
 import net.sourceforge.zbar.Symbol;
 
-import info.blockchain.util.BitcoinAddressCheck;
+import info.blockchain.merchant.util.PrefsUtil;
+import info.blockchain.merchant.util.ToastCustom;
+import info.blockchain.wallet.util.FormatsUtil;
 
-public class SettingsActivity extends Activity	{
+//import android.util.Log;
 
-	private SelectedSpinner spCurrencies = null;
-	private Switch sPushNotifications = null;
+public class SettingsActivity extends AppCompatActivity {
+
+	private Spinner spCurrencies = null;
+	private CheckBox sPushNotifications = null;
 	private String[] currencies = null;
-	private EditText receivingAddressView = null;
-	private EditText receivingNameView = null;
-	private Button bOK = null;
-	private Button bCancel = null;
-	private String strOtherCurrency = null;
+	private EditText merchantReceiverView = null;
+	private EditText merchantNameView = null;
+
+	private TextView tvOK = null;
+	private TextView tvCancel = null;
+    private ImageView ivQr = null;
     private ArrayAdapter<CharSequence> spAdapter = null;
-    private static boolean displayOthers = false;
-	
-	private SharedPreferences prefs = null;
-    private SharedPreferences.Editor editor = null;
-	
-	private static int OTHER_CURRENCY_ACTIVITY = 1;
+    private TextView tvChangePin = null;
+
 	private static int ZBAR_SCANNER_REQUEST = 2026;
-	
+
+    private static int PIN_ACTIVITY 		= 2;
+
+    private static boolean pausedForScan = false;
+
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 	    setContentView(R.layout.activity_settings);
-	    
-	    setTitle(R.string.action_settings_title);
-	    
-        Bundle extras = getIntent().getExtras();
-        if(extras != null)	{
-        	strOtherCurrency = extras.getString("ocurrency");
-        }
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        editor = prefs.edit();
-        
-        OtherCurrencyExchange.getInstance(this);
-
-        receivingAddressView = (EditText)findViewById(R.id.receive_coins_receiving_address);
-        receivingAddressView.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                final int DRAWABLE_RIGHT = 2;
-
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (receivingAddressView.getRight() - receivingAddressView.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-//                		Toast.makeText(SettingsActivity.this, "Show QR reader", Toast.LENGTH_SHORT).show();
-                		Intent intent = new Intent(SettingsActivity.this, ZBarScannerActivity.class);
-                		intent.putExtra(ZBarConstants.SCAN_MODES, new int[]{ Symbol.QRCODE } );
-                		startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
-                    }
-                }
-
-                return false;
-            }
-        });
-		
-        receivingNameView = (EditText)findViewById(R.id.receive_coins_name);
-
-		sPushNotifications = (Switch)findViewById(R.id.push_notifications);
-
-        spCurrencies = (SelectedSpinner)findViewById(R.id.receive_coins_default_currency);
-        spAdapter = ArrayAdapter.createFromResource(this, R.array.currencies, android.R.layout.simple_spinner_item);
-    	spAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); 
-    	spCurrencies.setAdapter(spAdapter);
-
-    	spCurrencies.setOnItemSelectedListener(new OnItemSelectedListener()	{
-	    	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3)	{
-	    		if(!displayOthers && arg2 == spAdapter.getCount() - 1)	{
-	    			displayOthers = true;
-	        		Intent intent = new Intent(SettingsActivity.this, OtherCurrencyActivity.class);
-	        		intent.putExtra("ocurrency", strOtherCurrency);
-	        		startActivityForResult(intent, OTHER_CURRENCY_ACTIVITY);
-	    		}
-	    	}
-	        public void onNothingSelected(AdapterView<?> arg0) {
-	        	;
-	        }
-    	});
-
-        bOK = (Button)findViewById(R.id.confirm);
-        bOK.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-            	
-            	String strReceivingAddress = receivingAddressView.getEditableText().toString();
-            	String strReceivingName = receivingNameView.getEditableText().toString();
-            	boolean push_notifications = sPushNotifications.isChecked();
-            	int currency = spCurrencies.getSelectedItemPosition();
-	        	currencies = getResources().getStringArray(R.array.currencies);
-
-	        	if(BitcoinAddressCheck.isValid(BitcoinAddressCheck.clean(strReceivingAddress))) {
-		            editor.putString("receiving_address", strReceivingAddress);
-		            editor.putString("receiving_name", strReceivingName);
-		            editor.putBoolean("push_notifications", push_notifications);
-		            
-		            if(currency == currencies.length - 1) {
-			            editor.putString("currency", "ZZZ");
-		            }
-		            else {
-			            editor.putString("currency", currencies[currency].substring(currencies[currency].length() - 3));
-			            editor.remove("ocurrency");
-			            strOtherCurrency = null;
-		            }
-
-		            editor.commit();
-	            	finish();
-	        	}
-	        	else {
-					Toast.makeText(SettingsActivity.this, R.string.invalid_btc_address, Toast.LENGTH_LONG).show();
-	        	}
-
-            }
-        });
-
-        bCancel = (Button)findViewById(R.id.cancel);
-        bCancel.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-            	finish();
-            }
-        });
-
+        initToolbar();
         initValues();
 
+        }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return super.onSupportNavigateUp();
+    }
+
+    private void initToolbar(){
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setTitle(getResources().getString(R.string.action_settings_title));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
     }
 
 	@Override
@@ -155,61 +79,113 @@ public class SettingsActivity extends Activity	{
 		
 		if(resultCode == Activity.RESULT_OK && requestCode == ZBAR_SCANNER_REQUEST)	{
 
-			String strResult = BitcoinAddressCheck.clean(data.getStringExtra(ZBarConstants.SCAN_RESULT));
-//        	Log.d("Scan result", strResult);
-			if(BitcoinAddressCheck.isValid(BitcoinAddressCheck.clean(strResult))) {
-	            receivingAddressView.setText(strResult);
-			}
-			else {
-				Toast.makeText(this, R.string.invalid_btc_address, Toast.LENGTH_LONG).show();
-			}
+            String scanResult = data.getStringExtra(ZBarConstants.SCAN_RESULT);
+            if(scanResult.startsWith("bitcoin:"))    {
+                scanResult = scanResult.substring(8);
+            }
+            if(FormatsUtil.getInstance().isValidXpub(scanResult) || FormatsUtil.getInstance().isValidBitcoinAddress(scanResult)){
+                merchantReceiverView.setText(scanResult);
+            }
+            else{
+                ToastCustom.makeText(this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+            }
 
+            pausedForScan = false;
         }
-		else if(resultCode == Activity.RESULT_CANCELED && requestCode == ZBAR_SCANNER_REQUEST) {
-//            Toast.makeText(this, R.string.camera_unavailable, Toast.LENGTH_SHORT).show();
-        }
-		else if(resultCode == Activity.RESULT_OK && requestCode == OTHER_CURRENCY_ACTIVITY) {
-			if(data != null && data.getAction() != null && data.getAction().length() > 0) {
-				String ocurrencyMsg = OtherCurrencyExchange.getInstance(this).getCurrencyNames().get(data.getAction()) + " - " + data.getAction();
-	            Toast.makeText(this, ocurrencyMsg, Toast.LENGTH_LONG).show();
-		        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		        editor = prefs.edit();
-	            editor.putString("ocurrency", data.getAction());
-	            editor.commit();
-	            strOtherCurrency = data.getAction();
-			}
-			else {
-				;
-			}
-			displayOthers = false;
-        }
-		else if(resultCode == Activity.RESULT_CANCELED && requestCode == OTHER_CURRENCY_ACTIVITY) {
-			displayOthers = false;
-		}
-        else {
-        	;
-        }
-
 	}
 
-	@Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) { 
-        if(keyCode == KeyEvent.KEYCODE_BACK) {
-            return true;
-        }
-        else	{
-        	;
-        }
+    @Override
+    protected void onPause() {
+        super.onPause();
 
-        return false;
+        if(!pausedForScan)  {
+            finish();
+        }
     }
 
     private void initValues() {
-        receivingNameView.setText(prefs.getString("receiving_name", ""));
-        receivingAddressView.setText(prefs.getString("receiving_address", ""));
-        sPushNotifications.setChecked(prefs.getBoolean("push_notifications", false));
+
+        spCurrencies = (Spinner)findViewById(R.id.receive_coins_default_currency);
+        merchantReceiverView = (EditText)findViewById(R.id.et_merchant_receiver);
+        ivQr = (ImageView)findViewById(R.id.iv_QR);
+        merchantNameView = (EditText)findViewById(R.id.et_merchant_name);
+        tvOK = (TextView)findViewById(R.id.confirm);
+        tvCancel = (TextView)findViewById(R.id.cancel);
+        tvChangePin = (TextView)findViewById(R.id.tv_change_pin);
+
+        tvChangePin.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+
+                Intent intent = new Intent(SettingsActivity.this, PinActivity.class);
+                intent.putExtra("create", true);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivityForResult(intent, PIN_ACTIVITY);
+
+                return false;
+            }
+        });
+
+        ivQr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pausedForScan = true;
+                Intent intent = new Intent(SettingsActivity.this, ZBarScannerActivity.class);
+                intent.putExtra(ZBarConstants.SCAN_MODES, new int[]{Symbol.QRCODE});
+                startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
+            }
+        });
+
+        sPushNotifications = (CheckBox)findViewById(R.id.push_notifications);
+        sPushNotifications.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, isChecked);
+            }
+        });
+
+//        AccountAdapter dataAdapter = new AccountAdapter(getActivity(), R.layout.spinner_item, _accounts);
+        spAdapter = ArrayAdapter.createFromResource(this, R.array.currencies, R.layout.spinner_item);
+        spAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spCurrencies.setAdapter(spAdapter);
+
+        tvOK.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+
+                String strMerchantReceiver = merchantReceiverView.getEditableText().toString().trim();
+                String strMerchantName = merchantNameView.getEditableText().toString().trim();
+                boolean push_notifications = sPushNotifications.isChecked();
+                int currency = spCurrencies.getSelectedItemPosition();
+                currencies = getResources().getStringArray(R.array.currencies);
+
+                if(FormatsUtil.getInstance().isValidBitcoinAddress(strMerchantReceiver) || FormatsUtil.getInstance().isValidXpub(strMerchantReceiver)) {
+
+                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, strMerchantReceiver);
+                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, strMerchantName);
+                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, push_notifications);
+
+                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[currency].substring(currencies[currency].length() - 3));
+
+                    finish();
+                } else {
+                    Toast.makeText(SettingsActivity.this, R.string.unrecognized_xpub, Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+
+        tvCancel.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        merchantNameView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
+        merchantReceiverView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""));
+        sPushNotifications.setChecked(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false));
+
     	currencies = getResources().getStringArray(R.array.currencies);
-    	String strCurrency = prefs.getString("currency", "USD");
+    	String strCurrency = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
+
     	int sel = -1;
     	for(int i = 0; i < currencies.length; i++) {
     		if(currencies[i].endsWith(strCurrency)) {

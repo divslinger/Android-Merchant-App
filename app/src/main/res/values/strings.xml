@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="version_name">2.0</string>
+
     <string name="app_name">Blockchain Merchant</string>
     <string name="action_settings">Settings</string>
     <string name="action_settings_title">Merchant Settings</string>
@@ -12,23 +14,22 @@
     <string name="rate_us">Rate us</string>
     <string name="email_chooser">Send e-mail...</string>
     <string name="about">Blockchain Merchant %1$s\n©%2$s Blockchain.info</string>
-    <string name="wallet_download">Get a free Bitcoin Wallet</string>
+    <string name="wallet_download">Free Bitcoin Wallet</string>
     
     <string name="tab_settings">Settings</string>
     <string name="tab_payment">Payment</string>
-    <string name="tab_transactions">Transactions</string>
+    <string name="tab_history">History</string>
     
-    <string name="receive_coins_fragment_name">Name</string>
-    <string name="receive_coins_fragment_receiving_address_hint">Wallet address</string>
+    <string name="receive_coins_fragment_name">Merchant Name</string>
+    <string name="receive_coins_fragment_merchant_xpub_hint">Your Public Key</string>
     <string name="receive_coins_fragment_receiving_address_error">Invalid address</string>
     <string name="receive_coins_fragment_default_currency_hint">Default currency</string>
-    <string name="receive_coins_fragment_email_address_hint">E-mail address</string>
     <string name="receive_coins_fragment_other_currency">Other currency code (3 letter code, ex.: MXP)</string>
     <string name="receive_coins_activity_title">Send Bitcoins</string>
     <string name="receive_coins_install_qr_scanner_msg">Please install ZXing QR-code scanner or Goggles!</string>
     <string name="receive_coins_uri_parse_error_title">Invalid Bitcoin URI</string>
     <string name="receive_coins_parse_address_error_msg">Got invalid bitcoin address!\n(Mixing up Testnet/Prodnet?)</string>
-    <string name="receive_coins_fragment_push_notifications">Push notifications</string>
+    <string name="receive_coins_fragment_push_notifications">Push Notifications</string>
     <string name="receive_coins_fragment_email_receipts">E-mail receipts</string>
     <string name="use_btc">Enter price in Bitcoins (BTC)</string>
     <string name="payment_note">Description (optional)...</string>
@@ -51,22 +52,31 @@
     <string name="pin_code_create_error">Enter two matching 4-digit PIN codes</string>
     <string name="pin_code_enter_error">PIN code incorrect</string>
     <string name="camera_unavailable">Camera unavailable</string>
-    
-    <string name="toggle_on">On</string>
-    <string name="toggle_off">Off</string>
 
     <string name="prompt_yes">Yes</string>
     <string name="prompt_no">No</string>
     <string name="prompt_ok">OK</string>
     <string name="prompt_ko">CANCEL</string>
     <string name="prompt_save">SAVE</string>
-    
-    <string name="pull_to_refresh_pull_label">Pull to refresh...</string>
-    <string name="pull_to_refresh_release_label">Release to refresh...</string>
-    <string name="pull_to_refresh_refreshing_label">Loading...</string>
-    <string name="pull_to_refresh_tap_label">Tap to refresh...</string>
 
 <!-- <string name="bitcoin_currency_symbol">&#xf15a;</string> -->
-    <string name="bitcoin_currency_symbol">&#x0243;</string>
+    <string name="bitcoin_currency_symbol">BTC</string>
+    <string name="enter_pin">Enter Pin</string>
+    <string name="create_pin">Create Pin</string>
+    <string name="confirm_pin">Confirm Pin</string>
+    <string name="unrecognized_xpub">Unrecognized public key format</string>
+    <string name="payment_received">Payment Received. Thank you.</string>
+    <string name="unable_to_generate_address">An address cannot be generated at this time. Please check your installation and try again.</string>
+    <string name="btc_limit_reached">Bitcoin limit reached.</string>
+
+    <string name="no_valid_receiver">Please configure your receiving address.</string>
+    <string name="invalid_amount">Invalid amount.</string>
+
+    <string name="new_version_message">\u2022 Beautiful new design\n\n\u2022 Faster and easier input\n\n\u2022 Stability fixes\n\n\u2022 Direct payments to any bitcoin address\n\n\u2022 Privacy support with BIP44 XPUBS</string>
+
+    <string name="insufficient_payment">Insufficient payment received.</string>
+    <string name="re_payment_requested">Requested:</string>
+    <string name="re_payment_received">Received:</string>
+    <string name="insufficient_payment_continue">Update QR code for remaining amount due?</string>
 
 </resources>

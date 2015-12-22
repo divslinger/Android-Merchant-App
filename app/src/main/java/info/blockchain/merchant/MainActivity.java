@@ -1,119 +1,198 @@
 package info.blockchain.merchant;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ActionBar.Tab;
-import android.app.FragmentTransaction;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.content.IntentFilter;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
+import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
+import android.os.Handler;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.Menu;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-//import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import info.blockchain.merchant.service.WebSocketHandler;
+import info.blockchain.merchant.service.WebSocketListener;
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
+import info.blockchain.merchant.util.AppUtil;
+import info.blockchain.merchant.util.PrefsUtil;
 
-public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
+public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener, NavigationView.OnNavigationItemSelectedListener {
 
-	private ViewPager viewPager;
-    private TabsPagerAdapter mAdapter;
-    private ActionBar actionBar;
-
-    private String[] tabs = null;
-
-    private static int SETTINGS_ACTIVITY 	= 1;
+    public static int SETTINGS_ACTIVITY 	= 1;
     private static int PIN_ACTIVITY 		= 2;
     private static int RESET_PIN_ACTIVITY 	= 3;
     private static int ABOUT_ACTIVITY 	= 4;
+
+    private WebSocketHandler webSocketHandler = null;
+
+    public static final String ACTION_INTENT_SUBSCRIBE_TO_ADDRESS = "info.blockchain.merchant.MainActivity.SUBSCRIBE_TO_ADDRESS";
+    public static final String ACTION_INTENT_INCOMING_TX = "info.blockchain.merchant.MainActivity.ACTION_INTENT_INCOMING_TX";
+    public static final String ACTION_INTENT_RECONNECT = "info.blockchain.merchant.MainActivity.ACTION_INTENT_RECONNECT";
+
+    //Navigation Drawer
+    private Toolbar toolbar = null;
+    DrawerLayout mDrawerLayout;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_main);
-	    
-	    tabs = new String[2];
-	    tabs[0] = getString(R.string.tab_payment);
-	    tabs[1] = getString(R.string.tab_transactions);
 
-        viewPager = (ViewPager) findViewById(R.id.pager);
-        mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
+        setToolbar();
+        setNavigtionDrawer();
 
-        viewPager.setAdapter(mAdapter);
-
-        actionBar = getActionBar();
-//        actionBar.hide();
-//        actionBar.setTitle("");
-        actionBar.setDisplayOptions(actionBar.getDisplayOptions() ^ ActionBar.DISPLAY_SHOW_TITLE);
-        actionBar.setLogo(R.drawable.masthead);
-        actionBar.setHomeButtonEnabled(false);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FF1B8AC7")));
-//        actionBar.show();
-        
-        for (String tab : tabs) {
-            actionBar.addTab(actionBar.newTab().setText(tab).setTabListener(this));
-
-            viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-     
-                @Override
-                public void onPageSelected(int position) {
-                    actionBar.setSelectedNavigationItem(position);
-                }
-     
-                @Override
-                public void onPageScrolled(int arg0, float arg1, int arg2) { ; }
-     
-                @Override
-                public void onPageScrollStateChanged(int arg0) { ; }
-            });
-        }
+        initTableLayout();
 
         // no PIN ?, then create one
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String pin = prefs.getString("pin", "");
+		String pin = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
         if(pin.equals("")) {
         	doPIN();
         }
+		else	{
+
+			//
+			// test for v1
+			//
+			if(AppUtil.getInstance(MainActivity.this).isLegacy())	{
+				String strCurrency = PrefsUtil.getInstance(MainActivity.this).getValue("currency", "");
+				if(strCurrency.equals("ZZZ"))	{
+					PrefsUtil.getInstance(MainActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
+				}
+				PrefsUtil.getInstance(MainActivity.this).removeValue("ocurrency");
+			}
+
+		}
+
+        //Start websockets
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
+        filter.addAction(ACTION_INTENT_RECONNECT);
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
+
+        webSocketHandler = new WebSocketHandler();
+        webSocketHandler.addListener(this);
+        webSocketHandler.start();
+
+        if(PrefsUtil.getInstance(MainActivity.this).getValue("popup_" + getResources().getString(R.string.version_name), false) == false)	{
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            TextView title = new TextView(MainActivity.this);
+            title.setText(R.string.app_name);
+            title.setGravity(Gravity.CENTER);
+            title.setTextSize(20);
+            builder.setCustomTitle(title);
+            builder.setMessage(R.string.new_version_message).setCancelable(false);
+            AlertDialog alert = builder.create();
+
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    PrefsUtil.getInstance(MainActivity.this).setValue("popup_" + getResources().getString(R.string.version_name), true);
+                }});
+
+            alert.show();
+
+        }
+        else    {
+            ;
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setMerchantName();
+    }
+
+    @Override
+	protected void onNewIntent(Intent intent) {
+		setIntent(intent);
+	}
+
+	@Override
+	public void onNdefPushComplete(NfcEvent event) {
+
+		if(Build.VERSION.SDK_INT < 16){
+			return;
+		}
+
+        final String eventString = "onNdefPushComplete\n" + event.toString();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), eventString, Toast.LENGTH_SHORT).show();
+            }
+        });
 
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+	public NdefMessage createNdefMessage(NfcEvent event) {
+
+		if(Build.VERSION.SDK_INT < 16){
+			return null;
+		}
+
+		NdefRecord rtdUriRecord = NdefRecord.createUri("market://details?id=info.blockchain.merchant");
+		NdefMessage ndefMessageout = new NdefMessage(rtdUriRecord);
+		return ndefMessageout;
 	}
+
+	@Override
+    protected void onDestroy() {
+        //Stop websockets
+        webSocketHandler.stop();
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
+
+        super.onDestroy();
+    }
+
+    private void initTableLayout(){
+
+        String[] tabs = new String[]{getResources().getString(R.string.tab_payment),getResources().getString(R.string.tab_history)};
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        PagerAdapter mAdapter = new TabsPagerAdapter(getSupportFragmentManager(), tabs);
+		viewPager.setAdapter(mAdapter);
+
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setTabTextColors(getResources().getColor(R.color.white_50), getResources().getColor(R.color.white));
+
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setTabsFromPagerAdapter(mAdapter);
+    }
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+
 	    // Handle item selection
 	    switch (item.getItemId()) {
-	    	case R.id.action_settings:
-	    		doSettings(false);
-	    		return true;
-	    	case R.id.action_newpin:
-	            final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-	            String pin = prefs.getString("pin", "");
-	            if(pin.equals("")) {
-		    		doPIN();
-	            }
-	            else {
-		    		resetPIN();
-	            }
-	    		return true;
-	    	case R.id.action_about:
-	    		doAbout();
-	    		return true;
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
@@ -126,8 +205,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			;
 		}
 		else if(requestCode == PIN_ACTIVITY && resultCode == RESULT_OK) {
-    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String strOtherCurrency = prefs.getString("ocurrency", "");
+			String strOtherCurrency = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
     		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
     		intent.putExtra("ocurrency", strOtherCurrency);
     		startActivityForResult(intent, SETTINGS_ACTIVITY);
@@ -136,20 +214,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			doPIN();
 		}
 		else {
-			;
+            super.onActivityResult(requestCode, resultCode, data);
 		}
 		
 	}
 
-	@Override
-    public void onTabReselected(Tab tab, FragmentTransaction ft) { ; }
- 
-    @Override
-    public void onTabSelected(Tab tab, FragmentTransaction ft) { viewPager.setCurrentItem(tab.getPosition()); }
- 
-    @Override
-    public void onTabUnselected(Tab tab, FragmentTransaction ft) { ; }
-    
     public static void hideSoftKeyboard(Activity activity) {
         InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
@@ -179,8 +248,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     private void doSettings(final boolean create)	{
     	if(create)	{
-    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String strOtherCurrency = prefs.getString("ocurrency", "");
+			String strOtherCurrency = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
     		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
     		intent.putExtra("ocurrency", strOtherCurrency);
     		startActivityForResult(intent, SETTINGS_ACTIVITY);
@@ -202,15 +270,107 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		startActivityForResult(intent, PIN_ACTIVITY);
     }
 
-    private void resetPIN()	{
-		Intent intent = new Intent(MainActivity.this, PinActivity.class);
-		intent.putExtra("create", false);
-		startActivityForResult(intent, RESET_PIN_ACTIVITY);
-    }
-
     private void doAbout()	{
     	Intent intent = new Intent(MainActivity.this, AboutActivity.class);
 		startActivityForResult(intent, ABOUT_ACTIVITY);
     }
 
+    protected BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+
+            if (ACTION_INTENT_SUBSCRIBE_TO_ADDRESS.equals(intent.getAction())) {
+                webSocketHandler.subscribeToAddress(intent.getStringExtra("address"));
+            }
+
+            //Connection re-established
+            if (ACTION_INTENT_RECONNECT.equals(intent.getAction())) {
+                if(webSocketHandler != null && !webSocketHandler.isConnected()){
+                    webSocketHandler.start();
+				}
+            }
+        }
+    };
+
+    private void setMerchantName(){
+        //Update Merchant name
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        TextView tvName = (TextView)navigationView.findViewById(R.id.drawer_title);
+        tvName.setText(PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, getResources().getString(R.string.app_name)));
+    }
+
+    @Override
+    public void onIncomingPayment(String addr, long paymentAmount) {
+
+        //New incoming payment - broadcast message
+        Intent intent = new Intent(MainActivity.ACTION_INTENT_INCOMING_TX);
+        intent.putExtra("payment_address",addr);
+        intent.putExtra("payment_amount",paymentAmount);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    public void setToolbar() {
+
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_menu_white_24dp));
+        setSupportActionBar(toolbar);
+    }
+
+    private void setNavigtionDrawer() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        setMerchantName();
+        // listen for navigation events
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isNavDrawerOpen()) {
+            closeNavDrawer();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    protected boolean isNavDrawerOpen() {
+        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START);
+    }
+
+    protected void closeNavDrawer() {
+        if (mDrawerLayout != null) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(final MenuItem menuItem) {
+
+        // allow some time after closing the drawer before performing real navigation
+        // so the user can see what is happening
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        Handler mDrawerActionHandler = new Handler();
+        mDrawerActionHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                switch (menuItem.getItemId()) {
+                    case R.id.action_profile:
+//                        doProfile();//TODO
+                        break;
+                    case R.id.action_settings:
+                        doSettings(false);
+                        break;
+                    case R.id.action_help:
+//                        doHelp();//TODO
+                        break;
+                    case R.id.action_about:
+                        doAbout();
+                        break;
+                }
+            }
+        }, 250);
+
+        return false;
+    }
 }

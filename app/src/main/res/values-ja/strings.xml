@@ -14,9 +14,9 @@
   <string name="wallet_download">無料ビットコインウォレットを開設する</string>
   <string name="tab_settings">設定</string>
   <string name="tab_payment">お支払い</string>
-  <string name="tab_transactions">取引一覧</string>
+  <string name="tab_history">取引一覧</string>
   <string name="receive_coins_fragment_name">名前</string>
-  <string name="receive_coins_fragment_receiving_address_hint">ウォレットアドレス</string>
+  <string name="receive_coins_fragment_merchant_xpub_hint">ウォレットアドレス</string>
   <string name="receive_coins_fragment_receiving_address_error">無効なアドレスです</string>
   <string name="receive_coins_fragment_default_currency_hint">規定の通貨</string>
   <string name="receive_coins_fragment_email_address_hint">メールアドレス</string>

@@ -3,20 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:minWidth="420dp"
-    android:background="#FF1B8AC7"
+    android:background="@color/blockchain_pearl_white"
     android:orientation="vertical"
     android:layout_gravity="center_horizontal"
     android:gravity="center_horizontal"
     >
 
     <ImageView
-    	android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="165dp"
+        android:layout_height="188dp"
         android:src="@drawable/logo2x"
         android:gravity="center_horizontal"
-	    android:layout_gravity="center_horizontal"
-    	android:layout_marginTop="10dp"
-    	/>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:tint="@color/blockchain_blue"
+        />
 
     <TextView
         android:id="@+id/about"
@@ -25,8 +26,8 @@
         android:gravity="center_horizontal"
 	    android:layout_gravity="center_horizontal"
     	android:layout_marginTop="10dp"
-    	android:textSize="22sp"
-    	android:textColor="#FFFFFFFF"
+        android:textSize="16sp"
+    	android:textColor="@color/textColorPrimary"
     	/>
 
     <LinearLayout
@@ -40,55 +41,45 @@
     	android:orientation="horizontal"
     	>
     
-    	<Button
+    	<TextView
             android:id="@+id/rate_us"
             android:layout_width="140dp"
             android:layout_height="50dp"
             android:layout_marginRight="5dp"
-	        android:layout_marginBottom="20dp"
-            android:background="@drawable/button_generic"
-        	android:text="@string/rate_us"
-			android:textSize="22sp"
-			android:textColor="#FF000000"
-    	 	android:shadowColor="#191919"
-			android:shadowDx="1"
-			android:shadowDy="1"
-			android:shadowRadius="1"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="@string/rate_us"
+            android:textSize="16sp"
+            android:alpha="0.7"
+            android:textColor="@color/textColorPrimary"
         />
 
-        <Button
+        <TextView
             android:id="@+id/support"
             android:layout_width="140dp"
             android:layout_height="50dp"
-            android:layout_marginLeft="5dp"
-	        android:layout_marginBottom="20dp"
-            android:background="@drawable/button_generic"
-        	android:text="@string/support"
-			android:textSize="22sp"
-			android:textColor="#FF000000"
-    	 	android:shadowColor="#191919"
-			android:shadowDx="1"
-			android:shadowDy="1"
-			android:shadowRadius="1"
-        />
-    	
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="@string/support"
+            android:textSize="16sp"
+            android:alpha="0.7"
+            android:textColor="@color/textColorPrimary"
+            />
+
     </LinearLayout>
 
-    <Button
-            android:id="@+id/free_wallet"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-	        android:layout_marginBottom="20dp"
-            android:background="@drawable/button_generic"
-        	android:text="@string/wallet_download"
-			android:textSize="22sp"
-			android:textColor="#FF000000"
-    	 	android:shadowColor="#191919"
-			android:shadowDx="1"
-			android:shadowDy="1"
-			android:shadowRadius="1"
+    <TextView
+        android:id="@+id/free_wallet"
+        android:layout_width="140dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:text="@string/wallet_download"
+        android:textSize="16sp"
+        android:alpha="0.7"
+        android:textColor="@color/textColorPrimary"
         />
-    
+
 </LinearLayout>
