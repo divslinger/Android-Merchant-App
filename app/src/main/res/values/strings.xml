@@ -79,4 +79,6 @@
     <string name="re_payment_received">Received:</string>
     <string name="insufficient_payment_continue">Update QR code for remaining amount due?</string>
 
+    <string name="settings_saved">Settings saved</string>
+
 </resources>
