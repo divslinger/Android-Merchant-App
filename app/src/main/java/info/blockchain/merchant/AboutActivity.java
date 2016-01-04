@@ -4,13 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
-import android.net.Uri;
 //import android.util.Log;
 
 public class AboutActivity extends Activity	{
@@ -47,6 +48,16 @@ public class AboutActivity extends Activity	{
             public void onClick(View v) {
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "support@blockchain.zendesk.com", null));
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Blockchain Merchant Tech Support");
+                emailIntent.putExtra(Intent.EXTRA_TEXT,
+                        "Dear Blockchain Support," +
+                                "\n\n" +
+                                "" +
+                                "\n\n" +
+                                "--\n" +
+                                "App: " + getString(R.string.app_name) + ", Version " + getString(R.string.version_name) + " \n" +
+                                "System: " + Build.MANUFACTURER + "\n" +
+                                "Model: " + Build.MODEL + "\n" +
+                                "Version: " + Build.VERSION.RELEASE);
                 startActivity(Intent.createChooser(emailIntent, AboutActivity.this.getResources().getText(R.string.email_chooser)));
             }
         });
