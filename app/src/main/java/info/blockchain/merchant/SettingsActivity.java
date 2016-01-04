@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.dm.zbar.android.scanner.ZBarConstants;
 import com.dm.zbar.android.scanner.ZBarScannerActivity;
@@ -165,9 +164,10 @@ public class SettingsActivity extends AppCompatActivity {
 
                     PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[currency].substring(currencies[currency].length() - 3));
 
+                    ToastCustom.makeText(getApplicationContext(), getResources().getString(R.string.settings_saved), ToastCustom.LENGTH_SHORT,ToastCustom.TYPE_OK);
                     finish();
                 } else {
-                    Toast.makeText(SettingsActivity.this, R.string.unrecognized_xpub, Toast.LENGTH_LONG).show();
+                    ToastCustom.makeText(getApplicationContext(), getResources().getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT,ToastCustom.TYPE_ERROR);
                 }
 
             }
