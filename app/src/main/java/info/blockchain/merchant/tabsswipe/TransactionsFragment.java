@@ -35,7 +35,7 @@ import java.util.TimerTask;
 
 import info.blockchain.merchant.NotificationData;
 import info.blockchain.merchant.R;
-import info.blockchain.merchant.db.DBController;
+import info.blockchain.merchant.db.DBControllerV2;
 import info.blockchain.merchant.util.DateUtil;
 import info.blockchain.merchant.util.MonetaryUtil;
 import info.blockchain.merchant.util.PrefsUtil;
@@ -167,7 +167,7 @@ public class TransactionsFragment extends Fragment {
             if(merchantXpub != null && merchantXpub.length() > 0) {
 
                 // get updated list from database
-                DBController pdb = new DBController(getActivity());
+                DBControllerV2 pdb = new DBControllerV2(getActivity());
                 ArrayList<ContentValues> vals = pdb.getAllPayments();
 
                 if(vals.size() > 0) {

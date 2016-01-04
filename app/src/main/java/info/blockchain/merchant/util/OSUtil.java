@@ -3,6 +3,11 @@ package info.blockchain.merchant.util;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
+
+import com.google.common.hash.Hashing;
+
+import java.nio.charset.Charset;
 
 public class OSUtil {
 
@@ -43,6 +48,14 @@ public class OSUtil {
         catch(PackageManager.NameNotFoundException nnfe)	{
             return false;
         }
+
+    }
+
+    public String getFootprint() {
+
+        String strFootprint = Build.MANUFACTURER + Build.BRAND + Build.MODEL + Build.DEVICE + Build.PRODUCT + Build.SERIAL;
+
+        return Hashing.sha256().hashString(strFootprint, Charset.forName("UTF8")).toString();
 
     }
 

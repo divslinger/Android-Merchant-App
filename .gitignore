@@ -20,6 +20,7 @@ build/
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/dictionaries
+.idea/libraries
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -35,3 +36,6 @@ proguard/
 
 # Mac OS X clutter
 *.DS_Store
+
+# API key
+*APIKey.java

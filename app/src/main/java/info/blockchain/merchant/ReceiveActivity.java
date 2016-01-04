@@ -41,7 +41,7 @@ import java.util.Locale;
 import info.blockchain.api.receive2.ReceiveV2;
 import info.blockchain.api.receive2.ReceiveV2Response;
 import info.blockchain.merchant.api.APIFactory;
-import info.blockchain.merchant.db.DBController;
+import info.blockchain.merchant.db.DBControllerV2;
 import info.blockchain.merchant.service.ExpectedIncoming;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 import info.blockchain.merchant.util.AppUtil;
@@ -382,7 +382,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvBtcAmount.setVisibility(View.GONE);
         tvFiatAmount.setVisibility(View.GONE);
 
-        DBController pdb = new DBController(ReceiveActivity.this);
+        DBControllerV2 pdb = new DBControllerV2(ReceiveActivity.this);
         pdb.insertPayment(
                 System.currentTimeMillis() / 1000,          // timestamp, Unix time
                 receivingAddress,                           // receiving address
