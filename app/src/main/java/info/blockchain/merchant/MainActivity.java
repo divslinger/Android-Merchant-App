@@ -32,6 +32,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import info.blockchain.merchant.db.MigrateDBUtil;
 import info.blockchain.merchant.service.WebSocketHandler;
 import info.blockchain.merchant.service.WebSocketListener;
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
@@ -82,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 				}
 				PrefsUtil.getInstance(MainActivity.this).removeValue("ocurrency");
 			}
+
+            MigrateDBUtil.getInstance(MainActivity.this).migrate();
 
 		}
 

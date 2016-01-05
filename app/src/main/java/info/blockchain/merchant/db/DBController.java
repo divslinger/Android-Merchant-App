@@ -72,4 +72,8 @@ public class DBController extends SQLiteOpenHelper {
 		return data;
 	}
 
+	public String getTableName()	{
+		return TABLE;
+	}
+
 }
