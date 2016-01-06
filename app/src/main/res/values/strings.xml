@@ -81,4 +81,8 @@
 
     <string name="settings_saved">Settings saved</string>
 
+    <string name="dialog_continue">Continue</string>
+    <string name="ssl_hostname_invalid">We are unable to validate the hostname of the SSL certificate. This might indicate malicious activity. Please verify your network connection and device before continuing.</string>
+    <string name="ssl_pinning_invalid">SSL certificate pinning has failed. This might indicate malicious activity. Please verify your network connection and device before continuing.</string>
+
 </resources>
