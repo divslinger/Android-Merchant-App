@@ -82,6 +82,13 @@ public class SettingsActivity extends AppCompatActivity {
             if(scanResult.startsWith("bitcoin:"))    {
                 scanResult = scanResult.substring(8);
             }
+            // Bitcoin Wallet (Schildbach) xpub
+            else if(scanResult.indexOf("?") != -1)   {
+                scanResult = scanResult.substring(0, scanResult.indexOf("?"));
+            }
+            else    {
+                ;
+            }
             if(FormatsUtil.getInstance().isValidXpub(scanResult) || FormatsUtil.getInstance().isValidBitcoinAddress(scanResult)){
                 merchantReceiverView.setText(scanResult);
             }
