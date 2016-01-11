@@ -15,6 +15,8 @@ import org.apache.http.impl.conn.SingleClientConnManager;
 
 import org.thoughtcrime.ssl.pinning.util.PinningHelper;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.net.ssl.HostnameVerifier;
@@ -88,11 +90,12 @@ public class SSLVerifierUtil {
 
             return true;
         }
-        catch(Exception e)  {
-
-            Toast.makeText(context, "Certificate pinning failed: " + e.getMessage().toString(), Toast.LENGTH_LONG).show();
-//            Log.i("SSLVerifierUtil", "Certificate pinning failed: " + e.getMessage().toString());
-
+        catch(MalformedURLException mue)  {
+            Toast.makeText(context, "Certificate pinning failed: " + mue.getMessage().toString(), Toast.LENGTH_LONG).show();
+            return false;
+        }
+        catch(IOException ioe)  {
+            Toast.makeText(context, "Certificate pinning failed: " + ioe.getMessage().toString(), Toast.LENGTH_LONG).show();
             return false;
         }
     }

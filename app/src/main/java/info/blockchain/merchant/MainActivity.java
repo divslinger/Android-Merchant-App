@@ -38,6 +38,7 @@ import info.blockchain.merchant.service.WebSocketListener;
 import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
 import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.PrefsUtil;
+import info.blockchain.merchant.util.SSLVerifierThreadUtil;
 
 public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener, NavigationView.OnNavigationItemSelectedListener {
 
@@ -65,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         setNavigtionDrawer();
 
         initTableLayout();
+
+        SSLVerifierThreadUtil.getInstance(MainActivity.this).validateSSLThread();
 
         // no PIN ?, then create one
 		String pin = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
