@@ -31,12 +31,13 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:hint="@string/receive_coins_fragment_merchant_xpub_hint"
-            android:imeOptions="actionDone"
+            android:imeOptions="actionNext"
             android:textColor="@color/textColorPrimary"
             android:textColorHint="@color/blockchain_grey"
             android:textCursorDrawable="@null"
             android:textSize="16sp"
-            android:inputType="textMultiLine|textNoSuggestions"
+            android:inputType="textNoSuggestions"
+            android:singleLine="true"
             />
 
         <ImageView
