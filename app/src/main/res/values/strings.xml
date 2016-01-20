@@ -85,4 +85,18 @@
     <string name="ssl_hostname_invalid">We are unable to validate the hostname of the SSL certificate. This might indicate malicious activity. Please verify your network connection and device before continuing.</string>
     <string name="ssl_pinning_invalid">SSL certificate pinning has failed. This might indicate malicious activity. Please verify your network connection and device before continuing.</string>
 
+    <string name="off">Off</string>
+    <string name="on">On</string>
+
+    <string name="options_cat_settings">Settings</string>
+    <string name="options_receive">Receiving payments</string>
+    <string name="options_merchant_name">Merchant name</string>
+    <string name="options_local_currency">Local currency</string>
+    <string name="options_pin_code">PIN code</string>
+    <string name="options_payment_address">Payment address</string>
+    <string name="options_forget_payment_address">Forget payment address</string>
+    <string name="options_receiving_payments">Receiving payments</string>
+    <string name="options_new_payment_address">New payment address</string>
+    <string name="options_new_payment_address_text"></string>
+
 </resources>
