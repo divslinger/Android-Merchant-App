@@ -6,7 +6,7 @@
         android:key="cat1">
 
         <Preference
-            android:title="@string/options_new_payment_address_text"
+            android:summary="@string/options_new_payment_address_text"
             />
 
         <Preference

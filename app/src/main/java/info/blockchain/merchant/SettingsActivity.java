@@ -35,15 +35,15 @@ public class SettingsActivity extends PreferenceActivity	{
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         final Preference receivePref = (Preference) findPreference("receiveAPI");
+        PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "xpub6CzxonKE1N4uYW9vitjfmL4qHyPUWjdKYQQgsUxZTunbdhXP25iDErn5ZCAWbfMAL4xv7zG6nFg7wK35Uc3PNYba1tPj23puwYTZdUhXtuk");
         final boolean status = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() == 0 ? false : true;
         receivePref.setSummary(status ? (String)SettingsActivity.this.getText(R.string.on) : (String)SettingsActivity.this.getText(R.string.off));
         receivePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
 
-                /*
-                Intent intent = new Intent(SettingsActivity.this, PinActivity.class);
+                Intent intent = new Intent(SettingsActivity.this, SettingsActivity2.class);
+                intent.putExtra("status", status);
                 startActivity(intent);
-                */
 
                 return true;
             }
