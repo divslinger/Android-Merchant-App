@@ -139,7 +139,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
                     new AlertDialog.Builder(SettingsActivity2.this)
                             .setTitle(R.string.options_add_payment_address)
                             .setView(tvReceiverHelp)
-                            .setCancelable(false)
+                            .setCancelable(true)
                             .setPositiveButton(R.string.paste, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
 
