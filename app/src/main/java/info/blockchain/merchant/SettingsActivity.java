@@ -159,6 +159,16 @@ public class SettingsActivity extends PreferenceActivity	{
         final Preference receivePref = (Preference) findPreference("receiveAPI");
         final boolean status = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() == 0 ? false : true;
         receivePref.setSummary(status ? (String) SettingsActivity.this.getText(R.string.on) : (String) SettingsActivity.this.getText(R.string.off));
+        receivePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
+
+                Intent intent = new Intent(SettingsActivity.this, SettingsActivity2.class);
+                intent.putExtra("status", status);
+                startActivity(intent);
+
+                return true;
+            }
+        });
     }
 
     @Override

@@ -153,11 +153,6 @@ public class SettingsActivity2 extends PreferenceActivity	{
                                                     String receiver = etReceiver.getText().toString().trim();
                                                     if (receiver != null && receiver.length() > 0 && (FormatsUtil.getInstance().isValidBitcoinAddress(receiver) || FormatsUtil.getInstance().isValidXpub(receiver))) {
                                                         PrefsUtil.getInstance(SettingsActivity2.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
-
-                                                        Intent intent = new Intent(SettingsActivity2.this, SettingsActivity2.class);
-                                                        intent.putExtra("status", true);
-                                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                        startActivity(intent);
                                                     }
 
                                                 }
@@ -207,11 +202,6 @@ public class SettingsActivity2 extends PreferenceActivity	{
                                 public void onClick(DialogInterface dialog, int whichButton) {
 
                                     PrefsUtil.getInstance(SettingsActivity2.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-
-                                    Intent intent = new Intent(SettingsActivity2.this, SettingsActivity2.class);
-                                    intent.putExtra("status", false);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(intent);
 
                                 }
 
