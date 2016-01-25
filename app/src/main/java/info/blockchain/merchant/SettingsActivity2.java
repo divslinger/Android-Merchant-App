@@ -201,7 +201,11 @@ public class SettingsActivity2 extends PreferenceActivity	{
 
                                 public void onClick(DialogInterface dialog, int whichButton) {
 
+                                    dialog.dismiss();
+
                                     PrefsUtil.getInstance(SettingsActivity2.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+
+                                    SettingsActivity2.this.finish();
 
                                 }
 
