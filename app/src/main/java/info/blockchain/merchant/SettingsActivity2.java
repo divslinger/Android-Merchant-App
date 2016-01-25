@@ -2,30 +2,29 @@ package info.blockchain.merchant;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dm.zbar.android.scanner.ZBarConstants;
+import com.dm.zbar.android.scanner.ZBarScannerActivity;
 
-import info.blockchain.merchant.util.AppUtil;
+import net.sourceforge.zbar.Symbol;
+
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.ToastCustom;
 import info.blockchain.wallet.util.FormatsUtil;
@@ -35,6 +34,8 @@ public class SettingsActivity2 extends PreferenceActivity	{
     private static int ZBAR_SCANNER_REQUEST = 2026;
 
     private Preference newPref = null;
+
+    private boolean pausedForScan = false;
 
     /** Called when the activity is first created. */
     @Override
@@ -55,10 +56,31 @@ public class SettingsActivity2 extends PreferenceActivity	{
         addPreferencesFromResource(status ? R.xml.settings_with_receive : R.xml.settings_no_receive);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
+        Toolbar toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
+        root.addView(toolbar, 0);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SettingsActivity2.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+
         newPref = (Preference) findPreference("address");
 
         doPopUp(status);
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if(!pausedForScan)  {
+            finish();
+        }
     }
 
     @Override
@@ -80,7 +102,26 @@ public class SettingsActivity2 extends PreferenceActivity	{
                 ToastCustom.makeText(this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
 
+            pausedForScan = false;
+
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if(id == android.R.id.home) {
+            Intent intent = new Intent(SettingsActivity2.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+        else {
+            ;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void doPopUp(boolean hasReceiver)  {
@@ -116,7 +157,11 @@ public class SettingsActivity2 extends PreferenceActivity	{
                                                     String receiver = etReceiver.getText().toString().trim();
                                                     if(receiver != null && receiver.length() > 0 && (FormatsUtil.getInstance().isValidBitcoinAddress(receiver) || FormatsUtil.getInstance().isValidXpub(receiver))) {
                                                         PrefsUtil.getInstance(SettingsActivity2.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
-                                                        newPref.setSummary(receiver);
+
+                                                        Intent intent = new Intent(SettingsActivity2.this, SettingsActivity2.class);
+                                                        intent.putExtra("status", true);
+                                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                        startActivity(intent);
                                                     }
 
                                                 }
@@ -134,7 +179,10 @@ public class SettingsActivity2 extends PreferenceActivity	{
                             }).setNegativeButton(R.string.scan, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
 
-                            ;
+                            pausedForScan = true;
+                            Intent intent = new Intent(SettingsActivity2.this, ZBarScannerActivity.class);
+                            intent.putExtra(ZBarConstants.SCAN_MODES, new int[]{Symbol.QRCODE});
+                            startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
 
                         }
                     }).show();
@@ -165,6 +213,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
                                     PrefsUtil.getInstance(SettingsActivity2.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
 
                                     Intent intent = new Intent(SettingsActivity2.this, SettingsActivity2.class);
+                                    intent.putExtra("status", false);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent);
 
@@ -190,9 +239,18 @@ public class SettingsActivity2 extends PreferenceActivity	{
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         if(keyCode == KeyEvent.KEYCODE_BACK) {
-            Intent intent = new Intent(SettingsActivity2.this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+
+            if(PrefsUtil.getInstance(SettingsActivity2.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() > 0)    {
+                Intent intent = new Intent(SettingsActivity2.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+            else    {
+                Intent intent = new Intent(SettingsActivity2.this, SettingsActivity2.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+
         }
 
         return false;

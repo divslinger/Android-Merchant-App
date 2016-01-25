@@ -35,7 +35,6 @@ public class SettingsActivity extends PreferenceActivity	{
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         final Preference receivePref = (Preference) findPreference("receiveAPI");
-        PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "xpub6CzxonKE1N4uYW9vitjfmL4qHyPUWjdKYQQgsUxZTunbdhXP25iDErn5ZCAWbfMAL4xv7zG6nFg7wK35Uc3PNYba1tPj23puwYTZdUhXtuk");
         final boolean status = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() == 0 ? false : true;
         receivePref.setSummary(status ? (String)SettingsActivity.this.getText(R.string.on) : (String)SettingsActivity.this.getText(R.string.off));
         receivePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
@@ -60,16 +59,18 @@ public class SettingsActivity extends PreferenceActivity	{
 
                 new AlertDialog.Builder(SettingsActivity.this)
                         .setTitle(R.string.receive_coins_fragment_name)
-                        .setMessage("")
                         .setView(etName)
                         .setCancelable(false)
                         .setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+
                                 String name = etName.getText().toString();
+
                                 if(name != null && name.length() > 0)    {
                                     PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, name);
                                     namePref.setSummary(name);
                                 }
+
                             }
 
                         }).setNegativeButton(R.string.prompt_ko, new DialogInterface.OnClickListener() {
@@ -111,14 +112,15 @@ public class SettingsActivity extends PreferenceActivity	{
 
                 new AlertDialog.Builder(SettingsActivity.this)
                         .setTitle(R.string.receive_coins_fragment_name)
-                        .setMessage("")
                         .setView(spCurrencies)
                         .setCancelable(false)
                         .setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+
                                 int currency = spCurrencies.getSelectedItemPosition();
                                 PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[currency].substring(currencies[currency].length() - 3));
                                 fiatPref.setSummary(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[currency].substring(currencies[currency].length() - 3)));
+
                             }
 
                         }).setNegativeButton(R.string.prompt_ko, new DialogInterface.OnClickListener() {
@@ -147,4 +149,5 @@ public class SettingsActivity extends PreferenceActivity	{
         });
 
     }
+
 }
