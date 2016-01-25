@@ -62,9 +62,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(SettingsActivity2.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                finish();
             }
         });
 
@@ -113,9 +111,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
         int id = item.getItemId();
 
         if(id == android.R.id.home) {
-            Intent intent = new Intent(SettingsActivity2.this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+            finish();
         }
         else {
             ;
@@ -155,7 +151,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
                                                 public void onClick(DialogInterface dialog, int whichButton) {
 
                                                     String receiver = etReceiver.getText().toString().trim();
-                                                    if(receiver != null && receiver.length() > 0 && (FormatsUtil.getInstance().isValidBitcoinAddress(receiver) || FormatsUtil.getInstance().isValidXpub(receiver))) {
+                                                    if (receiver != null && receiver.length() > 0 && (FormatsUtil.getInstance().isValidBitcoinAddress(receiver) || FormatsUtil.getInstance().isValidXpub(receiver))) {
                                                         PrefsUtil.getInstance(SettingsActivity2.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
 
                                                         Intent intent = new Intent(SettingsActivity2.this, SettingsActivity2.class);
@@ -239,18 +235,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         if(keyCode == KeyEvent.KEYCODE_BACK) {
-
-            if(PrefsUtil.getInstance(SettingsActivity2.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() > 0)    {
-                Intent intent = new Intent(SettingsActivity2.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-            else    {
-                Intent intent = new Intent(SettingsActivity2.this, SettingsActivity2.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-
+            finish();
         }
 
         return false;

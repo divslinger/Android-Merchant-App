@@ -39,13 +39,14 @@ import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
 import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.SSLVerifierThreadUtil;
+import info.blockchain.merchant.util.ToastCustom;
 
 public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener, NavigationView.OnNavigationItemSelectedListener {
 
     public static int SETTINGS_ACTIVITY 	= 1;
     private static int PIN_ACTIVITY 		= 2;
     private static int RESET_PIN_ACTIVITY 	= 3;
-    private static int ABOUT_ACTIVITY 	= 4;
+    private static int ABOUT_ACTIVITY 	    = 4;
 
     private WebSocketHandler webSocketHandler = null;
 
@@ -74,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         if(pin.equals("")) {
         	doPIN();
         }
+        else if(PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() == 0)    {
+            doSettings(false);
+        }
 		else	{
 
 			//
@@ -90,6 +94,19 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             MigrateDBUtil.getInstance(MainActivity.this).migrate();
 
 		}
+
+        //
+        // test for v1
+        //
+        if(AppUtil.getInstance(MainActivity.this).isLegacy())	{
+            String strCurrency = PrefsUtil.getInstance(MainActivity.this).getValue("currency", "");
+            if(strCurrency.equals("ZZZ"))	{
+                PrefsUtil.getInstance(MainActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
+            }
+            PrefsUtil.getInstance(MainActivity.this).removeValue("ocurrency");
+        }
+
+        MigrateDBUtil.getInstance(MainActivity.this).migrate();
 
         //Start websockets
         IntentFilter filter = new IntentFilter();
@@ -361,14 +378,8 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             @Override
             public void run() {
                 switch (menuItem.getItemId()) {
-                    case R.id.action_profile:
-//                        doProfile();//TODO
-                        break;
                     case R.id.action_settings:
                         doSettings(false);
-                        break;
-                    case R.id.action_help:
-//                        doHelp();//TODO
                         break;
                     case R.id.action_about:
                         doAbout();
