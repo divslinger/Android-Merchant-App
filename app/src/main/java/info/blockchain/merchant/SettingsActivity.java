@@ -106,6 +106,7 @@ public class SettingsActivity extends PreferenceActivity	{
                 }
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+                builder.setTitle(R.string.options_local_currency);
                 builder.setSingleChoiceItems(currencies, sel,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
