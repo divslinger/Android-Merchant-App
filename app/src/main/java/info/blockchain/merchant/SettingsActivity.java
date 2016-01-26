@@ -68,7 +68,7 @@ public class SettingsActivity extends PreferenceActivity	{
 
                                 String name = etName.getText().toString();
 
-                                if(name != null && name.length() > 0)    {
+                                if (name != null && name.length() > 0) {
                                     PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, name);
                                     namePref.setSummary(name);
                                 }
@@ -92,46 +92,30 @@ public class SettingsActivity extends PreferenceActivity	{
         fiatPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
 
-                ArrayAdapter<CharSequence> spAdapter = ArrayAdapter.createFromResource(SettingsActivity.this, R.array.currencies, R.layout.spinner_item);
-                spAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                final Spinner spCurrencies = new Spinner(SettingsActivity.this);
-                spCurrencies.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                spCurrencies.setAdapter(spAdapter);
-
                 final String[] currencies = getResources().getStringArray(R.array.currencies);
                 String strCurrency = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
                 int sel = -1;
-                for(int i = 0; i < currencies.length; i++) {
-                    if(currencies[i].endsWith(strCurrency)) {
-                        spCurrencies.setSelection(i);
+                for (int i = 0; i < currencies.length; i++) {
+                    if (currencies[i].endsWith(strCurrency)) {
                         sel = i;
                         break;
                     }
                 }
-                if(sel == -1) {
-                    spCurrencies.setSelection(currencies.length - 1);
+                if (sel == -1) {
+                    sel = currencies.length - 1;    // set to USD
                 }
 
-                new AlertDialog.Builder(SettingsActivity.this)
-                        .setTitle(R.string.receive_coins_fragment_name)
-                        .setView(spCurrencies)
-                        .setCancelable(false)
-                        .setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-
-                                int currency = spCurrencies.getSelectedItemPosition();
-                                PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[currency].substring(currencies[currency].length() - 3));
-                                fiatPref.setSummary(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[currency].substring(currencies[currency].length() - 3)));
-
-                            }
-
-                        }).setNegativeButton(R.string.prompt_ko, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-
-                        ;
-
-                    }
-                }).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+                builder.setSingleChoiceItems(currencies, sel,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[which].substring(currencies[which].length() - 3));
+                            fiatPref.setSummary(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[which].substring(currencies[which].length() - 3)));
+                        }
+                    });
+                AlertDialog alert = builder.create();
+                alert.show();
 
                 return true;
             }
