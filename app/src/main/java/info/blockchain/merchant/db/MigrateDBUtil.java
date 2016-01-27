@@ -3,7 +3,7 @@ package info.blockchain.merchant.db;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
+//import android.util.Log;
 
 import java.util.ArrayList;
 

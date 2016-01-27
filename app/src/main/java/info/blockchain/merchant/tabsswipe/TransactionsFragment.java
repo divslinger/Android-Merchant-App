@@ -24,9 +24,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 //import android.util.Log;
 
-import com.google.bitcoin.uri.BitcoinURI;
-
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
