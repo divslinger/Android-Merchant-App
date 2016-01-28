@@ -55,15 +55,12 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
     private TextView tvFiatAmount = null;
     private TextView tvBtcAmount = null;
     private ImageView ivReceivingQr = null;
-    private ProgressBar progressBar = null;
     private LinearLayout progressLayout = null;
     private ImageView ivCancel = null;
     private ImageView ivCheck = null;
     private TextView tvStatus = null;
 
     private String receivingAddress = null;
-
-    private static final int ADDRESS_LOOKAHEAD = 20;
 
     private BigInteger bamount = null;
 
@@ -112,7 +109,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvFiatAmount = (TextView)findViewById(R.id.tv_fiat_amount);
         tvBtcAmount = (TextView)findViewById(R.id.tv_btc_amount);
         ivReceivingQr = (ImageView)findViewById(R.id.qr);
-        progressBar = (ProgressBar)findViewById(R.id.progress);
         progressLayout = (LinearLayout)findViewById(R.id.progressLayout);
         ivCancel = (ImageView)findViewById(R.id.iv_cancel);
         ivCheck = (ImageView)findViewById(R.id.iv_check);
