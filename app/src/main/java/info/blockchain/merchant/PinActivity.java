@@ -3,11 +3,11 @@ package info.blockchain.merchant;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
+//import android.util.Log;
 
 import com.google.common.hash.Hashing;
 
@@ -129,7 +129,6 @@ public class PinActivity extends Activity	{
         String hashed = Hashing.sha256().hashString(userEnteredPIN, Charset.forName("UTF8")).toString();
         String stored = PrefsUtil.getInstance(PinActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
         if(stored.equals(hashed)) {
-            Log.v("","RESULT_OK");
             setResult(RESULT_OK);
             finish();
         }
