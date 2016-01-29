@@ -226,9 +226,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 			;
 		}
 		else if(requestCode == PIN_ACTIVITY && resultCode == RESULT_OK) {
-			String strOtherCurrency = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
     		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-    		intent.putExtra("ocurrency", strOtherCurrency);
     		startActivityForResult(intent, SETTINGS_ACTIVITY);
 		}
 		else if(requestCode == RESET_PIN_ACTIVITY && resultCode == RESULT_OK) {
@@ -264,9 +262,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     private void doSettings(final boolean create)	{
     	if(create)	{
-			String strOtherCurrency = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
     		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-    		intent.putExtra("ocurrency", strOtherCurrency);
     		startActivityForResult(intent, SETTINGS_ACTIVITY);
     	}
     	else	{
