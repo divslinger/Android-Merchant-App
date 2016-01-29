@@ -1,6 +1,5 @@
 package info.blockchain.merchant;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
