@@ -31,7 +31,7 @@ public class AboutActivity extends Activity	{
 	    this.setContentView(R.layout.activity_about);
 
         tvAbout = (TextView)findViewById(R.id.about);
-        tvAbout.setText(getString(R.string.about, getString(R.string.version_name), "2015"));
+        tvAbout.setText(getString(R.string.about, getString(R.string.version_name), "2015-2016"));
 
         bRate = (TextView)findViewById(R.id.rate_us);
         bRate.setOnClickListener(new Button.OnClickListener() {
