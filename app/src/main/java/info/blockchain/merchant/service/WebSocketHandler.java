@@ -137,23 +137,18 @@ public class WebSocketHandler {
                             }
 
                             public void onTextMessage(WebSocket websocket, String message) {
-//                                    Log.d("WebSocket", message);
 
                                 try {
                                     JSONObject jsonObject = null;
                                     try {
                                         jsonObject = new JSONObject(message);
                                     } catch (JSONException je) {
-//                                            Log.i("WebSocketHandler", "JSONException:" + je.getMessage());
                                         jsonObject = null;
                                     }
 
                                     if (jsonObject == null) {
-//                                            Log.i("WebSocketHandler", "jsonObject is null");
                                         return;
                                     }
-
-//                                        Log.i("WebSocketHandler", jsonObject.toString());
 
                                     String op = (String) jsonObject.get("op");
                                     if (op.equals("utx") && jsonObject.has("x")) {
@@ -161,7 +156,6 @@ public class WebSocketHandler {
                                         JSONObject objX = (JSONObject) jsonObject.get("x");
 
                                         long value = 0L;
-                                        long total_value = 0L;
 
                                         String foundAddr = null;
                                         long txValue = 0L;
@@ -170,20 +164,13 @@ public class WebSocketHandler {
                                             JSONObject outObj = null;
                                             for (int j = 0; j < outArray.length(); j++) {
                                                 outObj = (JSONObject) outArray.get(j);
-                                                if (outObj.has("value")) {
+                                                if(outObj.has("value")) {
                                                     value = outObj.getLong("value");
                                                 }
-                                                if (outObj.has("xpub")) {
-                                                    total_value += value;
-                                                }
-                                                else if (outObj.has("addr")) {
-                                                    if (ExpectedIncoming.getInstance().getBTC().containsKey((String) outObj.get("addr"))) {
+                                                if(outObj.has("addr")) {
+                                                    if(ExpectedIncoming.getInstance().getBTC().containsKey((String) outObj.get("addr"))) {
                                                         foundAddr = (String) outObj.get("addr");
-//                                                        Log.d("WebSocketHandler", "incoming address:" + foundAddr);
                                                         txValue = value;
-//                                                        Log.d("WebSocketHandler", "incoming value:" + txValue);
-//                                                        Log.d("WebSocketHandler", "expected value:" + ExpectedIncoming.getInstance().getBTC().get(foundAddr));
-                                                        total_value += value;
                                                         break;
                                                     }
                                                 }
@@ -191,7 +178,6 @@ public class WebSocketHandler {
                                         }
 
                                         if (txValue > 0L) {
-                                            //Incoming tx
                                             webSocketListener.onIncomingPayment(foundAddr, txValue);
                                         }
                                     }
