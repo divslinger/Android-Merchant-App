@@ -152,6 +152,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
 
                                                     String receiver = etReceiver.getText().toString().trim();
                                                     if (receiver != null && receiver.length() > 0 && (FormatsUtil.getInstance().isValidBitcoinAddress(receiver) || FormatsUtil.getInstance().isValidXpub(receiver))) {
+                                                        newPref.setSummary(receiver);
                                                         PrefsUtil.getInstance(SettingsActivity2.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
                                                     }
 
