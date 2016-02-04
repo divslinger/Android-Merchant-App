@@ -128,8 +128,9 @@ public class SettingsActivity2 extends PreferenceActivity	{
             newPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
 
-                    final TextView tvReceiverHelp = new EditText(SettingsActivity2.this);
+                    final TextView tvReceiverHelp = new TextView(SettingsActivity2.this);
                     tvReceiverHelp.setText(SettingsActivity2.this.getText(R.string.options_add_payment_address_text));
+                    tvReceiverHelp.setPadding(50, 10, 50, 10);
 
                     new AlertDialog.Builder(SettingsActivity2.this)
                             .setTitle(R.string.options_add_payment_address)
@@ -189,8 +190,9 @@ public class SettingsActivity2 extends PreferenceActivity	{
             forgetPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
 
-                    final TextView tvForgetHelp = new EditText(SettingsActivity2.this);
+                    final TextView tvForgetHelp = new TextView(SettingsActivity2.this);
                     tvForgetHelp.setText(SettingsActivity2.this.getText(R.string.options_forget_payment_address_text));
+                    tvForgetHelp.setPadding(50, 10, 50, 10);
 
                     new AlertDialog.Builder(SettingsActivity2.this)
                             .setTitle(R.string.options_forget_payment_address)
