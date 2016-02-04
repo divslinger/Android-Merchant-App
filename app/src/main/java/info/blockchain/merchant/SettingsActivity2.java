@@ -155,6 +155,9 @@ public class SettingsActivity2 extends PreferenceActivity	{
                                                         newPref.setSummary(receiver);
                                                         PrefsUtil.getInstance(SettingsActivity2.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
                                                     }
+                                                    else    {
+                                                        ToastCustom.makeText(SettingsActivity2.this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+                                                    }
 
                                                 }
 
