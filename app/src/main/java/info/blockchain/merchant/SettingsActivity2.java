@@ -235,7 +235,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         if(keyCode == KeyEvent.KEYCODE_BACK) {
-            finish();
+            goBack();
         }
 
         return false;
