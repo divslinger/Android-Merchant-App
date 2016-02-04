@@ -4,13 +4,20 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.ToastCustom;
@@ -29,6 +36,17 @@ public class SettingsActivity extends PreferenceActivity	{
         setTitle(R.string.app_name);
         addPreferencesFromResource(R.xml.settings);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
+        Toolbar toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
+        toolbar.setTitleTextColor(Color.WHITE);
+        root.addView(toolbar, 0);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goBack();
+            }
+        });
 
         final Preference receivePref = (Preference) findPreference("receiveAPI");
         final boolean status = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() == 0 ? false : true;
@@ -159,12 +177,18 @@ public class SettingsActivity extends PreferenceActivity	{
                 ToastCustom.makeText(this, getString(R.string.obligatory_receiver), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
             else    {
-                finish();
+                goBack();
             }
 
         }
 
         return false;
+    }
+
+    private void goBack()   {
+        Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
 }

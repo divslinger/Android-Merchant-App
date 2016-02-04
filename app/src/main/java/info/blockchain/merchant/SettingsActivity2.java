@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -57,11 +58,12 @@ public class SettingsActivity2 extends PreferenceActivity	{
 
         LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
         Toolbar toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
+        toolbar.setTitleTextColor(Color.WHITE);
         root.addView(toolbar, 0);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                goBack();
             }
         });
 
@@ -76,7 +78,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
         super.onPause();
 
         if(!pausedForScan)  {
-            finish();
+            goBack();
         }
     }
 
@@ -110,7 +112,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
         int id = item.getItemId();
 
         if(id == android.R.id.home) {
-            finish();
+            goBack();
         }
         else {
             ;
@@ -154,8 +156,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
                                                     if (receiver != null && receiver.length() > 0 && (FormatsUtil.getInstance().isValidBitcoinAddress(receiver) || FormatsUtil.getInstance().isValidXpub(receiver))) {
                                                         newPref.setSummary(receiver);
                                                         PrefsUtil.getInstance(SettingsActivity2.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
-                                                    }
-                                                    else    {
+                                                    } else {
                                                         ToastCustom.makeText(SettingsActivity2.this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
                                                     }
 
@@ -238,6 +239,12 @@ public class SettingsActivity2 extends PreferenceActivity	{
         }
 
         return false;
+    }
+
+    private void goBack()   {
+        Intent intent = new Intent(SettingsActivity2.this, SettingsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
 }
