@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
-        android:title="@string/options_receiving_payments"
-        android:key="cat1">
-
-        <Preference
-            android:title="@string/options_payment_address"
-            android:key="address"
-            />
-        <Preference
-            android:title="@string/options_forget_payment_address"
-            android:key="forget"
-            />
-
-    </PreferenceCategory>
+    <Preference
+        android:title="@string/options_payment_address"
+        android:key="address"
+        />
+    <Preference
+        android:title="@string/options_forget_payment_address"
+        android:key="forget"
+        />
 
 </PreferenceScreen>
