@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
@@ -229,9 +228,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 if(receivingAddress == null)    {
                     ToastCustom.makeText(ReceiveActivity.this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
                     return null;
-                }
-                else    {
-//                    ToastCustom.makeText(ReceiveActivity.this, receivingAddress, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_OK);
                 }
 
                 //Subscribe to websocket to new address
