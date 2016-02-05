@@ -276,10 +276,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
             String addr = intent.getStringExtra("payment_address");
             long paymentAmount = intent.getLongExtra("payment_amount", 0L);
 
-            if(paymentAmount >= ExpectedIncoming.getInstance().getBTC().get(addr))    {
-                onPaymentReceived(addr);
-            }
-            else    {
+            // underpayment
+            if(paymentAmount < ExpectedIncoming.getInstance().getBTC().get(addr))    {
 
                 final long remainder = ExpectedIncoming.getInstance().getBTC().get(addr) - paymentAmount;
                 ToastCustom.makeText(ReceiveActivity.this, "Remainder:" + remainder, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
@@ -340,6 +338,14 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 alert.show();
 
             }
+            // overpayment
+            else if(paymentAmount > ExpectedIncoming.getInstance().getBTC().get(addr))    {
+                onPaymentReceived(addr, paymentAmount);
+            }
+            // expected amount
+            else    {
+                onPaymentReceived(addr, -1L);
+            }
 
         }
         }
@@ -362,7 +368,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         }
     }
 
-    private void onPaymentReceived(String addr){
+    private void onPaymentReceived(String addr, long paymentAmount){
 
         ivCancel.setVisibility(View.GONE);
         ivReceivingQr.setVisibility(View.GONE);
@@ -378,12 +384,19 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvBtcAmount.setVisibility(View.GONE);
         tvFiatAmount.setVisibility(View.GONE);
 
+        long amount = (paymentAmount == -1L) ? ExpectedIncoming.getInstance().getBTC().get(addr) : paymentAmount;
+
+        String strCurrency = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, PaymentFragment.DEFAULT_CURRENCY_FIAT);
+        Double currencyPrice = CurrencyExchange.getInstance(ReceiveActivity.this).getCurrencyPrice(strCurrency);
+        double amountPayableFiat = ((double)amount / 1e8) * currencyPrice;
+        String strFiat  = (paymentAmount == -1L) ? ExpectedIncoming.getInstance().getFiat().get(addr) : getCurrencySymbol() + " " + MonetaryUtil.getInstance().getFiatDecimalFormat().format(amountPayableFiat);
+
         DBControllerV2 pdb = new DBControllerV2(ReceiveActivity.this);
         pdb.insertPayment(
                 System.currentTimeMillis() / 1000,          // timestamp, Unix time
                 receivingAddress,                           // receiving address
-                ExpectedIncoming.getInstance().getBTC().get(addr),  // BTC amount
-                ExpectedIncoming.getInstance().getFiat().get(addr), // fiat amount
+                amount,                                     // BTC amount
+                strFiat,                                    // fiat amount
                 -1,                                         // confirmations
                 ""                                          // note, message
         );
