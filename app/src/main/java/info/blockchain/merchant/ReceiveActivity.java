@@ -273,8 +273,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         if (MainActivity.ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
             soundAlert();
 
-            String addr = intent.getStringExtra("payment_address");
-            long paymentAmount = intent.getLongExtra("payment_amount", 0L);
+            final String addr = intent.getStringExtra("payment_address");
+            final long paymentAmount = intent.getLongExtra("payment_amount", 0L);
 
             // underpayment
             if(paymentAmount < ExpectedIncoming.getInstance().getBTC().get(addr))    {
@@ -332,6 +332,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.prompt_ko), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
+                        onPaymentReceived(addr, paymentAmount);
                     }
                 });
 
