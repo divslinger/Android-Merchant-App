@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 //import android.util.Log;
@@ -249,7 +250,7 @@ public class TransactionsFragment extends Fragment {
             TextView tvAmount = (TextView)view.findViewById(R.id.tv_amount);
             if(doBTC) {
                 String displayValue = null;
-                long amount = vals.getAsLong("amt");
+                long amount = Math.abs(vals.getAsLong("amt"));
                 displayValue = MonetaryUtil.getInstance(getActivity()).getDisplayAmountWithFormatting(amount);
 
                 SpannableStringBuilder cs = new SpannableStringBuilder(getActivity().getResources().getString(R.string.bitcoin_currency_symbol));
@@ -260,6 +261,11 @@ public class TransactionsFragment extends Fragment {
                 SpannableStringBuilder cs = new SpannableStringBuilder(vals.getAsString("famt").subSequence(0, 1));
                 cs.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 tvAmount.setText(cs + " " + vals.getAsString("famt").substring(1));
+            }
+
+            if(vals.getAsLong("amt") < 0L)    {
+                ImageView ivStatus = (ImageView)view.findViewById(R.id.iv_status);
+                ivStatus.setImageResource(R.drawable.ic_warning_black_18dp);
             }
 
             return view;

@@ -316,6 +316,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
                         dialog.dismiss();
 
+                        onPaymentReceived(addr, paymentAmount);
+
                         Intent intent = new Intent(ReceiveActivity.this, ReceiveActivity.class);
                         intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, _fiatAmount);
                         intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, btcAmount);
@@ -382,6 +384,9 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvFiatAmount.setVisibility(View.GONE);
 
         long amount = (paymentAmount == -1L) ? ExpectedIncoming.getInstance().getBTC().get(addr) : paymentAmount;
+        if(paymentAmount < ExpectedIncoming.getInstance().getBTC().get(addr))    {
+            amount *= -1L;
+        }
 
         String strCurrency = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, PaymentFragment.DEFAULT_CURRENCY_FIAT);
         Double currencyPrice = CurrencyExchange.getInstance(ReceiveActivity.this).getCurrencyPrice(strCurrency);
