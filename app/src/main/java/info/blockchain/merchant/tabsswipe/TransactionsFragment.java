@@ -1,5 +1,6 @@
 package info.blockchain.merchant.tabsswipe;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -53,6 +54,8 @@ public class TransactionsFragment extends Fragment {
     private boolean doBTC = false;
     private SwipeRefreshLayout swipeLayout = null;
 
+    private Activity thisActivity = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -77,6 +80,8 @@ public class TransactionsFragment extends Fragment {
         swipeLayout.setColorScheme(R.color.blockchain_blue,
                 R.color.blockchain_green,
                 R.color.blockchain_dark_blue);
+
+        thisActivity = getActivity();
 
         return rootView;
     }
@@ -172,7 +177,7 @@ public class TransactionsFragment extends Fragment {
                     mListItems.clear();
                     mListItems.addAll(vals);
 
-                    getActivity().runOnUiThread(new Runnable() {
+                    thisActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             adapter.notifyDataSetChanged();
@@ -188,7 +193,7 @@ public class TransactionsFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] result) {
 
-            getActivity().runOnUiThread(new Runnable() {
+            thisActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     swipeLayout.setRefreshing(false);
