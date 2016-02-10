@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             TextView title = new TextView(MainActivity.this);
+            title.setPadding(20, 60, 20, 20);
             title.setText(R.string.app_name);
             title.setGravity(Gravity.CENTER);
             title.setTextSize(20);
