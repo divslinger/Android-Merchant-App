@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 			;
 		}
 		else if(requestCode == PIN_ACTIVITY && resultCode == RESULT_OK) {
-    		Intent intent = new Intent(MainActivity.this, SettingsActivity2.class);
+    		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
     		startActivityForResult(intent, SETTINGS_ACTIVITY);
 		}
 		else if(requestCode == RESET_PIN_ACTIVITY && resultCode == RESULT_OK) {
