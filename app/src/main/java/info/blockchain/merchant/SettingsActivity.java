@@ -11,6 +11,7 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +69,10 @@ public class SettingsActivity extends PreferenceActivity	{
 
                 final EditText etName = new EditText(SettingsActivity.this);
                 etName.setSingleLine(true);
+                int maxLength = 70;
+                InputFilter[] fArray = new InputFilter[1];
+                fArray[0] = new InputFilter.LengthFilter(maxLength);
+                etName.setFilters(fArray);
                 etName.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
 
                 new AlertDialog.Builder(SettingsActivity.this)
