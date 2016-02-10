@@ -390,7 +390,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
         String strCurrency = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, PaymentFragment.DEFAULT_CURRENCY_FIAT);
         Double currencyPrice = CurrencyExchange.getInstance(ReceiveActivity.this).getCurrencyPrice(strCurrency);
-        double amountPayableFiat = ((double)amount / 1e8) * currencyPrice;
+        double amountPayableFiat = (Math.abs((double)amount) / 1e8) * currencyPrice;
         String strFiat  = (paymentAmount == -1L) ? ExpectedIncoming.getInstance().getFiat().get(addr) : getCurrencySymbol() + " " + MonetaryUtil.getInstance().getFiatDecimalFormat().format(amountPayableFiat);
 
         DBControllerV2 pdb = new DBControllerV2(ReceiveActivity.this);
