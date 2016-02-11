@@ -384,7 +384,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvFiatAmount.setVisibility(View.GONE);
 
         long amount = (paymentAmount == -1L) ? ExpectedIncoming.getInstance().getBTC().get(addr) : paymentAmount;
-        if(paymentAmount < ExpectedIncoming.getInstance().getBTC().get(addr))    {
+        if(paymentAmount != ExpectedIncoming.getInstance().getBTC().get(addr))    {
             amount *= -1L;
         }
 
