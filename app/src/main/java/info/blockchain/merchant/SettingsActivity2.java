@@ -79,8 +79,8 @@ public class SettingsActivity2 extends PreferenceActivity	{
                     public boolean onPreferenceClick(Preference preference) {
 
                         pausedForIntent = true;
-                        Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=piuk.blockchain.android"));
-                        startActivity(marketIntent);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://blockchain.info/wallet-beta"));
+                        startActivity(intent);
 
                         return true;
                     }
