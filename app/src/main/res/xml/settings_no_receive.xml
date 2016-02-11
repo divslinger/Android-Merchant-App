@@ -6,6 +6,11 @@
         />
 
     <Preference
+        android:summary="@string/options_new_payment_address_text2"
+        android:key="wallet"
+        />
+
+    <Preference
         android:title="@string/options_new_payment_address"
         android:key="address"
         />

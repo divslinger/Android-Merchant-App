@@ -98,7 +98,8 @@
     <string name="options_forget_payment_address_text">If you forget this payment address you will not be able to accept bitcoin payments until you add a new one.</string>
     <string name="options_receiving_payments">Receiving payments</string>
     <string name="options_new_payment_address">New payment address</string>
-    <string name="options_new_payment_address_text">A payment address is the extended public key (xPub) of your wallet or a bitcoin address that you control.\n\nUsing the extended public key from your Blockchain Wallet is the best way to set your payment address because it increases your privacy while making accounting easier.\n\nIf you do not have a Blockchain Bitcoin wallet you can create one for free by visiting https://blockchain.info/wallet</string>
+    <string name="options_new_payment_address_text">A payment address is the extended public key (xPub) of your wallet or a bitcoin address that you control.\n\nUsing the extended public key from your Blockchain Wallet is the best way to set your payment address because it increases your privacy while making accounting easier.</string>
+    <string name="options_new_payment_address_text2">If you do not have a Blockchain Bitcoin wallet you can create one for free by visiting https://blockchain.info/wallet</string>
     <string name="options_add_payment_address">Add payment address</string>
     <string name="options_add_payment_address_text">Login to Blockchain Wallet at http://blockchain.info/wallet-beta. Open Accounts &amp; Addresses in settings. Select Show xPub. Paste or scan the code displayed.\n\nIf you don\'t have an Extended Public Key you can paste or scan your bitcoin address.</string>
 

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -34,8 +35,9 @@ public class SettingsActivity2 extends PreferenceActivity	{
     private static int ZBAR_SCANNER_REQUEST = 2026;
 
     private Preference newPref = null;
+    private Preference walletPref = null;
 
-    private boolean pausedForScan = false;
+    private boolean pausedForIntent = false;
 
     /** Called when the activity is first created. */
     @Override
@@ -70,6 +72,22 @@ public class SettingsActivity2 extends PreferenceActivity	{
 
         newPref = (Preference) findPreference("address");
 
+        if(!status)    {
+            walletPref = (Preference) findPreference("wallet");
+            if(walletPref != null)    {
+                walletPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+                    public boolean onPreferenceClick(Preference preference) {
+
+                        pausedForIntent = true;
+                        Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=piuk.blockchain.android"));
+                        startActivity(marketIntent);
+
+                        return true;
+                    }
+                });
+            }
+        }
+
         doPopUp(status);
 
     }
@@ -78,9 +96,17 @@ public class SettingsActivity2 extends PreferenceActivity	{
     protected void onPause() {
         super.onPause();
 
-        if(!pausedForScan)  {
+        if(!pausedForIntent)  {
             goBack();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        pausedForIntent = false;
+
     }
 
     @Override
@@ -102,7 +128,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
                 ToastCustom.makeText(this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
 
-            pausedForScan = false;
+            pausedForIntent = false;
 
         }
     }
@@ -176,7 +202,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
                             }).setNegativeButton(R.string.scan, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
 
-                            pausedForScan = true;
+                            pausedForIntent = true;
                             Intent intent = new Intent(SettingsActivity2.this, ZBarScannerActivity.class);
                             intent.putExtra(ZBarConstants.SCAN_MODES, new int[]{Symbol.QRCODE});
                             startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
