@@ -108,4 +108,7 @@
 
     <string name="obligatory_receiver">You must provide a receiving xPub or bitcoin address.</string>
 
+    <string name="please_create_pin">Before proceding, please create a 4-digit PIN code in order to protect your Settings.</string>
+    <string name="overpaid_amount">The amount received is higher than expected.</string>
+
 </resources>
