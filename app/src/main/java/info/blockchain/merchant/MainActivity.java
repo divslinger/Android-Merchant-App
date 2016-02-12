@@ -71,7 +71,24 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         // no PIN ?, then create one
 		String pin = PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
         if(pin.equals("")) {
-        	doPIN();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            TextView title = new TextView(MainActivity.this);
+            title.setPadding(20, 60, 20, 20);
+            title.setText(R.string.app_name);
+            title.setGravity(Gravity.CENTER);
+            title.setTextSize(20);
+            builder.setCustomTitle(title);
+            builder.setMessage(R.string.please_create_pin).setCancelable(false);
+            AlertDialog alert = builder.create();
+
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    doPIN();
+                }});
+
+            alert.show();
+
         }
         else if(PrefsUtil.getInstance(MainActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() == 0)    {
             doSettings(false);
@@ -115,30 +132,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         webSocketHandler = new WebSocketHandler();
         webSocketHandler.addListener(this);
         webSocketHandler.start();
-
-        if(PrefsUtil.getInstance(MainActivity.this).getValue("popup_" + getResources().getString(R.string.version_name), false) == false)	{
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            TextView title = new TextView(MainActivity.this);
-            title.setPadding(20, 60, 20, 20);
-            title.setText(R.string.app_name);
-            title.setGravity(Gravity.CENTER);
-            title.setTextSize(20);
-            builder.setCustomTitle(title);
-            builder.setMessage(R.string.new_version_message).setCancelable(false);
-            AlertDialog alert = builder.create();
-
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    PrefsUtil.getInstance(MainActivity.this).setValue("popup_" + getResources().getString(R.string.version_name), true);
-                }});
-
-            alert.show();
-
-        }
-        else    {
-            ;
-        }
 
     }
 
@@ -227,8 +220,34 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 			;
 		}
 		else if(requestCode == PIN_ACTIVITY && resultCode == RESULT_OK) {
-    		Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-    		startActivityForResult(intent, SETTINGS_ACTIVITY);
+
+            if(PrefsUtil.getInstance(MainActivity.this).getValue("popup_" + getResources().getString(R.string.version_name), false) == false)	{
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                TextView title = new TextView(MainActivity.this);
+                title.setPadding(20, 60, 20, 20);
+                title.setText(R.string.app_name);
+                title.setGravity(Gravity.CENTER);
+                title.setTextSize(20);
+                builder.setCustomTitle(title);
+                builder.setMessage(R.string.new_version_message).setCancelable(false);
+                AlertDialog alert = builder.create();
+
+                alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        PrefsUtil.getInstance(MainActivity.this).setValue("popup_" + getResources().getString(R.string.version_name), true);
+                        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                        startActivityForResult(intent, SETTINGS_ACTIVITY);
+                    }});
+
+                alert.show();
+
+            }
+            else    {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivityForResult(intent, SETTINGS_ACTIVITY);
+            }
+
 		}
 		else if(requestCode == RESET_PIN_ACTIVITY && resultCode == RESULT_OK) {
 			doPIN();
@@ -272,9 +291,11 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     }
 
     private void doPIN()	{
-		Intent intent = new Intent(MainActivity.this, PinActivity.class);
-		intent.putExtra("create", true);
-		startActivityForResult(intent, PIN_ACTIVITY);
+
+        Intent intent = new Intent(MainActivity.this, PinActivity.class);
+        intent.putExtra("create", true);
+        startActivityForResult(intent, PIN_ACTIVITY);
+
     }
 
     private void enterPIN()	{
