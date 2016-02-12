@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
@@ -403,6 +404,26 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 ""                                          // note, message
         );
         pdb.close();
+
+        if(paymentAmount > ExpectedIncoming.getInstance().getBTC().get(addr))    {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ReceiveActivity.this);
+            TextView title = new TextView(ReceiveActivity.this);
+            title.setPadding(20, 60, 20, 20);
+            title.setText(R.string.app_name);
+            title.setGravity(Gravity.CENTER);
+            title.setTextSize(20);
+            builder.setCustomTitle(title);
+            builder.setMessage(R.string.overpaid_amount).setCancelable(false);
+            AlertDialog alert = builder.create();
+
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    ;
+                }});
+
+            alert.show();
+
+        }
 
         setResult(RESULT_OK);
     }
