@@ -49,7 +49,7 @@ public class SettingsActivity extends PreferenceActivity	{
                     ToastCustom.makeText(SettingsActivity.this, getString(R.string.obligatory_receiver), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
                 }
                 else    {
-                    goBack();
+                    finish();
                 }
             }
         });
@@ -187,18 +187,12 @@ public class SettingsActivity extends PreferenceActivity	{
                 ToastCustom.makeText(this, getString(R.string.obligatory_receiver), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
             else    {
-                goBack();
+                finish();
             }
 
         }
 
         return false;
-    }
-
-    private void goBack()   {
-        Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
     }
 
 }

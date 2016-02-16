@@ -66,7 +66,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goBack();
+                finish();
             }
         });
 
@@ -97,7 +97,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
         super.onPause();
 
         if(!pausedForIntent)  {
-            goBack();
+            finish();
         }
     }
 
@@ -139,7 +139,7 @@ public class SettingsActivity2 extends PreferenceActivity	{
         int id = item.getItemId();
 
         if(id == android.R.id.home) {
-            goBack();
+            finish();
         }
         else {
             ;
@@ -262,16 +262,10 @@ public class SettingsActivity2 extends PreferenceActivity	{
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         if(keyCode == KeyEvent.KEYCODE_BACK) {
-            goBack();
+            finish();
         }
 
         return false;
-    }
-
-    private void goBack()   {
-        Intent intent = new Intent(SettingsActivity2.this, SettingsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
     }
 
 }
