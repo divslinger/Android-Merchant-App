@@ -376,7 +376,9 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         ivCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                Intent intent = new Intent();
+                ReceiveActivity.this.setResult(RESULT_OK, intent);
+                ReceiveActivity.this.finish();
             }
         });
         tvStatus.setText(getResources().getText(R.string.payment_received));
