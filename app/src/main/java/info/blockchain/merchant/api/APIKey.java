@@ -2,8 +2,8 @@ package info.blockchain.merchant.api;
 
 public class APIKey	{
 
-    private static final String API_KEY = null;//[--REDACTED--]
-    private static final String API_CALLBACK = null;//[--REDACTED--]
+    private static final String API_KEY = "1fc17339-489e-4a56-943e-a68c1a30b4b1";
+    private static final String API_CALLBACK = "https://api.blockchain.info/v2/receive/ok.txt";
 
     private static APIKey instance = null;
 
