@@ -18,11 +18,11 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
@@ -41,7 +41,7 @@ import java.util.Locale;
 import info.blockchain.api.receive2.ReceiveV2;
 import info.blockchain.api.receive2.ReceiveV2Response;
 import info.blockchain.merchant.api.APIFactory;
-import info.blockchain.merchant.db.DBController;
+import info.blockchain.merchant.db.DBControllerV2;
 import info.blockchain.merchant.service.ExpectedIncoming;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 import info.blockchain.merchant.util.AppUtil;
@@ -55,15 +55,12 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
     private TextView tvFiatAmount = null;
     private TextView tvBtcAmount = null;
     private ImageView ivReceivingQr = null;
-    private ProgressBar progressBar = null;
     private LinearLayout progressLayout = null;
     private ImageView ivCancel = null;
     private ImageView ivCheck = null;
     private TextView tvStatus = null;
 
     private String receivingAddress = null;
-
-    private static final int ADDRESS_LOOKAHEAD = 20;
 
     private BigInteger bamount = null;
 
@@ -112,7 +109,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvFiatAmount = (TextView)findViewById(R.id.tv_fiat_amount);
         tvBtcAmount = (TextView)findViewById(R.id.tv_btc_amount);
         ivReceivingQr = (ImageView)findViewById(R.id.qr);
-        progressBar = (ProgressBar)findViewById(R.id.progress);
         progressLayout = (LinearLayout)findViewById(R.id.progressLayout);
         ivCancel = (ImageView)findViewById(R.id.iv_cancel);
         ivCheck = (ImageView)findViewById(R.id.iv_check);
@@ -234,9 +230,6 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                     ToastCustom.makeText(ReceiveActivity.this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
                     return null;
                 }
-                else    {
-//                    ToastCustom.makeText(ReceiveActivity.this, receivingAddress, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_OK);
-                }
 
                 //Subscribe to websocket to new address
                 Intent intent = new Intent(MainActivity.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
@@ -277,13 +270,11 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         if (MainActivity.ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
             soundAlert();
 
-            String addr = intent.getStringExtra("payment_address");
-            long paymentAmount = intent.getLongExtra("payment_amount", 0L);
+            final String addr = intent.getStringExtra("payment_address");
+            final long paymentAmount = intent.getLongExtra("payment_amount", 0L);
 
-            if(paymentAmount >= ExpectedIncoming.getInstance().getBTC().get(addr))    {
-                onPaymentReceived(addr);
-            }
-            else    {
+            // underpayment
+            if(paymentAmount < ExpectedIncoming.getInstance().getBTC().get(addr))    {
 
                 final long remainder = ExpectedIncoming.getInstance().getBTC().get(addr) - paymentAmount;
                 ToastCustom.makeText(ReceiveActivity.this, "Remainder:" + remainder, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
@@ -326,6 +317,8 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
 
                         dialog.dismiss();
 
+                        onPaymentReceived(addr, paymentAmount);
+
                         Intent intent = new Intent(ReceiveActivity.this, ReceiveActivity.class);
                         intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, _fiatAmount);
                         intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, btcAmount);
@@ -338,11 +331,20 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
                 alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.prompt_ko), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
+                        onPaymentReceived(addr, paymentAmount);
                     }
                 });
 
                 alert.show();
 
+            }
+            // overpayment
+            else if(paymentAmount > ExpectedIncoming.getInstance().getBTC().get(addr))    {
+                onPaymentReceived(addr, paymentAmount);
+            }
+            // expected amount
+            else    {
+                onPaymentReceived(addr, -1L);
             }
 
         }
@@ -366,7 +368,7 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         }
     }
 
-    private void onPaymentReceived(String addr){
+    private void onPaymentReceived(String addr, long paymentAmount){
 
         ivCancel.setVisibility(View.GONE);
         ivReceivingQr.setVisibility(View.GONE);
@@ -374,7 +376,9 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         ivCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                Intent intent = new Intent();
+                ReceiveActivity.this.setResult(RESULT_OK, intent);
+                ReceiveActivity.this.finish();
             }
         });
         tvStatus.setText(getResources().getText(R.string.payment_received));
@@ -382,16 +386,46 @@ public class ReceiveActivity extends Activity implements View.OnClickListener{
         tvBtcAmount.setVisibility(View.GONE);
         tvFiatAmount.setVisibility(View.GONE);
 
-        DBController pdb = new DBController(ReceiveActivity.this);
+        long amount = (paymentAmount == -1L) ? ExpectedIncoming.getInstance().getBTC().get(addr) : paymentAmount;
+        if(amount != ExpectedIncoming.getInstance().getBTC().get(addr))    {
+            amount *= -1L;
+        }
+
+        String strCurrency = PrefsUtil.getInstance(ReceiveActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, PaymentFragment.DEFAULT_CURRENCY_FIAT);
+        Double currencyPrice = CurrencyExchange.getInstance(ReceiveActivity.this).getCurrencyPrice(strCurrency);
+        double amountPayableFiat = (Math.abs((double)amount) / 1e8) * currencyPrice;
+        String strFiat  = (paymentAmount == -1L) ? ExpectedIncoming.getInstance().getFiat().get(addr) : getCurrencySymbol() + " " + MonetaryUtil.getInstance().getFiatDecimalFormat().format(amountPayableFiat);
+
+        DBControllerV2 pdb = new DBControllerV2(ReceiveActivity.this);
         pdb.insertPayment(
                 System.currentTimeMillis() / 1000,          // timestamp, Unix time
                 receivingAddress,                           // receiving address
-                ExpectedIncoming.getInstance().getBTC().get(addr),  // BTC amount
-                ExpectedIncoming.getInstance().getFiat().get(addr), // fiat amount
+                amount,                                     // BTC amount
+                strFiat,                                    // fiat amount
                 -1,                                         // confirmations
                 ""                                          // note, message
         );
         pdb.close();
+
+        if(paymentAmount > ExpectedIncoming.getInstance().getBTC().get(addr))    {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ReceiveActivity.this);
+            TextView title = new TextView(ReceiveActivity.this);
+            title.setPadding(20, 60, 20, 20);
+            title.setText(R.string.app_name);
+            title.setGravity(Gravity.CENTER);
+            title.setTextSize(20);
+            builder.setCustomTitle(title);
+            builder.setMessage(R.string.overpaid_amount).setCancelable(false);
+            AlertDialog alert = builder.create();
+
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    ;
+                }});
+
+            alert.show();
+
+        }
 
         setResult(RESULT_OK);
     }

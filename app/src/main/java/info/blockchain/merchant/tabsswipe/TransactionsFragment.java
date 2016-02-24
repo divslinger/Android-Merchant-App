@@ -1,5 +1,6 @@
 package info.blockchain.merchant.tabsswipe;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -20,13 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 //import android.util.Log;
 
-import com.google.bitcoin.uri.BitcoinURI;
-
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ import java.util.TimerTask;
 
 import info.blockchain.merchant.NotificationData;
 import info.blockchain.merchant.R;
-import info.blockchain.merchant.db.DBController;
+import info.blockchain.merchant.db.DBControllerV2;
 import info.blockchain.merchant.util.DateUtil;
 import info.blockchain.merchant.util.MonetaryUtil;
 import info.blockchain.merchant.util.PrefsUtil;
@@ -54,6 +53,8 @@ public class TransactionsFragment extends Fragment {
 
     private boolean doBTC = false;
     private SwipeRefreshLayout swipeLayout = null;
+
+    private Activity thisActivity = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -79,6 +80,8 @@ public class TransactionsFragment extends Fragment {
         swipeLayout.setColorScheme(R.color.blockchain_blue,
                 R.color.blockchain_green,
                 R.color.blockchain_dark_blue);
+
+        thisActivity = getActivity();
 
         return rootView;
     }
@@ -167,14 +170,14 @@ public class TransactionsFragment extends Fragment {
             if(merchantXpub != null && merchantXpub.length() > 0) {
 
                 // get updated list from database
-                DBController pdb = new DBController(getActivity());
+                DBControllerV2 pdb = new DBControllerV2(getActivity());
                 ArrayList<ContentValues> vals = pdb.getAllPayments();
 
                 if(vals.size() > 0) {
                     mListItems.clear();
                     mListItems.addAll(vals);
 
-                    getActivity().runOnUiThread(new Runnable() {
+                    thisActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             adapter.notifyDataSetChanged();
@@ -190,7 +193,7 @@ public class TransactionsFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] result) {
 
-            getActivity().runOnUiThread(new Runnable() {
+            thisActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     swipeLayout.setRefreshing(false);
@@ -252,7 +255,7 @@ public class TransactionsFragment extends Fragment {
             TextView tvAmount = (TextView)view.findViewById(R.id.tv_amount);
             if(doBTC) {
                 String displayValue = null;
-                long amount = vals.getAsLong("amt");
+                long amount = Math.abs(vals.getAsLong("amt"));
                 displayValue = MonetaryUtil.getInstance(getActivity()).getDisplayAmountWithFormatting(amount);
 
                 SpannableStringBuilder cs = new SpannableStringBuilder(getActivity().getResources().getString(R.string.bitcoin_currency_symbol));
@@ -263,6 +266,11 @@ public class TransactionsFragment extends Fragment {
                 SpannableStringBuilder cs = new SpannableStringBuilder(vals.getAsString("famt").subSequence(0, 1));
                 cs.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 tvAmount.setText(cs + " " + vals.getAsString("famt").substring(1));
+            }
+
+            if(vals.getAsLong("amt") < 0L)    {
+                ImageView ivStatus = (ImageView)view.findViewById(R.id.iv_status);
+                ivStatus.setImageResource(R.drawable.ic_warning_black_18dp);
             }
 
             return view;

@@ -1,216 +1,198 @@
 package info.blockchain.merchant;
 
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Rect;
+import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MotionEvent;
+import android.text.InputFilter;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.dm.zbar.android.scanner.ZBarConstants;
-import com.dm.zbar.android.scanner.ZBarScannerActivity;
-
-import net.sourceforge.zbar.Symbol;
+import android.widget.LinearLayout;
 
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.ToastCustom;
-import info.blockchain.wallet.util.FormatsUtil;
 
-//import android.util.Log;
+public class SettingsActivity extends PreferenceActivity	{
 
-public class SettingsActivity extends AppCompatActivity {
-
-	private Spinner spCurrencies = null;
-	private CheckBox sPushNotifications = null;
-	private String[] currencies = null;
-	private EditText merchantReceiverView = null;
-	private EditText merchantNameView = null;
-
-	private TextView tvOK = null;
-	private TextView tvCancel = null;
-    private ImageView ivQr = null;
-    private ArrayAdapter<CharSequence> spAdapter = null;
-    private TextView tvChangePin = null;
-
-	private static int ZBAR_SCANNER_REQUEST = 2026;
-
-    private static int PIN_ACTIVITY 		= 2;
-
-    private static boolean pausedForScan = false;
-
+    /** Called when the activity is first created. */
     @Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
 
-	    setContentView(R.layout.activity_settings);
-
-        initToolbar();
-        initValues();
-
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            setTheme(android.R.style.Theme_Holo);
         }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return super.onSupportNavigateUp();
-    }
+        super.onCreate(savedInstanceState);
+        setTitle(R.string.app_name);
+        addPreferencesFromResource(R.xml.settings);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-    private void initToolbar(){
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        toolbar.setTitle(getResources().getString(R.string.action_settings_title));
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-    }
-
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		
-		if(resultCode == Activity.RESULT_OK && requestCode == ZBAR_SCANNER_REQUEST)	{
-
-            String scanResult = data.getStringExtra(ZBarConstants.SCAN_RESULT);
-            if(scanResult.startsWith("bitcoin:"))    {
-                scanResult = scanResult.substring(8);
+        LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
+        Toolbar toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
+        toolbar.setTitle(R.string.action_settings);
+        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        root.addView(toolbar, 0);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() == 0)    {
+                    ToastCustom.makeText(SettingsActivity.this, getString(R.string.obligatory_receiver), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+                }
+                else    {
+                    finish();
+                }
             }
-            if(FormatsUtil.getInstance().isValidXpub(scanResult) || FormatsUtil.getInstance().isValidBitcoinAddress(scanResult)){
-                merchantReceiverView.setText(scanResult);
+        });
+
+        final Preference receivePref = (Preference) findPreference("receiveAPI");
+        final boolean status = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() == 0 ? false : true;
+        receivePref.setSummary(status ? (String)SettingsActivity.this.getText(R.string.on) : (String)SettingsActivity.this.getText(R.string.off));
+        receivePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
+
+                Intent intent = new Intent(SettingsActivity.this, SettingsActivity2.class);
+                intent.putExtra("status", status);
+                startActivity(intent);
+
+                return true;
             }
-            else{
-                ToastCustom.makeText(this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+        });
+
+        final Preference namePref = (Preference) findPreference("name");
+        namePref.setSummary(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
+        namePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
+
+                final EditText etName = new EditText(SettingsActivity.this);
+                etName.setSingleLine(true);
+                int maxLength = 70;
+                InputFilter[] fArray = new InputFilter[1];
+                fArray[0] = new InputFilter.LengthFilter(maxLength);
+                etName.setFilters(fArray);
+                etName.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
+
+                new AlertDialog.Builder(SettingsActivity.this)
+                        .setTitle(R.string.receive_coins_fragment_name)
+                        .setView(etName)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+
+                                String name = etName.getText().toString();
+
+                                if (name != null && name.length() > 0) {
+                                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, name);
+                                    namePref.setSummary(name);
+                                }
+
+                            }
+
+                        }).setNegativeButton(R.string.prompt_ko, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                        ;
+
+                    }
+                }).show();
+
+                return true;
             }
+        });
 
-            pausedForScan = false;
-        }
-	}
+        final Preference fiatPref = (Preference) findPreference("fiat");
+        fiatPref.setSummary(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD"));
+        fiatPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
 
-    @Override
-    protected void onPause() {
-        super.onPause();
+                final String[] currencies = getResources().getStringArray(R.array.currencies);
+                String strCurrency = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
+                int sel = -1;
+                for (int i = 0; i < currencies.length; i++) {
+                    if (currencies[i].endsWith(strCurrency)) {
+                        sel = i;
+                        break;
+                    }
+                }
+                if (sel == -1) {
+                    sel = currencies.length - 1;    // set to USD
+                }
 
-        if(!pausedForScan)  {
-            finish();
-        }
-    }
+                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+                builder.setTitle(R.string.options_local_currency);
+                builder.setSingleChoiceItems(currencies, sel,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[which].substring(currencies[which].length() - 3));
+                            fiatPref.setSummary(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[which].substring(currencies[which].length() - 3)));
+                        }
+                    });
+                AlertDialog alert = builder.create();
+                alert.show();
 
-    private void initValues() {
+                return true;
+            }
+        });
 
-        spCurrencies = (Spinner)findViewById(R.id.receive_coins_default_currency);
-        merchantReceiverView = (EditText)findViewById(R.id.et_merchant_receiver);
-        ivQr = (ImageView)findViewById(R.id.iv_QR);
-        merchantNameView = (EditText)findViewById(R.id.et_merchant_name);
-        tvOK = (TextView)findViewById(R.id.confirm);
-        tvCancel = (TextView)findViewById(R.id.cancel);
-        tvChangePin = (TextView)findViewById(R.id.tv_change_pin);
-
-        tvChangePin.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
+        Preference pinPref = (Preference) findPreference("pin");
+        pinPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
 
                 Intent intent = new Intent(SettingsActivity.this, PinActivity.class);
                 intent.putExtra("create", true);
                 intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivityForResult(intent, PIN_ACTIVITY);
+                startActivity(intent);
 
                 return false;
             }
         });
 
-        ivQr.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pausedForScan = true;
-                Intent intent = new Intent(SettingsActivity.this, ZBarScannerActivity.class);
-                intent.putExtra(ZBarConstants.SCAN_MODES, new int[]{Symbol.QRCODE});
-                startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
-            }
-        });
-
-        sPushNotifications = (CheckBox)findViewById(R.id.push_notifications);
-        sPushNotifications.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, isChecked);
-            }
-        });
-
-//        AccountAdapter dataAdapter = new AccountAdapter(getActivity(), R.layout.spinner_item, _accounts);
-        spAdapter = ArrayAdapter.createFromResource(this, R.array.currencies, R.layout.spinner_item);
-        spAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spCurrencies.setAdapter(spAdapter);
-
-        tvOK.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-
-                String strMerchantReceiver = merchantReceiverView.getEditableText().toString().trim();
-                String strMerchantName = merchantNameView.getEditableText().toString().trim();
-                boolean push_notifications = sPushNotifications.isChecked();
-                int currency = spCurrencies.getSelectedItemPosition();
-                currencies = getResources().getStringArray(R.array.currencies);
-
-                if(FormatsUtil.getInstance().isValidBitcoinAddress(strMerchantReceiver) || FormatsUtil.getInstance().isValidXpub(strMerchantReceiver)) {
-
-                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, strMerchantReceiver);
-                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, strMerchantName);
-                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, push_notifications);
-
-                    PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currencies[currency].substring(currencies[currency].length() - 3));
-
-                    finish();
-                } else {
-                    Toast.makeText(SettingsActivity.this, R.string.unrecognized_xpub, Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
-
-        tvCancel.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-        merchantNameView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
-        merchantReceiverView.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""));
-        sPushNotifications.setChecked(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false));
-
-    	currencies = getResources().getStringArray(R.array.currencies);
-    	String strCurrency = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
-
-    	int sel = -1;
-    	for(int i = 0; i < currencies.length; i++) {
-    		if(currencies[i].endsWith(strCurrency)) {
-    	        spCurrencies.setSelection(i);
-    	        sel = i;
-    	        break;
-    		}
-    	}
-    	if(sel == -1) {
-	        spCurrencies.setSelection(currencies.length - 1);
-    	}
-
     }
 
-	@Override
-	public boolean dispatchTouchEvent(MotionEvent event) {
-	    Rect dialogBounds = new Rect();
-	    getWindow().getDecorView().getHitRect(dialogBounds);
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-	    if(!dialogBounds.contains((int) event.getX(), (int) event.getY()) && event.getAction() == MotionEvent.ACTION_DOWN) {
-	    	return false;
-	    }
-	    else {
-		    return super.dispatchTouchEvent(event);
-	    }
-	}
+        final Preference receivePref = (Preference) findPreference("receiveAPI");
+        final boolean status = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() == 0 ? false : true;
+        receivePref.setSummary(status ? (String) SettingsActivity.this.getText(R.string.on) : (String) SettingsActivity.this.getText(R.string.off));
+        receivePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            public boolean onPreferenceClick(Preference preference) {
+
+                Intent intent = new Intent(SettingsActivity.this, SettingsActivity2.class);
+                intent.putExtra("status", status);
+                startActivity(intent);
+
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+
+            if(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "").length() == 0)    {
+                ToastCustom.makeText(this, getString(R.string.obligatory_receiver), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+            }
+            else    {
+                finish();
+            }
+
+        }
+
+        return false;
+    }
 
 }

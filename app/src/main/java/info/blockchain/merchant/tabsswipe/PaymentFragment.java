@@ -168,9 +168,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
             SnackCustom.make(getActivity(), getView(), getActivity().getText(R.string.no_valid_receiver), getActivity().getResources().getString(R.string.prompt_ok), new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String strOtherCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PIN, "");
                     Intent intent = new Intent(getActivity(), SettingsActivity.class);
-                    intent.putExtra("ocurrency", strOtherCurrency);
                     startActivityForResult(intent, MainActivity.SETTINGS_ACTIVITY);
                 }
             });

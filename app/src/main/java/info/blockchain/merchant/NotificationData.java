@@ -28,17 +28,4 @@ public class NotificationData {
     	notification_id = id;
     }
 
-    public void clearNotification() {
-        mNotificationManager.cancel(notification_id);
-    }
-
-    public void setNotification() {
-        mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        final Notification notifyDetails = new Notification(drawable, contentMarquee, System.currentTimeMillis());
-
-        Intent notifyIntent = new Intent(context,  intentClass);
-        PendingIntent intent = PendingIntent.getActivity(context, 0, notifyIntent, android.content.Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-        notifyDetails.setLatestEventInfo(context, contentTitle, contentText, intent);
-        mNotificationManager.notify(notification_id, notifyDetails);
-    }
 }
