@@ -1,28 +1,25 @@
 package info.blockchain.merchant.api;
-
 //import android.util.Log;
 
-public class APIFactory	{
-
+public class APIFactory {
     private static APIFactory instance = null;
 
-    private APIFactory()	{ ; }
+    private APIFactory() {
+        ;
+    }
 
     public static APIFactory getInstance() {
-
-        if(instance == null) {
+        if (instance == null) {
             instance = new APIFactory();
         }
-
         return instance;
     }
 
-    public String getAPIKey()    {
+    public String getAPIKey() {
         return APIKey.getInstance().getKey();
     }
 
-    public String getCallback()    {
+    public String getCallback() {
         return APIKey.getInstance().getCallback();
     }
-
 }

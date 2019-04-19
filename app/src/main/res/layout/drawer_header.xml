@@ -3,8 +3,8 @@
     android:id="@+id/navigationHeader"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="168dp"
-    android:background="@color/blockchain_blue"
+    android:layout_height="140dp"
+    android:background="@color/green_tropical_rain_forest"
     android:paddingTop="24dp">
 
     <ImageView
@@ -17,7 +17,7 @@
         android:background="@drawable/round_view_white"
         android:padding="8dp"
         android:src="@drawable/ic_store_mall_directory_white_48dp"
-        android:tint="@color/blockchain_blue"/>
+        android:tint="@color/green_tropical_rain_forest"/>
 
     <TextView
         android:id="@+id/drawer_title"

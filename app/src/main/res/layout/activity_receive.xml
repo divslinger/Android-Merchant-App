@@ -11,9 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:padding="10dp"
+        android:padding="4dp"
         android:text=""
-        android:textColor="@color/blockchain_blue"
+        android:textColor="@color/blockchain_darker_green"
         android:textSize="22sp"/>
 
     <View
@@ -29,7 +29,7 @@
         android:text="Waiting For Payment"
         android:textColor="@color/blockchain_red"
         android:paddingTop="10dp"
-        android:textSize="16sp"/>
+        android:textSize="18sp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -88,9 +88,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text=""
+        android:text="$ 99.50"
         android:textColor="@color/primary_text_default_material_light"
-        android:textSize="22sp"/>
+        android:textSize="36sp"/>
 
     <TextView
         android:id="@+id/tv_btc_amount"
@@ -98,9 +98,10 @@
         android:layout_height="wrap_content"
         android:alpha="0.7"
         android:gravity="center_horizontal"
-        android:text=""
+        android:text="0.123 456 78 BCH"
         android:textColor="@color/primary_text_default_material_light"
-        android:textSize="12sp"/>
+        android:padding="4dp"
+        android:textSize="14sp"/>
 
     <ImageView
         android:id="@+id/iv_cancel"

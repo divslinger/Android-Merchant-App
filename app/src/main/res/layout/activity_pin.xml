@@ -1,30 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/blockchain_blue"
-              android:orientation="vertical"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_centerInParent="true"
+        android:layout_weight="1"
+        android:background="@color/blockchain_dark_green"
         android:gravity="center_vertical"
-        android:orientation="vertical"
-        >
-
-        <ImageView
-            android:layout_width="124dp"
-            android:layout_height="113dp"
-            android:layout_alignParentTop="true"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_horizontal"
-            android:tint="@color/white"
-            android:src="@drawable/logo2x"
-            />
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,41 +25,36 @@
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal"
-                android:paddingBottom="5dp"
                 android:paddingTop="24dp"
-                >
+                android:paddingBottom="5dp">
 
                 <TextView
                     android:id="@+id/pinBox0"
                     android:layout_width="60dip"
                     android:layout_height="60dip"
                     android:layout_margin="10dip"
-                    android:background="@drawable/rounded_view_blue_white_border"
-                    />
+                    android:background="@drawable/rounded_view_blue_white_border" />
 
                 <TextView
                     android:id="@+id/pinBox1"
                     android:layout_width="60dip"
                     android:layout_height="60dip"
                     android:layout_margin="10dip"
-                    android:background="@drawable/rounded_view_blue_white_border"
-                    />
+                    android:background="@drawable/rounded_view_blue_white_border" />
 
                 <TextView
                     android:id="@+id/pinBox2"
                     android:layout_width="60dip"
                     android:layout_height="60dip"
                     android:layout_margin="10dip"
-                    android:background="@drawable/rounded_view_blue_white_border"
-                    />
+                    android:background="@drawable/rounded_view_blue_white_border" />
 
                 <TextView
                     android:id="@+id/pinBox3"
                     android:layout_width="60dip"
                     android:layout_height="60dip"
                     android:layout_margin="10dip"
-                    android:background="@drawable/rounded_view_blue_white_border"
-                    />
+                    android:background="@drawable/rounded_view_blue_white_border" />
 
             </LinearLayout>
 
@@ -85,23 +67,21 @@
                 android:padding="10dip"
                 android:text="@string/enter_pin"
                 android:textColor="@color/white"
-                android:textSize="18sp"
-                />
+                android:textSize="22sp" />
 
             <TextView
-                android:id="@+id/statusMessage"
+                android:id="@+id/enter_pin_explanation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:padding="5dip"
-                android:text=""
-                android:textColor="@color/blockchain_red"
-                android:textSize="20sp"
-                />
+                android:padding="10dip"
+                android:text="@string/please_create_pin"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
 
         </LinearLayout>
     </LinearLayout>
 
-    <include layout="@layout/include_pin_keypad"/>
+    <include layout="@layout/include_pin_keypad" />
 
 </LinearLayout>

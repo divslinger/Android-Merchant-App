@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Blockchain Merchant</string>
+    <string name="app_name">BCH Merchant</string>
     <string name="action_settings">Einstellungen</string>
     <string name="action_settings_title">Händler Einstellungen</string>
-    <string name="action_about">Über Blockchain Merchant</string>
+    <string name="action_about">Über BCH Merchant</string>
     <string name="action_newpin">PIN Code ändern</string>
     <string name="action_pincode">PIN Code</string>
     <string name="hello_world">Hello world!</string>
     <string name="support">Hilfe</string>
     <string name="rate_us">Bewerte uns</string>
     <string name="email_chooser">Sende E-Mail...</string>
-    <string name="about">Blockchain Merchant %1$s\n©%2$s Blockchain.info</string>
-    <string name="wallet_download">Hole dir eine kostenlose Bitcoin Wallet</string>
+    <string name="wallet_download">Hole dir eine kostenlose Bitcoin Cash Wallet</string>
     
     <string name="tab_settings">Einstellungen</string>
     <string name="tab_payment">Bezahlung</string>
@@ -26,11 +25,11 @@
     <string name="receive_coins_fragment_other_currency">Andere Währungs-Abkürzung (3 Buchstaben Code, z.B.: MXP)</string>
     <string name="receive_coins_activity_title">Sende Bitcoins</string>
     <string name="receive_coins_install_qr_scanner_msg">Bitte installiere den ZXing QR-code scanner oder Goggles!</string>
-    <string name="receive_coins_uri_parse_error_title">Ungültige Bitcoin URI</string>
-    <string name="receive_coins_parse_address_error_msg">Ungültige Bitcoin Address!\n(Verwechselst du Testnet/Prodnet?)</string>
+    <string name="receive_coins_uri_parse_error_title">Ungültige Bitcoin Cash URI</string>
+    <string name="receive_coins_parse_address_error_msg">Ungültige Bitcoin Cash Address!\n(Verwechselst du Testnet/Prodnet?)</string>
     <string name="receive_coins_fragment_push_notifications">Push Benachrichtigung</string>
     <string name="receive_coins_fragment_email_receipts">E-mail Empfänger</string>
-    <string name="use_btc">Betrag in Bitcoins (BTC) eingeben</string>
+    <string name="use_btc">Betrag in Bitcoins (BCH) eingeben</string>
     <string name="payment_note">Beschreibung (optional)...</string>
     <string name="payment_clear">CLEAR</string>
     <string name="payment_new">Start</string>
@@ -39,14 +38,14 @@
     <string name="no_data">Keine Daten</string>
     <string name="content_description">Danke! Bis zum nächsten mal.</string>
     <string name="delete_rec">Diesen Eintrag entfernen? Sicher?</string>
-    <string name="invalid_btc_address">Bitte gib eine gültige Bitcoin wallet Adresse ein.</string>
+    <string name="invalid_btc_address">Bitte gib eine gültige Bitcoin Cash wallet Adresse ein.</string>
     <string name="pin_code_prompt1">Erstelle 4-stelligen PIN Code</string>
     <string name="pin_code_prompt2">Wiederhole PIN Code</string>
     <string name="pin_code_prompt3">Gib deinen 4-stelligen PIN Code ein</string>
     <string name="marquee_start">Bezahlung erhalten von</string>
-    <string name="notification_end">BTC erhalten</string>
+    <string name="notification_end">BCH erhalten</string>
     <string name="generating_qr">Erstelle QR Code...</string>
-    <string name="no_exchange_rate">Blockchain Merchant konnte den Wechselkurs für deine Währung nicht bestimmen. Bitte überprüfe deine Internet Verbindung und versuche es erneut.</string>
+    <string name="no_exchange_rate">BCH Merchant konnte den Wechselkurs für deine Währung nicht bestimmen. Bitte überprüfe deine Internet Verbindung und versuche es erneut.</string>
     
     <string name="pin_code_create_error">Bitte zwei mal den gleichen PIN eingeben.</string>
     <string name="pin_code_enter_error">PIN Code falsch</string>
@@ -66,6 +65,6 @@
     <string name="pull_to_refresh_refreshing_label">Lädt...</string>
     <string name="pull_to_refresh_tap_label">Berühre um zu aktualisieren...</string>
 
-    <string name="bitcoin_currency_symbol">&#x0243;</string>
+    <string name="bitcoin_currency_symbol">BCH</string>
 
 </resources>

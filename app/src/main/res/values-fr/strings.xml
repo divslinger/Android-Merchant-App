@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Blockchain Merchant</string>
+    <string name="app_name">BCH Merchant</string>
     <string name="action_settings">Paramétrage</string>
     <string name="action_settings_title">Paramétrage commerçant</string>
-    <string name="action_about">A propos de Blockchain Merchant</string>
+    <string name="action_about">A propos de BCH Merchant</string>
     <string name="action_newpin">Changer code PIN</string>
     <string name="action_pincode">Code PIN</string>
     <string name="hello_world">Hello world!</string>
     <string name="support">Support</string>
     <string name="rate_us">Evaluez-nous</string>
     <string name="email_chooser">Envoyer e-mail...</string>
-    <string name="about">Blockchain Merchant %1$s\n©%2$s Blockchain.info</string>
-    <string name="wallet_download">Gratuit: Votre portfeuille Bitcoin</string>
+    <string name="wallet_download">Gratuit: Votre portfeuille Bitcoin Cash</string>
     <string name="tab_settings">Paramètres</string>
     <string name="tab_payment">Paiement</string>
     <string name="tab_history">Transactions</string>
@@ -24,12 +23,12 @@
     <string name="receive_coins_fragment_email_address_hint">Adresse e-mail</string>
     <string name="receive_coins_activity_title">Envoyer Bitcoins</string>
     <string name="receive_coins_install_qr_scanner_msg">Please install ZXing QR-code scanner or Goggles!</string>
-    <string name="receive_coins_uri_parse_error_title">Bitcoin URI incorrect</string>
-    <string name="receive_coins_parse_address_error_msg">Got invalid bitcoin address!\n(Mixing up Testnet/Prodnet?)</string>
+    <string name="receive_coins_uri_parse_error_title">Bitcoin Cash URI incorrect</string>
+    <string name="receive_coins_parse_address_error_msg">Got invalid Bitcoin Cash address!\n(Mixing up Testnet/Prodnet?)</string>
     <string name="receive_coins_fragment_push_notifications">Notifications</string>
     <string name="receive_coins_fragment_email_receipts">Récipissés e-mail</string>
     <string name="receive_coins_fragment_other_currency">Autre code devise (3 caractères, ex.: MXP)</string>
-    <string name="use_btc">Entrez le prix en Bitcoins (BTC)</string>
+    <string name="use_btc">Entrez le prix en Bitcoins (BCH)</string>
     <string name="payment_note">Descriptif (facultatif)...</string>
     <string name="payment_clear">EFFACER</string>
     <string name="payment_new">Démarrer</string>
@@ -43,9 +42,9 @@
     <string name="pin_code_prompt2">Répéter code PIN</string>
     <string name="pin_code_prompt3">Entrer votre code PIN à 4 chiffres</string>
     <string name="marquee_start">Paiement reçu de la part de</string>
-    <string name="notification_end">BTC reçu</string>
+    <string name="notification_end">BCH reçu</string>
     <string name="generating_qr">En train de générer code QR...</string>
-    <string name="no_exchange_rate">Blockchain Merchant n\'a pas encore déterminer le taux de change pour votre devise. Veuillez vérifier votre connexion Internet avant de ressayer.</string>
+    <string name="no_exchange_rate">BCH Merchant n\'a pas encore déterminer le taux de change pour votre devise. Veuillez vérifier votre connexion Internet avant de ressayer.</string>
     
     <string name="pin_code_create_error">Entrer 2 codes PIN identiques</string>
     <string name="pin_code_enter_error">code PIN incorrect</string>
@@ -66,6 +65,6 @@
     <string name="pull_to_refresh_tap_label">Tapez pour actualiser...</string>
 
 <!-- <string name="bitcoin_currency_symbol">&#xf15a;</string> -->
-    <string name="bitcoin_currency_symbol">&#x0243;</string>
+    <string name="bitcoin_currency_symbol">BCH</string>
     
 </resources>

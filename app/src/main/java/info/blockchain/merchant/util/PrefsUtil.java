@@ -7,8 +7,7 @@ import android.preference.PreferenceManager;
 
 import info.blockchain.wallet.util.PersistantPrefs;
 
-public class PrefsUtil  implements PersistantPrefs {
-
+public class PrefsUtil implements PersistantPrefs {
     public static final String MERCHANT_KEY_PIN = "pin";
     public static final String MERCHANT_KEY_CURRENCY = "currency";
     public static final String MERCHANT_KEY_CURRENCY_DISPLAY = "use_btc";
@@ -16,8 +15,7 @@ public class PrefsUtil  implements PersistantPrefs {
     public static final String MERCHANT_KEY_MERCHANT_RECEIVER = "receiving_address";
     public static final String MERCHANT_KEY_PUSH_NOTIFS = "push_notifications";
     public static final String MERCHANT_KEY_ACCOUNT_INDEX = "account_idx";
-
-    private static Context context  = null;
+    private static Context context = null;
     private static PrefsUtil instance = null;
 
     private PrefsUtil() {
@@ -25,13 +23,10 @@ public class PrefsUtil  implements PersistantPrefs {
     }
 
     public static PrefsUtil getInstance(Context ctx) {
-
         context = ctx;
-
         if (instance == null) {
             instance = new PrefsUtil();
         }
-
         return instance;
     }
 
@@ -65,14 +60,12 @@ public class PrefsUtil  implements PersistantPrefs {
 
     public long getValue(String name, long value) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
         long result = 0l;
-        try{
+        try {
             result = prefs.getLong(name, 0L);
-        }catch (Exception e){
-            result = (long)prefs.getInt(name, 0);
+        } catch (Exception e) {
+            result = (long) prefs.getInt(name, 0);
         }
-
         return result;
     }
 
@@ -103,5 +96,4 @@ public class PrefsUtil  implements PersistantPrefs {
         editor.clear();
         return editor.commit();
     }
-
 }

@@ -7,7 +7,7 @@
         android:key="receiveAPI"
         />
     <Preference
-        android:title="@string/options_merchant_name"
+        android:title="@string/options_business_name"
         android:key="name"
         />
     <Preference

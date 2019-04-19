@@ -3,14 +3,13 @@
   <string name="app_name">比特币收款机</string>
   <string name="action_settings">设置</string>
   <string name="action_settings_title">收款设置</string>
-  <string name="action_about">关于Blockchain比特币收款机</string>
+  <string name="action_about">关于比特币收款机</string>
   <string name="action_newpin">更改PIN码</string>
   <string name="action_pincode">PIN码</string>
   <string name="hello_world">嘿，你好！</string>
   <string name="support">帮助支持</string>
   <string name="rate_us">给App评分</string>
   <string name="email_chooser">发送电子邮件</string>
-  <string name="about">Blockchain比特币收银机 %1$s\n©%2$s Blockchain.info</string>
   <string name="wallet_download">注册免费的比特币钱包</string>
   <string name="tab_settings">设置</string>
   <string name="tab_payment">开单</string>
@@ -26,7 +25,7 @@
   <string name="receive_coins_parse_address_error_msg">无效的比特币地址！\n（是不是搞混了测试环境和现实环境？）</string>
   <string name="receive_coins_fragment_push_notifications">推送通知</string>
   <string name="receive_coins_fragment_email_receipts">电子邮件账单</string>
-  <string name="use_btc">请输入比特币定价（BTC）</string>
+  <string name="use_btc">请输入比特币定价（BCH）</string>
   <string name="payment_note">账单说明（可选）…</string>
   <string name="payment_clear">清除</string>
   <string name="payment_new">开单</string>
@@ -42,7 +41,7 @@
   <string name="marquee_start">收到付款 地址：</string>
   <string name="notification_end">比特币入账</string>
   <string name="generating_qr">生成二维码…</string>
-  <string name="no_exchange_rate">Blockchain比特币收银机无法获取您所选币种的当前汇率。请检查网络连接是否正常。</string>
+  <string name="no_exchange_rate">比特币收银机无法获取您所选币种的当前汇率。请检查网络连接是否正常。</string>
   <string name="pin_code_create_error">两次设置的4位数PIN码需相同</string>
   <string name="pin_code_enter_error">PIN码错误</string>
   <string name="camera_unavailable">无法获取摄像头数据</string>
@@ -57,5 +56,5 @@
   <string name="pull_to_refresh_release_label">松开屏幕开始刷新…</string>
   <string name="pull_to_refresh_refreshing_label">载入中…</string>
   <string name="pull_to_refresh_tap_label">点击刷新</string>
-  <string name="bitcoin_currency_symbol">&#x0243;</string>
+  <string name="bitcoin_currency_symbol">BCH</string>
 </resources>

@@ -20,7 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="0"
-            android:textSize="42sp"
+            android:textSize="48sp"
+            android:textStyle="bold"
             android:textColor="@color/textColorPrimary"
             android:gravity="center"/>
 
@@ -31,16 +32,24 @@
             android:text="USD"
             android:textSize="16sp"
             android:textColor="@color/textColorPrimary"
-            android:alpha="0.5"
+            android:alpha="0.8"
             android:gravity="center"/>
 
     </LinearLayout>
 
-    <include layout="@layout/include_container_shadow_top"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@drawable/container_dropshadow_top">
+    </View>
 
     <include layout="@layout/include_numeric_keypad"/>
 
-    <include layout="@layout/include_container_shadow_top_green"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@drawable/container_dropshadow_top_green">
+    </View>
 
     <ImageView
         android:id="@+id/iv_charge"

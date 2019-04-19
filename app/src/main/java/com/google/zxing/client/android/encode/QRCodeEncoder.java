@@ -2,13 +2,13 @@ package com.google.zxing.client.android.encode;
 
 /*
  * Copyright (C) 2008 ZXing authors
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,28 +16,26 @@ package com.google.zxing.client.android.encode;
  * limitations under the License.
  */
 
-import android.provider.ContactsContract;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.android.Contents;
+import com.google.zxing.common.BitMatrix;
 
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-
-import com.google.zxing.client.android.Contents;
-
 public final class QRCodeEncoder {
     private static final int WHITE = 0xFFFFFFFF;
     private static final int BLACK = 0xFF000000;
-
     private int dimension = Integer.MIN_VALUE;
     private String contents = null;
     private String displayContents = null;
@@ -48,6 +46,40 @@ public final class QRCodeEncoder {
     public QRCodeEncoder(String data, Bundle bundle, String type, String format, int dimension) {
         this.dimension = dimension;
         encoded = encodeContents(data, bundle, type, format);
+    }
+
+    private static String guessAppropriateEncoding(CharSequence contents) {
+        // Very crude at the moment
+        for (int i = 0; i < contents.length(); i++) {
+            if (contents.charAt(i) > 0xFF) {
+                return "UTF-8";
+            }
+        }
+        return null;
+    }
+
+    private static String trim(String s) {
+        if (s == null) {
+            return null;
+        }
+        String result = s.trim();
+        return result.length() == 0 ? null : result;
+    }
+
+    private static String escapeMECARD(String input) {
+        if (input == null || (input.indexOf(':') < 0 && input.indexOf(';') < 0)) {
+            return input;
+        }
+        int length = input.length();
+        StringBuilder result = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            char c = input.charAt(i);
+            if (c == ':' || c == ';') {
+                result.append('\\');
+            }
+            result.append(c);
+        }
+        return result.toString();
     }
 
     public String getContents() {
@@ -115,21 +147,17 @@ public final class QRCodeEncoder {
             if (bundle != null) {
                 StringBuilder newContents = new StringBuilder(100);
                 StringBuilder newDisplayContents = new StringBuilder(100);
-
                 newContents.append("MECARD:");
-
                 String name = trim(bundle.getString(ContactsContract.Intents.Insert.NAME));
                 if (name != null) {
                     newContents.append("N:").append(escapeMECARD(name)).append(';');
                     newDisplayContents.append(name);
                 }
-
                 String address = trim(bundle.getString(ContactsContract.Intents.Insert.POSTAL));
                 if (address != null) {
                     newContents.append("ADR:").append(escapeMECARD(address)).append(';');
                     newDisplayContents.append('\n').append(address);
                 }
-
                 Collection<String> uniquePhones = new HashSet<String>(Contents.PHONE_KEYS.length);
                 for (int x = 0; x < Contents.PHONE_KEYS.length; x++) {
                     String phone = trim(bundle.getString(Contents.PHONE_KEYS[x]));
@@ -141,7 +169,6 @@ public final class QRCodeEncoder {
                     newContents.append("TEL:").append(escapeMECARD(phone)).append(';');
                     newDisplayContents.append('\n').append(PhoneNumberUtils.formatNumber(phone));
                 }
-
                 Collection<String> uniqueEmails = new HashSet<String>(Contents.EMAIL_KEYS.length);
                 for (int x = 0; x < Contents.EMAIL_KEYS.length; x++) {
                     String email = trim(bundle.getString(Contents.EMAIL_KEYS[x]));
@@ -153,20 +180,17 @@ public final class QRCodeEncoder {
                     newContents.append("EMAIL:").append(escapeMECARD(email)).append(';');
                     newDisplayContents.append('\n').append(email);
                 }
-
                 String url = trim(bundle.getString(Contents.URL_KEY));
                 if (url != null) {
                     // escapeMECARD(url) -> wrong escape e.g. http\://zxing.google.com
                     newContents.append("URL:").append(url).append(';');
                     newDisplayContents.append('\n').append(url);
                 }
-
                 String note = trim(bundle.getString(Contents.NOTE_KEY));
                 if (note != null) {
                     newContents.append("NOTE:").append(escapeMECARD(note)).append(';');
                     newDisplayContents.append('\n').append(note);
                 }
-
                 // Make sure we've encoded at least one field.
                 if (newDisplayContents.length() > 0) {
                     newContents.append(';');
@@ -177,7 +201,6 @@ public final class QRCodeEncoder {
                     contents = null;
                     displayContents = null;
                 }
-
             }
         } else if (type.equals(Contents.Type.LOCATION)) {
             if (bundle != null) {
@@ -195,7 +218,6 @@ public final class QRCodeEncoder {
 
     public Bitmap encodeAsBitmap() throws WriterException {
         if (!encoded) return null;
-
         Map<EncodeHintType, Object> hints = null;
         String encoding = guessAppropriateEncoding(contents);
         if (encoding != null) {
@@ -214,37 +236,8 @@ public final class QRCodeEncoder {
                 pixels[offset + x] = result.get(x, y) ? BLACK : WHITE;
             }
         }
-
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
         return bitmap;
-    }
-
-    private static String guessAppropriateEncoding(CharSequence contents) {
-        // Very crude at the moment
-        for (int i = 0; i < contents.length(); i++) {
-            if (contents.charAt(i) > 0xFF) { return "UTF-8"; }
-        }
-        return null;
-    }
-
-    private static String trim(String s) {
-        if (s == null) { return null; }
-        String result = s.trim();
-        return result.length() == 0 ? null : result;
-    }
-
-    private static String escapeMECARD(String input) {
-        if (input == null || (input.indexOf(':') < 0 && input.indexOf(';') < 0)) { return input; }
-        int length = input.length();
-        StringBuilder result = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            char c = input.charAt(i);
-            if (c == ':' || c == ';') {
-                result.append('\\');
-            }
-            result.append(c);
-        }
-        return result.toString();
     }
 }

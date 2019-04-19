@@ -1,0 +1,37 @@
+{
+  "attention": "WARNING: This API is now deprecated and will be taken offline soon.  Please switch to the new CoinMarketCap API to avoid interruptions in service. (https://pro.coinmarketcap.com/migrate/)",
+  "data": {
+    "id": 1831,
+    "name": "Bitcoin Cash",
+    "symbol": "BCH",
+    "website_slug": "bitcoin-cash",
+    "rank": 6,
+    "circulating_supply": 17668650.0,
+    "total_supply": 17668650.0,
+    "max_supply": 21000000.0,
+    "quotes": {
+      "USD": {
+        "price": 129.204557995,
+        "volume_24h": 229190611.084857,
+        "market_cap": 2282870114.0,
+        "percent_change_1h": -0.17,
+        "percent_change_24h": 0.15,
+        "percent_change_7d": -2.41
+      },
+      "BTC": {
+        "price": 0.0330349473,
+        "volume_24h": 58599.3239545872,
+        "market_cap": 583683.0,
+        "percent_change_1h": -0.1,
+        "percent_change_24h": -0.08,
+        "percent_change_7d": -3.17
+      }
+    },
+    "last_updated": 1552417445
+  },
+  "metadata": {
+    "timestamp": 1552416355,
+    "warning": "WARNING: This API is now deprecated and will be taken offline soon.  Please switch to the new CoinMarketCap API to avoid interruptions in service. (https://pro.coinmarketcap.com/migrate/)",
+    "error": null
+  }
+}

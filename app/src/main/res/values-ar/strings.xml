@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="app_name">Blockchain Merchant</string>
+<string name="app_name">BCH Merchant</string>
 <string name="action_settings">الاعدادات</string>
 <string name="action_settings_title">اعدادات التاجر</string>
-<string name="action_about">عن Blockchain Merchant</string>
+<string name="action_about">عن BCH Merchant</string>
 <string name="action_newpin">تغيير رمز PIN</string>
 <string name="action_pincode">رمز PIN</string>
 <string name="hello_world">Hello world!</string>
 <string name="support">الدعم فني</string>
 <string name="rate_us">قيمنا</string>
 <string name="email_chooser">إرسال بريد إلكتروني...</string>
-<string name="about">Blockchain Merchant %1$s\n©%2$s Blockchain.info</string>
 <string name="wallet_download">احصل علي محفظة بيتكوين مجانا</string>
 <string name="tab_settings">الاعدادات</string>
 <string name="tab_payment">الدفعيه</string>
@@ -28,7 +27,7 @@
 </string>
 <string name="receive_coins_fragment_push_notifications">جلب التنبيهات</string>
 <string name="receive_coins_fragment_email_receipts">الإشعارات بالبريد الإلكتروني</string>
-<string name="use_btc">ادخال السعر بالبيتكوين (BTC)</string>
+<string name="use_btc">ادخال السعر بالبيتكوين (BCH)</string>
 <string name="payment_note">الوصف (اختياري)...</string>
 <string name="payment_clear">إفراغ</string>
 <string name="payment_new">إبدأ</string>
@@ -42,10 +41,10 @@
 <string name="pin_code_prompt2">أعد ادخال رمز PIN</string>
 <string name="pin_code_prompt3">أدخل رمزك PIN المكون من 4 أرقام</string>
 <string name="marquee_start">الدفعيه مستلمه من</string>
-<string name="notification_end">تم إستلام BTC</string>
+<string name="notification_end">تم إستلام BCH</string>
 <string name="generating_qr">تكوين رمز QR...</string>
 <string name="no_exchange_rate">
-Blockchain Merchant لم يُحدد سِعر الصرف للعمله التي اخترتها. الرجاء مراجعة اتصالك بالانترنت والمحاولة مرة اخري.
+BCH Merchant لم يُحدد سِعر الصرف للعمله التي اخترتها. الرجاء مراجعة اتصالك بالانترنت والمحاولة مرة اخري.
 </string>
 <string name="pin_code_create_error">
 أدخل رمزين PIN المكون من 4 أرقام بحيث يكونان متطابقان
@@ -63,5 +62,5 @@ Blockchain Merchant لم يُحدد سِعر الصرف للعمله التي ا
 <string name="pull_to_refresh_release_label">اترك للانعاش...</string>
 <string name="pull_to_refresh_refreshing_label">جاري التحميل...</string>
 <string name="pull_to_refresh_tap_label">إنقُر للانعاش...</string>
-<string name="bitcoin_currency_symbol">&#x0243;</string>
+<string name="bitcoin_currency_symbol">BCH</string>
 </resources>

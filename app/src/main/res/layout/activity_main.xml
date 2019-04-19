@@ -18,10 +18,10 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/blockchain_blue"
+            android:background="@color/blockchain_darker_green"
             android:minHeight="?attr/actionBarSize"
-            app:tabIndicatorColor="@color/blockchain_light_blue"
-            app:tabIndicatorHeight="4dp"
+            app:tabIndicatorColor="@color/blockchain_light_green"
+            app:tabIndicatorHeight="6dp"
             app:tabGravity="fill"
             app:tabMaxWidth="0dp"
             />

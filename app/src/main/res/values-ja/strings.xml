@@ -10,7 +10,6 @@
   <string name="support">サポート</string>
   <string name="rate_us">評価</string>
   <string name="email_chooser">お問い合わせ</string>
-  <string name="about">ブロックチェインマーチャント %1$s\n©%2$s Blockchain.info</string>
   <string name="wallet_download">無料ビットコインウォレットを開設する</string>
   <string name="tab_settings">設定</string>
   <string name="tab_payment">お支払い</string>
@@ -26,7 +25,7 @@
   <string name="receive_coins_parse_address_error_msg">無効なビットコインアドレスがあります。\n(TestnetとProdnetを間違えていませんか?)</string>
   <string name="receive_coins_fragment_push_notifications">プッシュ通知</string>
   <string name="receive_coins_fragment_email_receipts">メールによる通知メッセージ</string>
-  <string name="use_btc">ビットコイン(BTC)金額での入力をお願いします</string>
+  <string name="use_btc">ビットコイン(BCH)金額での入力をお願いします</string>
   <string name="payment_note">説明(オプション)</string>
   <string name="payment_clear">クリア</string>
   <string name="payment_new">スタート</string>
@@ -57,5 +56,5 @@
   <string name="pull_to_refresh_release_label">更新するにはここをリリースしてください</string>
   <string name="pull_to_refresh_refreshing_label">読み込み中...</string>
   <string name="pull_to_refresh_tap_label">更新するにはここをタップしてください</string>
-  <string name="bitcoin_currency_symbol">&#x0243;</string>
+  <string name="bitcoin_currency_symbol">BCH</string>
 </resources>

@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="green_mint_tulip">#b6f1e3</color>
+    <color name="green_turquoise_blue">#5fe3c5</color>
+    <color name="green_caribbean_green">#00c58a</color>
+    <color name="green_tropical_rain_forest">#006e55</color>
+    <color name="green_cyprus">#00423b</color>
 
-    <!--Spec v1.3-->
-    <color name="blockchain_blue">#FF1B8AC7</color>
-    <color name="blockchain_dark_blue">#1476ab</color>
     <color name="blockchain_red">#FA343A</color>
-    <color name="blockchain_light_blue">#48D4F8</color>
     <color name="blockchain_pearl_white">#fafafa</color>
-    <color name="blockchain_off_white">#f7fdfe</color>
+    <color name="blockchain_off_white">#fafafa</color>
     <color name="blockchain_grey">#FF808080</color>
     <color name="blockchain_light_grey">#FFf0f0f0</color>
     <color name="blockchain_navigation_bar">#FF000000</color>
-    <color name="blockchain_green">#31c68c</color>
-    <color name="blockchain_dark_green">#239367</color>
-    <color name="blockchain_receive_green">#8ab75e</color>
+    <color name="blockchain_light_green">#5fda57</color>
+    <color name="blockchain_green">#4bc846</color>
+    <color name="blockchain_dark_green">#00970f</color>
+    <!-- Color used by Tabs & Top bar -->
+    <color name="blockchain_darker_green">#00970f</color>
+    <color name="blockchain_darkest_green">#008000</color>
+    <color name="blockchain_receive_green">#4bc846</color>
     <color name="textColorPrimary">@color/primary_text_default_material_light</color>
 
     <color name="white">#FFffff</color>

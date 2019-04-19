@@ -5,34 +5,30 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 public class ConnectivityStatus {
-
-    ConnectivityStatus() { ; }
+    ConnectivityStatus() {
+        ;
+    }
 
     public static boolean hasConnectivity(Context ctx) {
         boolean ret = false;
-
-        ConnectivityManager cm = (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(cm != null) {
+        ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
             NetworkInfo neti = cm.getActiveNetworkInfo();
-            if(neti != null && neti.isConnectedOrConnecting()) {
+            if (neti != null && neti.isConnectedOrConnecting()) {
                 ret = true;
             }
         }
-
         return ret;
     }
 
     public static boolean hasWiFi(Context ctx) {
         boolean ret = false;
-
-        ConnectivityManager cm = (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(cm != null) {
-            if(cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
+        ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            if (cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
                 ret = true;
             }
         }
-
         return ret;
     }
-
 }

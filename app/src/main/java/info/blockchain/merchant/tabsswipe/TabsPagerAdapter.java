@@ -5,7 +5,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 public class TabsPagerAdapter extends FragmentPagerAdapter {
-
     private String[] tabs = null;
 
     public TabsPagerAdapter(FragmentManager fm, String[] tabs) {
@@ -18,7 +17,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
         return tabs.length;
     }
 
-    public CharSequence getPageTitle(int position){
+    public CharSequence getPageTitle(int position) {
         return tabs[position];
     }
 

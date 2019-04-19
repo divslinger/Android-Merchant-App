@@ -22,7 +22,8 @@
             android:title="Help"/>
         <item
             android:id="@+id/action_about"
-            android:icon="@drawable/ic_blockchainb"
+            android:icon="@drawable/ic_notification"
+            android:iconTint="@color/blockchain_green"
             android:title="About"/>
     </group>
 
