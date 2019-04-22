@@ -70,6 +70,7 @@
     <string name="invalid_amount">Invalid amount.</string>
 
     <string name="insufficient_payment">Insufficient payment received.</string>
+    <string name="re_payment_remainder">Remainder:</string>
     <string name="re_payment_requested">Requested:</string>
     <string name="re_payment_received">Received:</string>
     <string name="insufficient_payment_continue">Update QR code for remaining amount due?</string>

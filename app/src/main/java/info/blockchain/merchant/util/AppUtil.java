@@ -44,19 +44,11 @@ public class AppUtil {
 
     public boolean isV2API() {
         String strReceiver = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-        if (FormatsUtil.getInstance().isValidBitcoinAddress(strReceiver)) {
-            return false;
-        } else {
-            return true;
-        }
+        return !FormatsUtil.getInstance().isValidBitcoinAddress(strReceiver);
     }
 
     public boolean hasValidReceiver() {
         String receiver = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-        if (FormatsUtil.getInstance().isValidBitcoinAddress(receiver) || FormatsUtil.getInstance().isValidXpub(receiver)) {
-            return true;
-        } else {
-            return false;
-        }
+        return FormatsUtil.getInstance().isValidBitcoinAddress(receiver) || FormatsUtil.getInstance().isValidXpub(receiver);
     }
 }

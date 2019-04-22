@@ -43,6 +43,7 @@ import info.blockchain.merchant.api.APIFactory;
 import info.blockchain.merchant.db.DBControllerV3;
 import info.blockchain.merchant.service.ExpectedIncoming;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
+import info.blockchain.merchant.util.AmountUtil;
 import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.MonetaryUtil;
 import info.blockchain.merchant.util.PrefsUtil;
@@ -82,32 +83,38 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         }
     };
 
-    private void underpayment(final String addr, final long paymentAmount, final String paymentTxHash, Long expectedAmount) {
-        final long remainder = expectedAmount - paymentAmount;
-        ToastCustom.makeText(ReceiveTxActivity.this, "Remainder:" + remainder, ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
-        final double btcAmount = Double.valueOf(remainder / 1e8);
+    private void underpayment(final String addr, final long paymentAmountInSatoshis, final String paymentTxHash, Long expectedAmountInSatoshis) {
+        final double bchExpectedAmount = expectedAmountInSatoshis / 1e8;
+        final double bchPaymentAmount = paymentAmountInSatoshis / 1e8;
+        final double bchRemainder = bchExpectedAmount - bchPaymentAmount;
         String strCurrency = PrefsUtil.getInstance(ReceiveTxActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, PaymentFragment.DEFAULT_CURRENCY_FIAT);
         Double currencyPrice = CurrencyExchange.getInstance(ReceiveTxActivity.this).getCurrencyPrice(strCurrency);
         NumberFormat nf = NumberFormat.getInstance(Locale.getDefault());
         double fiatAmount;
         try {
-            fiatAmount = nf.parse(MonetaryUtil.getInstance().getFiatDecimalFormat().format(btcAmount * currencyPrice)).doubleValue();
+            fiatAmount = nf.parse(MonetaryUtil.getInstance().getFiatDecimalFormat().format(bchRemainder * currencyPrice)).doubleValue();
         } catch (ParseException pe) {
             fiatAmount = 0.0;
         }
-        final double _fiatAmount = fiatAmount;
+        final double _fiatRemainder = fiatAmount;
         StringBuilder sb = new StringBuilder();
         sb.append(ReceiveTxActivity.this.getText(R.string.insufficient_payment));
         sb.append("\n");
         sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_requested));
-        sb.append(": ");
-        sb.append(MonetaryUtil.getInstance(ReceiveTxActivity.this).getDisplayAmount(expectedAmount));
-        sb.append(" " + PaymentFragment.DEFAULT_CURRENCY_BCH);
+        sb.append(" ");
+        sb.append(AmountUtil.formatBch(this, bchExpectedAmount));
         sb.append("\n");
         sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_received));
-        sb.append(": ");
-        sb.append(MonetaryUtil.getInstance(ReceiveTxActivity.this).getDisplayAmount(paymentAmount));
-        sb.append(" " + PaymentFragment.DEFAULT_CURRENCY_BCH);
+        sb.append(" ");
+        sb.append(AmountUtil.formatBch(this, bchPaymentAmount));
+        sb.append("\n");
+        sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_remainder));
+        sb.append(" ");
+        sb.append(AmountUtil.formatBch(this, bchRemainder));
+        sb.append("\n");
+        sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_remainder));
+        sb.append(" ");
+        sb.append(AmountUtil.formatFiat(this, fiatAmount));
         sb.append("\n");
         sb.append(ReceiveTxActivity.this.getText(R.string.insufficient_payment_continue));
         AlertDialog.Builder builder = new AlertDialog.Builder(ReceiveTxActivity.this, R.style.AppTheme);
@@ -117,10 +124,10 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
-                onPaymentReceived(addr, paymentAmount, paymentTxHash);
+                onPaymentReceived(addr, paymentAmountInSatoshis, paymentTxHash);
                 Intent intent = new Intent(ReceiveTxActivity.this, ReceiveTxActivity.class);
-                intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, _fiatAmount);
-                intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, btcAmount);
+                intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, _fiatRemainder);
+                intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, bchRemainder);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
@@ -128,7 +135,7 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.prompt_ko), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
-                onPaymentReceived(addr, paymentAmount, paymentTxHash);
+                onPaymentReceived(addr, paymentAmountInSatoshis, paymentTxHash);
             }
         });
         alert.show();
@@ -147,10 +154,10 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
         //Incoming intent value
         double amountFiat = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, 0.0);
-        double amountBtc = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, 0.0);
-        tvFiatAmount.setText(getCurrencySymbol() + " " + MonetaryUtil.getInstance().getFiatDecimalFormat().format(amountFiat));
-        tvBtcAmount.setText(MonetaryUtil.getInstance().getBTCDecimalFormat().format(amountBtc) + " " + PaymentFragment.DEFAULT_CURRENCY_BCH);
-        getReceiveAddress(amountBtc, tvFiatAmount.getText().toString());
+        double amountBch = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, 0.0);
+        tvFiatAmount.setText(AmountUtil.formatFiat(ReceiveTxActivity.this, amountFiat));
+        tvBtcAmount.setText(AmountUtil.formatBch(ReceiveTxActivity.this, amountBch));
+        getReceiveAddress(amountBch, tvFiatAmount.getText().toString());
     }
 
     @Override
@@ -237,16 +244,6 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
                 ivReceivingQr.setImageBitmap(bitmap);
             }
         }.execute();
-    }
-
-    private String getCurrencySymbol() {
-        String strCurrencySymbol = "$";
-        String value = PrefsUtil.getInstance(ReceiveTxActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, PaymentFragment.DEFAULT_CURRENCY_FIAT);
-        String currencySymbol = CurrencyExchange.getInstance(this).getCurrencySymbol(value);
-        if (currencySymbol != null) {
-            strCurrencySymbol = currencySymbol.substring(0, 1);
-        }
-        return strCurrencySymbol;
     }
 
     private void getReceiveAddress(final double amountBtc, final String strFiat) {
@@ -342,7 +339,9 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         String strCurrency = PrefsUtil.getInstance(ReceiveTxActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, PaymentFragment.DEFAULT_CURRENCY_FIAT);
         Double currencyPrice = CurrencyExchange.getInstance(ReceiveTxActivity.this).getCurrencyPrice(strCurrency);
         double amountPayableFiat = (Math.abs((double) bchAmount) / 1e8) * currencyPrice;
-        String fiatAmount = (bchPaymentAmount == -1L) ? ExpectedIncoming.getInstance().getFiat().get(addr) : getCurrencySymbol() + " " + MonetaryUtil.getInstance().getFiatDecimalFormat().format(amountPayableFiat);
+        String fiatAmount = (bchPaymentAmount == -1L)
+                ? ExpectedIncoming.getInstance().getFiat().get(addr) :
+                AmountUtil.formatFiat(this, amountPayableFiat);
         DBControllerV3 pdb = new DBControllerV3(ReceiveTxActivity.this);
         pdb.insertPayment(
                 System.currentTimeMillis() / 1000,
