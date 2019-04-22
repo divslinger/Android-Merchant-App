@@ -19,6 +19,7 @@ app/debug/
 app/release/
 app/keystore
 /devops
+crowdin.properties
 
 # User-specific stuff:
 /.idea/caches

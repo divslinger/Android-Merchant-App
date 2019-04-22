@@ -23,7 +23,6 @@
     <string name="receive_coins_fragment_default_currency_hint">Default currency</string>
     <string name="receive_coins_fragment_other_currency">Other currency code (3 letter code, ex.: MXP)</string>
     <string name="receive_coins_activity_title">Send Bitcoins</string>
-    <string name="receive_coins_install_qr_scanner_msg">Please install ZXing QR-code scanner or Goggles!</string>
     <string name="receive_coins_uri_parse_error_title">Invalid Bitcoin Cash URI</string>
     <string name="receive_coins_parse_address_error_msg">Got invalid Bitcoin Cash address!\n(Mixing up Testnet/Prodnet?)</string>
     <string name="receive_coins_fragment_push_notifications">Push Notifications</string>
