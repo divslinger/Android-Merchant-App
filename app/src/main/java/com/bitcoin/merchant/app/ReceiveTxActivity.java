@@ -37,8 +37,8 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-import info.blockchain.api.receive2.ReceiveV2;
-import info.blockchain.api.receive2.ReceiveV2Response;
+import info.blockchain.api.receive.Receive;
+import info.blockchain.api.receive.ReceiveResponse;
 import info.blockchain.merchant.api.APIFactory;
 import info.blockchain.merchant.db.DBControllerV3;
 import info.blockchain.merchant.service.ExpectedIncoming;
@@ -260,9 +260,10 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
             @Override
             protected String doInBackground(Void... params) {
                 //Generate new address/QR code for receive
+                String address = PrefsUtil.getInstance(ReceiveTxActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
                 if (AppUtil.getInstance(ReceiveTxActivity.this).isV2API()) {
                     try {
-                        ReceiveV2Response response = ReceiveV2.receive(PrefsUtil.getInstance(ReceiveTxActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, ""), APIFactory.getInstance().getCallback(), APIFactory.getInstance().getAPIKey());
+                        ReceiveResponse response = new Receive(APIFactory.getInstance().getAPIKey()).receive(address, APIFactory.getInstance().getCallback());
                         receivingAddress = response.getReceivingAddress();
                     } catch (Exception e) {
                         receivingAddress = null;
@@ -270,7 +271,7 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
                         e.printStackTrace();
                     }
                 } else {
-                    receivingAddress = PrefsUtil.getInstance(ReceiveTxActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+                    receivingAddress = address;
                 }
                 if (receivingAddress == null) {
                     ToastCustom.makeText(ReceiveTxActivity.this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);

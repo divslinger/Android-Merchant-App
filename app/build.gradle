@@ -6,8 +6,8 @@ android {
         applicationId "com.bitcoin.merchant.app"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 30000
-        versionName "3.0.0"
+        versionCode 30001
+        versionName "3.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -41,9 +41,7 @@ dependencies {
 
     implementation 'com.google.guava:guava:24.1-android'
     implementation 'com.madgag.spongycastle:core:1.58.0.0'
-    implementation 'com.neovisionaries:nv-websocket-client:2.2'
-    implementation 'org.thoughtcrime.ssl.pinning:AndroidPinning:1.0.0'
-    implementation 'com.loopj.android:android-async-http:1.4.4'
+    implementation 'com.neovisionaries:nv-websocket-client:2.8'
     implementation 'com.google.code.gson:gson:2.5'
     implementation 'commons-io:commons-io:2.6'
     implementation 'commons-codec:commons-codec:1.11'
@@ -51,7 +49,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-android:1.7.25'
     implementation 'cash.bitcoinj:bitcoinj-core:0.14.5.2'
     implementation files('libs/MyWalletHD.jar')
-    implementation files('libs/info.blockchain.api-1.0.3.jar')
+    implementation files('libs/info.blockchain.api-2.0.0.jar')
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

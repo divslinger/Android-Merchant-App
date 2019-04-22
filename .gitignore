@@ -18,6 +18,7 @@ build/
 app/debug/
 app/release/
 app/keystore
+/devops
 
 # User-specific stuff:
 /.idea/caches
