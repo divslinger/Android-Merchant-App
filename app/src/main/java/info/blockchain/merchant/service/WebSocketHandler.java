@@ -21,11 +21,11 @@ import java.util.TimerTask;
 public class WebSocketHandler {
     private final long pingInterval = 20000L;//ping every 20 seconds
     private final long pongTimeout = 5000L;//pong timeout after 5 seconds
-    private WebSocket mConnection = null;
+    private volatile WebSocket mConnection = null;
     private WebSocketListener webSocketListener = null;
-    private HashSet<String> sentMessageSet = new HashSet<String>();
-    private Timer pingTimer = null;
-    private boolean pingPongSuccess = false;
+    private HashSet<String> sentMessageSet = new HashSet<>();
+    private volatile Timer pingTimer = null;
+    private volatile boolean pingPongSuccess = false;
 
     public WebSocketHandler() {
     }
@@ -47,34 +47,42 @@ public class WebSocketHandler {
         }
     }
 
-    private void startPingTimer() {
+    private synchronized void startPingTimer() {
         pingTimer = new Timer();
         pingTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (mConnection != null) {
-                    pingPongSuccess = false;
-                    if (mConnection.isOpen()) mConnection.sendPing();
-                    startPongTimer();
-                }
+                ping();
             }
         }, pingInterval, pingInterval);
     }
 
-    private void stopPingTimer() {
-        if (pingTimer != null) pingTimer.cancel();
+    private void ping() {
+        if (mConnection != null) {
+            pingPongSuccess = false;
+            if (mConnection.isOpen()) mConnection.sendPing();
+            startPongTimer();
+        }
     }
 
     private void startPongTimer() {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!pingPongSuccess) {
-                    //ping pong unsuccessful after x seconds - restart connection
-                    start();
-                }
+                pongCheckForTimedOut();
             }
         }, pongTimeout);
+    }
+
+    private synchronized void stopPingTimer() {
+        if (pingTimer != null) pingTimer.cancel();
+    }
+
+    private void pongCheckForTimedOut() {
+        if (!pingPongSuccess) {
+            // ping pong unsuccessful after x seconds - restart connection
+            start();
+        }
     }
 
     private void connect() throws IOException, WebSocketException {
