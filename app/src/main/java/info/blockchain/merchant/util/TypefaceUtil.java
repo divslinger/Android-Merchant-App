@@ -11,10 +11,10 @@ public class TypefaceUtil {
         ;
     }
 
-    public static TypefaceUtil getInstance(Context ctx) {
+    public static TypefaceUtil getInstance(Context ctx, String ttfFilePath) {
         if (instance == null) {
             instance = new TypefaceUtil();
-            btc_font = Typeface.createFromAsset(ctx.getAssets(), "DejaVuSans.ttf");
+            btc_font = Typeface.createFromAsset(ctx.getAssets(), ttfFilePath);
         }
         return instance;
     }

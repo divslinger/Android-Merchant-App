@@ -17,6 +17,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.bitcoin.merchant.app.currency.CurrencyRate;
+import com.bitcoin.merchant.app.currency.CurrencyExchange;
+
+import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 
 public class SettingsActivity extends PreferenceActivity {
@@ -56,7 +60,7 @@ public class SettingsActivity extends PreferenceActivity {
             }
         });
         final Preference fiatPref = findPreference("fiat");
-        fiatPref.setSummary(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD"));
+        fiatPref.setSummary(AppUtil.getCurrency(SettingsActivity.this));
         fiatPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
                 return selectCurrency(fiatPref);
@@ -118,8 +122,8 @@ public class SettingsActivity extends PreferenceActivity {
 
     private boolean selectCurrency(final Preference fiatPref) {
         final CurrencyExchange ce = CurrencyExchange.getInstance(this);
-        final Currency[] currencies = ce.getCurrencies();
-        String ticker = PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "USD");
+        final CurrencyRate[] currencies = ce.getCurrencies();
+        String ticker = AppUtil.getCurrency(SettingsActivity.this);
         int sel = -1;
         for (int i = 0; i < currencies.length; i++) {
             if (currencies[i].code.equals(ticker)) {
@@ -141,7 +145,7 @@ public class SettingsActivity extends PreferenceActivity {
                 dialog.dismiss();
                 String ticker = currencies[which].code;
                 PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, ticker);
-                fiatPref.setSummary(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, ticker));
+                fiatPref.setSummary(ticker);
             }
         });
         AlertDialog alert = builder.create();

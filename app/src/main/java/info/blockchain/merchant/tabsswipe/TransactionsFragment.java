@@ -52,7 +52,6 @@ public class TransactionsFragment extends Fragment {
     private boolean push_notifications = false;
     private Timer timer = null;
     private ListView listView = null;
-    private Typeface btc_font = null;
     private boolean valueShownInCoin = false;
     private SwipeRefreshLayout swipeLayout = null;
     private Activity thisActivity = null;
@@ -64,7 +63,6 @@ public class TransactionsFragment extends Fragment {
         merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
         push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
         valueShownInCoin = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
-        btc_font = TypefaceUtil.getInstance(getActivity()).getTypeface();
         swipeLayout = rootView.findViewById(R.id.swipe_container);
         swipeLayout.setProgressViewEndTarget(false, (int) (getResources().getDisplayMetrics().density * (72 + 20)));
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

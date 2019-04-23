@@ -4,10 +4,18 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
+import com.bitcoin.merchant.app.currency.CurrencyDetector;
+import com.google.gson.Gson;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 import info.blockchain.wallet.util.FormatsUtil;
 
 public class AppUtil {
+    public static final Gson GSON = new Gson();
     public static final String PACKAGE_BITCOIN_DOT_COM_WALLET = "com.bitcoin.mwallet";
+    public static final String DEFAULT_CURRENCY_FIAT = "USD";
     private static final boolean MISSING_WALLET_SIMULATED = false;
     private static Context context = null;
     private static AppUtil instance = null;
@@ -40,6 +48,46 @@ public class AppUtil {
         return (address != null && address.length() > 0)
                 && (FormatsUtil.getInstance().isValidXpub(address)
                 || FormatsUtil.getInstance().isValidBitcoinAddress(address));
+    }
+
+    public static String getCurrency(Context context) {
+        String currency = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "");
+        if (currency.length() == 0) {
+            // auto-detect currency
+            currency = CurrencyDetector.findCurrencyFromLocale(context);
+            if (currency.length() == 0) {
+                currency = DEFAULT_CURRENCY_FIAT;
+            }
+            // save to avoid further auto-detection
+            PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currency);
+        }
+        return currency;
+    }
+
+    public static <T> T readFromJsonFile(Context ctx, String fileName, Class<T> classOfT) {
+        return GSON.fromJson(readFromfile(fileName, ctx), classOfT);
+    }
+
+    public static String readFromfile(String fileName, Context context) {
+        StringBuilder b = new StringBuilder();
+        BufferedReader input = null;
+        try {
+            input = new BufferedReader(new InputStreamReader(context.getResources().getAssets().open(fileName)));
+            String line = "";
+            while ((line = input.readLine()) != null) {
+                b.append(line);
+            }
+        } catch (Exception e) {
+            e.getMessage();
+        } finally {
+            try {
+                if (input != null)
+                    input.close();
+            } catch (Exception e2) {
+                e2.getMessage();
+            }
+        }
+        return b.toString();
     }
 
     public boolean isV2API() {

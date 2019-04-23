@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.view.Window;
 import android.view.WindowManager;
+
+import com.bitcoin.merchant.app.currency.CurrencyExchange;
 //import android.util.Log;
 
 public class SplashActivity extends Activity {

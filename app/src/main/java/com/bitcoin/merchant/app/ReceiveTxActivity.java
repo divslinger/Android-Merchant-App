@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bitcoin.merchant.app.currency.CurrencyExchange;
 import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -87,8 +88,7 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         final double bchExpectedAmount = expectedAmountInSatoshis / 1e8;
         final double bchPaymentAmount = paymentAmountInSatoshis / 1e8;
         final double bchRemainder = bchExpectedAmount - bchPaymentAmount;
-        String strCurrency = PrefsUtil.getInstance(ReceiveTxActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, PaymentFragment.DEFAULT_CURRENCY_FIAT);
-        Double currencyPrice = CurrencyExchange.getInstance(ReceiveTxActivity.this).getCurrencyPrice(strCurrency);
+        Double currencyPrice = CurrencyExchange.getInstance(ReceiveTxActivity.this).getCurrencyPrice(getCurrency());
         NumberFormat nf = NumberFormat.getInstance(Locale.getDefault());
         double fiatAmount;
         try {
@@ -336,8 +336,7 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         if (bchAmount != bchExpectedAmount) {
             bchAmount *= -1L;
         }
-        String strCurrency = PrefsUtil.getInstance(ReceiveTxActivity.this).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, PaymentFragment.DEFAULT_CURRENCY_FIAT);
-        Double currencyPrice = CurrencyExchange.getInstance(ReceiveTxActivity.this).getCurrencyPrice(strCurrency);
+        Double currencyPrice = CurrencyExchange.getInstance(ReceiveTxActivity.this).getCurrencyPrice(getCurrency());
         double amountPayableFiat = (Math.abs((double) bchAmount) / 1e8) * currencyPrice;
         String fiatAmount = (bchPaymentAmount == -1L)
                 ? ExpectedIncoming.getInstance().getFiat().get(addr) :
@@ -371,6 +370,10 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
             alert.show();
         }
         setResult(RESULT_OK);
+    }
+
+    private String getCurrency() {
+        return AppUtil.getCurrency(this);
     }
 
     private void write2NFC(final String uri) {

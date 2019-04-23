@@ -2,14 +2,14 @@ package info.blockchain.merchant.util;
 
 import android.content.Context;
 
-import com.bitcoin.merchant.app.CurrencyExchange;
+import com.bitcoin.merchant.app.currency.CurrencyExchange;
 
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
 
 public class AmountUtil {
     public static String getCurrencySymbol(Context ctx) {
         String strCurrencySymbol = "$";
-        String value = PrefsUtil.getInstance(ctx).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, PaymentFragment.DEFAULT_CURRENCY_FIAT);
+        String value = AppUtil.getCurrency(ctx);
         String currencySymbol = CurrencyExchange.getInstance(ctx).getCurrencySymbol(value);
         if (currencySymbol != null) {
             strCurrencySymbol = currencySymbol.substring(0, 1);

@@ -1,15 +1,15 @@
-package com.bitcoin.merchant.app;
+package com.bitcoin.merchant.app.currency;
 
-public class Currency {
+public class CurrencyRate {
     public String code;
     public String name;
     public Double rate;
     public String symbol; // no in json
 
-    public Currency() {
+    public CurrencyRate() {
     }
 
-    public Currency(String code, String name, Double rate, String symbol) {
+    public CurrencyRate(String code, String name, Double rate, String symbol) {
         this.code = code;
         this.name = name;
         this.rate = rate;

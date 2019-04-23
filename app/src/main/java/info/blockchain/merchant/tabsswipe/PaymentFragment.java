@@ -1,6 +1,7 @@
 package info.blockchain.merchant.tabsswipe;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bitcoin.merchant.app.CurrencyExchange;
+import com.bitcoin.merchant.app.currency.CurrencyExchange;
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.ReceiveTxActivity;
@@ -30,7 +31,6 @@ import info.blockchain.merchant.util.ToastCustom;
 //import android.util.Log;
 
 public class PaymentFragment extends Fragment implements View.OnClickListener {
-    public static final String DEFAULT_CURRENCY_FIAT = "USD";
     public static final String DEFAULT_CURRENCY_BCH = "BCH";
     public static final int RECEIVE_RESULT = 1122;
     public static String AMOUNT_PAYABLE_FIAT = "AMOUNT_PAYABLE_FIAT";
@@ -82,11 +82,15 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
                 tvCurrency.setText(DEFAULT_CURRENCY_BCH);
                 allowedDecimalPlaces = DECIMAL_PLACES_BTC;
             } else {
-                tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
+                tvCurrency.setText(getCurrency());
                 allowedDecimalPlaces = DECIMAL_PLACES_FIAT;
             }
         }
         updateAmounts();
+    }
+
+    private String getCurrency() {
+        return AppUtil.getCurrency(getActivity());
     }
 
     private void initPadClickListeners() {
@@ -265,8 +269,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
                 ToastCustom.makeText(getActivity(), getResources().getString(R.string.btc_limit_reached), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             }
         } else {
-            String strCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT);
-            Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency);
+            Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
             double btcValue = 0.0;
             try {
                 btcValue = nf.parse(MonetaryUtil.getInstance().getBTCDecimalFormat().format(currentValue / currencyPrice)).doubleValue();
@@ -283,7 +286,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     private void toggleAmount() {
         if (isBch) {
             tvAmount.setText(MonetaryUtil.getInstance().getFiatDecimalFormat().format(amountPayableFiat));
-            tvCurrency.setText(PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT));
+            tvCurrency.setText(getCurrency());
             allowedDecimalPlaces = DECIMAL_PLACES_FIAT;
             PrefsUtil.getInstance(getActivity()).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
         } else {
@@ -299,8 +302,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         if (tvAmount == null) return;
         try {
             double amount = nf.parse(tvAmount.getText().toString()).doubleValue();
-            String strCurrency = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, DEFAULT_CURRENCY_FIAT);
-            Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(strCurrency);
+            Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
             MonetaryUtil util = MonetaryUtil.getInstance();
             if (isBch) {
                 amountPayableFiat = nf.parse(util.getFiatDecimalFormat().format(amount * currencyPrice)).doubleValue();

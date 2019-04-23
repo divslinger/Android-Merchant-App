@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app;
+package com.bitcoin.merchant.app.currency;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import info.blockchain.merchant.util.AppUtil;
+
 public class CurrencyExchange {
-    private static final Object LOCK = new Currency();
+    private static final Object LOCK = new Object();
     public static final int MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS = 3 * 60 * 1000;
     private static CurrencyExchange instance = null;
     private static Map<String, String> symbolByTicker;
@@ -25,65 +27,46 @@ public class CurrencyExchange {
     private static Map<String, String> nameByTicker = new TreeMap<>();
     private static List<String> tickers = new ArrayList<>();
     private static Context context = null;
-    private static long lastUpdate;
+    private static volatile long lastUpdate;
 
     private CurrencyExchange() {
-        ;
     }
 
-    public static CurrencyExchange getInstance(Context ctx) {
+    public static synchronized CurrencyExchange getInstance(Context ctx) {
         context = ctx;
         if (instance == null) {
-            Gson gson = new Gson();
-            symbolByTicker = gson.fromJson(readFromfile("symbols.json", ctx), TreeMap.class);
-            tickers = gson.fromJson(readFromfile("tickers.json", ctx), ArrayList.class);
             instance = new CurrencyExchange();
+            symbolByTicker = AppUtil.readFromJsonFile(ctx, "currency_symbols.json", TreeMap.class);
+            tickers = AppUtil.readFromJsonFile(ctx, "currency_tickers.json", ArrayList.class);
             loadFromStore();
         }
         requestUpdatedExchangeRates();
         return instance;
     }
 
-    public static String readFromfile(String fileName, Context context) {
-        StringBuilder b = new StringBuilder();
-        BufferedReader input = null;
-        try {
-            input = new BufferedReader(new InputStreamReader(context.getResources().getAssets().open(fileName)));
-            String line = "";
-            while ((line = input.readLine()) != null) {
-                b.append(line);
-            }
-        } catch (Exception e) {
-            e.getMessage();
-        } finally {
-            try {
-                if (input != null)
-                    input.close();
-            } catch (Exception e2) {
-                e2.getMessage();
-            }
-        }
-        return b.toString();
-    }
-
     private static void requestUpdatedExchangeRates() {
-        new Thread(new Runnable() {
+        if (isUpToDate()) return;
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 checkCurrencyUpdate();
             }
-        }).start();
+        });
+        t.setDaemon(true);
+        t.start();
     }
 
-    private synchronized static void checkCurrencyUpdate() {
+    private static boolean isUpToDate() {
         long now = System.currentTimeMillis();
-        if ((now - lastUpdate) < MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS) {
-            return;
-        }
+        return (now - lastUpdate) < MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS;
+    }
+
+    private static void checkCurrencyUpdate() {
+        if (isUpToDate()) return;
         try {
-            Currency[] rates = getUrlAsJson("https://www.bitcoin.com/special/rates.json", Currency[].class);
+            CurrencyRate[] rates = getUrlAsJson("https://www.bitcoin.com/special/rates.json", CurrencyRate[].class);
             double bchRate = findBchRate(rates);
-            for (Currency currency : rates) {
+            for (CurrencyRate currency : rates) {
                 String ticker = currency.code;
                 if (!currency.name.toLowerCase().contains("bitcoin")) {
                     BigDecimal bchValue = new BigDecimal(currency.rate * bchRate).setScale(2, BigDecimal.ROUND_CEILING);
@@ -105,16 +88,16 @@ public class CurrencyExchange {
             return;
         }
         try {
-            lastUpdate = now;
+            lastUpdate = System.currentTimeMillis();
             saveToStore();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static double findBchRate(Currency[] rates) {
+    private static double findBchRate(CurrencyRate[] rates) {
         double bchRate = 0;
-        for (Currency rate : rates) {
+        for (CurrencyRate rate : rates) {
             if ("BCH".equals(rate.code)) {
                 bchRate = rate.rate;
                 break;
@@ -158,6 +141,10 @@ public class CurrencyExchange {
         }
     }
 
+    public boolean isTickerSupported(String ticker) {
+        return (ticker != null) && (ticker.length() > 0) && tickers.contains(ticker);
+    }
+
     public Double getCurrencyPrice(String ticker) {
         Double price = priceByTicker.get(ticker);
         return price == null ? 0 : price;
@@ -167,13 +154,13 @@ public class CurrencyExchange {
         return symbolByTicker.get(ticker);
     }
 
-    public Currency[] getCurrencies() {
+    public CurrencyRate[] getCurrencies() {
         synchronized (LOCK) {
-            Currency[] currencies = new Currency[priceByTicker.size()];
+            CurrencyRate[] currencies = new CurrencyRate[priceByTicker.size()];
             int i = 0;
             for (String ticker : priceByTicker.keySet()) {
                 String symbol = symbolByTicker.get(ticker);
-                currencies[i++] = new Currency(ticker, nameByTicker.get(ticker), priceByTicker.get(ticker), symbol);
+                currencies[i++] = new CurrencyRate(ticker, nameByTicker.get(ticker), priceByTicker.get(ticker), symbol);
             }
             return currencies;
         }
