@@ -1,11 +1,11 @@
 <resources>
-
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/green_mint_tulip</item>
-        <item name="colorPrimaryDark">@color/green_tropical_rain_forest</item>
-        <item name="colorAccent">@color/green_caribbean_green</item>
+        <item name="colorPrimary">@color/blockchain_darker_green</item>
+        <item name="colorPrimaryDark">@color/blockchain_darkest_green</item>
+        <item name="colorAccent">@color/blockchain_darker_green</item>
 
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:textColorSecondary">@color/textColorSecondary</item>
         <item name="android:navigationBarColor">@color/blockchain_navigation_bar</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
 
@@ -22,10 +22,8 @@
         <item name="colorControlActivated">@color/blockchain_light_green</item>
         <item name="colorControlHighlight">@color/blockchain_light_green</item>
     </style>
-
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
         <item name="color">@android:color/white</item>
     </style>
-
 </resources>

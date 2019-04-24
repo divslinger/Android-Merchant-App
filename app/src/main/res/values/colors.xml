@@ -19,7 +19,8 @@
     <color name="blockchain_darker_green">#00970f</color>
     <color name="blockchain_darkest_green">#008000</color>
     <color name="blockchain_receive_green">#4bc846</color>
-    <color name="textColorPrimary">@color/primary_text_default_material_light</color>
+    <color name="textColorPrimary">#FF000000</color>
+    <color name="textColorSecondary">#FF222222</color>
 
     <color name="white">#FFffff</color>
     <color name="white_50">#80ffffff</color>
