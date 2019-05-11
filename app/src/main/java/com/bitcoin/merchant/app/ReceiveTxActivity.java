@@ -17,6 +17,7 @@ import android.nfc.NfcEvent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -38,9 +39,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-import info.blockchain.api.receive.Receive;
-import info.blockchain.api.receive.ReceiveResponse;
-import info.blockchain.merchant.api.APIFactory;
 import info.blockchain.merchant.db.DBControllerV3;
 import info.blockchain.merchant.service.ExpectedIncoming;
 import info.blockchain.merchant.tabsswipe.PaymentFragment;
@@ -49,6 +47,9 @@ import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.MonetaryUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.merchant.util.ToastCustom;
+import info.blockchain.merchant.util.WalletUtil;
+
+import static com.bitcoin.merchant.app.MainActivity.TAG;
 
 public class ReceiveTxActivity extends Activity implements View.OnClickListener {
     private TextView tvMerchantName = null;
@@ -157,7 +158,7 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         double amountBch = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, 0.0);
         tvFiatAmount.setText(AmountUtil.formatFiat(ReceiveTxActivity.this, amountFiat));
         tvBtcAmount.setText(AmountUtil.formatBch(ReceiveTxActivity.this, amountBch));
-        getReceiveAddress(amountBch, tvFiatAmount.getText().toString());
+        getReceiveAddress(ReceiveTxActivity.this, amountBch, tvFiatAmount.getText().toString());
     }
 
     @Override
@@ -246,7 +247,7 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         }.execute();
     }
 
-    private void getReceiveAddress(final double amountBtc, final String strFiat) {
+    private void getReceiveAddress(final Context context, final double amountBtc, final String strFiat) {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected void onPreExecute() {
@@ -260,8 +261,9 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
                 String address = PrefsUtil.getInstance(ReceiveTxActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
                 if (AppUtil.getInstance(ReceiveTxActivity.this).isV2API()) {
                     try {
-                        ReceiveResponse response = new Receive(APIFactory.getInstance().getAPIKey()).receive(address, APIFactory.getInstance().getCallback());
-                        receivingAddress = response.getReceivingAddress();
+                        WalletUtil walletUtil = new WalletUtil(address, context);
+                        receivingAddress = walletUtil.generateAddressFromXPub();
+                        Log.i(TAG, "BCH-address(xPub) to receive: " + receivingAddress);
                     } catch (Exception e) {
                         receivingAddress = null;
                         e.getMessage();

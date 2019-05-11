@@ -166,7 +166,6 @@
     <orderEntry type="library" name="Gradle: com.android.support:slidingpanelayout:28.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7:28.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: org.bitcoinj:orchid:1.2.1@jar" level="project" />
-    <orderEntry type="library" name="Gradle: __local_aars__:/home/xavier/AndroidStudioProjects/Android-Merchant-App/app/libs/info.blockchain.api-2.0.0.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.protobuf:protobuf-java:2.6.1@jar" level="project" />
     <orderEntry type="library" name="Gradle: net.jcip:jcip-annotations:1.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:collections:28.0.0@jar" level="project" />

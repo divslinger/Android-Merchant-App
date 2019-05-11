@@ -29,6 +29,10 @@ crowdin.properties
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idead/encodings.xml
+/.idead/gradle.xml
+/.idead/runConfigurations.xml
+/.idead/vcs.xml
 /testing
 /design
 

@@ -7,12 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import info.blockchain.merchant.util.OSUtil;
 import info.blockchain.merchant.util.PrefsUtil;
 import info.blockchain.wallet.crypto.AESUtil;
 import info.blockchain.wallet.util.CharSequenceX;
-//import android.util.Log;
 
 public class DBControllerV3 extends SQLiteOpenHelper {
     private static final String DB = "paymentsV3.db";
@@ -82,6 +83,23 @@ public class DBControllerV3 extends SQLiteOpenHelper {
                 vals.put("msg", AESUtil.decrypt(cursor.getString(6), pw, AESUtil.PinPbkdf2Iterations));
                 vals.put("tx", AESUtil.decrypt(cursor.getString(7), pw, AESUtil.PinPbkdf2Iterations));
                 data.add(vals);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        database.close();
+        return data;
+    }
+
+    public Set<String> getAllAddresses() {
+        CharSequenceX pw = new CharSequenceX(PrefsUtil.MERCHANT_KEY_PIN + OSUtil.getInstance(context).getFootprint());
+        Set<String> data = new HashSet<>();
+        String selectQuery = "SELECT iad FROM payment";
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String decrypt = AESUtil.decrypt(cursor.getString(0), pw, AESUtil.PinPbkdf2Iterations);
+                data.add(decrypt);
             } while (cursor.moveToNext());
         }
         cursor.close();
