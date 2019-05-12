@@ -10,7 +10,6 @@ public class OSUtil {
     private static Context context = null;
 
     private OSUtil() {
-        ;
     }
 
     public static OSUtil getInstance(Context ctx) {

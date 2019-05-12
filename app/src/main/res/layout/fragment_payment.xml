@@ -8,7 +8,6 @@
     <include layout="@layout/include_container_shadow_bottom"/>
 
     <LinearLayout
-        android:id="@+id/amount_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"

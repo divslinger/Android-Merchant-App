@@ -64,6 +64,14 @@ public class AppUtil {
         return currency;
     }
 
+    public static String getCountry(Context context) {
+        return PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_COUNTRY, null);
+    }
+
+    public static String getLocale(Context context) {
+        return PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_LOCALE, null);
+    }
+
     public static <T> T readFromJsonFile(Context ctx, String fileName, Class<T> classOfT) {
         return GSON.fromJson(readFromfile(fileName, ctx), classOfT);
     }

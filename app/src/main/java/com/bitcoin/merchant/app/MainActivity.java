@@ -113,8 +113,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     public NdefMessage createNdefMessage(NfcEvent event) {
         // TODO
         NdefRecord rtdUriRecord = NdefRecord.createUri("market://details?id=" + APP_PACKAGE);
-        NdefMessage ndefMessageout = new NdefMessage(rtdUriRecord);
-        return ndefMessageout;
+        return new NdefMessage(rtdUriRecord);
     }
 
     @Override

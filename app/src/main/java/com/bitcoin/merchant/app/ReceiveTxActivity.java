@@ -103,19 +103,20 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         sb.append("\n");
         sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_requested));
         sb.append(" ");
-        sb.append(AmountUtil.formatBch(this, bchExpectedAmount));
+        AmountUtil f = new AmountUtil(this);
+        sb.append(f.formatBch(bchExpectedAmount));
         sb.append("\n");
         sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_received));
         sb.append(" ");
-        sb.append(AmountUtil.formatBch(this, bchPaymentAmount));
+        sb.append(f.formatBch(bchPaymentAmount));
         sb.append("\n");
         sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_remainder));
         sb.append(" ");
-        sb.append(AmountUtil.formatBch(this, bchRemainder));
+        sb.append(f.formatBch(bchRemainder));
         sb.append("\n");
         sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_remainder));
         sb.append(" ");
-        sb.append(AmountUtil.formatFiat(this, fiatAmount));
+        sb.append(f.formatFiat(fiatAmount));
         sb.append("\n");
         sb.append(ReceiveTxActivity.this.getText(R.string.insufficient_payment_continue));
         AlertDialog.Builder builder = new AlertDialog.Builder(ReceiveTxActivity.this, R.style.AppTheme);
@@ -156,8 +157,9 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         //Incoming intent value
         double amountFiat = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, 0.0);
         double amountBch = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, 0.0);
-        tvFiatAmount.setText(AmountUtil.formatFiat(ReceiveTxActivity.this, amountFiat));
-        tvBtcAmount.setText(AmountUtil.formatBch(ReceiveTxActivity.this, amountBch));
+        AmountUtil f = new AmountUtil(this);
+        tvFiatAmount.setText(f.formatFiat(amountFiat));
+        tvBtcAmount.setText(f.formatBch(amountBch));
         getReceiveAddress(ReceiveTxActivity.this, amountBch, tvFiatAmount.getText().toString());
     }
 
@@ -342,7 +344,7 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         double amountPayableFiat = (Math.abs((double) bchAmount) / 1e8) * currencyPrice;
         String fiatAmount = (bchPaymentAmount == -1L)
                 ? ExpectedIncoming.getInstance().getFiat().get(addr) :
-                AmountUtil.formatFiat(this, amountPayableFiat);
+                new AmountUtil(this).formatFiat(amountPayableFiat);
         DBControllerV3 pdb = new DBControllerV3(ReceiveTxActivity.this);
         pdb.insertPayment(
                 System.currentTimeMillis() / 1000,

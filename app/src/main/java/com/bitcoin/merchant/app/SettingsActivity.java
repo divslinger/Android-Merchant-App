@@ -1,6 +1,7 @@
 package com.bitcoin.merchant.app;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -11,14 +12,22 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.bitcoin.merchant.app.currency.CurrencyRate;
+import com.bitcoin.merchant.app.currency.CountryCurrency;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
+
+import java.util.List;
 
 import info.blockchain.merchant.util.AppUtil;
 import info.blockchain.merchant.util.PrefsUtil;
@@ -60,13 +69,14 @@ public class SettingsActivity extends PreferenceActivity {
             }
         });
         final Preference fiatPref = findPreference("fiat");
-        fiatPref.setSummary(AppUtil.getCurrency(SettingsActivity.this));
+        setCurrencySummary(fiatPref, SettingsActivity.this);
         fiatPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
                 return selectCurrency(fiatPref);
             }
         });
         Preference pinPref = findPreference("pin");
+        pinPref.setSummary("####");
         pinPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
                 return changePin();
@@ -121,36 +131,64 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private boolean selectCurrency(final Preference fiatPref) {
-        final CurrencyExchange ce = CurrencyExchange.getInstance(this);
-        final CurrencyRate[] currencies = ce.getCurrencies();
-        String ticker = AppUtil.getCurrency(SettingsActivity.this);
-        int sel = -1;
-        for (int i = 0; i < currencies.length; i++) {
-            if (currencies[i].code.equals(ticker)) {
-                sel = i;
-                break;
-            }
-        }
-        if (sel == -1) {
-            sel = currencies.length - 1;    // set to USD
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+        final SettingsActivity activity = SettingsActivity.this;
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(R.string.options_local_currency);
-        String texts[] = new String[currencies.length];
-        for (int i = 0; i < texts.length; i++) {
-            texts[i] = currencies[i].toString();
-        }
-        builder.setSingleChoiceItems(texts, sel, new DialogInterface.OnClickListener() {
+        final List<CountryCurrency> currencies = CurrencyExchange.getInstance(activity).getCountryCurrencies();
+        ListAdapter adapter = new ArrayAdapterWithIcon(activity, currencies);
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+                CountryCurrency cc = currencies.get(which);
+                String locale = cc.countryLocales.getFirstSupportedLocale();
+                if (locale == null) {
+                    Toast.makeText(activity, "Not supported", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 dialog.dismiss();
-                String ticker = currencies[which].code;
-                PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, ticker);
-                fiatPref.setSummary(ticker);
+                PrefsUtil prefsUtil = PrefsUtil.getInstance(activity);
+                prefsUtil.setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, cc.currencyRate.code);
+                prefsUtil.setValue(PrefsUtil.MERCHANT_KEY_COUNTRY, cc.countryLocales.country);
+                prefsUtil.setValue(PrefsUtil.MERCHANT_KEY_LOCALE, locale);
+                setCurrencySummary(fiatPref, cc);
             }
         });
         AlertDialog alert = builder.create();
         alert.show();
         return true;
+    }
+
+    private void setCurrencySummary(Preference fiatPref, Context context) {
+        String currency = AppUtil.getCurrency(context);
+        String country = AppUtil.getCountry(context);
+        String locale = AppUtil.getLocale(context);
+        CountryCurrency cc = CurrencyExchange.getInstance(context).getCountryCurrency(currency, country, locale);
+        if (cc != null) {
+            setCurrencySummary(fiatPref, cc);
+        }
+    }
+
+    private void setCurrencySummary(Preference fiatPref, CountryCurrency countryCurrency) {
+        fiatPref.setIcon(countryCurrency.image);
+        fiatPref.setSummary(countryCurrency.toString());
+    }
+
+    private class ArrayAdapterWithIcon extends ArrayAdapter<CountryCurrency> {
+        private List<CountryCurrency> cc;
+
+        public ArrayAdapterWithIcon(Context context, List<CountryCurrency> items) {
+            super(context, android.R.layout.select_dialog_item, items);
+            this.cc = items;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = super.getView(position, convertView, parent);
+            TextView textView = view.findViewById(android.R.id.text1);
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(cc.get(position).image, 0, 0, 0);
+            float dimension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, getContext().getResources().getDisplayMetrics());
+            textView.setCompoundDrawablePadding((int) dimension);
+            return view;
+        }
     }
 
     private void backButton() {

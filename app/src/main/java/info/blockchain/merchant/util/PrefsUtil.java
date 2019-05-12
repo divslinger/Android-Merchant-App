@@ -10,6 +10,8 @@ import info.blockchain.wallet.util.PersistantPrefs;
 public class PrefsUtil implements PersistantPrefs {
     public static final String MERCHANT_KEY_PIN = "pin";
     public static final String MERCHANT_KEY_CURRENCY = "currency";
+    public static final String MERCHANT_KEY_COUNTRY = "country";
+    public static final String MERCHANT_KEY_LOCALE = "locale";
     public static final String MERCHANT_KEY_CURRENCY_DISPLAY = "use_btc";
     public static final String MERCHANT_KEY_MERCHANT_NAME = "receiving_name";
     public static final String MERCHANT_KEY_MERCHANT_RECEIVER = "receiving_address";
