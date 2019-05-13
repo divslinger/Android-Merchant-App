@@ -357,7 +357,7 @@
         >
 
         <LinearLayout
-            android:id="@+id/button10"
+            android:id="@+id/buttonDecimal"
             android:layout_width="0dip"
             android:layout_height="match_parent"
             android:layout_weight="1"
