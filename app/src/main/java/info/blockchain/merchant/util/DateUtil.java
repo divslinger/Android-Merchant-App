@@ -6,14 +6,11 @@ import java.util.Date;
 
 public class DateUtil {
     private static DateUtil instance = null;
-    private static Date now = null;
 
     private DateUtil() {
-        ;
     }
 
     public static DateUtil getInstance() {
-        now = new Date();
         if (instance == null) {
             instance = new DateUtil();
         }

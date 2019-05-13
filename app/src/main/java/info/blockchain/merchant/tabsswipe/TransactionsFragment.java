@@ -27,7 +27,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.bitcoin.merchant.app.NotificationData;
 import com.bitcoin.merchant.app.R;
 
 import java.text.SimpleDateFormat;
@@ -40,7 +39,6 @@ import info.blockchain.merchant.db.DBControllerV3;
 import info.blockchain.merchant.util.DateUtil;
 import info.blockchain.merchant.util.MonetaryUtil;
 import info.blockchain.merchant.util.PrefsUtil;
-import info.blockchain.merchant.util.TypefaceUtil;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
@@ -48,7 +46,6 @@ public class TransactionsFragment extends Fragment {
     private static String merchantXpub = null;
     private List<ContentValues> mListItems;
     private TransactionAdapter adapter = null;
-    private NotificationData notification = null;
     private boolean push_notifications = false;
     private Timer timer = null;
     private ListView listView = null;
