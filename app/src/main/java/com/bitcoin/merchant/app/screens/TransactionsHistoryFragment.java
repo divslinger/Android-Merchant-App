@@ -50,9 +50,11 @@ public class TransactionsHistoryFragment extends Fragment {
     private ListView listView = null;
     private SwipeRefreshLayout swipeLayout = null;
     private Activity thisActivity = null;
+    private volatile boolean ready;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ready = true;
         View rootView = inflater.inflate(getResources().getLayout(R.layout.fragment_transaction), container, false);
         initListView(rootView);
         merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
@@ -70,6 +72,12 @@ public class TransactionsHistoryFragment extends Fragment {
                 R.color.blockchain_darkest_green);
         thisActivity = getActivity();
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        ready = false;
+        super.onDestroyView();
     }
 
     private void initListView(View rootView) {
@@ -169,7 +177,10 @@ public class TransactionsHistoryFragment extends Fragment {
     private class GetDataTask extends AsyncTask<Void, Void, String[]> {
         @Override
         protected String[] doInBackground(Void... params) {
-            getActivity().runOnUiThread(new Runnable() {
+            if (!ready) {
+                return null;
+            }
+            thisActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     swipeLayout.setRefreshing(true);
@@ -195,12 +206,14 @@ public class TransactionsHistoryFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String[] result) {
-            thisActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    swipeLayout.setRefreshing(false);
-                }
-            });
+            if (ready) {
+                thisActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeLayout.setRefreshing(false);
+                    }
+                });
+            }
             super.onPostExecute(result);
         }
     }
