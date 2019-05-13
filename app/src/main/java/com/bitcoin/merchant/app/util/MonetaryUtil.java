@@ -80,6 +80,20 @@ public class MonetaryUtil {
                 strAmount = MonetaryUtil.getInstance().getBchFormat().format(value / BTC_DEC);
                 break;
         }
+        int i = strAmount.indexOf('.');
+        if (i != -1) {
+            String integerPart = strAmount.substring(0, i);
+            String decimalParts = strAmount.substring(i + 1);
+            StringBuilder s = new StringBuilder(integerPart + ".");
+            int length = decimalParts.length();
+            for (int j = 0; j < 8; j++) {
+                if (j == 3 || j == 6) {
+                    s.append(" ");
+                }
+                s.append(j < length ? decimalParts.charAt(j) : '0');
+            }
+            strAmount = s.toString();
+        }
         return strAmount;
     }
 

@@ -31,7 +31,8 @@
 	<dimen name="transaction_column_width">200dp</dimen>
 	<dimen name="transaction_note_width">160dp</dimen>
 	<dimen name="transaction_text_size">20sp</dimen>
-	<dimen name="transaction_amount_size">28sp</dimen>
+	<dimen name="transaction_amount_fiat_size">28sp</dimen>
+	<dimen name="transaction_amount_coin_size">14sp</dimen>
 	<dimen name="transaction_amount_size_superscript">22sp</dimen>
 	<dimen name="transaction_date_size">22sp</dimen>
 

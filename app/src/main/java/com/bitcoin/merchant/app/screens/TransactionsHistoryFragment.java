@@ -28,17 +28,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bitcoin.merchant.app.R;
+import com.bitcoin.merchant.app.database.DBControllerV3;
+import com.bitcoin.merchant.app.util.DateUtil;
+import com.bitcoin.merchant.app.util.MonetaryUtil;
+import com.bitcoin.merchant.app.util.PrefsUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.bitcoin.merchant.app.database.DBControllerV3;
-import com.bitcoin.merchant.app.util.DateUtil;
-import com.bitcoin.merchant.app.util.MonetaryUtil;
-import com.bitcoin.merchant.app.util.PrefsUtil;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
@@ -49,7 +48,6 @@ public class TransactionsHistoryFragment extends Fragment {
     private boolean push_notifications = false;
     private Timer timer = null;
     private ListView listView = null;
-    private boolean valueShownInCoin = false;
     private SwipeRefreshLayout swipeLayout = null;
     private Activity thisActivity = null;
 
@@ -59,7 +57,6 @@ public class TransactionsHistoryFragment extends Fragment {
         initListView(rootView);
         merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
         push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
-        valueShownInCoin = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
         swipeLayout = rootView.findViewById(R.id.swipe_container);
         swipeLayout.setProgressViewEndTarget(false, (int) (getResources().getDisplayMetrics().density * (72 + 20)));
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -76,22 +73,14 @@ public class TransactionsHistoryFragment extends Fragment {
     }
 
     private void initListView(View rootView) {
-        listView = (ListView) rootView.findViewById(R.id.txList);
-        mListItems = new ArrayList<ContentValues>();
+        mListItems = new ArrayList<>();
         adapter = new TransactionAdapter();
+        listView = rootView.findViewById(R.id.txList);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                valueShownInCoin = !valueShownInCoin;
-                adapter.notifyDataSetChanged();
-            }
-        });
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                doTxTap(id);
-                return true;
+                showTransactionMenu(id);
             }
         });
     }
@@ -102,7 +91,6 @@ public class TransactionsHistoryFragment extends Fragment {
         if (isVisibleToUser) {
             merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
             push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
-            valueShownInCoin = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
             if (push_notifications) {
                 if (timer == null) {
                     timer = new Timer();
@@ -129,11 +117,10 @@ public class TransactionsHistoryFragment extends Fragment {
         super.onResume();
         merchantXpub = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
         push_notifications = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_PUSH_NOTIFS, false);
-        valueShownInCoin = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY_DISPLAY, false);
         new GetDataTask().execute();
     }
 
-    private void doTxTap(final long item) {
+    private void showTransactionMenu(final long item) {
         final ContentValues val = mListItems.get((int) item);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setIcon(R.drawable.ic_launcher);
@@ -252,27 +239,26 @@ public class TransactionsHistoryFragment extends Fragment {
             ContentValues vals = mListItems.get(position);
             String date_str = DateUtil.getInstance().formatted(vals.getAsLong("ts"));
             SpannableStringBuilder ds = new SpannableStringBuilder(date_str);
-            if (date_str.indexOf("@") != -1) {
-                int idx = date_str.indexOf("@");
+            int idx = date_str.indexOf("@");
+            if (idx != -1) {
                 ds.setSpan(new StyleSpan(Typeface.NORMAL), 0, idx, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 ds.setSpan(new RelativeSizeSpan(0.75f), idx, date_str.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             TextView tvDate = view.findViewById(R.id.tv_date);
             tvDate.setText(ds);
             tvDate.setAlpha(0.7f);
-            TextView tvAmount = view.findViewById(R.id.tv_amount);
-            if (valueShownInCoin) {
-                String displayValue = null;
-                long amount = Math.abs(vals.getAsLong("amt"));
-                displayValue = MonetaryUtil.getInstance(getActivity()).getDisplayAmountWithFormatting(amount);
-                SpannableStringBuilder cs = new SpannableStringBuilder(getActivity().getResources().getString(R.string.bitcoin_currency_symbol));
-                cs.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                tvAmount.setText(displayValue + " " + cs);
-            } else {
-                SpannableStringBuilder cs = new SpannableStringBuilder(vals.getAsString("famt").subSequence(0, 1));
-                cs.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                tvAmount.setText(cs + " " + vals.getAsString("famt").substring(1));
-            }
+            // display coin value
+            long amount = Math.abs(vals.getAsLong("amt"));
+            SpannableStringBuilder coinSpan = new SpannableStringBuilder(getActivity().getResources().getString(R.string.bitcoin_currency_symbol));
+            coinSpan.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            TextView coinAmount = view.findViewById(R.id.tv_amount_coin);
+            String displayValue = MonetaryUtil.getInstance(getActivity()).getDisplayAmountWithFormatting(amount);
+            coinAmount.setText(displayValue + " " + coinSpan);
+            // display fiat value
+            SpannableStringBuilder fiatSpan = new SpannableStringBuilder(vals.getAsString("famt").subSequence(0, 1));
+            fiatSpan.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            TextView fiatAmount = view.findViewById(R.id.tv_amount_fiat);
+            fiatAmount.setText(fiatSpan + " " + vals.getAsString("famt").substring(1));
             if (vals.getAsLong("amt") < 0L) {
                 ImageView ivStatus = (ImageView) view.findViewById(R.id.iv_status);
                 ivStatus.setImageResource(R.drawable.ic_warning_black_18dp);
