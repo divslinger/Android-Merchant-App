@@ -3,7 +3,9 @@ package com.bitcoin.merchant.app.screens.dialogs;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.preference.Preference;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.currency.CountryCurrency;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
+import com.bitcoin.merchant.app.screens.PaymentInputFragment;
 import com.bitcoin.merchant.app.screens.SettingsActivity;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 
@@ -74,6 +77,8 @@ public class CurrencySelectionDialog {
         prefsUtil.setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, cc.currencyRate.code);
         prefsUtil.setValue(PrefsUtil.MERCHANT_KEY_COUNTRY, cc.countryLocales.country);
         prefsUtil.setValue(PrefsUtil.MERCHANT_KEY_LOCALE, locale);
+        Intent intent = new Intent(PaymentInputFragment.ACTION_INTENT_RESET_AMOUNT);
+        LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
         ctx.setCurrencySummary(fiatPref, cc);
     }
 }

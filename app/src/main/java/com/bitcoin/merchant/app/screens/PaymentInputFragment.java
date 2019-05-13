@@ -1,9 +1,13 @@
 package com.bitcoin.merchant.app.screens;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +31,7 @@ import java.util.Locale;
 public class PaymentInputFragment extends Fragment implements View.OnClickListener {
     public static final String DEFAULT_CURRENCY_BCH = "BCH";
     public static final int RECEIVE_RESULT = 1122;
+    public static final String ACTION_INTENT_RESET_AMOUNT = "RESET_AMOUNT";
     public static String AMOUNT_PAYABLE_FIAT = "AMOUNT_PAYABLE_FIAT";
     public static String AMOUNT_PAYABLE_BTC = "AMOUNT_PAYABLE_BTC";
     private static final double bitcoinLimit = 21000000.0;
@@ -39,6 +44,16 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
     private TextView tvCurrency = null;
     private NumberFormat nf = null;
     private String strDecimal = null;
+    protected BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+            if (ACTION_INTENT_RESET_AMOUNT.equals(intent.getAction())) {
+                if (tvAmount != null) {
+                    tvAmount.setText("0");
+                }
+            }
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,7 +66,16 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
         initPadClickListeners();
         initValues();
         initDecimalButton();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_INTENT_RESET_AMOUNT);
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(receiver, filter);
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).unregisterReceiver(receiver);
+        super.onDestroyView();
     }
 
     @Override

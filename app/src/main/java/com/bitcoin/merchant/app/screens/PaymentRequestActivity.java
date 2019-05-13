@@ -110,7 +110,6 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
 
     @Override
     protected void onDestroy() {
-        //Unregister receiver
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         super.onDestroy();
     }
