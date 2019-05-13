@@ -1,4 +1,4 @@
-package info.blockchain.merchant.db;
+package com.bitcoin.merchant.app.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import info.blockchain.merchant.util.OSUtil;
-import info.blockchain.merchant.util.PrefsUtil;
+import com.bitcoin.merchant.app.util.OSUtil;
+import com.bitcoin.merchant.app.util.PrefsUtil;
 import info.blockchain.wallet.crypto.AESUtil;
 import info.blockchain.wallet.util.CharSequenceX;
 

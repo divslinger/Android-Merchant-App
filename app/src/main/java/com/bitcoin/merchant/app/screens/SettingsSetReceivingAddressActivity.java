@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app;
+package com.bitcoin.merchant.app.screens;
 
 import android.Manifest;
 import android.app.Activity;
@@ -27,14 +27,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bitcoin.merchant.app.R;
 import com.google.bitcoin.uri.BitcoinCashURI;
 
-import info.blockchain.merchant.util.AppUtil;
-import info.blockchain.merchant.util.PrefsUtil;
-import info.blockchain.merchant.util.ToastCustom;
+import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.util.PrefsUtil;
+import com.bitcoin.merchant.app.util.ToastCustom;
 import info.blockchain.wallet.util.FormatsUtil;
 
-public class SetReceivingAddressActivity extends PreferenceActivity {
+public class SettingsSetReceivingAddressActivity extends PreferenceActivity {
     public static final String SCAN_RESULT = "SCAN_RESULT";
     private static final int CAMERA_PERMISSION = 1111;
     private static final boolean ENTERING_ADDRESS_BYPASSED = false;
@@ -73,7 +74,7 @@ public class SetReceivingAddressActivity extends PreferenceActivity {
             }
         });
         newAddressPref = findPreference("address");
-        String address = getAddress(SetReceivingAddressActivity.this);
+        String address = getAddress(SettingsSetReceivingAddressActivity.this);
         newAddressPref.setSummary(convertToBitcoinCash(address));
         if (!walletInstalled) {
             Preference walletUrlPref = findPreference("wallet");
@@ -122,10 +123,10 @@ public class SetReceivingAddressActivity extends PreferenceActivity {
     }
 
     private void askHowToAddNewAddress() {
-        final TextView tvReceiverHelp = new TextView(SetReceivingAddressActivity.this);
-        tvReceiverHelp.setText(SetReceivingAddressActivity.this.getText(R.string.options_add_payment_address_text));
+        final TextView tvReceiverHelp = new TextView(SettingsSetReceivingAddressActivity.this);
+        tvReceiverHelp.setText(SettingsSetReceivingAddressActivity.this.getText(R.string.options_add_payment_address_text));
         tvReceiverHelp.setPadding(50, 10, 50, 10);
-        new AlertDialog.Builder(SetReceivingAddressActivity.this)
+        new AlertDialog.Builder(SettingsSetReceivingAddressActivity.this)
                 .setTitle(R.string.options_add_payment_address)
                 .setView(tvReceiverHelp)
                 .setCancelable(true)
@@ -166,7 +167,7 @@ public class SetReceivingAddressActivity extends PreferenceActivity {
     }
 
     private void openCamera() {
-        Intent intent = new Intent(SetReceivingAddressActivity.this, SimpleScannerActivity.class);
+        Intent intent = new Intent(SettingsSetReceivingAddressActivity.this, ScanQRCodeActivity.class);
         // intent.putExtra(ZBarConstants.SCAN_MODES, new int[]{Symbol.QRCODE});
         startActivityForResult(intent, ZBAR_SCANNER_REQUEST);
     }
@@ -200,26 +201,26 @@ public class SetReceivingAddressActivity extends PreferenceActivity {
         if (ENTERING_ADDRESS_BYPASSED) {
             setNewAddress("1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k");
         } else {
-            final EditText etReceiver = new EditText(SetReceivingAddressActivity.this);
+            final EditText etReceiver = new EditText(SettingsSetReceivingAddressActivity.this);
             etReceiver.setSingleLine(true);
-            etReceiver.setText(getAddress(SetReceivingAddressActivity.this));
+            etReceiver.setText(getAddress(SettingsSetReceivingAddressActivity.this));
             showDialogToEnterAddress(etReceiver);
         }
     }
 
     private void confirmAddressRemoval() {
-        final TextView tvForgetHelp = new TextView(SetReceivingAddressActivity.this);
-        tvForgetHelp.setText(SetReceivingAddressActivity.this.getText(R.string.options_forget_payment_address_text));
+        final TextView tvForgetHelp = new TextView(SettingsSetReceivingAddressActivity.this);
+        tvForgetHelp.setText(SettingsSetReceivingAddressActivity.this.getText(R.string.options_forget_payment_address_text));
         tvForgetHelp.setPadding(50, 10, 50, 10);
-        new AlertDialog.Builder(SetReceivingAddressActivity.this)
+        new AlertDialog.Builder(SettingsSetReceivingAddressActivity.this)
                 .setTitle(R.string.options_forget_payment_address)
                 .setView(tvForgetHelp)
                 .setCancelable(false)
                 .setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         dialog.dismiss();
-                        PrefsUtil.getInstance(SetReceivingAddressActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-                        SetReceivingAddressActivity.this.finish();
+                        PrefsUtil.getInstance(SettingsSetReceivingAddressActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+                        SettingsSetReceivingAddressActivity.this.finish();
                     }
                 })
                 .setNegativeButton(R.string.prompt_ko, new DialogInterface.OnClickListener() {
@@ -231,7 +232,7 @@ public class SetReceivingAddressActivity extends PreferenceActivity {
     }
 
     private void showDialogToEnterAddress(final EditText etReceiver) {
-        new AlertDialog.Builder(SetReceivingAddressActivity.this)
+        new AlertDialog.Builder(SettingsSetReceivingAddressActivity.this)
                 .setTitle(R.string.options_add_payment_address)
                 .setView(etReceiver)
                 .setCancelable(false)
@@ -254,13 +255,13 @@ public class SetReceivingAddressActivity extends PreferenceActivity {
         if (AppUtil.isValidAddress(address)) {
             setNewAddress(address);
         } else {
-            ToastCustom.makeText(SetReceivingAddressActivity.this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+            ToastCustom.makeText(SettingsSetReceivingAddressActivity.this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
         }
     }
 
     private void setNewAddress(String receiver) {
         newAddressPref.setSummary(convertToBitcoinCash(receiver));
-        PrefsUtil.getInstance(SetReceivingAddressActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
+        PrefsUtil.getInstance(SettingsSetReceivingAddressActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package info.blockchain.merchant.util;
+package com.bitcoin.merchant.app.util;
 
 import android.content.Context;
 import android.util.Log;
@@ -9,7 +9,7 @@ import com.bitcoin.merchant.app.currency.CurrencyExchange;
 import java.text.NumberFormat;
 import java.util.Currency;
 
-import info.blockchain.merchant.tabsswipe.PaymentFragment;
+import com.bitcoin.merchant.app.screens.PaymentInputFragment;
 
 public class AmountUtil {
     public static final String TAG = "AmountUtil";
@@ -54,6 +54,6 @@ public class AmountUtil {
     }
 
     public String formatBch(double amountBch) {
-        return MonetaryUtil.getInstance().getBchDecimalFormat().format(amountBch) + " " + PaymentFragment.DEFAULT_CURRENCY_BCH;
+        return MonetaryUtil.getInstance().getBchDecimalFormat().format(amountBch) + " " + PaymentInputFragment.DEFAULT_CURRENCY_BCH;
     }
 }

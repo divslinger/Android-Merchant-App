@@ -28,10 +28,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import info.blockchain.merchant.service.WebSocketHandler;
-import info.blockchain.merchant.service.WebSocketListener;
-import info.blockchain.merchant.tabsswipe.TabsPagerAdapter;
-import info.blockchain.merchant.util.PrefsUtil;
+import com.bitcoin.merchant.app.network.WebSocketHandler;
+import com.bitcoin.merchant.app.network.WebSocketListener;
+import com.bitcoin.merchant.app.screens.AboutActivity;
+import com.bitcoin.merchant.app.screens.PinActivity;
+import com.bitcoin.merchant.app.screens.SettingsActivity;
+import com.bitcoin.merchant.app.screens.SettingsSetReceivingAddressActivity;
+import com.bitcoin.merchant.app.screens.TabsPagerAdapter;
+import com.bitcoin.merchant.app.util.PrefsUtil;
 
 public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener, NavigationView.OnNavigationItemSelectedListener {
     public static final String TAG = "MainActivity";
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         initTableLayout();
         if (PinActivity.isPinMissing(this)) {
             createPIN();
-        } else if (!SetReceivingAddressActivity.isReceivingAddressAvailable(this)) {
+        } else if (!SettingsSetReceivingAddressActivity.isReceivingAddressAvailable(this)) {
             goToSettings(false);
         }
         startWebsockets();

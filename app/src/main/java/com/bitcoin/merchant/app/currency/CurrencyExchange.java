@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import info.blockchain.merchant.util.AppUtil;
+import com.bitcoin.merchant.app.util.AppUtil;
 
 public class CurrencyExchange {
     public static final int MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS = 3 * 60 * 1000;

@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app;
+package com.bitcoin.merchant.app.screens;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,7 +11,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import info.blockchain.merchant.util.AppUtil;
+import com.bitcoin.merchant.app.BuildConfig;
+import com.bitcoin.merchant.app.R;
+import com.bitcoin.merchant.app.util.AppUtil;
 //import android.util.Log;
 
 public class AboutActivity extends Activity {

@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app;
+package com.bitcoin.merchant.app.screens;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,9 +12,10 @@ import android.widget.TextView;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import info.blockchain.merchant.util.OSUtil;
-import info.blockchain.merchant.util.PrefsUtil;
-import info.blockchain.merchant.util.ToastCustom;
+import com.bitcoin.merchant.app.R;
+import com.bitcoin.merchant.app.util.OSUtil;
+import com.bitcoin.merchant.app.util.PrefsUtil;
+import com.bitcoin.merchant.app.util.ToastCustom;
 //import android.util.Log;
 
 public class PinActivity extends Activity {

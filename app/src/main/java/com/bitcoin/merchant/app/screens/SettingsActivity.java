@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app;
+package com.bitcoin.merchant.app.screens;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -24,13 +24,14 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.currency.CountryCurrency;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
 
 import java.util.List;
 
-import info.blockchain.merchant.util.AppUtil;
-import info.blockchain.merchant.util.PrefsUtil;
+import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.util.PrefsUtil;
 
 public class SettingsActivity extends PreferenceActivity {
     @Override
@@ -53,7 +54,7 @@ public class SettingsActivity extends PreferenceActivity {
         });
         final Preference receivePref = findPreference("receiveAPI");
         SettingsActivity ctx = SettingsActivity.this;
-        final boolean addressAvailable = SetReceivingAddressActivity.isReceivingAddressAvailable(ctx);
+        final boolean addressAvailable = SettingsSetReceivingAddressActivity.isReceivingAddressAvailable(ctx);
         receivePref.setSummary(SettingsActivity.this.getText(addressAvailable ? R.string.on : R.string.off));
         receivePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
@@ -88,7 +89,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void goToReceivingPayments() {
-        Intent intent = new Intent(SettingsActivity.this, SetReceivingAddressActivity.class);
+        Intent intent = new Intent(SettingsActivity.this, SettingsSetReceivingAddressActivity.class);
         startActivity(intent);
     }
 
@@ -192,7 +193,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void backButton() {
-        if (!SetReceivingAddressActivity.isReceivingAddressAvailable(this)) {
+        if (!SettingsSetReceivingAddressActivity.isReceivingAddressAvailable(this)) {
             // ToastCustom.makeText(SettingsActivity.this, getString(R.string.obligatory_receiver), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
             forceToEnterReceivingPaymentAddress();
         } else {
@@ -218,7 +219,7 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onResume() {
         super.onResume();
         final Preference receivePref = findPreference("receiveAPI");
-        final boolean addressAvailable = SetReceivingAddressActivity.isReceivingAddressAvailable(this);
+        final boolean addressAvailable = SettingsSetReceivingAddressActivity.isReceivingAddressAvailable(this);
         receivePref.setSummary(addressAvailable ? (String) SettingsActivity.this.getText(R.string.on) : (String) SettingsActivity.this.getText(R.string.off));
         receivePref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {

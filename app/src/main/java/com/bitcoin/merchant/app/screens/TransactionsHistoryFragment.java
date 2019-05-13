@@ -1,4 +1,4 @@
-package info.blockchain.merchant.tabsswipe;
+package com.bitcoin.merchant.app.screens;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,14 +35,14 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import info.blockchain.merchant.db.DBControllerV3;
-import info.blockchain.merchant.util.DateUtil;
-import info.blockchain.merchant.util.MonetaryUtil;
-import info.blockchain.merchant.util.PrefsUtil;
+import com.bitcoin.merchant.app.database.DBControllerV3;
+import com.bitcoin.merchant.app.util.DateUtil;
+import com.bitcoin.merchant.app.util.MonetaryUtil;
+import com.bitcoin.merchant.app.util.PrefsUtil;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
-public class TransactionsFragment extends Fragment {
+public class TransactionsHistoryFragment extends Fragment {
     private static String merchantXpub = null;
     private List<ContentValues> mListItems;
     private TransactionAdapter adapter = null;

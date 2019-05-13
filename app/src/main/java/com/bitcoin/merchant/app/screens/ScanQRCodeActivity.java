@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app;
+package com.bitcoin.merchant.app.screens;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,9 +10,9 @@ import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-import static com.bitcoin.merchant.app.SetReceivingAddressActivity.SCAN_RESULT;
+import static com.bitcoin.merchant.app.screens.SettingsSetReceivingAddressActivity.SCAN_RESULT;
 
-public class SimpleScannerActivity extends Activity implements ZXingScannerView.ResultHandler {
+public class ScanQRCodeActivity extends Activity implements ZXingScannerView.ResultHandler {
     private static final String TAG = "Scanner";
     private ZXingScannerView mScannerView;
 

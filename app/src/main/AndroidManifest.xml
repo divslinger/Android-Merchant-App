@@ -52,36 +52,36 @@
         </activity>
 
         <activity
-            android:name="com.bitcoin.merchant.app.SimpleScannerActivity"
+            android:name="com.bitcoin.merchant.app.screens.ScanQRCodeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="com.bitcoin.merchant.app.SettingsActivity"
+            android:name="com.bitcoin.merchant.app.screens.SettingsActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"></activity>
 
         <activity
-            android:name="com.bitcoin.merchant.app.SetReceivingAddressActivity"
+            android:name="com.bitcoin.merchant.app.screens.SettingsSetReceivingAddressActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"></activity>
 
         <activity
-            android:name="com.bitcoin.merchant.app.PinActivity"
+            android:name="com.bitcoin.merchant.app.screens.PinActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"></activity>
 
         <activity
-            android:name="com.bitcoin.merchant.app.AboutActivity"
+            android:name="com.bitcoin.merchant.app.screens.AboutActivity"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Dialog"></activity>
 
         <activity
-            android:name="com.bitcoin.merchant.app.ReceiveTxActivity"
+            android:name="com.bitcoin.merchant.app.screens.PaymentRequestActivity"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Dialog"></activity>
 
-        <receiver android:name="com.bitcoin.merchant.app.NetworkStateReceiver">
+        <receiver android:name="com.bitcoin.merchant.app.network.NetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>

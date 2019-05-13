@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import info.blockchain.merchant.util.AppUtil;
+import com.bitcoin.merchant.app.util.AppUtil;
 
 public class CurrencyDetector {
     private static final String TAG = MainActivity.TAG;

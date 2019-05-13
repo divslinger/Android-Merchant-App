@@ -1,4 +1,4 @@
-package info.blockchain.merchant.util;
+package com.bitcoin.merchant.app.util;
 
 import android.content.Context;
 import android.util.Log;
@@ -15,7 +15,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import info.blockchain.merchant.db.DBControllerV3;
+import com.bitcoin.merchant.app.database.DBControllerV3;
 
 public class WalletUtil {
     public static final String TAG = "WalletUtil";

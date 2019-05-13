@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app;
+package com.bitcoin.merchant.app.screens;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bitcoin.merchant.app.MainActivity;
+import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
 import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.zxing.BarcodeFormat;
@@ -39,19 +41,18 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-import info.blockchain.merchant.db.DBControllerV3;
-import info.blockchain.merchant.service.ExpectedIncoming;
-import info.blockchain.merchant.tabsswipe.PaymentFragment;
-import info.blockchain.merchant.util.AmountUtil;
-import info.blockchain.merchant.util.AppUtil;
-import info.blockchain.merchant.util.MonetaryUtil;
-import info.blockchain.merchant.util.PrefsUtil;
-import info.blockchain.merchant.util.ToastCustom;
-import info.blockchain.merchant.util.WalletUtil;
+import com.bitcoin.merchant.app.database.DBControllerV3;
+import com.bitcoin.merchant.app.network.ExpectedIncoming;
+import com.bitcoin.merchant.app.util.AmountUtil;
+import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.util.MonetaryUtil;
+import com.bitcoin.merchant.app.util.PrefsUtil;
+import com.bitcoin.merchant.app.util.ToastCustom;
+import com.bitcoin.merchant.app.util.WalletUtil;
 
 import static com.bitcoin.merchant.app.MainActivity.TAG;
 
-public class ReceiveTxActivity extends Activity implements View.OnClickListener {
+public class PaymentRequestActivity extends Activity implements View.OnClickListener {
     private TextView tvMerchantName = null;
     private TextView tvFiatAmount = null;
     private TextView tvBtcAmount = null;
@@ -89,7 +90,7 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         final double bchExpectedAmount = expectedAmountInSatoshis / 1e8;
         final double bchPaymentAmount = paymentAmountInSatoshis / 1e8;
         final double bchRemainder = bchExpectedAmount - bchPaymentAmount;
-        Double currencyPrice = CurrencyExchange.getInstance(ReceiveTxActivity.this).getCurrencyPrice(getCurrency());
+        Double currencyPrice = CurrencyExchange.getInstance(PaymentRequestActivity.this).getCurrencyPrice(getCurrency());
         NumberFormat nf = NumberFormat.getInstance(Locale.getDefault());
         double fiatAmount;
         try {
@@ -99,27 +100,27 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         }
         final double _fiatRemainder = fiatAmount;
         StringBuilder sb = new StringBuilder();
-        sb.append(ReceiveTxActivity.this.getText(R.string.insufficient_payment));
+        sb.append(PaymentRequestActivity.this.getText(R.string.insufficient_payment));
         sb.append("\n");
-        sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_requested));
+        sb.append(PaymentRequestActivity.this.getText(R.string.re_payment_requested));
         sb.append(" ");
         AmountUtil f = new AmountUtil(this);
         sb.append(f.formatBch(bchExpectedAmount));
         sb.append("\n");
-        sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_received));
+        sb.append(PaymentRequestActivity.this.getText(R.string.re_payment_received));
         sb.append(" ");
         sb.append(f.formatBch(bchPaymentAmount));
         sb.append("\n");
-        sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_remainder));
+        sb.append(PaymentRequestActivity.this.getText(R.string.re_payment_remainder));
         sb.append(" ");
         sb.append(f.formatBch(bchRemainder));
         sb.append("\n");
-        sb.append(ReceiveTxActivity.this.getText(R.string.re_payment_remainder));
+        sb.append(PaymentRequestActivity.this.getText(R.string.re_payment_remainder));
         sb.append(" ");
         sb.append(f.formatFiat(fiatAmount));
         sb.append("\n");
-        sb.append(ReceiveTxActivity.this.getText(R.string.insufficient_payment_continue));
-        AlertDialog.Builder builder = new AlertDialog.Builder(ReceiveTxActivity.this, R.style.AppTheme);
+        sb.append(PaymentRequestActivity.this.getText(R.string.insufficient_payment_continue));
+        AlertDialog.Builder builder = new AlertDialog.Builder(PaymentRequestActivity.this, R.style.AppTheme);
         builder.setTitle(R.string.app_name);
         builder.setMessage(sb.toString()).setCancelable(false);
         AlertDialog alert = builder.create();
@@ -127,9 +128,9 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
                 onPaymentReceived(addr, paymentAmountInSatoshis, paymentTxHash);
-                Intent intent = new Intent(ReceiveTxActivity.this, ReceiveTxActivity.class);
-                intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, _fiatRemainder);
-                intent.putExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, bchRemainder);
+                Intent intent = new Intent(PaymentRequestActivity.this, PaymentRequestActivity.class);
+                intent.putExtra(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, _fiatRemainder);
+                intent.putExtra(PaymentInputFragment.AMOUNT_PAYABLE_BTC, bchRemainder);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
@@ -155,12 +156,12 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         IntentFilter filter = new IntentFilter(MainActivity.ACTION_INTENT_INCOMING_TX);
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
         //Incoming intent value
-        double amountFiat = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_FIAT, 0.0);
-        double amountBch = this.getIntent().getDoubleExtra(PaymentFragment.AMOUNT_PAYABLE_BTC, 0.0);
+        double amountFiat = this.getIntent().getDoubleExtra(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
+        double amountBch = this.getIntent().getDoubleExtra(PaymentInputFragment.AMOUNT_PAYABLE_BTC, 0.0);
         AmountUtil f = new AmountUtil(this);
         tvFiatAmount.setText(f.formatFiat(amountFiat));
         tvBtcAmount.setText(f.formatBch(amountBch));
-        getReceiveAddress(ReceiveTxActivity.this, amountBch, tvFiatAmount.getText().toString());
+        getReceiveAddress(PaymentRequestActivity.this, amountBch, tvFiatAmount.getText().toString());
     }
 
     @Override
@@ -260,8 +261,8 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
             @Override
             protected String doInBackground(Void... params) {
                 //Generate new address/QR code for receive
-                String address = PrefsUtil.getInstance(ReceiveTxActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-                if (AppUtil.getInstance(ReceiveTxActivity.this).isV2API()) {
+                String address = PrefsUtil.getInstance(PaymentRequestActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+                if (AppUtil.getInstance(PaymentRequestActivity.this).isV2API()) {
                     try {
                         WalletUtil walletUtil = new WalletUtil(address, context);
                         receivingAddress = walletUtil.generateAddressFromXPub();
@@ -275,13 +276,13 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
                     receivingAddress = address;
                 }
                 if (receivingAddress == null) {
-                    ToastCustom.makeText(ReceiveTxActivity.this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+                    ToastCustom.makeText(PaymentRequestActivity.this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
                     return null;
                 }
                 //Subscribe to websocket to new address
                 Intent intent = new Intent(MainActivity.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
                 intent.putExtra("address", receivingAddress);
-                LocalBroadcastManager.getInstance(ReceiveTxActivity.this).sendBroadcast(intent);
+                LocalBroadcastManager.getInstance(PaymentRequestActivity.this).sendBroadcast(intent);
                 long lAmount = getLongAmount(amountBtc);
                 ExpectedIncoming.getInstance().getBTC().put(receivingAddress, lAmount);
                 ExpectedIncoming.getInstance().getFiat().put(receivingAddress, strFiat);
@@ -327,8 +328,8 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                ReceiveTxActivity.this.setResult(RESULT_OK, intent);
-                ReceiveTxActivity.this.finish();
+                PaymentRequestActivity.this.setResult(RESULT_OK, intent);
+                PaymentRequestActivity.this.finish();
             }
         });
         tvStatus.setText(getResources().getText(R.string.payment_received));
@@ -340,12 +341,12 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         if (bchAmount != bchExpectedAmount) {
             bchAmount *= -1L;
         }
-        Double currencyPrice = CurrencyExchange.getInstance(ReceiveTxActivity.this).getCurrencyPrice(getCurrency());
+        Double currencyPrice = CurrencyExchange.getInstance(PaymentRequestActivity.this).getCurrencyPrice(getCurrency());
         double amountPayableFiat = (Math.abs((double) bchAmount) / 1e8) * currencyPrice;
         String fiatAmount = (bchPaymentAmount == -1L)
                 ? ExpectedIncoming.getInstance().getFiat().get(addr) :
                 new AmountUtil(this).formatFiat(amountPayableFiat);
-        DBControllerV3 pdb = new DBControllerV3(ReceiveTxActivity.this);
+        DBControllerV3 pdb = new DBControllerV3(PaymentRequestActivity.this);
         pdb.insertPayment(
                 System.currentTimeMillis() / 1000,
                 receivingAddress,
@@ -357,8 +358,8 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
         );
         pdb.close();
         if (bchPaymentAmount > bchExpectedAmount) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(ReceiveTxActivity.this);
-            TextView title = new TextView(ReceiveTxActivity.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(PaymentRequestActivity.this);
+            TextView title = new TextView(PaymentRequestActivity.this);
             title.setPadding(20, 60, 20, 20);
             title.setText(R.string.app_name);
             title.setGravity(Gravity.CENTER);
@@ -381,7 +382,7 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
     }
 
     private void write2NFC(final String uri) {
-        NfcAdapter nfc = NfcAdapter.getDefaultAdapter(ReceiveTxActivity.this);
+        NfcAdapter nfc = NfcAdapter.getDefaultAdapter(PaymentRequestActivity.this);
         if (nfc != null && nfc.isNdefPushEnabled()) {
             nfc.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
                 @Override
@@ -389,7 +390,7 @@ public class ReceiveTxActivity extends Activity implements View.OnClickListener 
                     NdefRecord uriRecord = NdefRecord.createUri(uri);
                     return new NdefMessage(new NdefRecord[]{uriRecord});
                 }
-            }, ReceiveTxActivity.this);
+            }, PaymentRequestActivity.this);
         }
     }
 }

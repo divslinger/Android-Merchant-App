@@ -1,4 +1,4 @@
-package info.blockchain.merchant.tabsswipe;
+package com.bitcoin.merchant.app.screens;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -25,9 +25,9 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new PaymentFragment();
+                return new PaymentInputFragment();
             case 1:
-                return new TransactionsFragment();
+                return new TransactionsHistoryFragment();
             default:
                 return null;
         }

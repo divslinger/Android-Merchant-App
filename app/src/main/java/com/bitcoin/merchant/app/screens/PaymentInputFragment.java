@@ -1,4 +1,4 @@
-package info.blockchain.merchant.tabsswipe;
+package com.bitcoin.merchant.app.screens;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,8 +12,6 @@ import android.widget.TextView;
 
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
-import com.bitcoin.merchant.app.ReceiveTxActivity;
-import com.bitcoin.merchant.app.SettingsActivity;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
 
 import java.text.DecimalFormatSymbols;
@@ -22,13 +20,13 @@ import java.text.ParseException;
 import java.util.Currency;
 import java.util.Locale;
 
-import info.blockchain.merchant.util.AppUtil;
-import info.blockchain.merchant.util.MonetaryUtil;
-import info.blockchain.merchant.util.SnackCustom;
-import info.blockchain.merchant.util.ToastCustom;
+import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.util.MonetaryUtil;
+import com.bitcoin.merchant.app.util.SnackCustom;
+import com.bitcoin.merchant.app.util.ToastCustom;
 //import android.util.Log;
 
-public class PaymentFragment extends Fragment implements View.OnClickListener {
+public class PaymentInputFragment extends Fragment implements View.OnClickListener {
     public static final String DEFAULT_CURRENCY_BCH = "BCH";
     public static final int RECEIVE_RESULT = 1122;
     public static String AMOUNT_PAYABLE_FIAT = "AMOUNT_PAYABLE_FIAT";
@@ -173,7 +171,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         }
         if (validateAmount()) {
             updateAmounts();
-            Intent intent = new Intent(getActivity(), ReceiveTxActivity.class);
+            Intent intent = new Intent(getActivity(), PaymentRequestActivity.class);
             intent.putExtra(AMOUNT_PAYABLE_FIAT, amountPayableFiat);
             intent.putExtra(AMOUNT_PAYABLE_BTC, amountPayableBch);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);

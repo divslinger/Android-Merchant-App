@@ -1,4 +1,4 @@
-package info.blockchain.merchant.util;
+package com.bitcoin.merchant.app.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

@@ -1,4 +1,4 @@
-package info.blockchain.merchant.service;
+package com.bitcoin.merchant.app.network;
 
 import android.os.AsyncTask;
 
