@@ -50,9 +50,6 @@ public class CurrencyRate {
     @Override
     public String toString() {
         String value = symbol == null ? "" : symbol + " - ";
-        if (BuildConfig.DEBUG) {
-            value = rate + " " + value;
-        }
         return code + " - " + value + name;
     }
 }

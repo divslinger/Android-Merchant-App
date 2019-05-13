@@ -281,7 +281,7 @@ public class CountryCurrency {
         this.countryLocales = countryLocales;
         this.currencyRate = cr;
         this.image = countryToImage.get(countryLocales.country);
-        this.description = countryName + ": " + cr.toString();
+        this.description = countryName + "\n" + cr.toString();
     }
 
     @Override

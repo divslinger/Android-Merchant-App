@@ -17,38 +17,29 @@ import android.preference.PreferenceActivity;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.InputFilter;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.currency.CountryCurrency;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
+import com.bitcoin.merchant.app.screens.dialogs.AddNewAddressDialog;
+import com.bitcoin.merchant.app.screens.dialogs.CurrencySelectionDialog;
+import com.bitcoin.merchant.app.screens.dialogs.MerchantNameEditorDialog;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.bitcoin.merchant.app.util.ToastCustom;
 import com.google.bitcoin.uri.BitcoinCashURI;
 
-import java.util.List;
-
-import info.blockchain.wallet.util.FormatsUtil;
-
 public class SettingsActivity extends PreferenceActivity {
     public static final String SCAN_RESULT = "SCAN_RESULT";
     private static final String TAG = "SettingsActivity";
     private static final int CAMERA_PERMISSION = 1111;
-    private static final boolean ENTERING_ADDRESS_BYPASSED = false;
     private static int ZBAR_SCANNER_REQUEST = 2026;
     private Preference newAddressPref = null;
 
@@ -77,43 +68,43 @@ public class SettingsActivity extends PreferenceActivity {
         addOptionAddress(ctx);
         addOptionDownloadWallet(ctx);
         addOptionPin(ctx);
-        if (!isReceivingAddressAvailable(ctx) && AppUtil.isWalletInstalled(ctx)) {
-            askHowToAddNewAddress();
+        if (!AppUtil.isReceivingAddressAvailable(ctx) && AppUtil.isWalletInstalled(ctx)) {
+            new AddNewAddressDialog(ctx).show();
         }
     }
 
-    private void addOptionName(SettingsActivity ctx) {
+    private void addOptionName(final SettingsActivity ctx) {
         final Preference p = findPreference("name");
         p.setSummary(PrefsUtil.getInstance(ctx).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "..."));
         p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
-                return selectMerchantName(p);
+                return new MerchantNameEditorDialog(ctx).show(p);
             }
         });
     }
 
-    private void addOptionCurrency(SettingsActivity ctx) {
+    private void addOptionCurrency(final SettingsActivity ctx) {
         final Preference p = findPreference("fiat");
         setCurrencySummary(p, ctx);
         p.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
-                return selectCurrency(p);
+                return new CurrencySelectionDialog(ctx).show(p);
             }
         });
     }
 
-    private void addOptionAddress(SettingsActivity ctx) {
+    private void addOptionAddress(final SettingsActivity ctx) {
         newAddressPref = findPreference("address");
         String summary = "";
-        if (isReceivingAddressAvailable(ctx)) {
-            summary = convertToBitcoinCash(getAddress(ctx));
+        if (AppUtil.isReceivingAddressAvailable(ctx)) {
+            summary = AppUtil.convertToBitcoinCash(AppUtil.getReceivingAddress(ctx));
         } else {
             summary = "...\n\n" + getString(R.string.options_explain_payment_address);
         }
         newAddressPref.setSummary(summary);
         newAddressPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
-                askHowToAddNewAddress();
+                new AddNewAddressDialog(ctx).show();
                 return true;
             }
         });
@@ -145,68 +136,12 @@ public class SettingsActivity extends PreferenceActivity {
         });
     }
 
-    private boolean selectMerchantName(final Preference namePref) {
-        final EditText etName = new EditText(SettingsActivity.this);
-        etName.setSingleLine(true);
-        int maxLength = 70;
-        InputFilter[] fArray = new InputFilter[1];
-        fArray[0] = new InputFilter.LengthFilter(maxLength);
-        etName.setFilters(fArray);
-        etName.setText(PrefsUtil.getInstance(SettingsActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
-        new AlertDialog.Builder(SettingsActivity.this)
-                .setTitle(R.string.receive_coins_fragment_name)
-                .setView(etName)
-                .setCancelable(false)
-                .setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String name = etName.getText().toString();
-                        if (name.length() > 0) {
-                            PrefsUtil.getInstance(SettingsActivity.this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, name);
-                            namePref.setSummary(name);
-                        }
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton(R.string.prompt_ko, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                    }
-                }).show();
-        return true;
-    }
-
     private boolean changePin() {
         Intent intent = new Intent(SettingsActivity.this, PinActivity.class);
         intent.putExtra("create", true);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
         return false;
-    }
-
-    private boolean selectCurrency(final Preference fiatPref) {
-        final SettingsActivity activity = SettingsActivity.this;
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        final List<CountryCurrency> currencies = CurrencyExchange.getInstance(activity).getCountryCurrencies();
-        ListAdapter adapter = new ArrayAdapterWithIcon(activity, currencies);
-        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                CountryCurrency cc = currencies.get(which);
-                String locale = cc.countryLocales.getFirstSupportedLocale();
-                if (locale == null) {
-                    Toast.makeText(activity, "Not supported", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                dialog.dismiss();
-                PrefsUtil prefsUtil = PrefsUtil.getInstance(activity);
-                prefsUtil.setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, cc.currencyRate.code);
-                prefsUtil.setValue(PrefsUtil.MERCHANT_KEY_COUNTRY, cc.countryLocales.country);
-                prefsUtil.setValue(PrefsUtil.MERCHANT_KEY_LOCALE, locale);
-                setCurrencySummary(fiatPref, cc);
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
-        return true;
     }
 
     private void setCurrencySummary(Preference fiatPref, Context context) {
@@ -219,32 +154,13 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
-    private void setCurrencySummary(Preference fiatPref, CountryCurrency countryCurrency) {
+    public void setCurrencySummary(Preference fiatPref, CountryCurrency countryCurrency) {
         fiatPref.setIcon(countryCurrency.image);
         fiatPref.setSummary(countryCurrency.toString());
     }
 
-    private class ArrayAdapterWithIcon extends ArrayAdapter<CountryCurrency> {
-        private List<CountryCurrency> cc;
-
-        public ArrayAdapterWithIcon(Context context, List<CountryCurrency> items) {
-            super(context, android.R.layout.select_dialog_item, items);
-            this.cc = items;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            TextView textView = view.findViewById(android.R.id.text1);
-            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(cc.get(position).image, 0, 0, 0);
-            float dimension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getContext().getResources().getDisplayMetrics());
-            textView.setCompoundDrawablePadding((int) dimension);
-            return view;
-        }
-    }
-
     private void backButton() {
-        if (!isReceivingAddressAvailable(this)) {
+        if (!AppUtil.isReceivingAddressAvailable(this)) {
             notifyUserThatAddressIsRequiredToReceivePayments();
         } else {
             finish();
@@ -272,64 +188,19 @@ public class SettingsActivity extends PreferenceActivity {
         return false;
     }
 
-    public static boolean isReceivingAddressAvailable(Context ctx) {
-        return getAddress(ctx).length() != 0;
-    }
-
-    private static String getAddress(Context setReceivingAddressActivity) {
-        return PrefsUtil.getInstance(setReceivingAddressActivity).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-    }
-
-    private static String convertToBitcoinCash(String address) {
-        FormatsUtil f = FormatsUtil.getInstance();
-        if (address != null && address.length() > 0 &&
-                (!f.isValidXpub(address) && f.isValidBitcoinAddress(address))) {
-            try {
-                address = BitcoinCashURI.toCashAddress(address);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return address;
-    }
-
-    private void askHowToAddNewAddress() {
-        final TextView tvReceiverHelp = new TextView(this);
-        tvReceiverHelp.setText(this.getText(R.string.options_add_payment_address_text));
-        tvReceiverHelp.setPadding(50, 10, 50, 10);
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.options_add_payment_address)
-                .setView(tvReceiverHelp)
-                .setCancelable(true)
-                .setPositiveButton(R.string.paste, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        enterAddressUsingInputField();
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton(R.string.scan, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                        requestToOpenCamera();
-                    }
-                }).show();
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case CAMERA_PERMISSION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openCamera();
-                } else {
-                    String text = "Please grant camera permission to use the QR Scanner";
-                    Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
-                }
+        if (requestCode == CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera();
+            } else {
+                String text = "Please grant camera permission to use the QR Scanner";
+                Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void requestToOpenCamera() {
+    public void requestToOpenCamera() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
         } else {
@@ -359,6 +230,11 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
+    public void setNewAddress(String receiver) {
+        newAddressPref.setSummary(AppUtil.convertToBitcoinCash(receiver));
+        AppUtil.setReceivingAddress(this, receiver);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -368,47 +244,4 @@ public class SettingsActivity extends PreferenceActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void enterAddressUsingInputField() {
-        if (ENTERING_ADDRESS_BYPASSED) {
-            setNewAddress("1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k");
-        } else {
-            final EditText etReceiver = new EditText(this);
-            etReceiver.setSingleLine(true);
-            etReceiver.setText(getAddress(this));
-            showDialogToEnterAddress(etReceiver);
-        }
-    }
-
-    private void showDialogToEnterAddress(final EditText etReceiver) {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.options_add_payment_address)
-                .setView(etReceiver)
-                .setCancelable(false)
-                .setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        validateThenSetNewAddress(etReceiver.getText().toString().trim());
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton(R.string.prompt_ko, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                    }
-                })
-                .show();
-    }
-
-    private void validateThenSetNewAddress(String address) {
-        address = BitcoinCashURI.toLegacyAddress(address);
-        if (AppUtil.isValidAddress(address)) {
-            setNewAddress(address);
-        } else {
-            ToastCustom.makeText(this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
-        }
-    }
-
-    private void setNewAddress(String receiver) {
-        newAddressPref.setSummary(convertToBitcoinCash(receiver));
-        PrefsUtil.getInstance(this).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
-    }
 }

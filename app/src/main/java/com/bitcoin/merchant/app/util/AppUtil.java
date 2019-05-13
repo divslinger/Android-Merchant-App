@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 
 import com.bitcoin.merchant.app.currency.CurrencyDetector;
+import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -96,6 +97,31 @@ public class AppUtil {
             }
         }
         return b.toString();
+    }
+
+    public static boolean isReceivingAddressAvailable(Context ctx) {
+        return getReceivingAddress(ctx).length() != 0;
+    }
+
+    public static String getReceivingAddress(Context setReceivingAddressActivity) {
+        return PrefsUtil.getInstance(setReceivingAddressActivity).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+    }
+
+    public static String convertToBitcoinCash(String address) {
+        FormatsUtil f = FormatsUtil.getInstance();
+        if (address != null && address.length() > 0 &&
+                (!f.isValidXpub(address) && f.isValidBitcoinAddress(address))) {
+            try {
+                address = BitcoinCashURI.toCashAddress(address);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return address;
+    }
+
+    public static void setReceivingAddress(Context ctx, String receiver) {
+        PrefsUtil.getInstance(ctx).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
     }
 
     public boolean isV2API() {

@@ -1,10 +1,8 @@
 package com.bitcoin.merchant.app.screens;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -18,7 +16,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
@@ -28,6 +25,8 @@ import android.widget.TextView;
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
+import com.bitcoin.merchant.app.screens.dialogs.PaymentTooHighDialog;
+import com.bitcoin.merchant.app.screens.dialogs.PaymentTooLowDialog;
 import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -37,9 +36,6 @@ import com.google.zxing.client.android.encode.QRCodeEncoder;
 import org.bitcoinj.core.Coin;
 
 import java.math.BigInteger;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.Locale;
 
 import com.bitcoin.merchant.app.database.DBControllerV3;
 import com.bitcoin.merchant.app.network.ExpectedIncoming;
@@ -74,7 +70,14 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
                 // underpayment
                 Long expectedAmount = ExpectedIncoming.getInstance().getBTC().get(addr);
                 if (paymentAmount < expectedAmount) {
-                    underpayment(addr, paymentAmount, paymentTxHash, expectedAmount);
+                    Runnable closingAction = new Runnable() {
+                        @Override
+                        public void run() {
+                            onPaymentReceived(addr, paymentAmount, paymentTxHash);
+                        }
+                    };
+                    new PaymentTooLowDialog(PaymentRequestActivity.this)
+                            .showUnderpayment(paymentAmount, expectedAmount, closingAction);
                 } else if (paymentAmount > expectedAmount) {
                     // overpayment
                     onPaymentReceived(addr, paymentAmount, paymentTxHash);
@@ -85,65 +88,6 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
             }
         }
     };
-
-    private void underpayment(final String addr, final long paymentAmountInSatoshis, final String paymentTxHash, Long expectedAmountInSatoshis) {
-        final double bchExpectedAmount = expectedAmountInSatoshis / 1e8;
-        final double bchPaymentAmount = paymentAmountInSatoshis / 1e8;
-        final double bchRemainder = bchExpectedAmount - bchPaymentAmount;
-        Double currencyPrice = CurrencyExchange.getInstance(PaymentRequestActivity.this).getCurrencyPrice(getCurrency());
-        NumberFormat nf = NumberFormat.getInstance(Locale.getDefault());
-        double fiatAmount;
-        try {
-            fiatAmount = nf.parse(MonetaryUtil.getInstance().getFiatDecimalFormat().format(bchRemainder * currencyPrice)).doubleValue();
-        } catch (ParseException pe) {
-            fiatAmount = 0.0;
-        }
-        final double _fiatRemainder = fiatAmount;
-        StringBuilder sb = new StringBuilder();
-        sb.append(PaymentRequestActivity.this.getText(R.string.insufficient_payment));
-        sb.append("\n");
-        sb.append(PaymentRequestActivity.this.getText(R.string.re_payment_requested));
-        sb.append(" ");
-        AmountUtil f = new AmountUtil(this);
-        sb.append(f.formatBch(bchExpectedAmount));
-        sb.append("\n");
-        sb.append(PaymentRequestActivity.this.getText(R.string.re_payment_received));
-        sb.append(" ");
-        sb.append(f.formatBch(bchPaymentAmount));
-        sb.append("\n");
-        sb.append(PaymentRequestActivity.this.getText(R.string.re_payment_remainder));
-        sb.append(" ");
-        sb.append(f.formatBch(bchRemainder));
-        sb.append("\n");
-        sb.append(PaymentRequestActivity.this.getText(R.string.re_payment_remainder));
-        sb.append(" ");
-        sb.append(f.formatFiat(fiatAmount));
-        sb.append("\n");
-        sb.append(PaymentRequestActivity.this.getText(R.string.insufficient_payment_continue));
-        AlertDialog.Builder builder = new AlertDialog.Builder(PaymentRequestActivity.this, R.style.AppTheme);
-        builder.setTitle(R.string.app_name);
-        builder.setMessage(sb.toString()).setCancelable(false);
-        AlertDialog alert = builder.create();
-        alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-                onPaymentReceived(addr, paymentAmountInSatoshis, paymentTxHash);
-                Intent intent = new Intent(PaymentRequestActivity.this, PaymentRequestActivity.class);
-                intent.putExtra(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, _fiatRemainder);
-                intent.putExtra(PaymentInputFragment.AMOUNT_PAYABLE_BTC, bchRemainder);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-            }
-        });
-        alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.prompt_ko), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-                onPaymentReceived(addr, paymentAmountInSatoshis, paymentTxHash);
-            }
-        });
-        alert.show();
-    }
-
     private BigInteger bamount = null;
 
     @Override
@@ -358,21 +302,8 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
         );
         pdb.close();
         if (bchPaymentAmount > bchExpectedAmount) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(PaymentRequestActivity.this);
-            TextView title = new TextView(PaymentRequestActivity.this);
-            title.setPadding(20, 60, 20, 20);
-            title.setText(R.string.app_name);
-            title.setGravity(Gravity.CENTER);
-            title.setTextSize(20);
-            builder.setCustomTitle(title);
-            builder.setMessage(R.string.overpaid_amount).setCancelable(false);
-            AlertDialog alert = builder.create();
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.dismiss();
-                }
-            });
-            alert.show();
+            new PaymentTooHighDialog(PaymentRequestActivity.this)
+                    .showOverpayment();
         }
         setResult(RESULT_OK);
     }

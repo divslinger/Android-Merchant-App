@@ -15,6 +15,7 @@ gen/
 # Gradle files
 .gradle/
 build/
+app/build/
 app/debug/
 app/release/
 app/keystore
