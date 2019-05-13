@@ -2,11 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Preference
-        android:title="@string/options_receive"
-        android:summary="@string/off"
-        android:key="receiveAPI"
-        />
-    <Preference
         android:title="@string/options_business_name"
         android:key="name"
         />
@@ -15,8 +10,16 @@
         android:key="fiat"
         />
     <Preference
+        android:title="@string/options_payment_address"
+        android:key="address"
+        />
+    <Preference
+        android:title="@string/wallet_download"
+        android:summary="https://wallet.bitcoin.com"
+        android:key="download_wallet"
+        />
+    <Preference
         android:title="@string/options_pin_code"
         android:key="pin"
         />
-
 </PreferenceScreen>

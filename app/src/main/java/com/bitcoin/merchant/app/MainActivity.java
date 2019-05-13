@@ -33,7 +33,6 @@ import com.bitcoin.merchant.app.network.WebSocketListener;
 import com.bitcoin.merchant.app.screens.AboutActivity;
 import com.bitcoin.merchant.app.screens.PinActivity;
 import com.bitcoin.merchant.app.screens.SettingsActivity;
-import com.bitcoin.merchant.app.screens.SettingsSetReceivingAddressActivity;
 import com.bitcoin.merchant.app.screens.TabsPagerAdapter;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 
@@ -75,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         initTableLayout();
         if (PinActivity.isPinMissing(this)) {
             createPIN();
-        } else if (!SettingsSetReceivingAddressActivity.isReceivingAddressAvailable(this)) {
+        } else if (!SettingsActivity.isReceivingAddressAvailable(this)) {
             goToSettings(false);
         }
         startWebsockets();

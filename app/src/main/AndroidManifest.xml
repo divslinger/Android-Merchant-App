@@ -62,11 +62,6 @@
             android:screenOrientation="portrait"></activity>
 
         <activity
-            android:name="com.bitcoin.merchant.app.screens.SettingsSetReceivingAddressActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"></activity>
-
-        <activity
             android:name="com.bitcoin.merchant.app.screens.PinActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"></activity>

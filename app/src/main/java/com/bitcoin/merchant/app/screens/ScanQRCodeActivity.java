@@ -10,7 +10,7 @@ import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-import static com.bitcoin.merchant.app.screens.SettingsSetReceivingAddressActivity.SCAN_RESULT;
+import static com.bitcoin.merchant.app.screens.SettingsActivity.SCAN_RESULT;
 
 public class ScanQRCodeActivity extends Activity implements ZXingScannerView.ResultHandler {
     private static final String TAG = "Scanner";
