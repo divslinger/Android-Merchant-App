@@ -26,26 +26,6 @@ public class OSUtil {
         // return Sha256Hash.wrap(userEnteredPIN.getBytes(Charset.forName("UTF8"))).toString();
     }
 
-    public boolean isServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo s : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(s.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasPackage(String p) {
-        PackageManager pm = context.getPackageManager();
-        try {
-            pm.getPackageInfo(p, 0);
-            return true;
-        } catch (PackageManager.NameNotFoundException nnfe) {
-            return false;
-        }
-    }
-
     public String getFootprint() {
         String strFootprint = Build.MANUFACTURER + Build.BRAND + Build.MODEL + Build.DEVICE + Build.PRODUCT + Build.SERIAL;
         return getSha256(strFootprint);

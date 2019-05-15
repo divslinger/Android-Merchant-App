@@ -289,17 +289,19 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
         String fiatAmount = (bchPaymentAmount == -1L)
                 ? ExpectedIncoming.getInstance().getFiat().get(addr) :
                 new AmountUtil(this).formatFiat(amountPayableFiat);
-        DBControllerV3 pdb = new DBControllerV3(PaymentRequestActivity.this);
-        pdb.insertPayment(
-                System.currentTimeMillis() / 1000,
-                receivingAddress,
-                bchAmount,
-                fiatAmount,
-                -1, // confirmations
-                "", // note, message
-                paymentTxHash
-        );
-        pdb.close();
+        try {
+            new DBControllerV3(PaymentRequestActivity.this).insertPayment(
+                    System.currentTimeMillis() / 1000,
+                    receivingAddress,
+                    bchAmount,
+                    fiatAmount,
+                    -1, // confirmations
+                    "", // note, message
+                    paymentTxHash
+            );
+        } catch (Exception e) {
+            Log.e(TAG, "insertPayment", e);
+        }
         if (bchPaymentAmount > bchExpectedAmount) {
             new PaymentTooHighDialog(PaymentRequestActivity.this)
                     .showOverpayment();

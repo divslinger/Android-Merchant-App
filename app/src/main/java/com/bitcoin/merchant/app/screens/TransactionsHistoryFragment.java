@@ -18,6 +18,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ import java.util.TimerTask;
 import static android.content.Context.CLIPBOARD_SERVICE;
 
 public class TransactionsHistoryFragment extends Fragment {
+    private static final String TAG = "TransactionsHistory";
     private static String merchantXpub = null;
     private List<ContentValues> mListItems;
     private TransactionAdapter adapter = null;
@@ -186,19 +188,22 @@ public class TransactionsHistoryFragment extends Fragment {
                     swipeLayout.setRefreshing(true);
                 }
             });
-            if (merchantXpub != null && merchantXpub.length() > 0) {
+            if ((merchantXpub != null) && (merchantXpub.length() > 0)) {
                 // get updated list from database
-                DBControllerV3 pdb = new DBControllerV3(getActivity());
-                ArrayList<ContentValues> vals = pdb.getAllPayments();
-                if (vals.size() > 0) {
-                    mListItems.clear();
-                    mListItems.addAll(vals);
-                    thisActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.notifyDataSetChanged();
-                        }
-                    });
+                try {
+                    ArrayList<ContentValues> vals = new DBControllerV3(getActivity()).getAllPayments();
+                    if (vals.size() > 0) {
+                        mListItems.clear();
+                        mListItems.addAll(vals);
+                        thisActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "getAllPayments", e);
                 }
             }
             return null;
