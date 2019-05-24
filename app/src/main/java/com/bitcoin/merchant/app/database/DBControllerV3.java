@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.bitcoin.merchant.app.util.OSUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
+import com.crashlytics.android.Crashlytics;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -132,6 +133,7 @@ public class DBControllerV3 extends SQLiteOpenHelper {
             close();
         } catch (Exception e) {
             Log.e(TAG, "closeAll", e);
+            Crashlytics.logException(e);
         }
     }
 }

@@ -27,6 +27,7 @@ import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooHighDialog;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooLowDialog;
+import com.crashlytics.android.Crashlytics;
 import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -301,6 +302,7 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
             );
         } catch (Exception e) {
             Log.e(TAG, "insertPayment", e);
+            Crashlytics.logException(e);
         }
         if (bchPaymentAmount > bchExpectedAmount) {
             new PaymentTooHighDialog(PaymentRequestActivity.this)

@@ -33,6 +33,7 @@ import com.bitcoin.merchant.app.database.DBControllerV3;
 import com.bitcoin.merchant.app.util.DateUtil;
 import com.bitcoin.merchant.app.util.MonetaryUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
+import com.crashlytics.android.Crashlytics;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -204,6 +205,7 @@ public class TransactionsHistoryFragment extends Fragment {
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "getAllPayments", e);
+                    Crashlytics.logException(e);
                 }
             }
             return null;

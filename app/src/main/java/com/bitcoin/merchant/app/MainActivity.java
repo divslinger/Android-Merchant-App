@@ -36,6 +36,8 @@ import com.bitcoin.merchant.app.screens.SettingsActivity;
 import com.bitcoin.merchant.app.screens.TabsPagerAdapter;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener, NavigationView.OnNavigationItemSelectedListener {
     public static final String TAG = "MainActivity";
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
         setToolbar();
         setNavigationDrawer();

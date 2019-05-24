@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.bitcoin.merchant.app.util.AppUtil;
+import com.crashlytics.android.Crashlytics;
 
 public class CurrencyDetector {
     private static final String TAG = MainActivity.TAG;
@@ -32,6 +33,7 @@ public class CurrencyDetector {
             Log.i(TAG, "Currency Default Fraction Digits: " + currency.getDefaultFractionDigits());
         } catch (Exception e) {
             Log.e(TAG, "Currency", e);
+            Crashlytics.logException(e);
             // check if currency can be determined from the country code
             if ((countryCode != null) && (countryCode.length() >= 2)) {
                 Map<String,String> countryToCurrency = AppUtil.readFromJsonFile(context, "country_to_currency.json", HashMap.class);
