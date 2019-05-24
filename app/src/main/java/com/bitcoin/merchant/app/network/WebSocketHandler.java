@@ -43,6 +43,7 @@ public class WebSocketHandler {
     public void stop() {
         stopPingTimer();
         if (mConnection != null && mConnection.isOpen()) {
+            mConnection.clearListeners();
             mConnection.disconnect();
         }
     }
@@ -66,9 +67,11 @@ public class WebSocketHandler {
     }
 
     private void startPongTimer() {
-        new Timer().schedule(new TimerTask() {
+        final Timer pongTimer = new Timer();
+        pongTimer.schedule(new TimerTask() {
             @Override
             public void run() {
+                pongTimer.cancel();
                 pongCheckForTimedOut();
             }
         }, pongTimeout);
@@ -134,38 +137,7 @@ public class WebSocketHandler {
 
                             public void onTextMessage(WebSocket websocket, String message) {
                                 try {
-                                    JSONObject jsonObject;
-                                    try {
-                                        jsonObject = new JSONObject(message);
-                                    } catch (JSONException je) {
-                                        jsonObject = null;
-                                    }
-                                    if (jsonObject == null) {
-                                        return;
-                                    }
-                                    String op = (String) jsonObject.get("op");
-                                    if (op.equals("utx") && jsonObject.has("x")) {
-                                        JSONObject objX = (JSONObject) jsonObject.get("x");
-                                        String foundAddr = null;
-                                        long txValue = 0L;
-                                        String txHash = (String) objX.get("hash");
-                                        if (objX.has("out")) {
-                                            JSONArray outArray = (JSONArray) objX.get("out");
-                                            for (int j = 0; j < outArray.length(); j++) {
-                                                JSONObject outObj = (JSONObject) outArray.get(j);
-                                                if (outObj.has("addr")) {
-                                                    if (ExpectedIncoming.getInstance().getBTC().containsKey(outObj.get("addr"))) {
-                                                        foundAddr = (String) outObj.get("addr");
-                                                        txValue = outObj.has("value") ? outObj.getLong("value") : 0;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        if (txValue > 0L) {
-                                            webSocketListener.onIncomingPayment(foundAddr, txValue, txHash);
-                                        }
-                                    }
+                                    parseTx(message);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -177,5 +149,41 @@ public class WebSocketHandler {
             }
             return null;
         }
+    }
+
+    private boolean parseTx(String message) throws JSONException {
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(message);
+        } catch (JSONException je) {
+            jsonObject = null;
+        }
+        if (jsonObject == null) {
+            return true;
+        }
+        String op = (String) jsonObject.get("op");
+        if (op.equals("utx") && jsonObject.has("x")) {
+            JSONObject objX = (JSONObject) jsonObject.get("x");
+            String foundAddr = null;
+            long txValue = 0L;
+            String txHash = (String) objX.get("hash");
+            if (objX.has("out")) {
+                JSONArray outArray = (JSONArray) objX.get("out");
+                for (int j = 0; j < outArray.length(); j++) {
+                    JSONObject outObj = (JSONObject) outArray.get(j);
+                    if (outObj.has("addr")) {
+                        if (ExpectedIncoming.getInstance().getBTC().containsKey(outObj.get("addr"))) {
+                            foundAddr = (String) outObj.get("addr");
+                            txValue = outObj.has("value") ? outObj.getLong("value") : 0;
+                            break;
+                        }
+                    }
+                }
+            }
+            if ((txValue > 0L) && (webSocketListener != null)) {
+                webSocketListener.onIncomingPayment(foundAddr, txValue, txHash);
+            }
+        }
+        return false;
     }
 }
