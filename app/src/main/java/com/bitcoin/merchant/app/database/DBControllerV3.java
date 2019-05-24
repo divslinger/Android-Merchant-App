@@ -12,6 +12,7 @@ import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.crashlytics.android.Crashlytics;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ public class DBControllerV3 extends SQLiteOpenHelper {
     private static final String TAG = "DBControllerV3";
     private static final String DB = "paymentsV3.db";
     private static final String TABLE = "payment";
+    private static final Boolean FAKE_TX_USED = false;
     private final CharSequenceX pw;
 
     public DBControllerV3(Context context) {
@@ -97,6 +99,20 @@ public class DBControllerV3 extends SQLiteOpenHelper {
             }
         } finally {
             closeAll(database, cursor);
+        }
+        if (FAKE_TX_USED) {
+            for (int i = 0; i < 10; i++) {
+                ContentValues vals = new ContentValues();
+                vals.put("_id", "" + i);
+                vals.put("ts", new Date().getTime()+"");
+                vals.put("iad", "1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k");
+                vals.put("amt", 123456789L);
+                vals.put("famt", "$3.55");
+                vals.put("cfm", "1");
+                vals.put("msg", "N/A");
+                vals.put("tx", "-");
+                data.add(vals);
+            }
         }
         return data;
     }
