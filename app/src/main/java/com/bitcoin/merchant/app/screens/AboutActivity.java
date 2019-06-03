@@ -71,6 +71,6 @@ public class AboutActivity extends Activity {
     }
 
     private boolean hasWallet() {
-        return AppUtil.isWalletInstalled(this);
+        return AppUtil.isWalletAppInstalled(this);
     }
 }

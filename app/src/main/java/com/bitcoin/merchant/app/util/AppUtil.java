@@ -20,6 +20,7 @@ public class AppUtil {
     private static final boolean MISSING_WALLET_SIMULATED = false;
     private static Context context = null;
     private static AppUtil instance = null;
+    private volatile WalletUtil walletUtil;
 
     private AppUtil() {
     }
@@ -32,7 +33,18 @@ public class AppUtil {
         return instance;
     }
 
-    public static boolean isWalletInstalled(Activity activity) {
+    /**
+     * For performance reasons, we cache the wallet (reported in May 2019 on Lenovo Tab E8)
+     */
+    public synchronized WalletUtil getWallet() throws Exception {
+        String xPub = AppUtil.getReceivingAddress(context);
+        if (walletUtil == null || !walletUtil.isSameXPub(xPub)) {
+            walletUtil = new WalletUtil(xPub, context);
+        }
+        return walletUtil;
+    }
+
+    public static boolean isWalletAppInstalled(Activity activity) {
         PackageManager pm = activity.getPackageManager();
         try {
             pm.getPackageInfo(PACKAGE_BITCOIN_DOT_COM_WALLET, 0);
@@ -103,8 +115,15 @@ public class AppUtil {
         return getReceivingAddress(ctx).length() != 0;
     }
 
-    public static String getReceivingAddress(Context setReceivingAddressActivity) {
-        return PrefsUtil.getInstance(setReceivingAddressActivity).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+    /**
+     * Gets pubKey or extendedPubKey
+     */
+    public static String getReceivingAddress(Context context) {
+        return PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+    }
+
+    public static void setReceivingAddress(Context context, String receiver) {
+        PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
     }
 
     public static String convertToBitcoinCash(String address) {
@@ -120,17 +139,14 @@ public class AppUtil {
         return address;
     }
 
-    public static void setReceivingAddress(Context ctx, String receiver) {
-        PrefsUtil.getInstance(ctx).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
-    }
-
-    public boolean isV2API() {
-        String strReceiver = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-        return !FormatsUtil.getInstance().isValidBitcoinAddress(strReceiver);
+    public boolean isValidXPub() {
+        String receiver = getReceivingAddress(context);
+        return FormatsUtil.getInstance().isValidXpub(receiver);
     }
 
     public boolean hasValidReceiver() {
-        String receiver = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-        return FormatsUtil.getInstance().isValidBitcoinAddress(receiver) || FormatsUtil.getInstance().isValidXpub(receiver);
+        String receiver = getReceivingAddress(context);
+        return FormatsUtil.getInstance().isValidBitcoinAddress(receiver)
+                || FormatsUtil.getInstance().isValidXpub(receiver);
     }
 }

@@ -68,7 +68,7 @@ public class SettingsActivity extends PreferenceActivity {
         addOptionAddress(ctx);
         addOptionDownloadWallet(ctx);
         addOptionPin(ctx);
-        if (!AppUtil.isReceivingAddressAvailable(ctx) && AppUtil.isWalletInstalled(ctx)) {
+        if (!AppUtil.isReceivingAddressAvailable(ctx) && AppUtil.isWalletAppInstalled(ctx)) {
             new AddNewAddressDialog(ctx).show();
         }
     }
@@ -111,7 +111,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     private void addOptionDownloadWallet(SettingsActivity ctx) {
-        boolean walletInstalled = AppUtil.isWalletInstalled(ctx);
+        boolean walletInstalled = AppUtil.isWalletAppInstalled(ctx);
         Preference p = findPreference("download_wallet");
         if (walletInstalled) {
             getPreferenceScreen().removePreference(p);

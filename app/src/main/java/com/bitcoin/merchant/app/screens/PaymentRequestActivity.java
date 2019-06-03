@@ -25,8 +25,15 @@ import android.widget.TextView;
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
+import com.bitcoin.merchant.app.database.DBControllerV3;
+import com.bitcoin.merchant.app.network.ExpectedIncoming;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooHighDialog;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooLowDialog;
+import com.bitcoin.merchant.app.util.AmountUtil;
+import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.util.MonetaryUtil;
+import com.bitcoin.merchant.app.util.PrefsUtil;
+import com.bitcoin.merchant.app.util.ToastCustom;
 import com.crashlytics.android.Crashlytics;
 import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.zxing.BarcodeFormat;
@@ -37,15 +44,6 @@ import com.google.zxing.client.android.encode.QRCodeEncoder;
 import org.bitcoinj.core.Coin;
 
 import java.math.BigInteger;
-
-import com.bitcoin.merchant.app.database.DBControllerV3;
-import com.bitcoin.merchant.app.network.ExpectedIncoming;
-import com.bitcoin.merchant.app.util.AmountUtil;
-import com.bitcoin.merchant.app.util.AppUtil;
-import com.bitcoin.merchant.app.util.MonetaryUtil;
-import com.bitcoin.merchant.app.util.PrefsUtil;
-import com.bitcoin.merchant.app.util.ToastCustom;
-import com.bitcoin.merchant.app.util.WalletUtil;
 
 import static com.bitcoin.merchant.app.MainActivity.TAG;
 
@@ -205,11 +203,10 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
             @Override
             protected String doInBackground(Void... params) {
                 //Generate new address/QR code for receive
-                String address = PrefsUtil.getInstance(PaymentRequestActivity.this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-                if (AppUtil.getInstance(PaymentRequestActivity.this).isV2API()) {
+                AppUtil util = AppUtil.getInstance(PaymentRequestActivity.this);
+                if (util.isValidXPub()) {
                     try {
-                        WalletUtil walletUtil = new WalletUtil(address, context);
-                        receivingAddress = walletUtil.generateAddressFromXPub();
+                        receivingAddress = util.getWallet().generateAddressFromXPub();
                         Log.i(TAG, "BCH-address(xPub) to receive: " + receivingAddress);
                     } catch (Exception e) {
                         receivingAddress = null;
@@ -217,7 +214,7 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
                         e.printStackTrace();
                     }
                 } else {
-                    receivingAddress = address;
+                    receivingAddress = AppUtil.getReceivingAddress(context);
                 }
                 if (receivingAddress == null) {
                     ToastCustom.makeText(PaymentRequestActivity.this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
@@ -291,9 +288,13 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
                 ? ExpectedIncoming.getInstance().getFiat().get(addr) :
                 new AmountUtil(this).formatFiat(amountPayableFiat);
         try {
+            AppUtil util = AppUtil.getInstance(this);
+            if (util.isValidXPub()) {
+                util.getWallet().addUsedAddress(addr);
+            }
             new DBControllerV3(PaymentRequestActivity.this).insertPayment(
                     System.currentTimeMillis() / 1000,
-                    receivingAddress,
+                    addr,
                     bchAmount,
                     fiatAmount,
                     -1, // confirmations
