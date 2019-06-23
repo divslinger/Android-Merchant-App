@@ -1,6 +1,7 @@
 package com.bitcoin.merchant.app.network;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
@@ -14,77 +15,41 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Timer;
-import java.util.TimerTask;
-//import android.util.Log;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * Socket will reconnect even without calling again webSocketHandler.start()
+ * and without ACTION_INTENT_RECONNECT being sent by the ConnectivityManager.
+ * The number of Thread will stay constant about 17 or 18 on OS v5.
+ */
 public class WebSocketHandler {
-    private final long pingInterval = 20000L;//ping every 20 seconds
-    private final long pongTimeout = 5000L;//pong timeout after 5 seconds
-    private volatile WebSocket mConnection = null;
-    private WebSocketListener webSocketListener = null;
-    private HashSet<String> sentMessageSet = new HashSet<>();
-    private volatile Timer pingTimer = null;
-    private volatile boolean pingPongSuccess = false;
+    private static final long PING_INTERVAL = 20 * 1000L; // ping every 20 seconds
+    private static final String TAG = "WebSocketHandler";
+    private volatile WebSocket mConnection;
+    private WebSocketListener webSocketListener;
+    private Set<String> sentMessageSet = new HashSet<>();
+    private final WebSocketFactory webSocketFactory;
 
     public WebSocketHandler() {
+        this.webSocketFactory = new WebSocketFactory();
     }
 
     public void start() {
         try {
+            Log.i(TAG, "start threads:" + Thread.activeCount());
             stop();
             connect();
-            startPingTimer();
-        } catch (IOException | com.neovisionaries.ws.client.WebSocketException e) {
-            e.printStackTrace();
+        } catch (IOException | WebSocketException e) {
+            Log.e(TAG, "start", e);
         }
     }
 
     public void stop() {
-        stopPingTimer();
-        if (mConnection != null && mConnection.isOpen()) {
+        if (isConnected()) {
             mConnection.clearListeners();
             mConnection.disconnect();
-        }
-    }
-
-    private synchronized void startPingTimer() {
-        pingTimer = new Timer();
-        pingTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                ping();
-            }
-        }, pingInterval, pingInterval);
-    }
-
-    private void ping() {
-        if (mConnection != null) {
-            pingPongSuccess = false;
-            if (mConnection.isOpen()) mConnection.sendPing();
-            startPongTimer();
-        }
-    }
-
-    private void startPongTimer() {
-        final Timer pongTimer = new Timer();
-        pongTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                pongTimer.cancel();
-                pongCheckForTimedOut();
-            }
-        }, pongTimeout);
-    }
-
-    private synchronized void stopPingTimer() {
-        if (pingTimer != null) pingTimer.cancel();
-    }
-
-    private void pongCheckForTimedOut() {
-        if (!pingPongSuccess) {
-            // ping pong unsuccessful after x seconds - restart connection
-            start();
         }
     }
 
@@ -96,23 +61,21 @@ public class WebSocketHandler {
         return mConnection != null && mConnection.isOpen();
     }
 
-    public void addListener(WebSocketListener webSocketListener) {
+    public void setListener(WebSocketListener webSocketListener) {
         this.webSocketListener = webSocketListener;
     }
 
     private void send(String message) {
-        //Make sure each message is only sent once per socket lifetime
+        // Make sure each message is only sent once per socket lifetime
         if (!sentMessageSet.contains(message)) {
             try {
-                if (mConnection != null && mConnection.isOpen()) {
+                if (isConnected()) {
                     mConnection.sendText(message);
                     sentMessageSet.add(message);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "send:" + message);
             }
-        } else {
-//            Log.d("WebSocketHandler", "Message sent already: "+message);
         }
     }
 
@@ -125,27 +88,47 @@ public class WebSocketHandler {
             try {
                 sentMessageSet.clear();
                 // https://www.blockchain.com/api/api_websocket
-                mConnection = new WebSocketFactory()
+                mConnection = webSocketFactory
                         .createSocket("wss://ws.blockchain.info/bch/inv")
                         .addHeader("Origin", "https://blockchain.info").recreate()
                         .addListener(new WebSocketAdapter() {
                             @Override
                             public void onPongFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
                                 super.onPongFrame(websocket, frame);
-                                pingPongSuccess = true;
+                                Log.d(TAG, "PongSuccess threads:" + Thread.activeCount());
                             }
 
+                            @Override
+                            public void onPingFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                                super.onPingFrame(websocket, frame);
+                                Log.d(TAG, "PingSuccess threads:" + Thread.activeCount());
+                            }
+
+                            @Override
+                            public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
+                                super.onConnected(websocket, headers);
+                                Log.i(TAG, "onConnected threads:" + Thread.activeCount());
+                            }
+
+                            @Override
+                            public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
+                                super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer);
+                                Log.e(TAG, "onDisconnected threads:" + Thread.activeCount());
+                            }
+
+                            @Override
                             public void onTextMessage(WebSocket websocket, String message) {
                                 try {
                                     parseTx(message);
                                 } catch (Exception e) {
-                                    e.printStackTrace();
+                                    Log.e(TAG, message, e);
                                 }
                             }
                         });
+                mConnection.setPingInterval(PING_INTERVAL);
                 mConnection.connect();
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "Connect", e);
             }
             return null;
         }
@@ -172,8 +155,9 @@ public class WebSocketHandler {
                 for (int j = 0; j < outArray.length(); j++) {
                     JSONObject outObj = (JSONObject) outArray.get(j);
                     if (outObj.has("addr")) {
-                        if (ExpectedIncoming.getInstance().getBTC().containsKey(outObj.get("addr"))) {
-                            foundAddr = (String) outObj.get("addr");
+                        String addr = (String) outObj.get("addr");
+                        if (ExpectedIncoming.getInstance().isValidAddress(addr)) {
+                            foundAddr = addr;
                             txValue = outObj.has("value") ? outObj.getLong("value") : 0;
                             break;
                         }

@@ -1,30 +1,44 @@
 package com.bitcoin.merchant.app.network;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ExpectedIncoming {
-    private static HashMap<String, Long> incomingBTC = null;
-    private static HashMap<String, String> incomingFiat = null;
-    private static ExpectedIncoming instance = null;
+    private static class Amounts {
+        final long bch;
+        final String fiat;
+
+        public Amounts(long bch, String fiat) {
+            this.bch = bch;
+            this.fiat = fiat;
+        }
+    }
+
+    private static final ExpectedIncoming instance = new ExpectedIncoming();
+    private final Map<String, Amounts> addressToAmounts = new ConcurrentHashMap<>();
 
     private ExpectedIncoming() {
-        ;
     }
 
     public static ExpectedIncoming getInstance() {
-        if (instance == null) {
-            incomingBTC = new HashMap<String, Long>();
-            incomingFiat = new HashMap<String, String>();
-            instance = new ExpectedIncoming();
-        }
         return instance;
     }
 
-    public HashMap<String, Long> getBTC() {
-        return incomingBTC;
+    public void setExpectedAmounts(String receivingAddress, long bchAmount, String fiatAmount) {
+        addressToAmounts.put(receivingAddress, new Amounts(bchAmount, fiatAmount));
     }
 
-    public HashMap<String, String> getFiat() {
-        return incomingFiat;
+    public long getBchAmount(String receivingAddress) {
+        Amounts amounts = addressToAmounts.get(receivingAddress);
+        return (amounts == null) ? 0L : amounts.bch;
+    }
+
+    public String getFiatAmount(String receivingAddress) {
+        Amounts amounts = addressToAmounts.get(receivingAddress);
+        return (amounts == null) ? null : amounts.fiat;
+    }
+
+    public boolean isValidAddress(String receivingAddress) {
+        return addressToAmounts.containsKey(receivingAddress);
     }
 }

@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -24,8 +22,6 @@ import android.widget.TextView;
 
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
-import com.bitcoin.merchant.app.currency.CurrencyExchange;
-import com.bitcoin.merchant.app.database.DBControllerV3;
 import com.bitcoin.merchant.app.network.ExpectedIncoming;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooHighDialog;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooLowDialog;
@@ -34,7 +30,6 @@ import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.MonetaryUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.bitcoin.merchant.app.util.ToastCustom;
-import com.crashlytics.android.Crashlytics;
 import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -57,36 +52,44 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
     private ImageView ivCheck = null;
     private TextView tvStatus = null;
     private String receivingAddress = null;
+
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
-            //Catch incoming tx
             if (MainActivity.ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
-                soundAlert();
                 final String addr = intent.getStringExtra("payment_address");
-                final long paymentAmount = intent.getLongExtra("payment_amount", 0L);
-                final String paymentTxHash = intent.getStringExtra("payment_tx_hash");
-                // underpayment
-                Long expectedAmount = ExpectedIncoming.getInstance().getBTC().get(addr);
-                if (paymentAmount < expectedAmount) {
-                    Runnable closingAction = new Runnable() {
-                        @Override
-                        public void run() {
-                            onPaymentReceived(addr, paymentAmount, paymentTxHash);
-                        }
-                    };
-                    new PaymentTooLowDialog(PaymentRequestActivity.this)
-                            .showUnderpayment(paymentAmount, expectedAmount, closingAction);
-                } else if (paymentAmount > expectedAmount) {
-                    // overpayment
-                    onPaymentReceived(addr, paymentAmount, paymentTxHash);
-                } else {
-                    // expected amount
-                    onPaymentReceived(addr, -1L, paymentTxHash);
+                final long bchReceived = intent.getLongExtra("payment_amount", 0L);
+                if (receivingAddress == null || ! receivingAddress.equalsIgnoreCase(addr)) {
+                    // different address: might be a previous one, keep the payment request
+                    return;
                 }
+                onPaymentReceived(context, addr, bchReceived);
             }
         }
     };
+
+    private void onPaymentReceived(Context context, String addr, long bchReceived) {
+        Long bchExpected = ExpectedIncoming.getInstance().getBchAmount(addr);
+        if (bchReceived < bchExpected) {
+            // underpayment
+            Runnable closingAction = new Runnable() {
+                @Override
+                public void run() {
+                    showCheckMark();
+                }
+            };
+            new PaymentTooLowDialog(context)
+                    .showUnderpayment(bchReceived, bchExpected, closingAction);
+        } else if (bchReceived > bchExpected) {
+            // overpayment
+            showCheckMark();
+            new PaymentTooHighDialog(context).showOverpayment();
+        } else {
+            // expected amount
+            showCheckMark();
+        }
+    }
+
     private BigInteger bamount = null;
 
     @Override
@@ -225,8 +228,7 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
                 intent.putExtra("address", receivingAddress);
                 LocalBroadcastManager.getInstance(PaymentRequestActivity.this).sendBroadcast(intent);
                 long lAmount = getLongAmount(amountBtc);
-                ExpectedIncoming.getInstance().getBTC().put(receivingAddress, lAmount);
-                ExpectedIncoming.getInstance().getFiat().put(receivingAddress, strFiat);
+                ExpectedIncoming.getInstance().setExpectedAmounts(receivingAddress, lAmount, strFiat);
                 displayQRCode(lAmount);
                 return receivingAddress;
             }
@@ -245,23 +247,7 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
         return longValue;
     }
 
-    public void soundAlert() {
-        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        if (audioManager != null && audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
-            MediaPlayer mp;
-            mp = MediaPlayer.create(this, R.raw.alert);
-            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mp.reset();
-                    mp.release();
-                }
-            });
-            mp.start();
-        }
-    }
-
-    private void onPaymentReceived(String addr, long bchPaymentAmount, String paymentTxHash) {
+    private void showCheckMark() {
         ivCancel.setVisibility(View.GONE);
         ivReceivingQr.setVisibility(View.GONE);
         ivCheck.setVisibility(View.VISIBLE);
@@ -277,43 +263,7 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
         tvStatus.setTextColor(getResources().getColor(R.color.blockchain_receive_green));
         tvBtcAmount.setVisibility(View.GONE);
         tvFiatAmount.setVisibility(View.GONE);
-        Long bchExpectedAmount = ExpectedIncoming.getInstance().getBTC().get(addr);
-        long bchAmount = (bchPaymentAmount == -1L) ? bchExpectedAmount : bchPaymentAmount;
-        if (bchAmount != bchExpectedAmount) {
-            bchAmount *= -1L;
-        }
-        Double currencyPrice = CurrencyExchange.getInstance(PaymentRequestActivity.this).getCurrencyPrice(getCurrency());
-        double amountPayableFiat = (Math.abs((double) bchAmount) / 1e8) * currencyPrice;
-        String fiatAmount = (bchPaymentAmount == -1L)
-                ? ExpectedIncoming.getInstance().getFiat().get(addr) :
-                new AmountUtil(this).formatFiat(amountPayableFiat);
-        try {
-            AppUtil util = AppUtil.getInstance(this);
-            if (util.isValidXPub()) {
-                util.getWallet().addUsedAddress(addr);
-            }
-            new DBControllerV3(PaymentRequestActivity.this).insertPayment(
-                    System.currentTimeMillis() / 1000,
-                    addr,
-                    bchAmount,
-                    fiatAmount,
-                    -1, // confirmations
-                    "", // note, message
-                    paymentTxHash
-            );
-        } catch (Exception e) {
-            Log.e(TAG, "insertPayment", e);
-            Crashlytics.logException(e);
-        }
-        if (bchPaymentAmount > bchExpectedAmount) {
-            new PaymentTooHighDialog(PaymentRequestActivity.this)
-                    .showOverpayment();
-        }
         setResult(RESULT_OK);
-    }
-
-    private String getCurrency() {
-        return AppUtil.getCurrency(this);
     }
 
     private void write2NFC(final String uri) {

@@ -1,9 +1,12 @@
 package com.bitcoin.merchant.app;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -31,12 +34,15 @@ import android.widget.Toast;
 import com.bitcoin.merchant.app.network.WebSocketHandler;
 import com.bitcoin.merchant.app.network.WebSocketListener;
 import com.bitcoin.merchant.app.screens.AboutActivity;
+import com.bitcoin.merchant.app.screens.PaymentProcessor;
 import com.bitcoin.merchant.app.screens.PinActivity;
 import com.bitcoin.merchant.app.screens.SettingsActivity;
 import com.bitcoin.merchant.app.screens.TabsPagerAdapter;
+import com.bitcoin.merchant.app.screens.TransactionsHistoryFragment;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.crashlytics.android.Crashlytics;
+
 import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener, NavigationView.OnNavigationItemSelectedListener {
@@ -45,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     public static final String ACTION_INTENT_SUBSCRIBE_TO_ADDRESS = APP_PACKAGE + "MainActivity.SUBSCRIBE_TO_ADDRESS";
     public static final String ACTION_INTENT_INCOMING_TX = APP_PACKAGE + "MainActivity.ACTION_INTENT_INCOMING_TX";
     public static final String ACTION_INTENT_RECONNECT = APP_PACKAGE + "MainActivity.ACTION_INTENT_RECONNECT";
+    public static final String ACTION_INTENT_SHOW_HISTORY = APP_PACKAGE + "MainActivity.ACTION_INTENT_SHOW_HISTORY";
     public static int SETTINGS_ACTIVITY = 1;
     private static int PIN_ACTIVITY = 2;
     private static int RESET_PIN_ACTIVITY = 3;
@@ -57,14 +64,58 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             if (ACTION_INTENT_SUBSCRIBE_TO_ADDRESS.equals(intent.getAction())) {
                 webSocketHandler.subscribeToAddress(intent.getStringExtra("address"));
             }
-            //Connection re-established
             if (ACTION_INTENT_RECONNECT.equals(intent.getAction())) {
                 if (webSocketHandler != null && !webSocketHandler.isConnected()) {
                     webSocketHandler.start();
                 }
             }
+            if (ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
+                final String addr = intent.getStringExtra("payment_address");
+                final long paymentAmount = intent.getLongExtra("payment_amount", 0L);
+                final String paymentTxHash = intent.getStringExtra("payment_tx_hash");
+                ContentValues values = new PaymentProcessor(context).receive(addr, paymentAmount, paymentTxHash);
+                showTxHistoryPage();
+                soundAlert();
+                updateTxHistoryList(values);
+            }
+            if (ACTION_INTENT_SHOW_HISTORY.equals(intent.getAction())) {
+                showTxHistoryPage();
+            }
         }
     };
+
+    private void updateTxHistoryList(ContentValues values) {
+        if (viewPager != null) {
+            TabsPagerAdapter pagerAdapter = (TabsPagerAdapter) viewPager.getAdapter();
+            TransactionsHistoryFragment transactionsHistoryFragment = (TransactionsHistoryFragment) pagerAdapter.getItem(1);
+            transactionsHistoryFragment.addTx(values);
+        }
+    }
+
+    private void showTxHistoryPage() {
+        if (viewPager != null) {
+            viewPager.setCurrentItem(1);
+        }
+    }
+
+    private ViewPager viewPager;
+
+    public void soundAlert() {
+        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        if (audioManager != null && audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
+            MediaPlayer mp;
+            mp = MediaPlayer.create(this, R.raw.alert);
+            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.reset();
+                    mp.release();
+                }
+            });
+            mp.start();
+        }
+    }
+
     //Navigation Drawer
     private Toolbar toolbar = null;
 
@@ -88,9 +139,11 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
         filter.addAction(ACTION_INTENT_RECONNECT);
+        filter.addAction(ACTION_INTENT_INCOMING_TX);
+        filter.addAction(ACTION_INTENT_SHOW_HISTORY);
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
         webSocketHandler = new WebSocketHandler();
-        webSocketHandler.addListener(this);
+        webSocketHandler.setListener(this);
         webSocketHandler.start();
     }
 
@@ -125,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     @Override
     protected void onDestroy() {
-        //Stop websockets
         webSocketHandler.stop();
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
         super.onDestroy();
@@ -134,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     private void initTableLayout() {
         String[] tabs = new String[]{getResources().getString(R.string.tab_payment), getResources().getString(R.string.tab_history)};
         TabLayout tabLayout = findViewById(R.id.tabs);
-        ViewPager viewPager = findViewById(R.id.pager);
+        viewPager = findViewById(R.id.pager);
         PagerAdapter mAdapter = new TabsPagerAdapter(getSupportFragmentManager(), tabs);
         viewPager.setAdapter(mAdapter);
         tabLayout.setupWithViewPager(viewPager);

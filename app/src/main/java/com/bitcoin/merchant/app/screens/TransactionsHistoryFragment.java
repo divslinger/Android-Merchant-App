@@ -118,8 +118,6 @@ public class TransactionsHistoryFragment extends Fragment {
                     }
                 }
             }
-        } else {
-            ;
         }
     }
 
@@ -175,6 +173,16 @@ public class TransactionsHistoryFragment extends Fragment {
             ClipData clipData = ClipData.newPlainText("Source Text", text);
             clipboardManager.setPrimaryClip(clipData);
         }
+    }
+
+    public void addTx(ContentValues val) {
+        mListItems.add(0, val);
+        thisActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private class GetDataTask extends AsyncTask<Void, Void, String[]> {

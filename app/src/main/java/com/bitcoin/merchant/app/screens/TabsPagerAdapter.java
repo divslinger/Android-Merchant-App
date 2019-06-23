@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 public class TabsPagerAdapter extends FragmentPagerAdapter {
     private String[] tabs = null;
+    private PaymentInputFragment paymentInputFragment;
+    private TransactionsHistoryFragment transactionsHistoryFragment;
 
     public TabsPagerAdapter(FragmentManager fm, String[] tabs) {
         super(fm);
@@ -25,9 +27,15 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new PaymentInputFragment();
+                if (paymentInputFragment == null) {
+                    paymentInputFragment = new PaymentInputFragment();
+                }
+                return paymentInputFragment;
             case 1:
-                return new TransactionsHistoryFragment();
+                if (transactionsHistoryFragment == null) {
+                    transactionsHistoryFragment = new TransactionsHistoryFragment();
+                }
+                return transactionsHistoryFragment;
             default:
                 return null;
         }

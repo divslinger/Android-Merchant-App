@@ -55,10 +55,11 @@ public class DBControllerV3 extends SQLiteOpenHelper {
         onCreate(database);
     }
 
-    public void insertPayment(long ts, String address, long amount, String fiat_amount, int confirmed, String message, String tx)
+    public ContentValues insertPayment(long ts, String address, long amount, String fiat_amount, int confirmed, String message, String tx)
             throws Exception {
         SQLiteDatabase database = null;
         try {
+            tx = tx != null ? tx : "";
             database = this.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put("ts", ts);
@@ -67,11 +68,20 @@ public class DBControllerV3 extends SQLiteOpenHelper {
             values.put("famt", AESUtil.encrypt(fiat_amount, pw, AESUtil.PinPbkdf2Iterations));
             values.put("cfm", AESUtil.encrypt(Integer.toString(confirmed), pw, AESUtil.PinPbkdf2Iterations));
             values.put("msg", AESUtil.encrypt(message, pw, AESUtil.PinPbkdf2Iterations));
-            values.put("tx", AESUtil.encrypt(tx != null ? tx : "", pw, AESUtil.PinPbkdf2Iterations));
+            values.put("tx", AESUtil.encrypt(tx, pw, AESUtil.PinPbkdf2Iterations));
             database.insert(TABLE, null, values);
         } finally {
             closeAll(database, null);
         }
+        ContentValues vals = new ContentValues();
+        vals.put("ts", ts);
+        vals.put("iad", address);
+        vals.put("amt", Long.toString(amount));
+        vals.put("famt", fiat_amount);
+        vals.put("cfm", Integer.toString(confirmed));
+        vals.put("msg", message);
+        vals.put("tx", tx);
+        return vals;
     }
 
     public ArrayList<ContentValues> getAllPayments()
