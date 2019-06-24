@@ -63,12 +63,12 @@ public class DBControllerV3 extends SQLiteOpenHelper {
             database = this.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put("ts", ts);
-            values.put("iad", AESUtil.encrypt(address, pw, AESUtil.PinPbkdf2Iterations));
-            values.put("amt", AESUtil.encrypt(Long.toString(amount), pw, AESUtil.PinPbkdf2Iterations));
-            values.put("famt", AESUtil.encrypt(fiat_amount, pw, AESUtil.PinPbkdf2Iterations));
-            values.put("cfm", AESUtil.encrypt(Integer.toString(confirmed), pw, AESUtil.PinPbkdf2Iterations));
-            values.put("msg", AESUtil.encrypt(message, pw, AESUtil.PinPbkdf2Iterations));
-            values.put("tx", AESUtil.encrypt(tx, pw, AESUtil.PinPbkdf2Iterations));
+            values.put("iad", address);
+            values.put("amt", Long.toString(amount));
+            values.put("famt", fiat_amount);
+            values.put("cfm", Integer.toString(confirmed));
+            values.put("msg", message);
+            values.put("tx", tx);
             database.insert(TABLE, null, values);
         } finally {
             closeAll(database, null);
@@ -88,33 +88,35 @@ public class DBControllerV3 extends SQLiteOpenHelper {
             throws Exception {
         ArrayList<ContentValues> data = new ArrayList<>();
         SQLiteDatabase database = null;
-        Cursor cursor = null;
+        Cursor c = null;
         try {
             String selectQuery = "SELECT * FROM payment ORDER BY ts DESC";
             database = this.getReadableDatabase();
-            cursor = database.rawQuery(selectQuery, null);
-            if (cursor.moveToFirst()) {
+            c = database.rawQuery(selectQuery, null);
+            if (c.moveToFirst()) {
                 do {
                     ContentValues vals = new ContentValues();
-                    vals.put("_id", cursor.getString(0));
-                    vals.put("ts", cursor.getLong(1));
-                    vals.put("iad", AESUtil.decrypt(cursor.getString(2), pw, AESUtil.PinPbkdf2Iterations));
-                    vals.put("amt", Long.parseLong(AESUtil.decrypt(cursor.getString(3), pw, AESUtil.PinPbkdf2Iterations)));
-                    vals.put("famt", AESUtil.decrypt(cursor.getString(4), pw, AESUtil.PinPbkdf2Iterations));
-                    vals.put("cfm", Integer.parseInt(AESUtil.decrypt(cursor.getString(5), pw, AESUtil.PinPbkdf2Iterations)));
-                    vals.put("msg", AESUtil.decrypt(cursor.getString(6), pw, AESUtil.PinPbkdf2Iterations));
-                    vals.put("tx", AESUtil.decrypt(cursor.getString(7), pw, AESUtil.PinPbkdf2Iterations));
+                    vals.put("_id", c.getString(0));
+                    vals.put("ts", c.getLong(1));
+                    vals.put("iad", c.getString(2));
+                    vals.put("amt", c.getString(3));
+                    vals.put("famt", c.getString(4));
+                    vals.put("cfm", c.getString(5));
+                    vals.put("msg", c.getString(6));
+                    vals.put("tx", c.getString(7));
                     data.add(vals);
-                } while (cursor.moveToNext());
+                } while (c.moveToNext());
             }
         } finally {
-            closeAll(database, cursor);
+            closeAll(database, c);
         }
+        // decrypt and overwrite decrypted
+        formatDecryptAndResave(data);
         if (FAKE_TX_USED) {
             for (int i = 0; i < 10; i++) {
                 ContentValues vals = new ContentValues();
                 vals.put("_id", "" + i);
-                vals.put("ts", new Date().getTime()+"");
+                vals.put("ts", new Date().getTime() + "");
                 vals.put("iad", "1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k");
                 vals.put("amt", 123456789L);
                 vals.put("famt", "$3.55");
@@ -125,6 +127,44 @@ public class DBControllerV3 extends SQLiteOpenHelper {
             }
         }
         return data;
+    }
+
+    private void formatDecryptAndResave(ArrayList<ContentValues> data) {
+        SQLiteDatabase database = null;
+        try {
+            for (int i = 0; i < data.size(); i++) {
+                ContentValues vals = data.get(i);
+                try {
+                    formatValues(vals);
+                } catch (Exception e) {
+                    // decrypt
+                    vals.put("iad", AESUtil.decrypt(vals.getAsString("iad"), pw, AESUtil.PinPbkdf2Iterations));
+                    vals.put("amt", AESUtil.decrypt(vals.getAsString("amt"), pw, AESUtil.PinPbkdf2Iterations));
+                    vals.put("famt", AESUtil.decrypt(vals.getAsString("famt"), pw, AESUtil.PinPbkdf2Iterations));
+                    vals.put("cfm", AESUtil.decrypt(vals.getAsString("cfm"), pw, AESUtil.PinPbkdf2Iterations));
+                    vals.put("msg", AESUtil.decrypt(vals.getAsString("msg"), pw, AESUtil.PinPbkdf2Iterations));
+                    vals.put("tx", AESUtil.decrypt(vals.getAsString("tx"), pw, AESUtil.PinPbkdf2Iterations));
+                    Log.i(TAG, "decrypted record:" + vals.get("_id"));
+                    // resave
+                    if (database == null) {
+                        database = this.getWritableDatabase();
+                    }
+                    int result = database.update(TABLE, vals, "_id=" + vals.get("_id"), null);
+                    Log.i(TAG, "resaved record:" + vals.get("_id") + ", update:" + result);
+                    // format
+                    formatValues(vals);
+                }
+            }
+        } finally {
+            closeAll(database, null);
+        }
+    }
+
+    private void formatValues(ContentValues vals) {
+        long amt = Long.parseLong(vals.getAsString("amt"));
+        int cfm = Integer.parseInt(vals.getAsString("cfm"));
+        vals.put("amt", amt);
+        vals.put("cfm", cfm);
     }
 
     public Set<String> getAllAddresses()
