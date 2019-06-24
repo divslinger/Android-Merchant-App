@@ -5,6 +5,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 public class TabsPagerAdapter extends FragmentPagerAdapter {
+    public static final int TAB_INPUT_AMOUNT = 0;
+    public static final int TAB_TX_HISTORY = 1;
+
     private String[] tabs = null;
     private PaymentInputFragment paymentInputFragment;
     private TransactionsHistoryFragment transactionsHistoryFragment;

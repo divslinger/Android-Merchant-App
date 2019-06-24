@@ -73,10 +73,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
                 final String addr = intent.getStringExtra("payment_address");
                 final long paymentAmount = intent.getLongExtra("payment_amount", 0L);
                 final String paymentTxHash = intent.getStringExtra("payment_tx_hash");
-                ContentValues values = new PaymentProcessor(context).receive(addr, paymentAmount, paymentTxHash);
-                showTxHistoryPage();
-                soundAlert();
-                updateTxHistoryList(values);
+                processIncomingTx(addr, paymentAmount, paymentTxHash);
             }
             if (ACTION_INTENT_SHOW_HISTORY.equals(intent.getAction())) {
                 showTxHistoryPage();
@@ -84,17 +81,26 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         }
     };
 
-    private void updateTxHistoryList(ContentValues values) {
+    private void processIncomingTx(String addr, long paymentAmount, String paymentTxHash) {
+        ContentValues tx = new PaymentProcessor(this).receive(addr, paymentAmount, paymentTxHash);
+        addTxToHistory(tx);
+        showTxHistoryPage();
+        soundAlert();
+    }
+
+    private void addTxToHistory(ContentValues tx) {
         if (viewPager != null) {
             TabsPagerAdapter pagerAdapter = (TabsPagerAdapter) viewPager.getAdapter();
-            TransactionsHistoryFragment transactionsHistoryFragment = (TransactionsHistoryFragment) pagerAdapter.getItem(1);
-            transactionsHistoryFragment.addTx(values);
+            if (pagerAdapter != null) {
+                TransactionsHistoryFragment transactionsHistoryFragment = (TransactionsHistoryFragment) pagerAdapter.getItem(TabsPagerAdapter.TAB_TX_HISTORY);
+                transactionsHistoryFragment.addTx(tx);
+            }
         }
     }
 
     private void showTxHistoryPage() {
         if (viewPager != null) {
-            viewPager.setCurrentItem(1);
+            viewPager.setCurrentItem(TabsPagerAdapter.TAB_TX_HISTORY);
         }
     }
 
