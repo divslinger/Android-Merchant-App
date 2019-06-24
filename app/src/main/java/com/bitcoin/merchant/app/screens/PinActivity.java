@@ -94,7 +94,6 @@ public class PinActivity extends Activity {
     private void confirmNewPin() {
         // End of Confirm - Pin is confirmed
         String hashed = OSUtil.getSha256(userEnteredPIN);
-//      ToastCustom.makeText(PinActivity.this, hashed, ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_OK);
         PrefsUtil.getInstance(PinActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PIN, hashed);
         PrefsUtil.getInstance(PinActivity.this).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, 0);
         setResult(RESULT_OK);
@@ -109,31 +108,42 @@ public class PinActivity extends Activity {
             setResult(RESULT_OK);
             finish();
         } else {
-            ToastCustom.makeText(PinActivity.this, getString(R.string.pin_code_enter_error), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
-            clearPinBoxes();
-            userEnteredPIN = "";
-            userEnteredPINConfirm = null;
+            delayAction(new Runnable() {
+                @Override
+                public void run() {
+                    ToastCustom.makeText(PinActivity.this, getString(R.string.pin_code_enter_error), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+                    clearPinBoxes();
+                    userEnteredPIN = "";
+                    userEnteredPINConfirm = null;
+                }
+            }, 750);
         }
     }
 
     private void createNewPin() {
         // End of Create -  Change to Confirm
-        Timer timer = new Timer();
+        Runnable action = new Runnable() {
+            @Override
+            public void run() {
+                titleView.setText(R.string.confirm_pin);
+                explanationView.setText("");
+                clearPinBoxes();
+                userEnteredPINConfirm = userEnteredPIN;
+                userEnteredPIN = "";
+            }
+        };
+        delayAction(action, 200);
+    }
+
+    private void delayAction(final Runnable action, int delay) {
+        final Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                PinActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        titleView.setText(R.string.confirm_pin);
-                        explanationView.setText("");
-                        clearPinBoxes();
-                        userEnteredPINConfirm = userEnteredPIN;
-                        userEnteredPIN = "";
-                    }
-                });
+                PinActivity.this.runOnUiThread(action);
+                timer.cancel();
             }
-        }, 200);
+        }, delay);
     }
 
     private void pinCreationError() {
