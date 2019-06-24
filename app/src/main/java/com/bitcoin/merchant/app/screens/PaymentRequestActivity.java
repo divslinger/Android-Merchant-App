@@ -2,6 +2,8 @@ package com.bitcoin.merchant.app.screens;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -22,7 +24,7 @@ import android.widget.TextView;
 
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
-import com.bitcoin.merchant.app.network.ExpectedIncoming;
+import com.bitcoin.merchant.app.network.ExpectedPayments;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooHighDialog;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooLowDialog;
 import com.bitcoin.merchant.app.util.AmountUtil;
@@ -42,7 +44,7 @@ import java.math.BigInteger;
 
 import static com.bitcoin.merchant.app.MainActivity.TAG;
 
-public class PaymentRequestActivity extends Activity implements View.OnClickListener {
+public class PaymentRequestActivity extends Activity {
     private TextView tvMerchantName = null;
     private TextView tvFiatAmount = null;
     private TextView tvBtcAmount = null;
@@ -52,45 +54,39 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
     private ImageView ivCheck = null;
     private TextView tvStatus = null;
     private String receivingAddress = null;
-
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
             if (MainActivity.ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
-                final String addr = intent.getStringExtra("payment_address");
-                final long bchReceived = intent.getLongExtra("payment_amount", 0L);
-                if (receivingAddress == null || ! receivingAddress.equalsIgnoreCase(addr)) {
+                PaymentReceived p = new PaymentReceived(intent);
+                if (receivingAddress == null || !receivingAddress.equalsIgnoreCase(p.addr)) {
                     // different address: might be a previous one, keep the payment request
                     return;
                 }
-                onPaymentReceived(context, addr, bchReceived);
+                onPaymentReceived(p);
             }
         }
     };
+    private String qrCodeUri;
 
-    private void onPaymentReceived(Context context, String addr, long bchReceived) {
-        Long bchExpected = ExpectedIncoming.getInstance().getBchAmount(addr);
-        if (bchReceived < bchExpected) {
-            // underpayment
+    private void onPaymentReceived(PaymentReceived p) {
+        if (p.isUnderpayment()) {
             Runnable closingAction = new Runnable() {
                 @Override
                 public void run() {
                     showCheckMark();
                 }
             };
-            new PaymentTooLowDialog(context)
-                    .showUnderpayment(bchReceived, bchExpected, closingAction);
-        } else if (bchReceived > bchExpected) {
-            // overpayment
+            new PaymentTooLowDialog(this)
+                    .showUnderpayment(p.bchReceived, p.bchExpected, closingAction);
+        } else if (p.isOverpayment()) {
             showCheckMark();
-            new PaymentTooHighDialog(context).showOverpayment();
+            new PaymentTooHighDialog(this).showOverpayment();
         } else {
             // expected amount
             showCheckMark();
         }
     }
-
-    private BigInteger bamount = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,9 +94,14 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_receive);
         initViews();
+        // avoid to mistakenly discard the window
+        setFinishOnTouchOutside(false);
         //Register receiver (Listen for incoming tx)
         IntentFilter filter = new IntentFilter(MainActivity.ACTION_INTENT_INCOMING_TX);
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
+        broadcastManager.registerReceiver(receiver, filter);
+        // ensure that we are connected
+        broadcastManager.sendBroadcast(new Intent(MainActivity.ACTION_INTENT_RECONNECT));
         //Incoming intent value
         double amountFiat = this.getIntent().getDoubleExtra(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
         double amountBch = this.getIntent().getDoubleExtra(PaymentInputFragment.AMOUNT_PAYABLE_BTC, 0.0);
@@ -116,15 +117,6 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
         super.onDestroy();
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.iv_cancel:
-                onBackPressed();
-                break;
-        }
-    }
-
     private void initViews() {
         tvMerchantName = findViewById(R.id.tv_merchant_name);
         tvMerchantName.setText(PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
@@ -138,20 +130,50 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
         ivReceivingQr.setVisibility(View.GONE);
         ivCheck.setVisibility(View.GONE);
         progressLayout.setVisibility(View.VISIBLE);
-        ivCancel.setOnClickListener(this);
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickButton(v);
+            }
+        };
+        ivCancel.setOnClickListener(listener);
+        ivReceivingQr.setOnClickListener(listener);
+    }
+
+    private void clickButton(View v) {
+        switch (v.getId()) {
+            case R.id.iv_cancel:
+                onBackPressed();
+                break;
+            case R.id.qr:
+                copyQrCodeToClipboard();
+                break;
+        }
+    }
+
+    private void copyQrCodeToClipboard() {
+        try {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText(qrCodeUri, qrCodeUri);
+            clipboard.setPrimaryClip(clip);
+            Log.i(TAG, "Copied to clipboard: " + qrCodeUri);
+        } catch (Exception e) {
+            Log.i(TAG, "Failed to copy to clipboard: " + qrCodeUri);
+        }
     }
 
     private void displayQRCode(long lamount) {
         String uri = BitcoinCashURI.toCashAddress(receivingAddress);
         try {
-            bamount = MonetaryUtil.getInstance(this).getUndenominatedAmount(lamount);
+            BigInteger bamount = MonetaryUtil.getInstance(this).getUndenominatedAmount(lamount);
             if (bamount.compareTo(BigInteger.valueOf(2100000000000000L)) == 1) {
                 ToastCustom.makeText(this, "Invalid amount", ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
                 return;
             }
             if (!bamount.equals(BigInteger.ZERO)) {
-                generateQRCode(BitcoinCashURI.toURI(receivingAddress, Coin.valueOf(bamount.longValue()), "", ""));
-                write2NFC(BitcoinCashURI.toURI(receivingAddress, Coin.valueOf(bamount.longValue()), "", ""));
+                qrCodeUri = BitcoinCashURI.toURI(receivingAddress, Coin.valueOf(bamount.longValue()), "", "");
+                generateQRCode(qrCodeUri);
+                write2NFC(qrCodeUri);
             } else {
                 generateQRCode(uri);
                 write2NFC(uri);
@@ -195,7 +217,7 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
         }.execute();
     }
 
-    private void getReceiveAddress(final Context context, final double amountBtc, final String strFiat) {
+    private void getReceiveAddress(final Context context, final double amountBch, final String strFiat) {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected void onPreExecute() {
@@ -227,8 +249,8 @@ public class PaymentRequestActivity extends Activity implements View.OnClickList
                 Intent intent = new Intent(MainActivity.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
                 intent.putExtra("address", receivingAddress);
                 LocalBroadcastManager.getInstance(PaymentRequestActivity.this).sendBroadcast(intent);
-                long lAmount = getLongAmount(amountBtc);
-                ExpectedIncoming.getInstance().setExpectedAmounts(receivingAddress, lAmount, strFiat);
+                long lAmount = getLongAmount(amountBch);
+                ExpectedPayments.getInstance().addExpectedPayment(receivingAddress, lAmount, strFiat);
                 displayQRCode(lAmount);
                 return receivingAddress;
             }

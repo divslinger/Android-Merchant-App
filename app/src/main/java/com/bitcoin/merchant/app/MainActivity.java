@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -31,10 +33,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bitcoin.merchant.app.network.NetworkStateReceiver;
 import com.bitcoin.merchant.app.network.WebSocketHandler;
 import com.bitcoin.merchant.app.network.WebSocketListener;
 import com.bitcoin.merchant.app.screens.AboutActivity;
 import com.bitcoin.merchant.app.screens.PaymentProcessor;
+import com.bitcoin.merchant.app.screens.PaymentReceived;
 import com.bitcoin.merchant.app.screens.PinActivity;
 import com.bitcoin.merchant.app.screens.SettingsActivity;
 import com.bitcoin.merchant.app.screens.TabsPagerAdapter;
@@ -64,16 +68,12 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             if (ACTION_INTENT_SUBSCRIBE_TO_ADDRESS.equals(intent.getAction())) {
                 webSocketHandler.subscribeToAddress(intent.getStringExtra("address"));
             }
-            if (ACTION_INTENT_RECONNECT.equals(intent.getAction())) {
-                if (webSocketHandler != null && !webSocketHandler.isConnected()) {
-                    webSocketHandler.start();
-                }
+            if (ACTION_INTENT_RECONNECT.equals(intent.getAction())
+                    || ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+                reconnectIfNecessary();
             }
             if (ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
-                final String addr = intent.getStringExtra("payment_address");
-                final long paymentAmount = intent.getLongExtra("payment_amount", 0L);
-                final String paymentTxHash = intent.getStringExtra("payment_tx_hash");
-                processIncomingTx(addr, paymentAmount, paymentTxHash);
+                processIncomingTx(new PaymentReceived(intent));
             }
             if (ACTION_INTENT_SHOW_HISTORY.equals(intent.getAction())) {
                 showTxHistoryPage();
@@ -81,8 +81,18 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         }
     };
 
-    private void processIncomingTx(String addr, long paymentAmount, String paymentTxHash) {
-        ContentValues tx = new PaymentProcessor(this).receive(addr, paymentAmount, paymentTxHash);
+    private void reconnectIfNecessary() {
+        final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
+        if (ni != null && ni.isConnectedOrConnecting()) {
+            if (webSocketHandler != null && !webSocketHandler.isConnected()) {
+                webSocketHandler.start();
+            }
+        }
+    }
+
+    private void processIncomingTx(PaymentReceived payment) {
+        ContentValues tx = new PaymentProcessor(this).receive(payment);
         addTxToHistory(tx);
         showTxHistoryPage();
         soundAlert();
@@ -148,6 +158,9 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         filter.addAction(ACTION_INTENT_INCOMING_TX);
         filter.addAction(ACTION_INTENT_SHOW_HISTORY);
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
+        filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(new NetworkStateReceiver(), filter);
         webSocketHandler = new WebSocketHandler();
         webSocketHandler.setListener(this);
         webSocketHandler.start();
@@ -287,12 +300,10 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     }
 
     @Override
-    public void onIncomingPayment(String addr, long paymentAmount, String txHash) {
+    public void onIncomingPayment(PaymentReceived p) {
         //New incoming payment - broadcast message
         Intent intent = new Intent(MainActivity.ACTION_INTENT_INCOMING_TX);
-        intent.putExtra("payment_address", addr);
-        intent.putExtra("payment_amount", paymentAmount);
-        intent.putExtra("payment_tx_hash", txHash);
+        p.toIntent(intent);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

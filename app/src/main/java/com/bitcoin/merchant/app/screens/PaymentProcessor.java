@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
 import com.bitcoin.merchant.app.database.DBControllerV3;
-import com.bitcoin.merchant.app.network.ExpectedIncoming;
 import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.crashlytics.android.Crashlytics;
@@ -20,30 +19,27 @@ public class PaymentProcessor {
         this.context = context;
     }
 
-    public ContentValues receive(String addr, long bchReceived, String paymentTxHash) {
-        long bchExpected = ExpectedIncoming.getInstance().getBchAmount(addr);
-        long bchAmount = (bchReceived == -1L) ? bchExpected : bchReceived;
-        if (bchAmount != bchExpected) {
+    public ContentValues receive(PaymentReceived p) {
+        long bchAmount = (p.bchReceived == -1L) ? p.bchExpected : p.bchReceived;
+        if (bchAmount != p.bchExpected) {
             bchAmount *= -1L;
         }
         Double currencyPrice = CurrencyExchange.getInstance(context).getCurrencyPrice(AppUtil.getCurrency(context));
         double amountPayableFiat = (Math.abs((double) bchAmount) / 1e8) * currencyPrice;
-        String fiatAmount = (bchReceived == -1L)
-                ? ExpectedIncoming.getInstance().getFiatAmount(addr) :
-                new AmountUtil(context).formatFiat(amountPayableFiat);
+        String fiatAmount = (p.bchReceived == -1L) ? p.fiatExpected : new AmountUtil(context).formatFiat(amountPayableFiat);
         try {
             AppUtil util = AppUtil.getInstance(context);
             if (util.isValidXPub()) {
-                util.getWallet().addUsedAddress(addr);
+                util.getWallet().addUsedAddress(p.addr);
             }
             ContentValues vals = new DBControllerV3(context).insertPayment(
                     System.currentTimeMillis() / 1000,
-                    addr,
+                    p.addr,
                     bchAmount,
                     fiatAmount,
                     -1, // confirmations
                     "", // note, message
-                    paymentTxHash
+                    p.txHash
             );
             return vals;
         } catch (Exception e) {

@@ -1,5 +1,7 @@
 package com.bitcoin.merchant.app.network;
 
+import com.bitcoin.merchant.app.screens.PaymentReceived;
+
 public interface WebSocketListener {
-    void onIncomingPayment(String addr, long paymentAmount, String txHash);
+    void onIncomingPayment(PaymentReceived payment);
 }

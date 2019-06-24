@@ -1,0 +1,56 @@
+package com.bitcoin.merchant.app.screens;
+
+import android.content.Intent;
+
+import com.bitcoin.merchant.app.network.ExpectedAmounts;
+
+public class PaymentReceived {
+    public final String addr;
+    public final long bchReceived;
+    public final long bchExpected;
+    public final String fiatExpected;
+    public final String txHash;
+
+    public PaymentReceived(String addr, long bchReceived, String txHash, ExpectedAmounts expected) {
+        this.addr = addr;
+        this.bchReceived = bchReceived;
+        this.bchExpected = expected.bch;
+        this.fiatExpected = expected.fiat;
+        this.txHash = txHash;
+    }
+
+    public PaymentReceived(Intent intent) {
+        addr = intent.getStringExtra("payment_address");
+        bchReceived = intent.getLongExtra("payment_received_amount", 0L);
+        bchExpected = intent.getLongExtra("payment_expected_amount", 0L);
+        fiatExpected = intent.getStringExtra("payment_expected_fiat");
+        txHash = intent.getStringExtra("payment_tx_hash");
+    }
+
+    public void toIntent(Intent intent) {
+        intent.putExtra("payment_address", addr);
+        intent.putExtra("payment_received_amount", bchReceived);
+        intent.putExtra("payment_expected_amount", bchExpected);
+        intent.putExtra("payment_expected_fiat", fiatExpected);
+        intent.putExtra("payment_tx_hash", txHash);
+    }
+
+    public boolean isUnderpayment() {
+        return bchReceived < bchExpected;
+    }
+
+    public boolean isOverpayment() {
+        return bchReceived > bchExpected;
+    }
+
+    @Override
+    public String toString() {
+        return "PaymentReceived{" +
+                "addr='" + addr + '\'' +
+                ", bchReceived=" + bchReceived +
+                ", bchExpected=" + bchExpected +
+                ", fiatExpected='" + fiatExpected + '\'' +
+                ", txHash='" + txHash + '\'' +
+                '}';
+    }
+}
