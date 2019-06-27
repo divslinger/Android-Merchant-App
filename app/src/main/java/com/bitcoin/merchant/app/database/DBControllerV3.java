@@ -138,12 +138,12 @@ public class DBControllerV3 extends SQLiteOpenHelper {
                     formatValues(vals);
                 } catch (Exception e) {
                     // decrypt
-                    vals.put("iad", AESUtil.decrypt(vals.getAsString("iad"), pw, AESUtil.PinPbkdf2Iterations));
-                    vals.put("amt", AESUtil.decrypt(vals.getAsString("amt"), pw, AESUtil.PinPbkdf2Iterations));
-                    vals.put("famt", AESUtil.decrypt(vals.getAsString("famt"), pw, AESUtil.PinPbkdf2Iterations));
-                    vals.put("cfm", AESUtil.decrypt(vals.getAsString("cfm"), pw, AESUtil.PinPbkdf2Iterations));
-                    vals.put("msg", AESUtil.decrypt(vals.getAsString("msg"), pw, AESUtil.PinPbkdf2Iterations));
-                    vals.put("tx", AESUtil.decrypt(vals.getAsString("tx"), pw, AESUtil.PinPbkdf2Iterations));
+                    decrypt(vals, "iad");
+                    decrypt(vals, "amt");
+                    decrypt(vals, "famt");
+                    decrypt(vals, "cfm");
+                    decrypt(vals, "msg");
+                    decrypt(vals, "tx");
                     Log.i(TAG, "decrypted record:" + vals.get("_id"));
                     // resave
                     if (database == null) {
@@ -157,6 +157,13 @@ public class DBControllerV3 extends SQLiteOpenHelper {
             }
         } finally {
             closeAll(database, null);
+        }
+    }
+
+    private void decrypt(ContentValues vals, String name) {
+        String value = vals.getAsString(name);
+        if (value != null) {
+            vals.put(name, AESUtil.decrypt(value, pw, AESUtil.PinPbkdf2Iterations));
         }
     }
 

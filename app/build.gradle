@@ -11,8 +11,8 @@ android {
         applicationId "com.bitcoin.merchant.app"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 30600
-        versionName "3.6.0"
+        versionCode 30602
+        versionName "3.6.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
