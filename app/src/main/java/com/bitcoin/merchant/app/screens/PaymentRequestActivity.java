@@ -38,6 +38,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.encode.QRCodeEncoder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bitcoinj.core.Coin;
 
 import java.math.BigInteger;
@@ -235,13 +236,12 @@ public class PaymentRequestActivity extends Activity {
                         Log.i(TAG, "BCH-address(xPub) to receive: " + receivingAddress);
                     } catch (Exception e) {
                         receivingAddress = null;
-                        e.getMessage();
                         e.printStackTrace();
                     }
                 } else {
                     receivingAddress = AppUtil.getReceivingAddress(context);
                 }
-                if (receivingAddress == null) {
+                if (StringUtils.isEmpty(receivingAddress)) {
                     ToastCustom.makeText(PaymentRequestActivity.this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
                     return null;
                 }
