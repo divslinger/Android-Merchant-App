@@ -289,15 +289,20 @@ public class PaymentRequestActivity extends Activity {
     }
 
     private void write2NFC(final String uri) {
-        NfcAdapter nfc = NfcAdapter.getDefaultAdapter(PaymentRequestActivity.this);
-        if (nfc != null && nfc.isNdefPushEnabled()) {
-            nfc.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
-                @Override
-                public NdefMessage createNdefMessage(NfcEvent event) {
-                    NdefRecord uriRecord = NdefRecord.createUri(uri);
-                    return new NdefMessage(new NdefRecord[]{uriRecord});
-                }
-            }, PaymentRequestActivity.this);
+        try {
+            NfcAdapter nfc = NfcAdapter.getDefaultAdapter(PaymentRequestActivity.this);
+            if (nfc != null && nfc.isNdefPushEnabled()) {
+                nfc.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
+                    @Override
+                    public NdefMessage createNdefMessage(NfcEvent event) {
+                        NdefRecord uriRecord = NdefRecord.createUri(uri);
+                        return new NdefMessage(new NdefRecord[]{uriRecord});
+                    }
+                }, PaymentRequestActivity.this);
+            }
+        } catch (Exception e) {
+            // usually happens when activity is being closed while background task is executing
+            Log.e(TAG, "Failed write2NFC: " + uri, e);
         }
     }
 }
