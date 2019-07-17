@@ -31,7 +31,7 @@ public class CurrencyExchange {
     private final Map<String, String> countryToName;
     private final Map<String, String> countryToCurrency;
 
-    private static class CurrencyToLocales extends TreeMap<String, List<CountryLocales>> {
+    private static class CurrencyToLocales extends TreeMap<String, CountryLocales[]> {
     }
 
     public static synchronized CurrencyExchange getInstance(Context ctx) {
@@ -59,7 +59,7 @@ public class CurrencyExchange {
             String currency = countryToCurrency.get(country);
             CurrencyRate cr = getCurrencyRate(currency);
             if (cr != null && isCountrySupported(country)) {
-                List<CountryLocales> countryLocalesList = currencyToLocales.get(currency);
+                CountryLocales[] countryLocalesList = currencyToLocales.get(currency);
                 if (countryLocalesList != null) {
                     for (CountryLocales countryLocales : countryLocalesList) {
                         if (countryLocales.country.equals(country)) {
@@ -82,11 +82,11 @@ public class CurrencyExchange {
 
     private CountryLocales getCountryLocalesForCurrency(String currency, String country, String locale) {
         if (StringUtils.isEmpty(country) || StringUtils.isEmpty(locale)) {
-            List<CountryLocales> countryLocales = currencyToLocales.get(currency);
-            if ((countryLocales == null) || (countryLocales.size() == 0)) {
+            CountryLocales[] countryLocales = currencyToLocales.get(currency);
+            if ((countryLocales == null) || (countryLocales.length == 0)) {
                 return null;
             }
-            return countryLocales.get(0);
+            return countryLocales[0];
         }
         return new CountryLocales(country, locale);
     }
