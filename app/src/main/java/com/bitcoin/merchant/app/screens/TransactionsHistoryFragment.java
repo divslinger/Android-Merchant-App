@@ -175,14 +175,32 @@ public class TransactionsHistoryFragment extends Fragment {
         }
     }
 
+    protected boolean isSafe() {
+        if (mListItems == null || thisActivity == null || adapter == null) {
+            return false; // view not yet created
+        }
+        return !(this.isRemoving() || this.getActivity() == null || this.isDetached() || !this.isAdded() || this.getView() == null);
+    }
+
     public void addTx(ContentValues val) {
-        mListItems.add(0, val);
-        thisActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                adapter.notifyDataSetChanged();
+        try {
+            if (!isSafe()) {
+                return;
             }
-        });
+            mListItems.add(0, val);
+            thisActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (!isSafe()) {
+                        return;
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "addTx", e);
+            Crashlytics.logException(e);
+        }
     }
 
     private class GetDataTask extends AsyncTask<Void, Void, String[]> {
