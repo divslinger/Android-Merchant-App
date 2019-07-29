@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bitcoin.merchant.app.database.PaymentRecord;
+import com.bitcoin.merchant.app.network.ExpectedAmounts;
 import com.bitcoin.merchant.app.network.ExpectedPayments;
 import com.bitcoin.merchant.app.network.NetworkStateReceiver;
 import com.bitcoin.merchant.app.network.QueryUtxoTask;
@@ -232,6 +233,21 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             new QueryUtxoTask(MainActivity.this, QueryUtxoType.ALL).execute();
         } else {
             new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED).execute();
+        }
+    }
+
+    /**
+     * Only used for debugging purposes
+     * @param tx
+     */
+    private void resetPaymentTime(String tx) {
+        PaymentProcessor processor = new PaymentProcessor(this);
+        ContentValues values = processor.getExistingRecord(new PaymentReceived("", 0, tx, 0, 0, ExpectedAmounts.UNDEFINED));
+        if (values != null) {
+            PaymentRecord record = new PaymentRecord(values);
+            record.timeInSec = 0;
+            record.toContentValues(values);
+            processor.updateInDatabase(values);
         }
     }
 

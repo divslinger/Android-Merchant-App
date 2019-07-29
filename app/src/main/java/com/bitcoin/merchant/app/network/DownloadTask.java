@@ -43,6 +43,11 @@ public abstract class DownloadTask<R> {
     public final void execute() {
         String url = getUrl();
         if (url == null || isCancelled()) {
+            try {
+                onDownloaded(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return;
         }
         final Thread thread = new Thread(url) {
