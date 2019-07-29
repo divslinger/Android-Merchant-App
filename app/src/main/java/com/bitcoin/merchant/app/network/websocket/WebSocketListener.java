@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app.network;
+package com.bitcoin.merchant.app.network.websocket;
 
 import com.bitcoin.merchant.app.screens.PaymentReceived;
 

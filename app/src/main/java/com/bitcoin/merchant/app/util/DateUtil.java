@@ -6,6 +6,11 @@ import java.util.Date;
 
 public class DateUtil {
     private static DateUtil instance = null;
+    private final SimpleDateFormat pastYearsFormat = new SimpleDateFormat("E dd MMM @ HH:mm");
+    private final SimpleDateFormat currentYearFormat = new SimpleDateFormat("dd MMM yyyy");
+    private final SimpleDateFormat previousDaysFormat = new SimpleDateFormat("E dd MMM @ HH:mm");
+    private final SimpleDateFormat yesterdayFormat = new SimpleDateFormat("HH:mm");
+    private final SimpleDateFormat todayFormat = new SimpleDateFormat("HH:mm");
 
     private DateUtil() {
     }
@@ -17,39 +22,36 @@ public class DateUtil {
         return instance;
     }
 
-    public String formatted(long date) {
-        String ret = null;
+    public String format(long timeInSec) {
+        if (timeInSec == 0) {
+            return "";
+        }
         long hours24 = 60L * 60L * 24;
         long now = System.currentTimeMillis() / 1000L;
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date(now * 1000L));
         int nowYear = cal.get(Calendar.YEAR);
         int nowDay = cal.get(Calendar.DAY_OF_MONTH);
-        cal.setTime(new Date(date * 1000L));
+        cal.setTime(new Date(timeInSec * 1000L));
         int thenYear = cal.get(Calendar.YEAR);
         int thenDay = cal.get(Calendar.DAY_OF_MONTH);
         // within 24h
-        if (now - date < hours24) {
+        String ret;
+        if (now - timeInSec < hours24) {
             if (thenDay < nowDay) {
-//				SimpleDateFormat sd = new SimpleDateFormat("HH:mm a");
-                SimpleDateFormat sd = new SimpleDateFormat("HH:mm");
-                ret = "Yesterday @ " + sd.format(date * 1000L);
+                ret = "Yesterday @ " + yesterdayFormat.format(timeInSec * 1000L);
             } else {
-                SimpleDateFormat sd = new SimpleDateFormat("HH:mm");
-                ret = "Today @ " + sd.format(date * 1000L);
+                ret = "Today @ " + todayFormat.format(timeInSec * 1000L);
             }
         }
         // within 48h
-        else if (now - date < (hours24 * 2)) {
-            SimpleDateFormat sd = new SimpleDateFormat("E dd MMM @ HH:mm");
-            ret = sd.format(date * 1000L);
+        else if (now - timeInSec < (hours24 * 2)) {
+            ret = previousDaysFormat.format(timeInSec * 1000L);
         } else {
             if (thenYear < nowYear) {
-                SimpleDateFormat sd = new SimpleDateFormat("dd MMM yyyy");
-                ret = sd.format(date * 1000L);
+                ret = currentYearFormat.format(timeInSec * 1000L);
             } else {
-                SimpleDateFormat sd = new SimpleDateFormat("E dd MMM @ HH:mm");
-                ret = sd.format(date * 1000L);
+                ret = pastYearsFormat.format(timeInSec * 1000L);
             }
         }
         return ret;

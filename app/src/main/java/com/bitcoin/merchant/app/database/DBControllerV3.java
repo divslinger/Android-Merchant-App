@@ -12,7 +12,6 @@ import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.crashlytics.android.Crashlytics;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,12 +22,12 @@ public class DBControllerV3 extends SQLiteOpenHelper {
     private static final String TAG = "DBControllerV3";
     private static final String DB = "paymentsV3.db";
     private static final String TABLE = "payment";
-    private static final Boolean FAKE_TX_USED = false;
-    private final CharSequenceX pw;
+    private static CharSequenceX pw;
+    private final Context context;
 
     public DBControllerV3(Context context) {
         super(context, DB, null, 1);
-        this.pw = new CharSequenceX(PrefsUtil.MERCHANT_KEY_PIN + OSUtil.getInstance(context).getFootprint());
+        this.context = context;
     }
 
     @Override
@@ -55,37 +54,34 @@ public class DBControllerV3 extends SQLiteOpenHelper {
         onCreate(database);
     }
 
-    public ContentValues insertPayment(long ts, String address, long amount, String fiat_amount, int confirmed, String message, String tx)
-            throws Exception {
+    public void insertPayment(ContentValues record) throws Exception {
         SQLiteDatabase database = null;
         try {
-            tx = tx != null ? tx : "";
             database = this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put("ts", ts);
-            values.put("iad", address);
-            values.put("amt", Long.toString(amount));
-            values.put("famt", fiat_amount);
-            values.put("cfm", Integer.toString(confirmed));
-            values.put("msg", message);
-            values.put("tx", tx);
-            database.insert(TABLE, null, values);
+            database.insert(TABLE, null, record);
         } finally {
             closeAll(database, null);
         }
-        ContentValues vals = new ContentValues();
-        vals.put("ts", ts);
-        vals.put("iad", address);
-        vals.put("amt", Long.toString(amount));
-        vals.put("famt", fiat_amount);
-        vals.put("cfm", Integer.toString(confirmed));
-        vals.put("msg", message);
-        vals.put("tx", tx);
+    }
+
+    public ContentValues getPaymentFromTx(String tx) {
+        ContentValues vals = null;
+        SQLiteDatabase database = null;
+        Cursor c = null;
+        try {
+            String selectQuery = "SELECT * FROM payment WHERE tx = ?";
+            database = this.getReadableDatabase();
+            c = database.rawQuery(selectQuery, new String[]{tx});
+            if (c.moveToFirst()) {
+                vals = parseRecord(c);
+            }
+        } finally {
+            closeAll(database, c);
+        }
         return vals;
     }
 
-    public ArrayList<ContentValues> getAllPayments()
-            throws Exception {
+    public ArrayList<ContentValues> getAllPayments() throws Exception {
         ArrayList<ContentValues> data = new ArrayList<>();
         SQLiteDatabase database = null;
         Cursor c = null;
@@ -95,15 +91,7 @@ public class DBControllerV3 extends SQLiteOpenHelper {
             c = database.rawQuery(selectQuery, null);
             if (c.moveToFirst()) {
                 do {
-                    ContentValues vals = new ContentValues();
-                    vals.put("_id", c.getString(0));
-                    vals.put("ts", c.getLong(1));
-                    vals.put("iad", c.getString(2));
-                    vals.put("amt", c.getString(3));
-                    vals.put("famt", c.getString(4));
-                    vals.put("cfm", c.getString(5));
-                    vals.put("msg", c.getString(6));
-                    vals.put("tx", c.getString(7));
+                    ContentValues vals = parseRecord(c);
                     data.add(vals);
                 } while (c.moveToNext());
             }
@@ -112,21 +100,20 @@ public class DBControllerV3 extends SQLiteOpenHelper {
         }
         // decrypt and overwrite decrypted
         formatDecryptAndResave(data);
-        if (FAKE_TX_USED) {
-            for (int i = 0; i < 10; i++) {
-                ContentValues vals = new ContentValues();
-                vals.put("_id", "" + i);
-                vals.put("ts", new Date().getTime() + "");
-                vals.put("iad", "1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k");
-                vals.put("amt", 123456789L);
-                vals.put("famt", "$3.55");
-                vals.put("cfm", "1");
-                vals.put("msg", "N/A");
-                vals.put("tx", "-");
-                data.add(vals);
-            }
-        }
         return data;
+    }
+
+    private ContentValues parseRecord(Cursor c) {
+        ContentValues vals = new ContentValues();
+        vals.put("_id", c.getString(0));
+        vals.put("ts", c.getLong(1));
+        vals.put("iad", c.getString(2));
+        vals.put("amt", c.getString(3));
+        vals.put("famt", c.getString(4));
+        vals.put("cfm", c.getString(5));
+        vals.put("msg", c.getString(6));
+        vals.put("tx", c.getString(7));
+        return vals;
     }
 
     private void formatDecryptAndResave(ArrayList<ContentValues> data) {
@@ -160,10 +147,28 @@ public class DBControllerV3 extends SQLiteOpenHelper {
         }
     }
 
+    public void updateRecord(ContentValues values) {
+        SQLiteDatabase database = null;
+        try {
+            database = this.getWritableDatabase();
+            int result = database.update(TABLE, values, "_id=" + values.get("_id"), null);
+            Log.i(TAG, "resaved record:" + values.get("_id") + ", update:" + result);
+        } finally {
+            closeAll(database, null);
+        }
+    }
+
+    private String decryptValue(String value) {
+        if (pw == null) {
+            pw = new CharSequenceX(PrefsUtil.MERCHANT_KEY_PIN + OSUtil.getInstance(context).getFootprint());
+        }
+        return AESUtil.decrypt(value, pw, AESUtil.PinPbkdf2Iterations);
+    }
+
     private void decrypt(ContentValues vals, String name) {
         String value = vals.getAsString(name);
         if (value != null) {
-            vals.put(name, AESUtil.decrypt(value, pw, AESUtil.PinPbkdf2Iterations));
+            vals.put(name, decryptValue(value));
         }
     }
 
@@ -174,8 +179,7 @@ public class DBControllerV3 extends SQLiteOpenHelper {
         vals.put("cfm", cfm);
     }
 
-    public Set<String> getAllAddresses()
-            throws Exception {
+    public Set<String> getAllAddresses() throws Exception {
         Set<String> data = new HashSet<>();
         SQLiteDatabase database = null;
         Cursor cursor = null;
@@ -185,7 +189,7 @@ public class DBControllerV3 extends SQLiteOpenHelper {
             cursor = database.rawQuery(selectQuery, null);
             if (cursor.moveToFirst()) {
                 do {
-                    String decrypt = AESUtil.decrypt(cursor.getString(0), pw, AESUtil.PinPbkdf2Iterations);
+                    String decrypt = decryptValue(cursor.getString(0));
                     data.add(decrypt);
                 } while (cursor.moveToNext());
             }

@@ -10,13 +10,18 @@ public class PaymentReceived {
     public final long bchExpected;
     public final String fiatExpected;
     public final String txHash;
+    public final long timeInSec;
+    public final int confirmations;
 
-    public PaymentReceived(String addr, long bchReceived, String txHash, ExpectedAmounts expected) {
+    public PaymentReceived(String addr, long bchReceived, String txHash, long timeInSec, int confirmations,
+                           ExpectedAmounts expected) {
         this.addr = addr;
         this.bchReceived = bchReceived;
         this.bchExpected = expected.bch;
         this.fiatExpected = expected.fiat;
         this.txHash = txHash;
+        this.timeInSec = timeInSec;
+        this.confirmations = confirmations;
     }
 
     public PaymentReceived(Intent intent) {
@@ -25,6 +30,8 @@ public class PaymentReceived {
         bchExpected = intent.getLongExtra("payment_expected_amount", 0L);
         fiatExpected = intent.getStringExtra("payment_expected_fiat");
         txHash = intent.getStringExtra("payment_tx_hash");
+        timeInSec = intent.getLongExtra("payment_ts_seconds", 0L);
+        confirmations = intent.getIntExtra("payment_conf", 0);
     }
 
     public void toIntent(Intent intent) {
@@ -33,6 +40,8 @@ public class PaymentReceived {
         intent.putExtra("payment_expected_amount", bchExpected);
         intent.putExtra("payment_expected_fiat", fiatExpected);
         intent.putExtra("payment_tx_hash", txHash);
+        intent.putExtra("payment_ts_seconds", timeInSec);
+        intent.putExtra("payment_conf", confirmations);
     }
 
     public boolean isUnderpayment() {
@@ -46,11 +55,13 @@ public class PaymentReceived {
     @Override
     public String toString() {
         return "PaymentReceived{" +
-                "addr='" + addr + '\'' +
+                "txHash='" + txHash + '\'' +
+                ", addr='" + addr + '\'' +
                 ", bchReceived=" + bchReceived +
                 ", bchExpected=" + bchExpected +
                 ", fiatExpected='" + fiatExpected + '\'' +
-                ", txHash='" + txHash + '\'' +
+                ", timeInSec=" + timeInSec +
+                ", confirmations=" + confirmations +
                 '}';
     }
 }

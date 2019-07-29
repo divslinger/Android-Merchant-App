@@ -38,7 +38,7 @@ public class ExpectedPayments {
 
     public ExpectedAmounts getExpectedAmounts(String receivingAddress) {
         ExpectedAmounts amounts = addressToAmounts.get(receivingAddress);
-        return (amounts == null) ? new ExpectedAmounts(0, null) : amounts;
+        return (amounts == null) ? ExpectedAmounts.UNDEFINED : amounts;
     }
 
     public boolean isValidAddress(String receivingAddress) {

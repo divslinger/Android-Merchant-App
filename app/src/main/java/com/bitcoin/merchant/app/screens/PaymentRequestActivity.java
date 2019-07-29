@@ -58,7 +58,7 @@ public class PaymentRequestActivity extends Activity {
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
-            if (MainActivity.ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
+            if (MainActivity.ACTION_INTENT_EXPECTED_PAYMENT_RECEIVED.equals(intent.getAction())) {
                 PaymentReceived p = new PaymentReceived(intent);
                 if (receivingAddress == null || !receivingAddress.equalsIgnoreCase(p.addr)) {
                     // different address: might be a previous one, keep the payment request
@@ -98,7 +98,7 @@ public class PaymentRequestActivity extends Activity {
         // avoid to mistakenly discard the window
         setFinishOnTouchOutside(false);
         //Register receiver (Listen for incoming tx)
-        IntentFilter filter = new IntentFilter(MainActivity.ACTION_INTENT_INCOMING_TX);
+        IntentFilter filter = new IntentFilter(MainActivity.ACTION_INTENT_EXPECTED_PAYMENT_RECEIVED);
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
         broadcastManager.registerReceiver(receiver, filter);
         // ensure that we are connected
@@ -110,6 +110,7 @@ public class PaymentRequestActivity extends Activity {
         tvFiatAmount.setText(f.formatFiat(amountFiat));
         tvBtcAmount.setText(f.formatBch(amountBch));
         getReceiveAddress(PaymentRequestActivity.this, amountBch, tvFiatAmount.getText().toString());
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_MISSING_TX_IN_MEMPOOL));
     }
 
     @Override
@@ -145,6 +146,7 @@ public class PaymentRequestActivity extends Activity {
         switch (v.getId()) {
             case R.id.iv_cancel:
                 onBackPressed();
+                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO));
                 break;
             case R.id.qr:
                 copyQrCodeToClipboard();
@@ -270,6 +272,7 @@ public class PaymentRequestActivity extends Activity {
     }
 
     private void showCheckMark() {
+        setFinishOnTouchOutside(true); // now allow easy dismissal
         ivCancel.setVisibility(View.GONE);
         ivReceivingQr.setVisibility(View.GONE);
         ivCheck.setVisibility(View.VISIBLE);
@@ -284,7 +287,7 @@ public class PaymentRequestActivity extends Activity {
         tvStatus.setText(getResources().getText(R.string.payment_received));
         tvStatus.setTextColor(getResources().getColor(R.color.blockchain_receive_green));
         tvBtcAmount.setVisibility(View.GONE);
-        tvFiatAmount.setVisibility(View.GONE);
+        tvFiatAmount.setVisibility(View.INVISIBLE); // INVISIBLE instead of gone to keep some padding
         setResult(RESULT_OK);
     }
 

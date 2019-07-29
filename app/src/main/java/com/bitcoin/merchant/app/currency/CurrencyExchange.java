@@ -3,7 +3,9 @@ package com.bitcoin.merchant.app.currency;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
+import com.bitcoin.merchant.app.util.AppUtil;
 import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,8 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.bitcoin.merchant.app.util.AppUtil;
 
 public class CurrencyExchange {
     public static final int MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS = 3 * 60 * 1000;
@@ -130,6 +130,7 @@ public class CurrencyExchange {
             tickerToRate.putAll(CurrencyRate.convertFromBtcToBch(rates, tickerToSymbol));
             lastUpdate = System.currentTimeMillis();
             saveToStore();
+            Log.i("CurrencyExchange", "rates updated 1 BCH=$" + tickerToRate.get("USD").rate);
         } catch (Exception e) {
             e.printStackTrace();
         }

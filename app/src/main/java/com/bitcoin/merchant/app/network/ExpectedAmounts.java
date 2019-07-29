@@ -1,6 +1,7 @@
 package com.bitcoin.merchant.app.network;
 
 public class ExpectedAmounts {
+    public static final ExpectedAmounts UNDEFINED = new ExpectedAmounts(0, null);
     public final long bch;
     public final String fiat;
 

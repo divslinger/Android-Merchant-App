@@ -33,9 +33,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bitcoin.merchant.app.database.PaymentRecord;
+import com.bitcoin.merchant.app.network.ExpectedPayments;
 import com.bitcoin.merchant.app.network.NetworkStateReceiver;
-import com.bitcoin.merchant.app.network.WebSocketHandler;
-import com.bitcoin.merchant.app.network.WebSocketListener;
+import com.bitcoin.merchant.app.network.QueryUtxoTask;
+import com.bitcoin.merchant.app.network.QueryUtxoType;
+import com.bitcoin.merchant.app.network.websocket.TxWebSocketHandler;
+import com.bitcoin.merchant.app.network.websocket.WebSocketListener;
+import com.bitcoin.merchant.app.network.websocket.impl.bitcoincom.BitcoinComSocketHandler;
+import com.bitcoin.merchant.app.network.websocket.impl.blockchaininfo.BlockchainInfoSocketSocketHandler;
 import com.bitcoin.merchant.app.screens.AboutActivity;
 import com.bitcoin.merchant.app.screens.PaymentProcessor;
 import com.bitcoin.merchant.app.screens.PaymentReceived;
@@ -53,30 +59,50 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     public static final String TAG = "MainActivity";
     private static final String APP_PACKAGE = "com.bitcoin.merchant.app";
     public static final String ACTION_INTENT_SUBSCRIBE_TO_ADDRESS = APP_PACKAGE + "MainActivity.SUBSCRIBE_TO_ADDRESS";
-    public static final String ACTION_INTENT_INCOMING_TX = APP_PACKAGE + "MainActivity.ACTION_INTENT_INCOMING_TX";
+    public static final String ACTION_INTENT_RECORD_TX = APP_PACKAGE + "MainActivity.ACTION_INTENT_RECORD_TX";
+    public static final String ACTION_INTENT_UPDATE_TX = APP_PACKAGE + "MainActivity.ACTION_INTENT_UPDATE_TX";
+    public static final String ACTION_INTENT_EXPECTED_PAYMENT_RECEIVED = APP_PACKAGE + "MainActivity.ACTION_INTENT_EXPECTED_PAYMENT_RECEIVED";
     public static final String ACTION_INTENT_RECONNECT = APP_PACKAGE + "MainActivity.ACTION_INTENT_RECONNECT";
     public static final String ACTION_INTENT_SHOW_HISTORY = APP_PACKAGE + "MainActivity.ACTION_INTENT_SHOW_HISTORY";
+    public static final String ACTION_QUERY_MISSING_TX_IN_MEMPOOL = APP_PACKAGE + "MainActivity.ACTION_QUERY_MISSING_TX_IN_MEMPOOL";
+    public static final String ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO = APP_PACKAGE + "MainActivity.ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO";
+    public static final String ACTION_QUERY_ALL_UXTO = APP_PACKAGE + "MainActivity.ACTION_QUERY_ALL_UXTO";
+    public static final String ACTION_QUERY_ALL_UXTO_FINISHED = APP_PACKAGE + "MainActivity.ACTION_QUERY_ALL_UXTO_FINISHED";
     public static int SETTINGS_ACTIVITY = 1;
     private static int PIN_ACTIVITY = 2;
     private static int RESET_PIN_ACTIVITY = 3;
     private static int ABOUT_ACTIVITY = 4;
     DrawerLayout mDrawerLayout;
-    private WebSocketHandler webSocketHandler = null;
+    private TxWebSocketHandler bitcoinDotComSocket = null;
+    private TxWebSocketHandler blockchainDotInfoSocket = null;
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
             if (ACTION_INTENT_SUBSCRIBE_TO_ADDRESS.equals(intent.getAction())) {
-                webSocketHandler.subscribeToAddress(intent.getStringExtra("address"));
+                bitcoinDotComSocket.subscribeToAddress(intent.getStringExtra("address"));
+                blockchainDotInfoSocket.subscribeToAddress(intent.getStringExtra("address"));
             }
             if (ACTION_INTENT_RECONNECT.equals(intent.getAction())
                     || ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
                 reconnectIfNecessary();
             }
-            if (ACTION_INTENT_INCOMING_TX.equals(intent.getAction())) {
-                processIncomingTx(new PaymentReceived(intent));
+            if (ACTION_INTENT_RECORD_TX.equals(intent.getAction())) {
+                recordNewTx(new PaymentReceived(intent));
+            }
+            if (ACTION_INTENT_UPDATE_TX.equals(intent.getAction())) {
+                updateExistingTx(new PaymentReceived(intent));
             }
             if (ACTION_INTENT_SHOW_HISTORY.equals(intent.getAction())) {
                 showTxHistoryPage();
+            }
+            if (ACTION_QUERY_MISSING_TX_IN_MEMPOOL.equals(intent.getAction())) {
+                new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED).execute();
+            }
+            if (ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO.equals(intent.getAction())) {
+                new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED, QueryUtxoType.ALL).execute();
+            }
+            if (ACTION_QUERY_ALL_UXTO.equals(intent.getAction())) {
+                new QueryUtxoTask(MainActivity.this, QueryUtxoType.ALL).execute();
             }
         }
     };
@@ -85,25 +111,76 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
         if (ni != null && ni.isConnectedOrConnecting()) {
-            if (webSocketHandler != null && !webSocketHandler.isConnected()) {
-                webSocketHandler.start();
+            if (bitcoinDotComSocket != null && !bitcoinDotComSocket.isConnected()) {
+                bitcoinDotComSocket.start();
+            }
+            if (blockchainDotInfoSocket != null && !blockchainDotInfoSocket.isConnected()) {
+                blockchainDotInfoSocket.start();
             }
         }
     }
 
-    private void processIncomingTx(PaymentReceived payment) {
-        ContentValues tx = new PaymentProcessor(this).receive(payment);
+    private void recordNewTx(PaymentReceived payment) {
+        Log.i(TAG, "record potential new Tx:" + payment);
+        PaymentProcessor processor = new PaymentProcessor(this);
+        if (processor.isAlreadyRecorded(payment)) {
+            Log.i(TAG, "TX was already in DB: " + payment);
+            return; // already in the DB, nothing to do
+        }
+        ContentValues tx = processor.recordInDatabase(payment);
+        boolean paymentExpected = payment.bchExpected > 0;
+        if (paymentExpected) {
+            if (payment.bchReceived >= payment.bchExpected) {
+                ExpectedPayments.getInstance().removePayment(payment.addr);
+            }
+            if (payment.confirmations <= 2) {
+                Intent intent = new Intent(MainActivity.ACTION_INTENT_EXPECTED_PAYMENT_RECEIVED);
+                payment.toIntent(intent);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            }
+        }
         addTxToHistory(tx);
-        showTxHistoryPage();
-        soundAlert();
+        if (paymentExpected) {
+            showTxHistoryPage();
+            soundAlert();
+        }
+    }
+
+    private void updateExistingTx(PaymentReceived payment) {
+        Log.i(TAG, "update existing Tx:" + payment);
+        PaymentProcessor processor = new PaymentProcessor(this);
+        ContentValues values = processor.getExistingRecord(payment);
+        if (values != null) {
+            PaymentRecord record = new PaymentRecord(values);
+            record.confirmations = Math.max(payment.confirmations, record.confirmations);
+            if ((record.timeInSec == 0) && (payment.timeInSec > 0)) {
+                record.timeInSec = payment.timeInSec;
+            }
+            // Reuse existing content to preserve the db id
+            record.toContentValues(values);
+            processor.updateInDatabase(values);
+            updateTxToHistory(values);
+        } else {
+            Log.e(TAG, "TX not found in DB: " + payment.txHash);
+        }
     }
 
     private void addTxToHistory(ContentValues tx) {
         if (viewPager != null) {
             TabsPagerAdapter pagerAdapter = (TabsPagerAdapter) viewPager.getAdapter();
             if (pagerAdapter != null) {
-                TransactionsHistoryFragment transactionsHistoryFragment = (TransactionsHistoryFragment) pagerAdapter.getItem(TabsPagerAdapter.TAB_TX_HISTORY);
-                transactionsHistoryFragment.addTx(tx);
+                TransactionsHistoryFragment f = (TransactionsHistoryFragment) pagerAdapter.getItem(TabsPagerAdapter.TAB_TX_HISTORY);
+                f.addTx(tx);
+            }
+        }
+    }
+
+    private void updateTxToHistory(ContentValues tx) {
+        if (viewPager != null) {
+            TabsPagerAdapter pagerAdapter = (TabsPagerAdapter) viewPager.getAdapter();
+            if (pagerAdapter != null) {
+                TransactionsHistoryFragment f = (TransactionsHistoryFragment) pagerAdapter.getItem(TabsPagerAdapter.TAB_TX_HISTORY);
+                f.updateTx(tx);
             }
         }
     }
@@ -149,21 +226,35 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             goToSettings(false);
         }
         startWebsockets();
+        // scan for missing funds at least one
+        if (!PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_SCANNED_ALL_MISSING_FUNDS, false)) {
+            PrefsUtil.getInstance(this).setValue(PrefsUtil.MERCHANT_KEY_SCANNED_ALL_MISSING_FUNDS, true);
+            new QueryUtxoTask(MainActivity.this, QueryUtxoType.ALL).execute();
+        } else {
+            new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED).execute();
+        }
     }
 
     private void startWebsockets() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
         filter.addAction(ACTION_INTENT_RECONNECT);
-        filter.addAction(ACTION_INTENT_INCOMING_TX);
+        filter.addAction(ACTION_INTENT_RECORD_TX);
+        filter.addAction(ACTION_INTENT_UPDATE_TX);
         filter.addAction(ACTION_INTENT_SHOW_HISTORY);
+        filter.addAction(ACTION_QUERY_MISSING_TX_IN_MEMPOOL);
+        filter.addAction(ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO);
+        filter.addAction(ACTION_QUERY_ALL_UXTO);
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
         filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(new NetworkStateReceiver(), filter);
-        webSocketHandler = new WebSocketHandler();
-        webSocketHandler.setListener(this);
-        webSocketHandler.start();
+        bitcoinDotComSocket = new BitcoinComSocketHandler();
+        bitcoinDotComSocket.setListener(this);
+        bitcoinDotComSocket.start();
+        blockchainDotInfoSocket = new BlockchainInfoSocketSocketHandler();
+        blockchainDotInfoSocket.setListener(this);
+        blockchainDotInfoSocket.start();
     }
 
     @Override
@@ -197,7 +288,8 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     @Override
     protected void onDestroy() {
-        webSocketHandler.stop();
+        bitcoinDotComSocket.stop();
+        blockchainDotInfoSocket.stop();
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
         super.onDestroy();
     }
@@ -301,8 +393,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     @Override
     public void onIncomingPayment(PaymentReceived p) {
-        //New incoming payment - broadcast message
-        Intent intent = new Intent(MainActivity.ACTION_INTENT_INCOMING_TX);
+        Intent intent = new Intent(MainActivity.ACTION_INTENT_RECORD_TX);
         p.toIntent(intent);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }

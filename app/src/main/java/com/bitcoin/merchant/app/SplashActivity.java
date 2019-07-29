@@ -21,7 +21,7 @@ public class SplashActivity extends Activity {
             public void run() {
                 Looper.getMainLooper().prepare();
                 try {
-                    sleep(950);
+                    sleep(300);
                 } catch (InterruptedException ie) {
                 }
                 CurrencyExchange.getInstance(SplashActivity.this);
