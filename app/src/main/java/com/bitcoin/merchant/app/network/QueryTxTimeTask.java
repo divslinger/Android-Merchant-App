@@ -37,6 +37,10 @@ public class QueryTxTimeTask extends DownloadTask<Block> {
 
     @Override
     protected String getUrl() {
+        // 8MB block would be a 1,8MB request
+        // https://rest.bitcoin.com/v2/block/detailsByHeight/479469
+        // Using this method is clearly not efficient network wise
+        // but it should be rare and only be needed when a UTXO has been missed by the sockets
         return "https://rest.bitcoin.com/v2/block/detailsByHeight/" + utxo.height;
     }
 
