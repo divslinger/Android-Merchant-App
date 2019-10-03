@@ -20,7 +20,7 @@ public class BitcoinComSocketHandler extends TxWebSocketHandlerImpl {
 
     @Override
     protected WebSocket createWebSocket(WebSocketFactory factory) throws IOException {
-        return factory.createSocket("ws://47.254.143.172:80/v1/address");
+        return factory.createSocket("wss://bch.api.wallet.bitcoin.com/bws/api/socket/v1/address");
     }
 
     @Override
