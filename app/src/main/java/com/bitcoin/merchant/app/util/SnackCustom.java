@@ -2,7 +2,7 @@ package com.bitcoin.merchant.app.util;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.design.widget.Snackbar;
+import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
 
 import com.bitcoin.merchant.app.R;
