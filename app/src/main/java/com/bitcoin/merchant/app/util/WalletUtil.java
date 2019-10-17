@@ -81,7 +81,7 @@ public class WalletUtil {
     public WalletUtil(String xPub, Context context) throws Exception {
         this.xPub = xPub;
         this.context = context;
-        this.xpubIndex = !this.isSameXPub(this.xPub) ? 0 : PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX, 0);
+        this.xpubIndex = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + this.xPub, 0);
         DeterministicKey key = WalletUtil.createMasterPubKeyFromXPub(xPub);
         //This gets the receive chain from the xpub. If you want to generate change addresses, switch to 1 for the childNumber.
         this.accountKey = HDKeyDerivation.deriveChildKey(key, new ChildNumber(0, false));
