@@ -7,6 +7,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.bitcoin.merchant.app.currency.CurrencyDetector;
+import com.github.kiulian.converter.AddressConverter;
 import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.gson.Gson;
 
@@ -123,6 +124,16 @@ public class AppUtil {
     }
 
     public static void setReceivingAddress(Context context, String receiver) {
+        /*
+        We keep the storage format as legacy for compatibility purposes.
+         */
+        if (AddressUtil.isValidCashAddr(receiver)) {
+            try {
+                receiver = AddressConverter.toLegacyAddress(receiver);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
     }
 
