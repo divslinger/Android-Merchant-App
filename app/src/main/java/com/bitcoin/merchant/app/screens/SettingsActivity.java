@@ -31,10 +31,14 @@ import com.bitcoin.merchant.app.currency.CurrencyExchange;
 import com.bitcoin.merchant.app.screens.dialogs.AddNewAddressDialog;
 import com.bitcoin.merchant.app.screens.dialogs.CurrencySelectionDialog;
 import com.bitcoin.merchant.app.screens.dialogs.MerchantNameEditorDialog;
+import com.bitcoin.merchant.app.util.AddressUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.bitcoin.merchant.app.util.ToastCustom;
 import com.google.bitcoin.uri.BitcoinCashURI;
+
+import de.tobibrandt.bitcoincash.BitcoinCashAddressFormatter;
+import info.blockchain.wallet.util.FormatsUtil;
 
 public class SettingsActivity extends PreferenceActivity {
     public static final String SCAN_RESULT = "SCAN_RESULT";
@@ -219,12 +223,8 @@ public class SettingsActivity extends PreferenceActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if ((resultCode == Activity.RESULT_OK) && (requestCode == ZBAR_SCANNER_REQUEST) && (data != null)) {
             Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode + ", Intent:" + data.getStringExtra(SCAN_RESULT));
-            String address = BitcoinCashURI.toLegacyAddress(data.getStringExtra(SCAN_RESULT));
-            if (AppUtil.isValidAddress(address)) {
-                setNewAddress(address);
-            } else {
-                ToastCustom.makeText(this, getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
-            }
+            System.out.println("ADDRESS SCANNED: " + data.getStringExtra(SCAN_RESULT));
+            validateThenSetNewAddress(data.getStringExtra(SCAN_RESULT));
         } else {
             Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode);
         }
@@ -233,6 +233,54 @@ public class SettingsActivity extends PreferenceActivity {
     public void setNewAddress(String receiver) {
         newAddressPref.setSummary(AppUtil.convertToBitcoinCash(receiver));
         AppUtil.setReceivingAddress(this, receiver);
+    }
+
+    public void validateThenSetNewAddress(String address) {
+        final SettingsActivity ctx = SettingsActivity.this;
+        if (AppUtil.isValidAddress(address)) {
+            /*
+            If it's not a valid xpub, we can assume it's a Bitcoin Cash address since the address is valid from the previous if statement.
+             */
+            if (!FormatsUtil.getInstance().isValidXpub(address)) {
+                if (AddressUtil.isValidCashAddr(address)) {
+                    String cashAddrPrefix = BitcoinCashAddressFormatter.MAIN_NET_PREFIX + ":";
+                    if (!address.startsWith(cashAddrPrefix))
+                        address = cashAddrPrefix + address;
+                }
+                setNewAddress(address);
+            } else {
+                setNewAddress(address);
+
+                /*
+                When a merchant sets an xpub as their address in the settings, we want to sync the wallet up to the freshest address so users won't be sending to older addresses.
+                We do this by polling Bitcoin.com's REST API for the address history of all addresses up until we find a fresh address.
+
+                Due to Android forcing networking to be on a separate thread, we do this in a thread.
+                 */
+                new Thread() {
+                    @Override
+                    public void run() {
+                        AppUtil util = AppUtil.getInstance(ctx);
+                        try {
+                            boolean synced = util.getWallet().syncXpub();
+                            if (synced) {
+                                ctx.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ToastCustom.makeText(ctx, ctx.getString(R.string.synced_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_OK);
+                                    }
+                                });
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+                ToastCustom.makeText(ctx, ctx.getString(R.string.syncing_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_GENERAL);
+            }
+        } else {
+            ToastCustom.makeText(ctx, ctx.getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+        }
     }
 
     @Override
