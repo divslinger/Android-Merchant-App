@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     DrawerLayout mDrawerLayout;
     private TxWebSocketHandler bitcoinDotComSocket = null;
     private TxWebSocketHandler blockchainDotInfoSocket = null;
+    private NetworkStateReceiver networkStateReceiver;
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -265,7 +266,8 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
         filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(new NetworkStateReceiver(), filter);
+        networkStateReceiver = new NetworkStateReceiver();
+        registerReceiver(networkStateReceiver, filter);
         bitcoinDotComSocket = new BitcoinComSocketHandler();
         bitcoinDotComSocket.setListener(this);
         bitcoinDotComSocket.start();
@@ -309,6 +311,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         bitcoinDotComSocket.stop();
         blockchainDotInfoSocket.stop();
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
+        unregisterReceiver(networkStateReceiver);
         super.onDestroy();
     }
 
