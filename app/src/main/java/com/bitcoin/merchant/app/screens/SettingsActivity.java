@@ -239,50 +239,69 @@ public class SettingsActivity extends Activity {
 
     public void validateThenSetNewAddress(String address) {
         final SettingsActivity ctx = SettingsActivity.this;
+        //Is this a valid xpub, legacy, or cashaddr?
         if (AppUtil.isValidAddress(address)) {
             /*
             If it's not a valid xpub, we can assume it's a Bitcoin Cash address since the address is valid from the previous if statement.
              */
             if (!FormatsUtil.getInstance().isValidXpub(address)) {
-                if (AddressUtil.isValidCashAddr(address)) {
-                    String cashAddrPrefix = BitcoinCashAddressFormatter.MAIN_NET_PREFIX + ":";
-                    if (!address.startsWith(cashAddrPrefix))
-                        address = cashAddrPrefix + address;
-                }
-                setNewAddress(address);
+                //legacy or cashaddr logic.
+                this.validateCashaddrOrLegacyAddress(address);
             } else {
-                setNewAddress(address);
-
-                /*
-                When a merchant sets an xpub as their address in the settings, we want to sync the wallet up to the freshest address so users won't be sending to older addresses.
-                We do this by polling Bitcoin.com's REST API for the address history of all addresses up until we find a fresh address.
-
-                Due to Android forcing networking to be on a separate thread, we do this in a thread.
-                 */
-                new Thread() {
-                    @Override
-                    public void run() {
-                        AppUtil util = AppUtil.getInstance(ctx);
-                        try {
-                            boolean synced = util.getWallet().syncXpub();
-                            if (synced) {
-                                ctx.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        ToastCustom.makeText(ctx, ctx.getString(R.string.synced_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_OK);
-                                    }
-                                });
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }.start();
-                ToastCustom.makeText(ctx, ctx.getString(R.string.syncing_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_GENERAL);
+                //xpub logic
+                this.saveXpubAsDestinationAddress(address);
+                this.beginSyncingXpubWallet(ctx);
             }
         } else {
+            //If it is not valid, then display to the user that they did not enter a valid xpub, or legacy/cashaddr address.
             ToastCustom.makeText(ctx, ctx.getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
         }
+    }
+
+    private void validateCashaddrOrLegacyAddress(String address) {
+        //First we check if it's a cashaddr
+        if (AddressUtil.isValidCashAddr(address)) {
+            //Then we check if it has the bitcoincash: prefix, if it doesn't then we add it
+            String cashAddrPrefix = BitcoinCashAddressFormatter.MAIN_NET_PREFIX + ":";
+            if (!address.startsWith(cashAddrPrefix))
+                address = cashAddrPrefix + address;
+        }
+        //Then we set the address.
+        setNewAddress(address);
+    }
+
+    private void saveXpubAsDestinationAddress(String xpub)
+    {
+        setNewAddress(xpub);
+    }
+
+    private void beginSyncingXpubWallet(final SettingsActivity ctx) {
+        /*
+        When a merchant sets an xpub as their address in the settings, we want to sync the wallet up to the freshest address so users won't be sending to older addresses.
+        We do this by polling Bitcoin.com's REST API for the address history of all addresses up until we find a fresh address.
+
+        Due to Android forcing networking to be on a separate thread, we do this in a thread.
+         */
+        new Thread() {
+            @Override
+            public void run() {
+                AppUtil util = AppUtil.getInstance(ctx);
+                try {
+                    boolean synced = util.getWallet().syncXpub();
+                    if (synced) {
+                        ctx.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ToastCustom.makeText(ctx, ctx.getString(R.string.synced_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_OK);
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "", e);
+                }
+            }
+        }.start();
+        ToastCustom.makeText(ctx, ctx.getString(R.string.syncing_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_GENERAL);
     }
 
     @Override
