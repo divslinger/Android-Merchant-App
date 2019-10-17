@@ -98,31 +98,16 @@ public class WalletUtil {
     }
 
     public String generateAddressFromXPub() {
-        String potentialAddress = getAddressFromXpubKey(this.xpubIndex);
-        while (true) {
-            if (addressBank.isUsed(potentialAddress)) {
-                this.xpubIndex++;
-                Log.d(TAG, "Getting next xpub index " + this.xpubIndex);
-                saveWallet(this.xpubIndex);
-                potentialAddress = getAddressFromXpubKey(this.xpubIndex);
-            } else {
-                boolean hasHistory = doesAddressHaveHistory(potentialAddress);
-                if (hasHistory) {
-                    this.xpubIndex++;
-                    Log.d(TAG, "Getting next xpub index " + this.xpubIndex);
-                    saveWallet(this.xpubIndex);
-                    addUsedAddress(potentialAddress);
-                    potentialAddress = getAddressFromXpubKey(this.xpubIndex);
-                } else {
-                    break;
-                }
-            }
-        }
-        saveWallet(this.xpubIndex);
-        return potentialAddress;
+        return this.loopThroughXpubChildren();
     }
 
     public boolean syncXpub() {
+        this.loopThroughXpubChildren();
+        return true;
+    }
+
+    private String loopThroughXpubChildren()
+    {
         String potentialAddress = getAddressFromXpubKey(this.xpubIndex);
         while (true) {
             if (addressBank.isUsed(potentialAddress)) {
@@ -143,19 +128,22 @@ public class WalletUtil {
                 }
             }
         }
-        saveWallet(this.xpubIndex);
-        return true;
-    }
 
+        saveWallet(this.xpubIndex);
+        return potentialAddress;
+    }
     private boolean doesAddressHaveHistory(String address) {
-        try {
-            String out = new Scanner(new URL("https://rest.bitcoin.com/v2/address/details/" + address).openStream(), "UTF-8").useDelimiter("\\A").next();
-            JSONObject json = new JSONObject(out);
-            return json.getInt("txApperances") > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return doesAddressHaveHistory(address);
+        while(true)
+        {
+            try {
+                String out = new Scanner(new URL("https://rest.bitcoin.com/v2/address/details/" + address).openStream(), "UTF-8").useDelimiter("\\A").next();
+                JSONObject json = new JSONObject(out);
+                return json.getJSONArray("transactions").length() > 0;
+            } catch (Exception e) {
+                Log.e(TAG, "", e);
+            }
         }
+
     }
 
     private String getAddressFromXpubKey(int index) {
