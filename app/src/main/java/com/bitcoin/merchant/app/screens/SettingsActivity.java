@@ -46,6 +46,7 @@ public class SettingsActivity extends PreferenceActivity {
     private static final int CAMERA_PERMISSION = 1111;
     private static int ZBAR_SCANNER_REQUEST = 2026;
     private Preference newAddressPref = null;
+    private boolean isScanning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,6 +199,7 @@ public class SettingsActivity extends PreferenceActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera();
             } else {
+                this.isScanning = false;
                 String text = "Please grant camera permission to use the QR Scanner";
                 Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
             }
@@ -205,6 +207,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     public void requestToOpenCamera() {
+        this.isScanning = true;
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
         } else {
@@ -225,6 +228,7 @@ public class SettingsActivity extends PreferenceActivity {
             Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode + ", Intent:" + data.getStringExtra(SCAN_RESULT));
             System.out.println("ADDRESS SCANNED: " + data.getStringExtra(SCAN_RESULT));
             validateThenSetNewAddress(data.getStringExtra(SCAN_RESULT));
+            this.isScanning = false;
         } else {
             Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode);
         }
@@ -292,4 +296,11 @@ public class SettingsActivity extends PreferenceActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (!this.isScanning) {
+            this.onBackPressed();
+        }
+    }
 }
