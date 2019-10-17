@@ -22,6 +22,7 @@
     <color name="textColorPrimary">#FF000000</color>
     <color name="textColorSecondary">#FF222222</color>
 
+    <color name="gray">#ccc</color>
     <color name="white">#FFffff</color>
     <color name="white_50">#80ffffff</color>
 
@@ -34,4 +35,9 @@
     <color name="toast_info_background">#D8F296</color>
     <color name="toast_info_text">#4F772F</color>
 
+    <color name="bitcoindotcom_light_green">#00D897</color>
+    <color name="bitcoindotcom_green">#00c58a</color>
+    <color name="bitcoindotcom_dark_green">#009B6C</color>
+    <color name="bitcoindotcom_darker_green">#009B6C</color>
+    <color name="bitcoindotcom_darkest_green">#00704E</color>
 </resources>
