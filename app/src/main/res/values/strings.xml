@@ -119,8 +119,8 @@
     <string name="synced_xpub">xpub synced!</string>
     <string name="about_title">About</string>
     <string name="no_history_text">This Cash Register does not have a transaction history.</string>
-    <string name="options_explain_payment_address">A destination address can either be a Bitcoin Cash address, Extended Public Key, or a pay.bitcoin.com Access Key.</string>
+    <string name="options_explain_payment_address">A destination address can either be a Bitcoin Cash address, or an Extended Public Key (xpub)</string>
     <string name="options_add_payment_address">Add destination address</string>
-    <string name="options_add_payment_address_text">You can use any Bitcoin Cash address from your wallet, an Extended Public Key, or a pay.bitcoin.com Access Key.</string>
+    <string name="options_add_payment_address_text">You can use any Bitcoin Cash address from your wallet, or an Extended Public Key (xpub)</string>
     <string name="save">Save</string>
 </resources>
