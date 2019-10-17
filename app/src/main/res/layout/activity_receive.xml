@@ -13,7 +13,8 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="35dp">
+        android:padding="35dp"
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/tv_merchant_name"
@@ -121,12 +122,12 @@
             android:layout_height="55dp"
             android:layout_margin="5dp"
             android:background="@drawable/button_rounded_green"
+            android:stateListAnimator="@null"
             android:text="@string/cancel"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:stateListAnimator="@null"/>
+            android:textStyle="bold" />
 
         <Space
             android:layout_width="match_parent"
@@ -153,7 +154,7 @@
             android:background="@drawable/round_view_green"
             android:padding="20dp"
             android:src="@drawable/ic_done_white_48dp"
-            android:tint="@color/white" />
+            android:tint="@color/bitcoindotcom_green" />
 
         <TextView
             android:layout_width="match_parent"
@@ -176,12 +177,12 @@
             android:layout_height="55dp"
             android:layout_margin="5dp"
             android:background="@drawable/button_rounded"
+            android:stateListAnimator="@null"
             android:text="@string/done"
             android:textAllCaps="false"
             android:textColor="@color/bitcoindotcom_green"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:stateListAnimator="@null"/>
+            android:textStyle="bold" />
 
         <Space
             android:layout_width="match_parent"
