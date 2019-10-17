@@ -153,7 +153,7 @@
             android:background="@drawable/round_view_green"
             android:padding="20dp"
             android:src="@drawable/ic_done_white_48dp"
-            android:tint="@color/bitcoindotcom_green" />
+            android:tint="@color/white" />
 
         <TextView
             android:layout_width="match_parent"
