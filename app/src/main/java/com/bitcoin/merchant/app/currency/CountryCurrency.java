@@ -262,26 +262,25 @@ public class CountryCurrency {
         add("zw", R.drawable.iso_zw);
     }
 
-    private static void add(String country, int resource) {
-        countryToImage.put(country.toUpperCase(), resource);
-    }
-
     public final String countryName;
     public final CountryLocales countryLocales;
     public final CurrencyRate currencyRate;
     public final int image;
     private final String description;
-
-    public static boolean isSupported(String country) {
-        return countryToImage.containsKey(country);
-    }
-
     public CountryCurrency(CountryLocales countryLocales, String countryName, CurrencyRate cr) {
         this.countryName = countryName;
         this.countryLocales = countryLocales;
         this.currencyRate = cr;
         this.image = countryToImage.get(countryLocales.country);
         this.description = countryName + "\n" + cr.toString();
+    }
+
+    private static void add(String country, int resource) {
+        countryToImage.put(country.toUpperCase(), resource);
+    }
+
+    public static boolean isSupported(String country) {
+        return countryToImage.containsKey(country);
     }
 
     @Override

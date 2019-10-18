@@ -3,8 +3,9 @@ package com.bitcoin.merchant.app.network;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.database.DBControllerV3;
@@ -27,15 +28,6 @@ public class QueryUtxoTask extends DownloadTask<Utxos> {
     private final List<Utxo> utxosWithoutTimeButWithBlockHeight = new ArrayList<>();
     private final List<Utxo> utxosWithUpdatedConfirmations = new ArrayList<>();
 
-    public static PaymentReceived createPayment(Utxo utxo, boolean checkExpectedPayment, String address) {
-        ExpectedAmounts expected = checkExpectedPayment
-                ? ExpectedPayments.getInstance().getExpectedAmounts(address)
-                : ExpectedAmounts.UNDEFINED;
-        // use current time for expected payments
-        long ts = checkExpectedPayment ? System.currentTimeMillis() / 1000 : utxo.ts;
-        return new PaymentReceived(address, utxo.satoshis, utxo.txid, ts, (int) utxo.confirmations, expected);
-    }
-
     public QueryUtxoTask(Context context, QueryUtxoType... queries) {
         super(context);
         this.context = context;
@@ -43,6 +35,15 @@ public class QueryUtxoTask extends DownloadTask<Utxos> {
         memPool = query == QueryUtxoType.UNCONFIRMED;
         checkExpectedPayment = memPool;
         nextQuery = queries.length > 1 ? queries[1] : null;
+    }
+
+    public static PaymentReceived createPayment(Utxo utxo, boolean checkExpectedPayment, String address) {
+        ExpectedAmounts expected = checkExpectedPayment
+                ? ExpectedPayments.getInstance().getExpectedAmounts(address)
+                : ExpectedAmounts.UNDEFINED;
+        // use current time for expected payments
+        long ts = checkExpectedPayment ? System.currentTimeMillis() / 1000 : utxo.ts;
+        return new PaymentReceived(address, utxo.satoshis, utxo.txid, ts, (int) utxo.confirmations, expected);
     }
 
     @Override

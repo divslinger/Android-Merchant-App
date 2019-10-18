@@ -26,33 +26,20 @@ import java.util.Set;
 public class WalletUtil {
     public static final String TAG = "WalletUtil";
     private final String xPub;
-    private int xpubIndex;
     private final DeterministicKey accountKey;
     private final Context context;
     // For performance reasons, we cache all used addresses (reported in May 2019 on Lenovo Tab E8)
     private final AddressBank addressBank;
+    private int xpubIndex;
 
-    private class AddressBank {
-        final Set<String> usedAddresses;
-
-        public AddressBank() {
-            Set<String> addresses = new HashSet<>();
-            try {
-                addresses = new DBControllerV3(context).getAllAddresses();
-                Log.d(TAG, "loaded " + addresses.size() + " addresses from TX history: " + addresses);
-            } catch (Exception e) {
-                Log.e(TAG, "Unable to load addresses from TX history");
-            }
-            usedAddresses = Collections.synchronizedSet(addresses);
-        }
-
-        public boolean isUsed(String address) {
-            return usedAddresses.contains(address);
-        }
-
-        public void addUsedAddress(String address) {
-            usedAddresses.add(address);
-        }
+    public WalletUtil(String xPub, Context context) throws Exception {
+        this.xPub = xPub;
+        this.context = context;
+        this.xpubIndex = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + this.xPub, 0);
+        DeterministicKey key = WalletUtil.createMasterPubKeyFromXPub(xPub);
+        //This gets the receive chain from the xpub. If you want to generate change addresses, switch to 1 for the childNumber.
+        this.accountKey = HDKeyDerivation.deriveChildKey(key, new ChildNumber(0, false));
+        addressBank = new AddressBank();
     }
 
     private static DeterministicKey createMasterPubKeyFromXPub(String xpubstr) throws AddressFormatException {
@@ -76,16 +63,6 @@ public class WalletUtil {
         byte[] b1 = B58.decodeAndCheck(this.xPub);
         byte[] b2 = B58.decodeAndCheck(xPub);
         return Arrays.equals(b1, b2);
-    }
-
-    public WalletUtil(String xPub, Context context) throws Exception {
-        this.xPub = xPub;
-        this.context = context;
-        this.xpubIndex = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + this.xPub, 0);
-        DeterministicKey key = WalletUtil.createMasterPubKeyFromXPub(xPub);
-        //This gets the receive chain from the xpub. If you want to generate change addresses, switch to 1 for the childNumber.
-        this.accountKey = HDKeyDerivation.deriveChildKey(key, new ChildNumber(0, false));
-        addressBank = new AddressBank();
     }
 
     public void addUsedAddress(String address) {
@@ -165,5 +142,28 @@ public class WalletUtil {
                 "xPub='" + xPub + '\'' +
                 ", index=" + this.xpubIndex +
                 '}';
+    }
+
+    private class AddressBank {
+        final Set<String> usedAddresses;
+
+        public AddressBank() {
+            Set<String> addresses = new HashSet<>();
+            try {
+                addresses = new DBControllerV3(context).getAllAddresses();
+                Log.d(TAG, "loaded " + addresses.size() + " addresses from TX history: " + addresses);
+            } catch (Exception e) {
+                Log.e(TAG, "Unable to load addresses from TX history");
+            }
+            usedAddresses = Collections.synchronizedSet(addresses);
+        }
+
+        public boolean isUsed(String address) {
+            return usedAddresses.contains(address);
+        }
+
+        public void addUsedAddress(String address) {
+            usedAddresses.add(address);
+        }
     }
 }
