@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.bitcoin.merchant.app.database.DBControllerV3;
-import com.bitcoin.merchant.app.network.websocket.impl.TxWebSocketHandlerImpl;
 import com.github.kiulian.converter.b58.B58;
 
 import org.bitcoinj.core.AddressFormatException;
