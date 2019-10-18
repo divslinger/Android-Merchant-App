@@ -132,13 +132,20 @@ public class WalletUtil {
     }
 
     private boolean doesAddressHaveHistory(String address) {
+        long doubleBackOff = 1000;
         while (true) {
             try {
                 String out = new Scanner(new URL("https://rest.bitcoin.com/v2/address/details/" + address).openStream(), "UTF-8").useDelimiter("\\A").next();
                 JSONObject json = new JSONObject(out);
                 return json.getJSONArray("transactions").length() > 0;
             } catch (Exception e) {
-                Log.e(TAG, "", e);
+                Log.e(TAG, "doesAddressHaveHistory", e);
+                try {
+                    Thread.sleep(doubleBackOff);
+                } catch (InterruptedException ex) {
+                    // fail silently
+                }
+                doubleBackOff *= 2;
             }
         }
     }
