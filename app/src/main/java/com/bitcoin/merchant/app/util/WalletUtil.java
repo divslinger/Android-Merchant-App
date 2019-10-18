@@ -133,7 +133,8 @@ public class WalletUtil {
 
     private boolean doesAddressHaveHistory(String address) {
         long doubleBackOff = 1000;
-        while (true) {
+        int maxRetry = 9;
+        for (int i = 0; i < maxRetry; i++) {
             try {
                 String out = new Scanner(new URL("https://rest.bitcoin.com/v2/address/details/" + address).openStream(), "UTF-8").useDelimiter("\\A").next();
                 JSONObject json = new JSONObject(out);
@@ -148,6 +149,7 @@ public class WalletUtil {
                 doubleBackOff *= 2;
             }
         }
+        return false;
     }
 
     private String getAddressFromXpubKey(int index) {
