@@ -106,8 +106,7 @@ public class WalletUtil {
         return true;
     }
 
-    private String loopThroughXpubChildren()
-    {
+    private String loopThroughXpubChildren() {
         String potentialAddress = getAddressFromXpubKey(this.xpubIndex);
         while (true) {
             if (addressBank.isUsed(potentialAddress)) {
@@ -128,22 +127,29 @@ public class WalletUtil {
                 }
             }
         }
-
         saveWallet(this.xpubIndex);
         return potentialAddress;
     }
+
     private boolean doesAddressHaveHistory(String address) {
-        while(true)
-        {
+        long doubleBackOff = 1000;
+        int maxRetry = 9;
+        for (int i = 0; i < maxRetry; i++) {
             try {
                 String out = new Scanner(new URL("https://rest.bitcoin.com/v2/address/details/" + address).openStream(), "UTF-8").useDelimiter("\\A").next();
                 JSONObject json = new JSONObject(out);
                 return json.getJSONArray("transactions").length() > 0;
             } catch (Exception e) {
-                Log.e(TAG, "", e);
+                Log.e(TAG, "doesAddressHaveHistory", e);
+                try {
+                    Thread.sleep(doubleBackOff);
+                } catch (InterruptedException ex) {
+                    // fail silently
+                }
+                doubleBackOff *= 2;
             }
         }
-
+        return false;
     }
 
     private String getAddressFromXpubKey(int index) {
