@@ -70,7 +70,7 @@ public class WalletUtil {
     }
 
     private void saveWallet(int newIndex) {
-        PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX, newIndex);
+        PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + this.xPub, newIndex);
         Log.d(TAG, "Saving new xpub index " + newIndex);
     }
 
