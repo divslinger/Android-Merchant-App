@@ -1,5 +1,6 @@
 package com.bitcoin.merchant.app.network.websocket.impl.bitcoincom;
 
+import android.os.Build;
 import android.util.Log;
 
 import com.bitcoin.merchant.app.model.websocket.Tx;
@@ -20,6 +21,10 @@ public class BitcoinComSocketHandler extends TxWebSocketHandlerImpl {
 
     @Override
     protected WebSocket createWebSocket(WebSocketFactory factory) throws IOException {
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            // Hostname verification fails on Android 5.x & 6
+            factory.setVerifyHostname(false);
+        }
         return factory.createSocket("wss://bch.api.wallet.bitcoin.com/bws/api/socket/v1/address");
     }
 
