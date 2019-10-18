@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape
+<bitmap
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval"
-    >
-    <solid android:color="@color/white" />
-</shape>
-
+    android:src="@drawable/ic_menu_white_24dp"
+    android:tint="@android:color/black"/>

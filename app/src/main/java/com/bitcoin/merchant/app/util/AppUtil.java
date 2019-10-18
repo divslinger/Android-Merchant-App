@@ -3,6 +3,8 @@ package com.bitcoin.merchant.app.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.bitcoin.merchant.app.currency.CurrencyDetector;
 import com.github.kiulian.converter.AddressConverter;
@@ -159,5 +161,11 @@ public class AppUtil {
     public boolean hasValidReceiver() {
         String receiver = getReceivingAddress(context);
         return AddressUtil.isValidLegacy(receiver) || FormatsUtil.getInstance().isValidXpub(receiver);
+    }
+
+    public static void setStatusBarColor(Activity activity, int color) {
+        Window window = activity.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(activity.getResources().getColor(color));
     }
 }
