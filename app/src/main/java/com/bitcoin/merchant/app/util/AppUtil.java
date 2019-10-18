@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 
 import com.bitcoin.merchant.app.currency.CurrencyDetector;
+import com.github.kiulian.converter.AddressConverter;
 import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.gson.Gson;
 
@@ -58,9 +59,7 @@ public class AppUtil {
     }
 
     public static boolean isValidAddress(String address) {
-        return (address != null && address.length() > 0)
-                && (FormatsUtil.getInstance().isValidXpub(address)
-                || FormatsUtil.getInstance().isValidBitcoinAddress(address));
+        return (address != null && address.length() > 0) && (FormatsUtil.getInstance().isValidXpub(address) || AddressUtil.isValidCashAddr(address) || AddressUtil.isValidLegacy(address));
     }
 
     public static String getCurrency(Context context) {
@@ -123,19 +122,32 @@ public class AppUtil {
     }
 
     public static void setReceivingAddress(Context context, String receiver) {
+        /*
+        We keep the storage format as legacy for compatibility purposes.
+         */
+        if (AddressUtil.isValidCashAddr(receiver)) {
+            try {
+                receiver = AddressConverter.toLegacyAddress(receiver);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
     }
 
     public static String convertToBitcoinCash(String address) {
         FormatsUtil f = FormatsUtil.getInstance();
         if (address != null && address.length() > 0 &&
-                (!f.isValidXpub(address) && f.isValidBitcoinAddress(address))) {
+                (!f.isValidXpub(address) && AddressUtil.isValidLegacy(address))) {
             try {
-                address = BitcoinCashURI.toCashAddress(address);
+                address = AddressUtil.toCashAddress(address);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        /*
+        If it's not a valid legacy address from the if statement above, just return as the text we are sending.
+         */
         return address;
     }
 
@@ -146,7 +158,6 @@ public class AppUtil {
 
     public boolean hasValidReceiver() {
         String receiver = getReceivingAddress(context);
-        return FormatsUtil.getInstance().isValidBitcoinAddress(receiver)
-                || FormatsUtil.getInstance().isValidXpub(receiver);
+        return AddressUtil.isValidLegacy(receiver) || FormatsUtil.getInstance().isValidXpub(receiver);
     }
 }
