@@ -117,7 +117,7 @@
 
         <Button
             android:id="@+id/iv_cancel"
-            android:layout_width="match_parent"
+            android:layout_width="330dp"
             android:layout_height="55dp"
             android:layout_margin="5dp"
             android:background="@drawable/button_rounded_green"
@@ -172,7 +172,7 @@
 
         <Button
             android:id="@+id/iv_done"
-            android:layout_width="match_parent"
+            android:layout_width="330dp"
             android:layout_height="55dp"
             android:layout_margin="5dp"
             android:background="@drawable/button_rounded"

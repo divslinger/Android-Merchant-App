@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.util.Log;
@@ -50,6 +51,7 @@ public class SettingsActivity extends Activity {
     private LinearLayout lvLocalCurrency = null;
     private LinearLayout lvPinCode = null;
     private Button btnSave = null;
+    private Button btnLocalBitcoin = null;
     private boolean isScanning = false;
 
     @Override
@@ -65,6 +67,7 @@ public class SettingsActivity extends Activity {
         lvLocalCurrency = ctx.findViewById(R.id.lv_fiat_currency);
         lvPinCode = ctx.findViewById(R.id.lv_pin_code);
         btnSave = ctx.findViewById(R.id.btn_save);
+        btnLocalBitcoin = ctx.findViewById(R.id.localbch_ad);
         LinearLayout root = (LinearLayout) lvMerchantName.getParent().getParent();
         Toolbar toolbar = (Toolbar) LayoutInflater.from(ctx).inflate(R.layout.settings_toolbar, root, false);
         toolbar.setTitle(R.string.action_settings);
@@ -85,6 +88,14 @@ public class SettingsActivity extends Activity {
             @Override
             public void onClick(View v) {
                 onBackPressed();
+            }
+        });
+        btnLocalBitcoin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.parse("https://local.bitcoin.com");
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
             }
         });
     }
