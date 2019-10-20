@@ -267,6 +267,7 @@ public class CountryCurrency {
     public final CurrencyRate currencyRate;
     public final int image;
     private final String description;
+
     public CountryCurrency(CountryLocales countryLocales, String countryName, CurrencyRate cr) {
         this.countryName = countryName;
         this.countryLocales = countryLocales;

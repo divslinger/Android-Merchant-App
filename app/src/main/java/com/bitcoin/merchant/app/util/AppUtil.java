@@ -144,6 +144,12 @@ public class AppUtil {
         window.setStatusBarColor(activity.getResources().getColor(color));
     }
 
+    public static void setStatusBarColor(Activity activity, int color) {
+        Window window = activity.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(activity.getResources().getColor(color));
+    }
+
     /**
      * For performance reasons, we cache the wallet (reported in May 2019 on Lenovo Tab E8)
      */
@@ -163,11 +169,5 @@ public class AppUtil {
     public boolean hasValidReceiver() {
         String receiver = getReceivingAddress(context);
         return AddressUtil.isValidLegacy(receiver) || FormatsUtil.getInstance().isValidXpub(receiver);
-    }
-
-    public static void setStatusBarColor(Activity activity, int color) {
-        Window window = activity.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(activity.getResources().getColor(color));
     }
 }

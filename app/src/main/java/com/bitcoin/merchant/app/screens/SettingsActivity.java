@@ -281,8 +281,7 @@ public class SettingsActivity extends Activity {
         setNewAddress(address);
     }
 
-    private void saveXpubAsDestinationAddress(String xpub)
-    {
+    private void saveXpubAsDestinationAddress(String xpub) {
         setNewAddress(xpub);
     }
 

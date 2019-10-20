@@ -36,15 +36,25 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
     public static final String DEFAULT_CURRENCY_BCH = "BCH";
     public static final int RECEIVE_RESULT = 1122;
     public static final String ACTION_INTENT_RESET_AMOUNT = "RESET_AMOUNT";
+    private static final double bitcoinLimit = 21000000.0;
     public static String AMOUNT_PAYABLE_FIAT = "AMOUNT_PAYABLE_FIAT";
     public static String AMOUNT_PAYABLE_BTC = "AMOUNT_PAYABLE_BTC";
-    private static final double bitcoinLimit = 21000000.0;
-    private int allowedDecimalPlaces = 2;
     public double amountPayableFiat = 0.0;
     public double amountPayableBch = 0.0;
+    private int allowedDecimalPlaces = 2;
     private View rootView = null;
     private TextView tvCurrencySymbol = null;
     private TextView tvAmount = null;
+    protected BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+            if (ACTION_INTENT_RESET_AMOUNT.equals(intent.getAction())) {
+                if (tvAmount != null) {
+                    tvAmount.setText("0");
+                }
+            }
+        }
+    };
     private Button ivCharge = null;
     private Button button0 = null;
     private Button button1 = null;
@@ -63,16 +73,6 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
     private DecimalFormat df = null;
     private DecimalFormatSymbols dfs = null;
     private String strDecimal = null;
-    protected BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, final Intent intent) {
-            if (ACTION_INTENT_RESET_AMOUNT.equals(intent.getAction())) {
-                if (tvAmount != null) {
-                    tvAmount.setText("0");
-                }
-            }
-        }
-    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
