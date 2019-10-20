@@ -14,6 +14,17 @@ public class Tx {
     public long amount;
     public Output[] outputs;
 
+    @Override
+    public String toString() {
+        return "Tx{" +
+                "txid='" + txid + '\'' +
+                ", fees=" + fees +
+                ", confirmations=" + confirmations +
+                ", amount=" + amount +
+                ", outputs=" + Arrays.toString(outputs) +
+                '}';
+    }
+
     public static class Output {
         public String address;
         public long value;
@@ -25,16 +36,5 @@ public class Tx {
                     ", value=" + value +
                     '}';
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Tx{" +
-                "txid='" + txid + '\'' +
-                ", fees=" + fees +
-                ", confirmations=" + confirmations +
-                ", amount=" + amount +
-                ", outputs=" + Arrays.toString(outputs) +
-                '}';
     }
 }

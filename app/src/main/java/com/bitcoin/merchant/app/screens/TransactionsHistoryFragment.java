@@ -55,8 +55,6 @@ public class TransactionsHistoryFragment extends Fragment {
     private ListView listView = null;
     private LinearLayout noTxHistoryLv = null;
     private SwipeRefreshLayout swipeLayout = null;
-    private Activity thisActivity = null;
-    private volatile boolean ready;
     private final BroadcastReceiver fragmentBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -65,6 +63,8 @@ public class TransactionsHistoryFragment extends Fragment {
             }
         }
     };
+    private Activity thisActivity = null;
+    private volatile boolean ready;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -235,6 +235,10 @@ public class TransactionsHistoryFragment extends Fragment {
         }
     }
 
+    private void findAllPotentialMissingTx() {
+        LocalBroadcastManager.getInstance(thisActivity).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_ALL_UXTO));
+    }
+
     private class LoadTxFromDatabaseTask extends AsyncTask<Void, Void, ArrayList<ContentValues>> {
         private boolean queryServer;
 
@@ -287,10 +291,6 @@ public class TransactionsHistoryFragment extends Fragment {
                 }
             }
         }
-    }
-
-    private void findAllPotentialMissingTx() {
-        LocalBroadcastManager.getInstance(thisActivity).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_ALL_UXTO));
     }
 
     private class TransactionAdapter extends BaseAdapter {

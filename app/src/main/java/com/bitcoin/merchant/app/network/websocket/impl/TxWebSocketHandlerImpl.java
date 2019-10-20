@@ -24,19 +24,22 @@ import java.util.Set;
 public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
     private static final long PING_INTERVAL = 20 * 1000L; // ping every 20 seconds
     private final WebSocketFactory webSocketFactory;
-    private volatile ConnectionHandler handler;
     protected WebSocketListener webSocketListener;
     protected String TAG = "WebSocketHandler";
+    private volatile ConnectionHandler handler;
 
     public TxWebSocketHandlerImpl() {
         this.webSocketFactory = new WebSocketFactory();
+    }
+
+    private static String getSubscribeMessage(String address) {
+        return "{\"op\":\"addr_sub\", \"addr\":\"" + address + "\"}";
     }
 
     @Override
     public void setListener(WebSocketListener webSocketListener) {
         this.webSocketListener = webSocketListener;
     }
-
 
     @Override
     public void start() {
@@ -72,9 +75,9 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
         send(getSubscribeMessage(address));
     }
 
-    private static String getSubscribeMessage(String address) {
-        return "{\"op\":\"addr_sub\", \"addr\":\"" + address + "\"}";
-    }
+    abstract protected WebSocket createWebSocket(WebSocketFactory factory) throws IOException;
+
+    abstract protected void parseTx(String message) throws Exception;
 
     private class ConnectionThread extends Thread {
         public ConnectionThread() {
@@ -101,10 +104,6 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
             }
         }
     }
-
-    abstract protected WebSocket createWebSocket(WebSocketFactory factory) throws IOException;
-
-    abstract protected void parseTx(String message) throws Exception;
 
     private class ConnectionHandler extends WebSocketAdapter {
         public static final int MINUTE_IN_MS = 60 * 1000;

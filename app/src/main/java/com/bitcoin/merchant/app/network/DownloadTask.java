@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -21,13 +22,39 @@ import javax.net.ssl.HttpsURLConnection;
 public abstract class DownloadTask<R> {
     private Context activity;
 
+    public DownloadTask(Context activity) {
+        this.activity = activity;
+    }
+
+    public static String readStream(InputStream stream) throws IOException {
+        byte[] tempBuffer = new byte[65536];
+        byte[] bytes = loadBytes(stream, tempBuffer);
+        return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    public static byte[] loadBytes(InputStream is, byte[] tempBuffer) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        copy(os, is, tempBuffer);
+        return os.toByteArray();
+    }
+
+    public static int copy(OutputStream os, InputStream is, byte[] tempBuffer) throws IOException {
+        int total = 0;
+        while (true) {
+            int read = is.read(tempBuffer);
+            if (read == -1) {
+                // end of file reached
+                break;
+            }
+            os.write(tempBuffer, 0, read);
+            total += read;
+        }
+        return total;
+    }
+
     private NetworkInfo getActiveNetworkInfo() {
         ConnectivityManager connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         return connectivityManager.getActiveNetworkInfo();
-    }
-
-    public DownloadTask(Context activity) {
-        this.activity = activity;
     }
 
     protected boolean isCancelled() {
@@ -139,31 +166,5 @@ public abstract class DownloadTask<R> {
             }
         }
         return result;
-    }
-
-    public static String readStream(InputStream stream) throws IOException {
-        byte[] tempBuffer = new byte[65536];
-        byte[] bytes = loadBytes(stream, tempBuffer);
-        return new String(bytes, "UTF-8");
-    }
-
-    public static byte[] loadBytes(InputStream is, byte[] tempBuffer) throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        copy(os, is, tempBuffer);
-        return os.toByteArray();
-    }
-
-    public static int copy(OutputStream os, InputStream is, byte[] tempBuffer) throws IOException {
-        int total = 0;
-        while (true) {
-            int read = is.read(tempBuffer);
-            if (read == -1) {
-                // end of file reached
-                break;
-            }
-            os.write(tempBuffer, 0, read);
-            total += read;
-        }
-        return total;
     }
 }
