@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     private TxWebSocketHandler bitcoinDotComSocket = null;
     private TxWebSocketHandler blockchainDotInfoSocket = null;
     private NetworkStateReceiver networkStateReceiver;
-    private NonSwipeViewPager viewPager;
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -111,8 +110,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             }
         }
     };
-    //Navigation Drawer
-    private Toolbar toolbar = null;
 
     private void reconnectIfNecessary() {
         final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -197,6 +194,8 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         }
     }
 
+    private NonSwipeViewPager viewPager;
+
     public void soundAlert() {
         AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         if (audioManager != null && audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
@@ -212,6 +211,9 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             mp.start();
         }
     }
+
+    //Navigation Drawer
+    private Toolbar toolbar = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

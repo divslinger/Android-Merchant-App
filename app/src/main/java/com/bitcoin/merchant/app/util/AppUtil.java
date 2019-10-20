@@ -164,4 +164,10 @@ public class AppUtil {
         String receiver = getReceivingAddress(context);
         return AddressUtil.isValidLegacy(receiver) || FormatsUtil.getInstance().isValidXpub(receiver);
     }
+
+    public static void setStatusBarColor(Activity activity, int color) {
+        Window window = activity.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(activity.getResources().getColor(color));
+    }
 }

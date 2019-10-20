@@ -30,6 +30,25 @@ public class CurrencySelectionDialog {
         this.ctx = ctx;
     }
 
+    private class ArrayAdapterWithIcon extends ArrayAdapter<CountryCurrency> {
+        private List<CountryCurrency> cc;
+
+        public ArrayAdapterWithIcon(Context context, List<CountryCurrency> items) {
+            super(context, R.layout.select_currency_dialog_item, items);
+            this.cc = items;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = super.getView(position, convertView, parent);
+            TextView textView = view.findViewById(R.id.select_currency_text);
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(cc.get(position).image, 0, 0, 0);
+            float dimension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getContext().getResources().getDisplayMetrics());
+            textView.setCompoundDrawablePadding((int) dimension);
+            return view;
+        }
+    }
+
     public boolean show() {
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
         final List<CountryCurrency> currencies = CurrencyExchange.getInstance(ctx).getCountryCurrencies();
@@ -61,24 +80,5 @@ public class CurrencySelectionDialog {
         Intent intent = new Intent(PaymentInputFragment.ACTION_INTENT_RESET_AMOUNT);
         LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
         ctx.setCurrencySummary(cc);
-    }
-
-    private class ArrayAdapterWithIcon extends ArrayAdapter<CountryCurrency> {
-        private List<CountryCurrency> cc;
-
-        public ArrayAdapterWithIcon(Context context, List<CountryCurrency> items) {
-            super(context, R.layout.select_currency_dialog_item, items);
-            this.cc = items;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            TextView textView = view.findViewById(R.id.select_currency_text);
-            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(cc.get(position).image, 0, 0, 0);
-            float dimension = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getContext().getResources().getDisplayMetrics());
-            textView.setCompoundDrawablePadding((int) dimension);
-            return view;
-        }
     }
 }
