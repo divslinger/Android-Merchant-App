@@ -10,8 +10,8 @@ import com.bitcoin.merchant.app.screens.SettingsActivity;
 import com.bitcoin.merchant.app.util.AppUtil;
 
 public class AddNewAddressDialog {
-    private final SettingsActivity ctx;
     private static final boolean ENTERING_ADDRESS_BYPASSED = false;
+    private final SettingsActivity ctx;
 
     public AddNewAddressDialog(SettingsActivity ctx) {
         this.ctx = ctx;

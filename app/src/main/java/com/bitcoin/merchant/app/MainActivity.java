@@ -24,13 +24,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 
 import com.bitcoin.merchant.app.database.PaymentRecord;
 import com.bitcoin.merchant.app.network.ExpectedAmounts;
@@ -43,6 +43,7 @@ import com.bitcoin.merchant.app.network.websocket.WebSocketListener;
 import com.bitcoin.merchant.app.network.websocket.impl.bitcoincom.BitcoinComSocketHandler;
 import com.bitcoin.merchant.app.network.websocket.impl.blockchaininfo.BlockchainInfoSocketSocketHandler;
 import com.bitcoin.merchant.app.screens.AboutActivity;
+import com.bitcoin.merchant.app.screens.NonSwipeViewPager;
 import com.bitcoin.merchant.app.screens.PaymentProcessor;
 import com.bitcoin.merchant.app.screens.PaymentReceived;
 import com.bitcoin.merchant.app.screens.PinActivity;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     private TxWebSocketHandler bitcoinDotComSocket = null;
     private TxWebSocketHandler blockchainDotInfoSocket = null;
     private NetworkStateReceiver networkStateReceiver;
+    private NonSwipeViewPager viewPager;
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -96,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
                 updateExistingTx(new PaymentReceived(intent));
             }
             if (ACTION_INTENT_SHOW_HISTORY.equals(intent.getAction())) {
-                showTxHistoryPage();
+                showPage(TabsPagerAdapter.TAB_TX_HISTORY);
             }
             if (ACTION_QUERY_MISSING_TX_IN_MEMPOOL.equals(intent.getAction())) {
                 new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED).execute();
@@ -109,6 +111,8 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             }
         }
     };
+    //Navigation Drawer
+    private Toolbar toolbar = null;
 
     private void reconnectIfNecessary() {
         final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -144,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         }
         addTxToHistory(tx);
         if (paymentExpected) {
-            showTxHistoryPage();
             soundAlert();
         }
     }
@@ -188,13 +191,11 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         }
     }
 
-    private void showTxHistoryPage() {
+    private void showPage(int page) {
         if (viewPager != null) {
-            viewPager.setCurrentItem(TabsPagerAdapter.TAB_TX_HISTORY);
+            viewPager.setCurrentItem(page);
         }
     }
-
-    private ViewPager viewPager;
 
     public void soundAlert() {
         AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
@@ -211,9 +212,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             mp.start();
         }
     }
-
-    //Navigation Drawer
-    private Toolbar toolbar = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,10 +234,36 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         } else {
             new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED).execute();
         }
+        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View view, float v) {
+                if (v > 0) {
+                    AppUtil.setStatusBarColor(MainActivity.this, R.color.bitcoindotcom_green);
+                } else {
+                    AppUtil.setStatusBarColor(MainActivity.this, R.color.gray);
+                }
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View view) {
+                AppUtil.setStatusBarColor(MainActivity.this, R.color.bitcoindotcom_green);
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View view) {
+                AppUtil.setStatusBarColor(MainActivity.this, R.color.gray);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int i) {
+            }
+        });
+        System.out.println("Stored address: " + AppUtil.getReceivingAddress(this));
     }
 
     /**
      * Only used for debugging purposes
+     *
      * @param tx
      */
     private void resetPaymentTime(String tx) {
@@ -280,6 +304,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     protected void onResume() {
         super.onResume();
         setMerchantName();
+        showPage(TabsPagerAdapter.TAB_INPUT_AMOUNT);
     }
 
     @Override
@@ -343,7 +368,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode + ", Intent:" + data);
         if (requestCode == SETTINGS_ACTIVITY && resultCode == RESULT_OK) {
-            ;
         } else if (requestCode == PIN_ACTIVITY && resultCode == RESULT_OK) {
             showSettings();
         } else if (requestCode == RESET_PIN_ACTIVITY && resultCode == RESULT_OK) {
@@ -364,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         View view = this.getCurrentFocus();
         if (view instanceof EditText) {
             View w = this.getCurrentFocus();
-            int scrcoords[] = new int[2];
+            int[] scrcoords = new int[2];
             w.getLocationOnScreen(scrcoords);
             float x = event.getRawX() + w.getLeft() - scrcoords[0];
             float y = event.getRawY() + w.getTop() - scrcoords[1];
@@ -409,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         TextView tvName = headerView.findViewById(R.id.drawer_title);
         String drawerTitle = PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, getResources().getString(R.string.app_name));
         tvName.setText(drawerTitle);
-        toolbar.setTitle(drawerTitle);
+        toolbar.setTitle("");
     }
 
     @Override
@@ -421,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     public void setToolbar() {
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_menu_white_24dp));
+        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_menu_black_24dp));
         setSupportActionBar(toolbar);
     }
 
@@ -437,6 +461,9 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     public void onBackPressed() {
         if (isNavDrawerOpen()) {
             closeNavDrawer();
+        }
+        if (viewPager.getCurrentItem() == TabsPagerAdapter.TAB_TX_HISTORY) {
+            showPage(TabsPagerAdapter.TAB_INPUT_AMOUNT);
         } else {
             super.onBackPressed();
         }
@@ -462,6 +489,12 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             @Override
             public void run() {
                 switch (menuItem.getItemId()) {
+                    case R.id.action_checkout:
+                        showPage(TabsPagerAdapter.TAB_INPUT_AMOUNT);
+                        break;
+                    case R.id.action_transactions:
+                        showPage(TabsPagerAdapter.TAB_TX_HISTORY);
+                        break;
                     case R.id.action_settings:
                         goToSettings(false);
                         break;

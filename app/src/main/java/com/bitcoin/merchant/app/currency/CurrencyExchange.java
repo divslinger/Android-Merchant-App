@@ -23,24 +23,13 @@ import java.util.TreeMap;
 public class CurrencyExchange {
     public static final int MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS = 3 * 60 * 1000;
     private static CurrencyExchange instance;
-    private volatile long lastUpdate;
     private final Context context;
     private final Map<String, CurrencyRate> tickerToRate = Collections.synchronizedMap(new TreeMap<String, CurrencyRate>());
     private final CurrencyToLocales currencyToLocales;
     private final Map<String, String> tickerToSymbol;
     private final Map<String, String> countryToName;
     private final Map<String, String> countryToCurrency;
-
-    private static class CurrencyToLocales extends TreeMap<String, CountryLocales[]> {
-    }
-
-    public static synchronized CurrencyExchange getInstance(Context ctx) {
-        if (instance == null) {
-            instance = new CurrencyExchange(ctx);
-        }
-        instance.requestUpdatedExchangeRates();
-        return instance;
-    }
+    private volatile long lastUpdate;
 
     private CurrencyExchange(Context context) {
         this.context = context;
@@ -51,6 +40,30 @@ public class CurrencyExchange {
         CurrencyRate[] btcRates = AppUtil.readFromJsonFile(context, "example_rates.json", CurrencyRate[].class);
         tickerToRate.putAll(CurrencyRate.convertFromBtcToBch(btcRates, tickerToSymbol));
         loadFromStore();
+    }
+
+    public static synchronized CurrencyExchange getInstance(Context ctx) {
+        if (instance == null) {
+            instance = new CurrencyExchange(ctx);
+        }
+        instance.requestUpdatedExchangeRates();
+        return instance;
+    }
+
+    public static <T> T getUrlAsJson(String url, Class<T> c) {
+        try {
+            InputStream i = new URL(url).openStream();
+            BufferedReader in = new BufferedReader(new InputStreamReader(i));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine).append('\n');
+            }
+            in.close();
+            return new Gson().fromJson(response.toString(), c);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<CountryCurrency> getCountryCurrencies() {
@@ -161,22 +174,6 @@ public class CurrencyExchange {
         editor.commit();
     }
 
-    public static <T> T getUrlAsJson(String url, Class<T> c) {
-        try {
-            InputStream i = new URL(url).openStream();
-            BufferedReader in = new BufferedReader(new InputStreamReader(i));
-            StringBuilder response = new StringBuilder();
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine).append('\n');
-            }
-            in.close();
-            return new Gson().fromJson(response.toString(), c);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public boolean isTickerSupported(String ticker) {
         return getCurrencyRate(ticker) != null;
     }
@@ -198,5 +195,8 @@ public class CurrencyExchange {
 
     public CurrencyRate getCurrencyRate(String ticker) {
         return (ticker != null) && (ticker.length() > 0) ? tickerToRate.get(ticker) : null;
+    }
+
+    private static class CurrencyToLocales extends TreeMap<String, CountryLocales[]> {
     }
 }

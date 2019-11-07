@@ -5,13 +5,13 @@ import android.content.ContentValues;
 import java.util.Objects;
 
 public class PaymentRecord {
-    public long timeInSec; // can be 0
     public final String address;
     public final long bchAmount; // can negative
     public final String fiatAmount; // can be null
-    public int confirmations; // can be -1
     public final String message;
     public final String tx; // can be null or empty
+    public long timeInSec; // can be 0
+    public int confirmations; // can be -1
 
     public PaymentRecord(long timeInSec, String address, long bchAmount, String fiatAmount, int confirmations, String message, String tx) {
         this.timeInSec = timeInSec;

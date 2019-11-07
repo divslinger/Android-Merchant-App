@@ -3,10 +3,11 @@ package com.bitcoin.merchant.app.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.bitcoin.merchant.app.currency.CurrencyDetector;
 import com.github.kiulian.converter.AddressConverter;
-import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -34,25 +35,11 @@ public class AppUtil {
         return instance;
     }
 
-    /**
-     * For performance reasons, we cache the wallet (reported in May 2019 on Lenovo Tab E8)
-     */
-    public synchronized WalletUtil getWallet() throws Exception {
-        String xPub = AppUtil.getReceivingAddress(context);
-        if (walletUtil == null || !walletUtil.isSameXPub(xPub)) {
-            walletUtil = new WalletUtil(xPub, context);
-        }
-        return walletUtil;
-    }
-
     public static boolean isWalletAppInstalled(Activity activity) {
         PackageManager pm = activity.getPackageManager();
         try {
             pm.getPackageInfo(PACKAGE_BITCOIN_DOT_COM_WALLET, 0);
-            if (MISSING_WALLET_SIMULATED) {
-                return false;
-            }
-            return true;
+            return !MISSING_WALLET_SIMULATED;
         } catch (PackageManager.NameNotFoundException nnfe) {
             return false;
         }
@@ -149,6 +136,23 @@ public class AppUtil {
         If it's not a valid legacy address from the if statement above, just return as the text we are sending.
          */
         return address;
+    }
+
+    public static void setStatusBarColor(Activity activity, int color) {
+        Window window = activity.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(activity.getResources().getColor(color));
+    }
+
+    /**
+     * For performance reasons, we cache the wallet (reported in May 2019 on Lenovo Tab E8)
+     */
+    public synchronized WalletUtil getWallet() throws Exception {
+        String xPub = AppUtil.getReceivingAddress(context);
+        if (walletUtil == null || !walletUtil.isSameXPub(xPub)) {
+            walletUtil = new WalletUtil(xPub, context);
+        }
+        return walletUtil;
     }
 
     public boolean isValidXPub() {

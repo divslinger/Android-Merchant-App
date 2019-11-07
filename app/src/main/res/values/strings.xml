@@ -57,10 +57,10 @@
 
 <!-- <string name="bitcoin_currency_symbol">&#xf15a;</string> -->
     <string name="bitcoin_currency_symbol">BCH</string>
-    <string name="create_pin">Create Pin</string>
-    <string name="confirm_pin">Confirm Pin</string>
+    <string name="create_pin">Create passcode</string>
+    <string name="confirm_pin">Confirm passcode</string>
     <string name="unrecognized_xpub">Unrecognized public key format</string>
-    <string name="payment_received">Payment Received. Thank you.</string>
+    <string name="payment_received">Payment complete. Thank you.</string>
     <string name="unable_to_generate_address">An address cannot be generated at this time. Please check your installation and try again.</string>
     <string name="btc_limit_reached">Bitcoin Cash limit reached.</string>
 
@@ -104,11 +104,11 @@
 
     <string name="pull_to_refresh_tap_label">Tap to refresh…</string>
     <string name="receive_coins_fragment_email_address_hint">Adresse e-mail</string>
-    <string name="waiting_for_payment">Waiting For Payment</string>
+    <string name="waiting_for_payment">Scan to Pay</string>
 
     <!--
-Translations needed
--->
+    Translations needed
+    -->
     <string name="confirm_request">Checkout</string>
     <string name="cancel">Cancel</string>
     <string name="done">Done</string>
@@ -119,8 +119,8 @@ Translations needed
     <string name="synced_xpub">xpub synced!</string>
     <string name="about_title">About</string>
     <string name="no_history_text">This Cash Register does not have a transaction history.</string>
-    <string name="options_explain_payment_address">A destination address can either be a Bitcoin Cash address or Extended Public Key</string>
+    <string name="options_explain_payment_address">A destination address can either be a Bitcoin Cash address, or an Extended Public Key (xpub)</string>
     <string name="options_add_payment_address">Add destination address</string>
-    <string name="options_add_payment_address_text">You can use any Bitcoin Cash address from your wallet or an Extended Public Key</string>
+    <string name="options_add_payment_address_text">You can use any Bitcoin Cash address from your wallet, or an Extended Public Key (xpub)</string>
     <string name="save">Save</string>
 </resources>
