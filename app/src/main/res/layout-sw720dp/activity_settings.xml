@@ -194,6 +194,8 @@
 
     <include layout="@layout/localbch_ad"/>
 
+    <include layout="@layout/thepit_ad" />
+
     <Button
         android:id="@+id/btn_save"
         android:layout_width="330dp"

@@ -14,7 +14,7 @@
         android:layout_height="85dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/localbch_banner" />
+        android:src="@drawable/thepit_banner" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="15dp"
-            android:text="Local Bitcoin Cash"
+            android:text="Blockchain.com - The Pit"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -37,9 +37,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="20dp"
-            android:text="Sell your Bitcoin Cash (BCH) for Cash"
+            android:text="Sell your Bitcoin Cash (BCH) for USD, EUR, or GBP direct to your bank account"
             android:textColor="@color/white"
             android:textSize="12sp" />
     </LinearLayout>
