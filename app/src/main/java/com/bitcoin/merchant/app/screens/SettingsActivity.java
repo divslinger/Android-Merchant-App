@@ -341,7 +341,7 @@ public class SettingsActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (AppUtil.isReceivingAddressAvailable(this)) {
+        if (AppUtil.isReceivingAddressAvailable(this) && !this.isScanning) {
             this.backButton();
         }
     }
