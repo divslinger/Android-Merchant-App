@@ -18,7 +18,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,7 +53,8 @@ public class SettingsActivity extends Activity {
     private LinearLayout lvLocalCurrency = null;
     private LinearLayout lvPinCode = null;
     private Button btnSave = null;
-    private Button btnLocalBitcoin = null;
+    private RelativeLayout btnLocalBitcoin = null;
+    private RelativeLayout btnThePit = null;
     private boolean isScanning = false;
 
     @Override
@@ -68,6 +71,7 @@ public class SettingsActivity extends Activity {
         lvPinCode = ctx.findViewById(R.id.lv_pin_code);
         btnSave = ctx.findViewById(R.id.btn_save);
         btnLocalBitcoin = ctx.findViewById(R.id.localbch_ad);
+        btnThePit = ctx.findViewById(R.id.thepit_ad);
         LinearLayout root = (LinearLayout) lvMerchantName.getParent().getParent();
         Toolbar toolbar = (Toolbar) LayoutInflater.from(ctx).inflate(R.layout.settings_toolbar, root, false);
         toolbar.setTitle(R.string.action_settings);
@@ -87,17 +91,28 @@ public class SettingsActivity extends Activity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                backButton();
             }
         });
         btnLocalBitcoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri uri = Uri.parse("https://local.bitcoin.com");
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intent);
+                openUrl("https://local.bitcoin.com");
+
             }
         });
+        btnThePit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openUrl("https://pit.blockchain.com");
+            }
+        });
+    }
+
+    private void openUrl(String url) {
+        Uri uri = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
     }
 
     private void addOptionName(final SettingsActivity ctx) {
@@ -326,8 +341,8 @@ public class SettingsActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (!this.isScanning) {
-            this.onBackPressed();
+        if (AppUtil.isReceivingAddressAvailable(this) && !this.isScanning) {
+            this.backButton();
         }
     }
 }
