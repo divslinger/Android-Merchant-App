@@ -47,15 +47,14 @@ public class SettingsActivity extends Activity {
     private static final String TAG = "SettingsActivity";
     private static final int CAMERA_PERMISSION = 1111;
     private static int ZBAR_SCANNER_REQUEST = 2026;
-    private Preference newAddressPref = null;
-    private LinearLayout lvMerchantName = null;
-    private LinearLayout lvPaymentAddress = null;
-    private LinearLayout lvLocalCurrency = null;
-    private LinearLayout lvPinCode = null;
-    private Button btnSave = null;
-    private RelativeLayout btnLocalBitcoin = null;
-    private RelativeLayout btnThePit = null;
-    private boolean isScanning = false;
+    private LinearLayout lvMerchantName;
+    private LinearLayout lvPaymentAddress;
+    private LinearLayout lvLocalCurrency;
+    private LinearLayout lvPinCode;
+    private Button btnSave;
+    private RelativeLayout btnLocalBitcoin;
+    private RelativeLayout btnThePit;
+    private boolean isScanning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
