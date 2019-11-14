@@ -201,13 +201,6 @@
 
             </LinearLayout>
 
-            <include layout="@layout/localbch_ad" />
-
-            <include
-                layout="@layout/thepit_ad"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
             <Button
                 android:id="@+id/btn_save"
                 android:layout_width="match_parent"
@@ -221,6 +214,18 @@
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="25dp" />
+
+            <include layout="@layout/localbch_ad" />
+
+            <include
+                layout="@layout/thepit_ad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <Space
                 android:layout_width="match_parent"
