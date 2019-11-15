@@ -16,7 +16,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.bitcoin.merchant.app.BuildConfig;
 import com.bitcoin.merchant.app.R;
-//import android.util.Log;
 
 public class AboutActivity extends Activity {
     private TextView tvAbout = null;
