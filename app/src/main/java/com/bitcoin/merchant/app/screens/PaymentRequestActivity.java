@@ -1,5 +1,6 @@
 package com.bitcoin.merchant.app.screens;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
@@ -56,7 +57,6 @@ public class PaymentRequestActivity extends Activity {
     private LinearLayout progressLayout = null;
     private Button ivCancel = null;
     private Button ivDone = null;
-    private TextView tvStatus = null;
     private String receivingAddress = null;
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -131,7 +131,6 @@ public class PaymentRequestActivity extends Activity {
         receivedLayout = findViewById(R.id.layout_complete);
         ivCancel = findViewById(R.id.iv_cancel);
         ivDone = findViewById(R.id.iv_done);
-        tvStatus = findViewById(R.id.tv_status);
         ivReceivingQr.setVisibility(View.GONE);
         progressLayout.setVisibility(View.VISIBLE);
         View.OnClickListener listener = new View.OnClickListener() {
@@ -179,7 +178,7 @@ public class PaymentRequestActivity extends Activity {
         String uri = AddressConverter.toCashAddress(receivingAddress);
         try {
             BigInteger bamount = MonetaryUtil.getInstance(this).getUndenominatedAmount(lamount);
-            if (bamount.compareTo(BigInteger.valueOf(2100000000000000L)) == 1) {
+            if (bamount.compareTo(BigInteger.valueOf(21_000_000_000_000_00L)) == 1) {
                 ToastCustom.makeText(this, "Invalid amount", ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
                 return;
             }
@@ -197,6 +196,7 @@ public class PaymentRequestActivity extends Activity {
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     private void generateQRCode(final String uri) {
         new AsyncTask<Void, Void, Bitmap>() {
             @Override
@@ -230,6 +230,7 @@ public class PaymentRequestActivity extends Activity {
         }.execute();
     }
 
+    @SuppressLint("StaticFieldLeak")
     private void getReceiveAddress(final Context context, final double amountBch, final String strFiat) {
         new AsyncTask<Void, Void, String>() {
             @Override
