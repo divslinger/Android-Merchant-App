@@ -1,7 +1,7 @@
 package com.bitcoin.merchant.app.screens.dialogs;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.view.Gravity;
 import android.widget.TextView;
@@ -9,9 +9,9 @@ import android.widget.TextView;
 import com.bitcoin.merchant.app.R;
 
 public class PaymentTooHighDialog {
-    private final Context context;
+    private final Activity context;
 
-    public PaymentTooHighDialog(Context context) {
+    public PaymentTooHighDialog(Activity context) {
         this.context = context;
     }
 
@@ -30,6 +30,8 @@ public class PaymentTooHighDialog {
                 dialog.dismiss();
             }
         });
-        alert.show();
+        if (! context.isFinishing()) {
+            alert.show();
+        }
     }
 }

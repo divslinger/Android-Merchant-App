@@ -1,7 +1,7 @@
 package com.bitcoin.merchant.app.screens.dialogs;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.text.InputFilter;
 import android.widget.EditText;
@@ -11,9 +11,9 @@ import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 
 public class MerchantNameEditorDialog {
-    private final Context ctx;
+    private final Activity ctx;
 
-    public MerchantNameEditorDialog(Context ctx) {
+    public MerchantNameEditorDialog(Activity ctx) {
         this.ctx = ctx;
     }
 
@@ -25,7 +25,7 @@ public class MerchantNameEditorDialog {
         fArray[0] = new InputFilter.LengthFilter(maxLength);
         etName.setFilters(fArray);
         etName.setText(PrefsUtil.getInstance(ctx).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
-        new AlertDialog.Builder(ctx)
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx)
                 .setTitle(R.string.receive_coins_fragment_name)
                 .setView(etName)
                 .setCancelable(false)
@@ -43,7 +43,10 @@ public class MerchantNameEditorDialog {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         dialog.dismiss();
                     }
-                }).show();
+                });
+        if (! ctx.isFinishing()) {
+            builder.show();
+        }
         return true;
     }
 }

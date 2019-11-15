@@ -1,7 +1,7 @@
 package com.bitcoin.merchant.app.screens.dialogs;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
@@ -18,9 +18,9 @@ import java.text.ParseException;
 import java.util.Locale;
 
 public class PaymentTooLowDialog {
-    private final Context context;
+    private final Activity context;
 
-    public PaymentTooLowDialog(Context context) {
+    public PaymentTooLowDialog(Activity context) {
         this.context = context;
     }
 
@@ -80,6 +80,8 @@ public class PaymentTooLowDialog {
                 closingAction.run();
             }
         });
-        alert.show();
+        if (! context.isFinishing()) {
+            alert.show();
+        }
     }
 }

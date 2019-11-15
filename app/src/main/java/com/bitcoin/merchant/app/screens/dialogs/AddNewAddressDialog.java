@@ -21,7 +21,7 @@ public class AddNewAddressDialog {
         final TextView tvReceiverHelp = new TextView(ctx);
         tvReceiverHelp.setText(ctx.getText(R.string.options_add_payment_address_text));
         tvReceiverHelp.setPadding(50, 10, 50, 10);
-        new AlertDialog.Builder(ctx)
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx)
                 .setTitle(R.string.options_add_payment_address)
                 .setView(tvReceiverHelp)
                 .setCancelable(true)
@@ -36,12 +36,15 @@ public class AddNewAddressDialog {
                         dialog.dismiss();
                         ctx.requestToOpenCamera();
                     }
-                }).show();
+                });
+        if (! ctx.isFinishing()) {
+            builder.show();
+        }
     }
 
 
     private void showDialogToEnterAddress(final EditText etReceiver) {
-        new AlertDialog.Builder(ctx)
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx)
                 .setTitle(R.string.options_add_payment_address)
                 .setView(etReceiver)
                 .setCancelable(false)
@@ -55,8 +58,10 @@ public class AddNewAddressDialog {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         dialog.dismiss();
                     }
-                })
-                .show();
+                });
+        if (! ctx.isFinishing()) {
+            builder.show();
+        }
     }
 
     private void enterAddressUsingInputField() {
