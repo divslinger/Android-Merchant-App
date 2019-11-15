@@ -13,7 +13,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
     private TransactionsHistoryFragment transactionsHistoryFragment;
 
     public TabsPagerAdapter(FragmentManager fm, String[] tabs) {
-        super(fm);
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         this.tabs = tabs;
     }
 
