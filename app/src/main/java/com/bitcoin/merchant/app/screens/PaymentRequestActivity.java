@@ -215,7 +215,7 @@ public class PaymentRequestActivity extends Activity {
                 try {
                     bitmap = qrCodeEncoder.encodeAsBitmap();
                 } catch (WriterException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "", e);
                 }
                 return bitmap;
             }
@@ -249,7 +249,7 @@ public class PaymentRequestActivity extends Activity {
                         Log.i(TAG, "BCH-address(xPub) to receive: " + receivingAddress);
                     } catch (Exception e) {
                         receivingAddress = null;
-                        e.printStackTrace();
+                        Log.e(TAG, "", e);
                     }
                 } else {
                     receivingAddress = AppUtil.getReceivingAddress(context);

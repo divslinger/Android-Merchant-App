@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import java.util.Locale;
 //import android.util.Log;
 
 public class PaymentInputFragment extends Fragment implements View.OnClickListener {
+    private static final String TAG = "PaymentInputFragment";
     public static final String DEFAULT_CURRENCY_BCH = "BCH";
     public static final int RECEIVE_RESULT = 1122;
     public static final String ACTION_INTENT_RESET_AMOUNT = "RESET_AMOUNT";
@@ -119,7 +121,7 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
             buttonView.setEnabled(enabled);
             buttonDecimal.setText(enabled ? strDecimal : "");
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "", e);
         }
     }
 
@@ -323,14 +325,14 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
         double currentValue = 0.0;
         try {
             currentValue = nf.parse(tvAmount.getText().toString()).doubleValue();
-        } catch (ParseException pe) {
-            pe.printStackTrace();
+        } catch (ParseException e) {
+            Log.e(TAG, "", e);
         }
         double bchValue = 0.0;
         try {
             bchValue = toBch(currentValue);
-        } catch (ParseException pe) {
-            pe.printStackTrace();
+        } catch (ParseException e) {
+            Log.e(TAG, "", e);
         }
         if (bchValue > bitcoinLimit) {
             Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
@@ -346,10 +348,10 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
             double bch = toBch(amount);
             amountPayableFiat = amount;
             amountPayableBch = bch;
-        } catch (ParseException pe) {
+        } catch (ParseException e) {
             amountPayableFiat = 0.0;
             amountPayableBch = 0.0;
-            pe.printStackTrace();
+            Log.e(TAG, "", e);
         }
         if (amountPayableFiat == 0.0) {
             tvBch.setText("Enter an amount");

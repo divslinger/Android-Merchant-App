@@ -264,9 +264,7 @@ public class SettingsActivity extends Activity {
         final SettingsActivity ctx = SettingsActivity.this;
         //Is this a valid xpub, legacy, or cashaddr?
         if (AppUtil.isValidAddress(address)) {
-            /*
-            If it's not a valid xpub, we can assume it's a Bitcoin Cash address since the address is valid from the previous if statement.
-             */
+            //If it's not an xpub, we can assume it's a BCH address since the address is valid from the previous if statement.
             if (!FormatsUtil.getInstance().isValidXpub(address)) {
                 //legacy or cashaddr logic.
                 this.validateCashaddrOrLegacyAddress(address);
