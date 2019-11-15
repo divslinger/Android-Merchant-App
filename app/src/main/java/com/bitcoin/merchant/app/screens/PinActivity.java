@@ -20,7 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 //import android.util.Log;
 
-public class PinActivity extends Activity implements View.OnClickListener {
+public class PinActivity extends Activity {
     String userEnteredPIN = "";
     String userEnteredPINConfirm;
     private TextView titleView;
@@ -46,17 +46,6 @@ public class PinActivity extends Activity implements View.OnClickListener {
             }
         }
         titleView = findViewById(R.id.titleBox);
-        findViewById(R.id.button0).setOnClickListener(this);
-        findViewById(R.id.button1).setOnClickListener(this);
-        findViewById(R.id.button2).setOnClickListener(this);
-        findViewById(R.id.button3).setOnClickListener(this);
-        findViewById(R.id.button4).setOnClickListener(this);
-        findViewById(R.id.button5).setOnClickListener(this);
-        findViewById(R.id.button6).setOnClickListener(this);
-        findViewById(R.id.button7).setOnClickListener(this);
-        findViewById(R.id.button8).setOnClickListener(this);
-        findViewById(R.id.button9).setOnClickListener(this);
-        findViewById(R.id.buttonDeleteBack).setOnClickListener(this);
         if (doCreate) {
             titleView.setText(R.string.create_pin);
         } else {
@@ -183,8 +172,7 @@ public class PinActivity extends Activity implements View.OnClickListener {
             this.onBackPressed();
     }
 
-    @Override
-    public void onClick(View view) {
+    public void clickPinButton(View view) {
         Button viewButton = (Button) view;
         if (view.getId() != R.id.buttonDeleteBack)
             padClicked(viewButton.getText().toString());
