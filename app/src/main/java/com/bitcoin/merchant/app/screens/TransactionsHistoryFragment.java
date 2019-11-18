@@ -121,11 +121,19 @@ public class TransactionsHistoryFragment extends Fragment {
             }
         });
         if (adapter.getCount() == 0) {
-            listView.setVisibility(View.GONE);
-            noTxHistoryLv.setVisibility(View.VISIBLE);
+            this.setTxListVisibility(View.GONE);
         } else {
-            listView.setVisibility(View.VISIBLE);
-            noTxHistoryLv.setVisibility(View.GONE);
+            this.setTxListVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setTxListVisibility(int visibility) {
+        this.listView.setVisibility(visibility);
+
+        if(visibility == View.GONE) {
+            this.noTxHistoryLv.setVisibility(View.VISIBLE);
+        } else {
+            this.noTxHistoryLv.setVisibility(View.GONE);
         }
     }
 

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import java.util.Locale;
 //import android.util.Log;
 
 public class PaymentInputFragment extends Fragment implements View.OnClickListener {
+    private static final String TAG = "PaymentInputFragment";
     public static final String DEFAULT_CURRENCY_BCH = "BCH";
     public static final int RECEIVE_RESULT = 1122;
     public static final String ACTION_INTENT_RESET_AMOUNT = "RESET_AMOUNT";
@@ -55,19 +57,7 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
             }
         }
     };
-    private Button ivCharge = null;
-    private Button button0 = null;
-    private Button button1 = null;
-    private Button button2 = null;
-    private Button button3 = null;
-    private Button button4 = null;
-    private Button button5 = null;
-    private Button button6 = null;
-    private Button button7 = null;
-    private Button button8 = null;
-    private Button button9 = null;
     private Button buttonDecimal = null;
-    private Button buttonDeleteBack = null;
     private TextView tvBch = null;
     private NumberFormat nf = null;
     private DecimalFormat df = null;
@@ -82,8 +72,13 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
         df = new DecimalFormat("#.########", dfs);
         tvCurrencySymbol = rootView.findViewById(R.id.tv_currency_symbol);
         tvAmount = rootView.findViewById(R.id.tv_fiat_amount);
-        ivCharge = rootView.findViewById(R.id.iv_charge);
-        ivCharge.setOnClickListener(this);
+        Button ivCharge = rootView.findViewById(R.id.iv_charge);
+        ivCharge.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chargeClicked();
+            }
+        });
         tvBch = rootView.findViewById(R.id.tv_bch);
         initalizeButtons();
         updateAmounts();
@@ -119,7 +114,7 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
             buttonView.setEnabled(enabled);
             buttonDecimal.setText(enabled ? strDecimal : "");
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "", e);
         }
     }
 
@@ -155,75 +150,32 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
 
 
     private void initalizeButtons() {
-        button0 = rootView.findViewById(R.id.button0);
-        button1 = rootView.findViewById(R.id.button1);
-        button2 = rootView.findViewById(R.id.button2);
-        button3 = rootView.findViewById(R.id.button3);
-        button4 = rootView.findViewById(R.id.button4);
-        button5 = rootView.findViewById(R.id.button5);
-        button6 = rootView.findViewById(R.id.button6);
-        button7 = rootView.findViewById(R.id.button7);
-        button8 = rootView.findViewById(R.id.button8);
-        button9 = rootView.findViewById(R.id.button9);
+        rootView.findViewById(R.id.button0).setOnClickListener(this);
+        rootView.findViewById(R.id.button1).setOnClickListener(this);
+        rootView.findViewById(R.id.button2).setOnClickListener(this);
+        rootView.findViewById(R.id.button3).setOnClickListener(this);
+        rootView.findViewById(R.id.button4).setOnClickListener(this);
+        rootView.findViewById(R.id.button5).setOnClickListener(this);
+        rootView.findViewById(R.id.button6).setOnClickListener(this);
+        rootView.findViewById(R.id.button7).setOnClickListener(this);
+        rootView.findViewById(R.id.button8).setOnClickListener(this);
+        rootView.findViewById(R.id.button9).setOnClickListener(this);
         buttonDecimal = rootView.findViewById(R.id.buttonDecimal);
-        buttonDeleteBack = rootView.findViewById(R.id.buttonDeleteBack);
-        button0.setOnClickListener(this);
-        button1.setOnClickListener(this);
-        button2.setOnClickListener(this);
-        button3.setOnClickListener(this);
-        button4.setOnClickListener(this);
-        button5.setOnClickListener(this);
-        button6.setOnClickListener(this);
-        button7.setOnClickListener(this);
-        button8.setOnClickListener(this);
-        button9.setOnClickListener(this);
         buttonDecimal.setOnClickListener(this);
+        Button buttonDeleteBack = rootView.findViewById(R.id.buttonDeleteBack);
         buttonDeleteBack.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.button0:
-                padClicked(button0.getText().toString());
-                break;
-            case R.id.button1:
-                padClicked(button1.getText().toString());
-                break;
-            case R.id.button2:
-                padClicked(button2.getText().toString());
-                break;
-            case R.id.button3:
-                padClicked(button3.getText().toString());
-                break;
-            case R.id.button4:
-                padClicked(button4.getText().toString());
-                break;
-            case R.id.button5:
-                padClicked(button5.getText().toString());
-                break;
-            case R.id.button6:
-                padClicked(button6.getText().toString());
-                break;
-            case R.id.button7:
-                padClicked(button7.getText().toString());
-                break;
-            case R.id.button8:
-                padClicked(button8.getText().toString());
-                break;
-            case R.id.button9:
-                padClicked(button9.getText().toString());
-                break;
-            case R.id.buttonDecimal:
-                padClicked(strDecimal);
-                break;
-            case R.id.buttonDeleteBack:
-                padClicked(null);
-                break;
-            case R.id.iv_charge:
-                chargeClicked();
-                return;
-        }
+        Button viewButton = (Button) v;
+        if (v.getId() != R.id.buttonDeleteBack && v.getId() != R.id.buttonDecimal)
+            padClicked(viewButton.getText().toString());
+        else if(v.getId() == R.id.buttonDeleteBack)
+            padClicked(null);
+        else if(v.getId() == R.id.buttonDecimal)
+            padClicked(strDecimal);
+
         updateAmounts();
     }
 
@@ -323,14 +275,14 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
         double currentValue = 0.0;
         try {
             currentValue = nf.parse(tvAmount.getText().toString()).doubleValue();
-        } catch (ParseException pe) {
-            pe.printStackTrace();
+        } catch (ParseException e) {
+            Log.e(TAG, "", e);
         }
         double bchValue = 0.0;
         try {
             bchValue = toBch(currentValue);
-        } catch (ParseException pe) {
-            pe.printStackTrace();
+        } catch (ParseException e) {
+            Log.e(TAG, "", e);
         }
         if (bchValue > bitcoinLimit) {
             Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
@@ -346,10 +298,10 @@ public class PaymentInputFragment extends Fragment implements View.OnClickListen
             double bch = toBch(amount);
             amountPayableFiat = amount;
             amountPayableBch = bch;
-        } catch (ParseException pe) {
+        } catch (ParseException e) {
             amountPayableFiat = 0.0;
             amountPayableBch = 0.0;
-            pe.printStackTrace();
+            Log.e(TAG, "", e);
         }
         if (amountPayableFiat == 0.0) {
             tvBch.setText("Enter an amount");
