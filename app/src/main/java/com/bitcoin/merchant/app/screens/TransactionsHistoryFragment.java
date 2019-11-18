@@ -120,21 +120,12 @@ public class TransactionsHistoryFragment extends Fragment {
                 }
             }
         });
-        if (adapter.getCount() == 0) {
-            this.setTxListVisibility(View.GONE);
-        } else {
-            this.setTxListVisibility(View.VISIBLE);
-        }
+        this.setTxListVisibility(adapter.getCount() > 0);
     }
 
-    private void setTxListVisibility(int visibility) {
-        this.listView.setVisibility(visibility);
-
-        if(visibility == View.GONE) {
-            this.noTxHistoryLv.setVisibility(View.VISIBLE);
-        } else {
-            this.noTxHistoryLv.setVisibility(View.GONE);
-        }
+    private void setTxListVisibility(boolean enabled) {
+        this.listView.setVisibility(enabled ? View.VISIBLE : View.GONE);
+        this.noTxHistoryLv.setVisibility(enabled ? View.GONE : View.VISIBLE);
     }
 
     @Override
@@ -207,8 +198,7 @@ public class TransactionsHistoryFragment extends Fragment {
             if (!isSafe()) {
                 return;
             }
-            listView.setVisibility(View.VISIBLE);
-            noTxHistoryLv.setVisibility(View.GONE);
+            setTxListVisibility(true);
             thisActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -229,8 +219,7 @@ public class TransactionsHistoryFragment extends Fragment {
             if (!isSafe()) {
                 return;
             }
-            listView.setVisibility(View.VISIBLE);
-            noTxHistoryLv.setVisibility(View.GONE);
+            setTxListVisibility(true);
             thisActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -284,16 +273,14 @@ public class TransactionsHistoryFragment extends Fragment {
                 if (result != null && adapter != null) {
                     adapter.reset(result);
                     if (result.size() != 0) {
-                        listView.setVisibility(View.VISIBLE);
-                        noTxHistoryLv.setVisibility(View.GONE);
+                        setTxListVisibility(true);
                     }
                 }
                 if (queryServer) {
                     findAllPotentialMissingTx();
                 } else {
                     if (result != null && result.size() != 0) {
-                        listView.setVisibility(View.VISIBLE);
-                        noTxHistoryLv.setVisibility(View.GONE);
+                        setTxListVisibility(true);
                     }
                     swipeLayout.setRefreshing(false);
                 }
