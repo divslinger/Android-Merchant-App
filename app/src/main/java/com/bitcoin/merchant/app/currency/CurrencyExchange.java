@@ -22,6 +22,7 @@ import java.util.TreeMap;
 
 public class CurrencyExchange {
     public static final int MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS = 3 * 60 * 1000;
+    public static final String TAG = "CurrencyExchange";
     private static CurrencyExchange instance;
     private final Context context;
     private final Map<String, CurrencyRate> tickerToRate = Collections.synchronizedMap(new TreeMap<String, CurrencyRate>());
@@ -145,7 +146,7 @@ public class CurrencyExchange {
             saveToStore();
             Log.i("CurrencyExchange", "rates updated 1 BCH=$" + tickerToRate.get("USD").rate);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "", e);
         }
     }
 

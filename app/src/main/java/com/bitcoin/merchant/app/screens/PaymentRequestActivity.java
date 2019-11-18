@@ -49,15 +49,15 @@ import java.math.BigInteger;
 import static com.bitcoin.merchant.app.MainActivity.TAG;
 
 public class PaymentRequestActivity extends Activity {
-    private LinearLayout waitingLayout = null;
-    private LinearLayout receivedLayout = null;
-    private TextView tvFiatAmount = null;
-    private TextView tvBtcAmount = null;
-    private ImageView ivReceivingQr = null;
-    private LinearLayout progressLayout = null;
-    private Button ivCancel = null;
-    private Button ivDone = null;
-    private String receivingAddress = null;
+    private LinearLayout waitingLayout;
+    private LinearLayout receivedLayout;
+    private TextView tvFiatAmount;
+    private TextView tvBtcAmount;
+    private ImageView ivReceivingQr;
+    private LinearLayout progressLayout;
+    private Button ivCancel;
+    private Button ivDone;
+    private String receivingAddress;
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -131,8 +131,7 @@ public class PaymentRequestActivity extends Activity {
         receivedLayout = findViewById(R.id.layout_complete);
         ivCancel = findViewById(R.id.iv_cancel);
         ivDone = findViewById(R.id.iv_done);
-        ivReceivingQr.setVisibility(View.GONE);
-        progressLayout.setVisibility(View.VISIBLE);
+        showGeneratingQrCodeProgress(true);
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,6 +142,11 @@ public class PaymentRequestActivity extends Activity {
         ivReceivingQr.setOnClickListener(listener);
         waitingLayout.setVisibility(View.VISIBLE);
         receivedLayout.setVisibility(View.GONE);
+    }
+
+    private void showGeneratingQrCodeProgress(boolean enabled) {
+        this.progressLayout.setVisibility(enabled ? View.VISIBLE : View.GONE);
+        this.ivReceivingQr.setVisibility(enabled ? View.GONE : View.VISIBLE);
     }
 
     private void clickButton(View v) {
@@ -202,9 +206,7 @@ public class PaymentRequestActivity extends Activity {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                //Show generating QR message
-                ivReceivingQr.setVisibility(View.GONE);
-                progressLayout.setVisibility(View.VISIBLE);
+                showGeneratingQrCodeProgress(true);
             }
 
             @Override
@@ -223,8 +225,7 @@ public class PaymentRequestActivity extends Activity {
             @Override
             protected void onPostExecute(Bitmap bitmap) {
                 super.onPostExecute(bitmap);
-                progressLayout.setVisibility(View.GONE);
-                ivReceivingQr.setVisibility(View.VISIBLE);
+                showGeneratingQrCodeProgress(false);
                 ivReceivingQr.setImageBitmap(bitmap);
             }
         }.execute();

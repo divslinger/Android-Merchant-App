@@ -8,7 +8,6 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
-//import android.util.Log;
 
 public class SplashActivity extends Activity {
     @Override

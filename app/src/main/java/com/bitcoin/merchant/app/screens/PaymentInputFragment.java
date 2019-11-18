@@ -31,7 +31,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Currency;
 import java.util.Locale;
-//import android.util.Log;
 
 public class PaymentInputFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "PaymentInputFragment";

@@ -3,6 +3,7 @@ package com.bitcoin.merchant.app.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -16,6 +17,7 @@ import java.io.InputStreamReader;
 import info.blockchain.wallet.util.FormatsUtil;
 
 public class AppUtil {
+    public static final String TAG = "AppUtil";
     public static final Gson GSON = new Gson();
     public static final String PACKAGE_BITCOIN_DOT_COM_WALLET = "com.bitcoin.mwallet";
     public static final String DEFAULT_CURRENCY_FIAT = "USD";
@@ -116,7 +118,7 @@ public class AppUtil {
             try {
                 receiver = AddressConverter.toLegacyAddress(receiver);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "", e);
             }
         }
         PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
@@ -129,7 +131,7 @@ public class AppUtil {
             try {
                 address = AddressUtil.toCashAddress(address);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "", e);
             }
         }
         /*

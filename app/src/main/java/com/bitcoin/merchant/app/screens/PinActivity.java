@@ -18,7 +18,6 @@ import com.bitcoin.merchant.app.util.ToastCustom;
 
 import java.util.Timer;
 import java.util.TimerTask;
-//import android.util.Log;
 
 public class PinActivity extends Activity {
     String userEnteredPIN = "";

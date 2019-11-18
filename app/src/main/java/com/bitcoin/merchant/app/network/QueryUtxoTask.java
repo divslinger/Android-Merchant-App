@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueryUtxoTask extends DownloadTask<Utxos> {
+    public static final String TAG = "QueryUtxoTask";
     private final Context context;
     private final QueryUtxoType query;
     private final QueryUtxoType nextQuery;
@@ -96,7 +97,7 @@ public class QueryUtxoTask extends DownloadTask<Utxos> {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "", e);
             }
         }
         utxos.utxos = newUtxos.toArray(new Utxo[0]);

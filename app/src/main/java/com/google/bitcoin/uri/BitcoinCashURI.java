@@ -17,6 +17,8 @@
  */
 package com.google.bitcoin.uri;
 
+import android.util.Log;
+
 import com.github.kiulian.converter.AddressConverter;
 
 import org.bitcoinj.core.Coin;
@@ -69,15 +71,7 @@ import java.math.BigInteger;
  * @see <a href="https://en.bitcoin.it/wiki/BIP_0021">BIP 0021</a>
  */
 public class BitcoinCashURI {
-    /**
-     * Provides logging for this class
-     */
-//    private static final Logger log = LoggerFactory.getLogger(BitcoinURI.class);
-    // Not worth turning into an enum
-    public static final String FIELD_MESSAGE = "message";
-    public static final String FIELD_LABEL = "label";
-    public static final String FIELD_AMOUNT = "amount";
-    public static final String FIELD_ADDRESS = "address";
+    public static final String TAG = "BitcoinCashURI";
     public static final String BITCOIN_SCHEME = "bitcoincash";
     /**
      * How many "nanocoins" there are in a BitCoin.
@@ -196,7 +190,7 @@ public class BitcoinCashURI {
                 try {
                     address = AddressConverter.toLegacyAddress(bchAddress);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "", e);
                     address = null;
                 }
             }
