@@ -114,6 +114,11 @@ public class PaymentRequestActivity extends Activity {
         tvFiatAmount.setText(f.formatFiat(amountFiat));
         tvBtcAmount.setText(f.formatBch(amountBch));
         getReceiveAddress(PaymentRequestActivity.this, amountBch, tvFiatAmount.getText().toString());
+        // Attempt to reconnect in case we were disconnected from Internet
+        broadcastManager.sendBroadcast(new Intent(MainActivity.ACTION_INTENT_RECONNECT));
+        // Query mempool, in case the previous TX was not received by the socket listeners
+        // It will be unnecessary and can be removed after the switch to BIP-70 in the next big release.
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_MISSING_TX_IN_MEMPOOL));
     }
 
     @Override
