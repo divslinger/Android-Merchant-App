@@ -49,7 +49,7 @@
             android:layout_height="wrap_content"
             android:alpha="0.4"
             android:gravity="center"
-            android:text="Enter an amount"
+            android:text="@string/payment_enter_an_amount"
             android:textColor="@color/textColorPrimary"
             android:textSize="16sp" />
 

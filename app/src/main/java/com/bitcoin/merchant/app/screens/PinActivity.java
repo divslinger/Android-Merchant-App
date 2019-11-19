@@ -37,7 +37,6 @@ public class PinActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_pin);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setTitle(R.string.action_pincode);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             if (extras.getBoolean("create")) {

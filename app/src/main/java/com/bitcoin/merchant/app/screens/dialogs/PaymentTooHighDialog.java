@@ -23,7 +23,7 @@ public class PaymentTooHighDialog {
         title.setGravity(Gravity.CENTER);
         title.setTextSize(20);
         builder.setCustomTitle(title);
-        builder.setMessage(R.string.overpaid_amount).setCancelable(false);
+        builder.setMessage(R.string.removed_by_bip70_overpaid_amount).setCancelable(false);
         AlertDialog alert = builder.create();
         alert.setButton(AlertDialog.BUTTON_POSITIVE, context.getString(R.string.prompt_ok), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {

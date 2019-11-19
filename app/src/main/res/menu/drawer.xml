@@ -6,19 +6,19 @@
             android:id="@+id/action_profile"
             android:visible="false"
             android:icon="@drawable/ic_person_white_24dp"
-            android:title="Profile"/>
+            android:title="@string/menu_profile"/>
         <item
             android:id="@+id/action_checkout"
             android:icon="@drawable/register_icon"
-            android:title="Cash Register"/>
+            android:title="@string/menu_cash_register"/>
         <item
             android:id="@+id/action_transactions"
             android:icon="@drawable/transactions_icon"
-            android:title="Transactions"/>
+            android:title="@string/menu_transactions"/>
         <item
             android:id="@+id/action_settings"
             android:icon="@drawable/settings_icon"
-            android:title="Settings"/>
+            android:title="@string/menu_settings"/>
     </group>
 
     <group android:id="@+id/grp2" android:checkableBehavior="single">
@@ -27,12 +27,12 @@
             android:id="@+id/action_help"
             android:visible="false"
             android:icon="@drawable/ic_help_white_24dp"
-            android:title="Help"/>
+            android:title="@string/menu_help"/>
         <item
             android:id="@+id/action_about"
             android:icon="@drawable/ic_notification"
             android:iconTint="@color/bitcoindotcom_green"
-            android:title="About"/>
+            android:title="@string/menu_about"/>
     </group>
 
 </menu>

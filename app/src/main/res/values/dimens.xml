@@ -1,17 +1,8 @@
 <resources>
     <dimen name="pinentry_num_text_size">50sp</dimen>
-    <dimen name="pinentry_alpha_text_size">9sp</dimen>
-    <dimen name="pinentry_padding">7dp</dimen>
 
-    <dimen name="transaction_height">84dp</dimen>
-    <dimen name="transaction_height_half">42dp</dimen>
-    <dimen name="transaction_incoming_btc_height">84dp</dimen>
-    <dimen name="transaction_column_width">125dp</dimen>
-    <dimen name="transaction_note_width">95dp</dimen>
-    <dimen name="transaction_text_size">12sp</dimen>
     <dimen name="transaction_amount_fiat_size">22sp</dimen>
     <dimen name="transaction_amount_coin_size">9sp</dimen>
-    <dimen name="transaction_amount_size_superscript">16sp</dimen>
     <dimen name="transaction_date_size">16sp</dimen>
 
     <dimen name="qr_code_size">240dp</dimen>

@@ -354,7 +354,7 @@ public class TransactionsHistoryFragment extends Fragment {
             tvDate.setAlpha(0.7f);
             // display coin amount
             long amount = Math.abs(bch);
-            SpannableStringBuilder coinSpan = new SpannableStringBuilder(thisActivity.getResources().getString(R.string.bitcoin_currency_symbol));
+            SpannableStringBuilder coinSpan = new SpannableStringBuilder("BCH");
             coinSpan.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             TextView coinView = view.findViewById(R.id.tv_amount_coin);
             String displayValue = MonetaryUtil.getInstance(thisActivity).getDisplayAmountWithFormatting(amount);

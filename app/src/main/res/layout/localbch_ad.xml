@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="15dp"
-            android:text="Local Bitcoin Cash"
+            android:text="@string/ad_title_local_bitcoin_cash"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -39,7 +39,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="20dp"
-            android:text="Sell your Bitcoin Cash (BCH) for Cash"
+            android:text="@string/ad_content_local_bitcoin_cash"
             android:textColor="@color/white"
             android:textSize="12sp" />
     </LinearLayout>

@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="blockchain_red">#FA343A</color>
-    <color name="blockchain_grey">#FF808080</color>
-    <color name="blockchain_light_grey">#FFf0f0f0</color>
     <color name="blockchain_navigation_bar">#FF000000</color>
     <color name="textColorPrimary">#FF000000</color>
     <color name="textColorSecondary">#FF222222</color>
 
     <color name="white">#fff</color>
     <color name="gray">#ccc</color>
-    <color name="black">#000</color>
     <color name="white_50">#80ffffff</color>
 
     <color name="dropshadow_grey">#CCCCCC</color>
@@ -22,7 +18,6 @@
     <color name="toast_info_text">#4F772F</color>
     <color name="bitcoindotcom_light_green">#00D897</color>
     <color name="bitcoindotcom_green">#00c58a</color>
-    <color name="bitcoindotcom_dark_green">#009B6C</color>
     <color name="bitcoindotcom_darker_green">#009B6C</color>
     <color name="bitcoindotcom_darkest_green">#00704E</color>
 

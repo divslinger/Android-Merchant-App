@@ -61,7 +61,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="Yesterday @23:58"
+            android:text="...Yesterday @23:58"
             android:textSize="@dimen/transaction_date_size" />
 
     </LinearLayout>

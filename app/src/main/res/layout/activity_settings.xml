@@ -49,7 +49,7 @@
                             android:gravity="center_vertical"
                             android:paddingStart="10dp"
                             android:paddingEnd="10dp"
-                            android:text="Merchant Name"
+                            android:text="@string/settings_merchant_name"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -93,7 +93,7 @@
                             android:gravity="center_vertical"
                             android:paddingStart="10dp"
                             android:paddingEnd="10dp"
-                            android:text="Destination Address"
+                            android:text="@string/settings_destination_address"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -138,7 +138,7 @@
                             android:gravity="center_vertical"
                             android:paddingStart="10dp"
                             android:paddingEnd="10dp"
-                            android:text="Local Currency"
+                            android:text="@string/settings_local_currency"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -182,7 +182,7 @@
                             android:gravity="center_vertical"
                             android:paddingStart="10dp"
                             android:paddingEnd="10dp"
-                            android:text="PIN Code"
+                            android:text="@string/settings_pin_code"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -209,7 +209,7 @@
                 android:layout_marginEnd="50dp"
                 android:background="@drawable/button_rounded_green"
                 android:stateListAnimator="@null"
-                android:text="@string/save"
+                android:text="@string/button_save"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="18sp"

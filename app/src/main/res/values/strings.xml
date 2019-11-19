@@ -1,126 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BCH Merchant</string>
+    <string name="app_name">BCH Cash Register</string>
     <string name="action_settings">Settings</string>
-    <string name="action_settings_title">Merchant Settings</string>
-    <string name="action_about">About BCH Merchant</string>
-    <string name="action_newpin">Change PIN code</string>
-    <string name="action_pincode">PIN code</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="support">Support</string>
-    <string name="rate_us">Rate us</string>
-    <string name="email_chooser">Send e-mail…</string>
-    <string name="about">BCH Merchant %1$s\n©%2$s</string>
-    <string name="wallet_download">Free Bitcoin Cash Wallet</string>
-    
-    <string name="tab_settings">Settings</string>
     <string name="tab_payment">Payment</string>
     <string name="tab_history">History</string>
-    
     <string name="receive_coins_fragment_name">Name of your business</string>
-    <string name="receive_coins_fragment_merchant_xpub_hint">Your Public Key</string>
-    <string name="receive_coins_fragment_receiving_address_error">Invalid address</string>
-    <string name="receive_coins_fragment_default_currency_hint">Default currency</string>
-    <string name="receive_coins_fragment_other_currency">Other currency code (3 letter code, ex.: MXP)</string>
-    <string name="receive_coins_activity_title">Send Bitcoins</string>
-    <string name="receive_coins_uri_parse_error_title">Invalid Bitcoin Cash URI</string>
-    <string name="receive_coins_parse_address_error_msg">Got invalid Bitcoin Cash address!\n(Mixing up Testnet/Prodnet?)</string>
-    <string name="receive_coins_fragment_push_notifications">Push Notifications</string>
-    <string name="receive_coins_fragment_email_receipts">E-mail receipts</string>
-    <string name="use_btc">Enter price in Bitcoins (BCH)</string>
-    <string name="payment_note">Description (optional)…</string>
-    <string name="payment_clear">CLEAR</string>
-    <string name="payment_new">Start</string>
-    <string name="payment_ready">Confirm Payment</string>
-    <string name="payment_executed">Payment Executed</string>
-    <string name="no_data">No data</string>
-    <string name="content_description">Thank you. Hope to see you soon.</string>
-    <string name="delete_rec">Are you sure you want to delete this payment entry?</string>
-    <string name="invalid_btc_address">Please enter a valid Bitcoin Cash wallet address.</string>
-    <string name="pin_code_prompt1">Create a 4-digit PIN code</string>
-    <string name="pin_code_prompt2">Repeat PIN code</string>
-    <string name="pin_code_prompt3">Enter your 4-digit PIN code</string>
-    <string name="marquee_start">Payment received from</string>
-    <string name="notification_end">BCH received</string>
-    <string name="generating_qr">Generating QR code…</string>
-    <string name="no_exchange_rate">BCH Merchant has not determined the exchange rate for your selected currency. Please check your Internet connection and try again.</string>
-    
     <string name="pin_code_create_error">Enter two matching 4-digit PIN codes</string>
     <string name="pin_code_enter_error">PIN code incorrect</string>
-    <string name="camera_unavailable">Camera unavailable</string>
-
-    <string name="prompt_yes">Yes</string>
-    <string name="prompt_no">No</string>
     <string name="prompt_ok">OK</string>
     <string name="prompt_ko">CANCEL</string>
-    <string name="prompt_save">SAVE</string>
-
-<!-- <string name="bitcoin_currency_symbol">&#xf15a;</string> -->
-    <string name="bitcoin_currency_symbol">BCH</string>
     <string name="create_pin">Create passcode</string>
     <string name="confirm_pin">Confirm passcode</string>
     <string name="unrecognized_xpub">Unrecognized public key format</string>
     <string name="payment_received">Payment complete. Thank you.</string>
     <string name="unable_to_generate_address">An address cannot be generated at this time. Please check your installation and try again.</string>
-    <string name="btc_limit_reached">Bitcoin Cash limit reached.</string>
-
     <string name="no_valid_receiver">Please configure your receiving address.</string>
     <string name="invalid_amount">Invalid amount.</string>
-
-    <string name="insufficient_payment">Insufficient payment received.</string>
-    <string name="re_payment_remainder">Remainder:</string>
-    <string name="re_payment_requested">Requested:</string>
-    <string name="re_payment_received">Received:</string>
-    <string name="insufficient_payment_continue">Update QR code for remaining amount due?</string>
-
-    <string name="settings_saved">Settings saved</string>
-
-    <string name="dialog_continue">Continue</string>
-    <string name="ssl_hostname_invalid">We are unable to validate the hostname of the SSL certificate. This might indicate malicious activity. Please verify your network connection and device before continuing.</string>
-    <string name="ssl_pinning_invalid">SSL certificate pinning has failed. This might indicate malicious activity. Please verify your network connection and device before continuing.</string>
-
-    <string name="off">Off</string>
-    <string name="on">On</string>
-
-    <string name="options_cat_settings">Settings</string>
-    <string name="options_receive">Receiving payments</string>
-    <string name="options_business_name">Business name</string>
-    <string name="options_local_currency">Local currency</string>
-    <string name="options_pin_code">PIN code</string>
+    <string name="removed_by_bip70_insufficient_payment">Insufficient payment received.</string>
+    <string name="removed_by_bip70_re_payment_remainder">Remainder:</string>
+    <string name="removed_by_bip70_re_payment_requested">Requested:</string>
+    <string name="removed_by_bip70_re_payment_received">Received:</string>
+    <string name="removed_by_bip70_insufficient_payment_continue">Update QR code for remaining amount due?</string>
+    <string name="removed_by_bip70_overpaid_amount">The amount received is higher than expected.</string>
     <string name="options_payment_address">Payment address</string>
-    <string name="options_forget_payment_address">Forget payment address</string>
-    <string name="options_forget_payment_address_text">If you forget this payment address you will not be able to accept Bitcoin Cash payments until you add a new one.</string>
     <string name="options_receiving_payments">Receiving payments</string>
-    <string name="options_new_payment_address">New payment address</string>
-    <string name="options_download_wallet">If you do not have a Bitcoin Cash wallet, create one for free by clicking here:\n\nhttps://wallet.bitcoin.com</string>
-
     <string name="scan">Scan</string>
     <string name="paste">Paste</string>
-
     <string name="obligatory_receiver">You must provide a Bitcoin Cash address to receive payments.</string>
-
-    <string name="please_create_pin">Before proceeding, please create a 4-digit PIN code to protect your Settings.</string>
-    <string name="overpaid_amount">The amount received is higher than expected.</string>
-
-    <string name="pull_to_refresh_tap_label">Tap to refresh…</string>
-    <string name="receive_coins_fragment_email_address_hint">Adresse e-mail</string>
     <string name="waiting_for_payment">Scan to Pay</string>
-
-    <!--
-    Translations needed
-    -->
     <string name="confirm_request">Checkout</string>
-    <string name="cancel">Cancel</string>
-    <string name="done">Done</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_done">Done</string>
     <string name="powered_by">Powered by</string>
     <string name="bitcoindotcom">Bitcoin.com</string>
     <string name="enter_pin">Enter passcode</string>
     <string name="syncing_xpub">Syncing xpub…</string>
     <string name="synced_xpub">xpub synced!</string>
-    <string name="about_title">About</string>
-    <string name="no_history_text">This Cash Register does not have a transaction history.</string>
+    <string name="no_history_text">There is no transaction history.</string>
     <string name="options_explain_payment_address">A destination address can either be a Bitcoin Cash address, or an Extended Public Key (xpub)</string>
     <string name="options_add_payment_address">Add destination address</string>
     <string name="options_add_payment_address_text">You can use any Bitcoin Cash address from your wallet, or an Extended Public Key (xpub)</string>
-    <string name="save">Save</string>
+    <string name="button_save">Save</string>
+    <string name="payment_enter_an_amount">Enter an amount</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_cash_register">Cash Register</string>
+    <string name="menu_transactions">Transactions</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_help">Help</string>
+    <string name="menu_about">About</string>
+    <string name="settings_merchant_name">Merchant Name</string>
+    <string name="settings_destination_address">Destination Address</string>
+    <string name="settings_local_currency">Local Currency</string>
+    <string name="settings_pin_code">PIN Code</string>
+    <string name="ad_title_local_bitcoin_cash">Local Bitcoin Cash</string>
+    <string name="ad_content_local_bitcoin_cash">Sell your Bitcoin Cash (BCH) for Cash</string>
+    <string name="ad_title_blockchain_com_the_pit">Blockchain.com - The Pit</string>
+    <string name="ad_content_blockchain_com_the_pit">Sell your Bitcoin Cash (BCH) for USD, EUR, or GBP direct to your bank account</string>
 </resources>

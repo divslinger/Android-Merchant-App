@@ -426,7 +426,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     }
 
     private void setMerchantName() {
-        //Update Merchant name
         NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);

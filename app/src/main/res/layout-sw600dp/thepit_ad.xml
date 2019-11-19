@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="24dp"
-            android:text="Blockchain.com - The Pit"
+            android:text="@string/ad_title_blockchain_com_the_pit"
             android:textColor="@color/white"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -39,7 +39,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="20dp"
-            android:text="Sell your Bitcoin Cash (BCH) for USD, EUR, or GBP direct to your bank account"
+            android:text="@string/ad_content_blockchain_com_the_pit"
             android:textColor="@color/white"
             android:textSize="16sp" />
     </LinearLayout>
