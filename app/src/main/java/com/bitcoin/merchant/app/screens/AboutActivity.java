@@ -23,7 +23,7 @@ public class AboutActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.activity_about);
         TextView about = findViewById(R.id.about);
-        about.setText(BuildConfig.VERSION_NAME + "\n©2019");
+        about.setText(BuildConfig.VERSION_NAME + " - 2019");
         LinearLayout root = findViewById(R.id.about_container);
         Toolbar toolbar = (Toolbar) LayoutInflater.from(AboutActivity.this).inflate(R.layout.settings_toolbar, root, false);
         toolbar.setTitle(R.string.menu_about);
