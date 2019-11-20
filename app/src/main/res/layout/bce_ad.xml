@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bce_ad"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="40dp"
+    android:paddingEnd="40dp"
+    android:paddingBottom="24dp">
+
+    <ImageView
+        android:id="@+id/flag"
+        android:layout_width="fill_parent"
+        android:layout_height="100dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bce_banner" />
+
+</RelativeLayout>
