@@ -68,7 +68,7 @@ public class SettingsActivity extends Activity {
         lvPinCode = ctx.findViewById(R.id.lv_pin_code);
         btnSave = ctx.findViewById(R.id.btn_save);
         btnLocalBitcoin = ctx.findViewById(R.id.localbch_ad);
-        btnThePit = ctx.findViewById(R.id.thepit_ad);
+        btnThePit = ctx.findViewById(R.id.bce_ad);
         LinearLayout root = (LinearLayout) lvMerchantName.getParent().getParent();
         Toolbar toolbar = (Toolbar) LayoutInflater.from(ctx).inflate(R.layout.settings_toolbar, root, false);
         toolbar.setTitle(R.string.action_settings);
@@ -101,7 +101,7 @@ public class SettingsActivity extends Activity {
         btnThePit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openUrl("https://pit.blockchain.com");
+                openUrl("https://exchange.bitcoin.com");
             }
         });
     }

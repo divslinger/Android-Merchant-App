@@ -11,7 +11,7 @@
     <ImageView
         android:id="@+id/flag"
         android:layout_width="fill_parent"
-        android:layout_height="150dp"
+        android:layout_height="155dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
         android:src="@drawable/localbch_banner" />
@@ -25,18 +25,18 @@
             android:id="@+id/textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_gravity="center"
             android:layout_marginTop="30dp"
             android:text="@string/ad_title_local_bitcoin_cash"
             android:textColor="@color/white"
-            android:textSize="32sp"
+            android:textSize="36sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textview2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_gravity="center"
             android:layout_marginTop="15dp"
             android:text="@string/ad_content_local_bitcoin_cash"
             android:textColor="@color/white"

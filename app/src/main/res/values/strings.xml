@@ -54,6 +54,4 @@
     <string name="settings_pin_code">PIN Code</string>
     <string name="ad_title_local_bitcoin_cash">Local Bitcoin Cash</string>
     <string name="ad_content_local_bitcoin_cash">Sell your Bitcoin Cash (BCH) for Cash</string>
-    <string name="ad_title_blockchain_com_the_pit">Blockchain.com - The Pit</string>
-    <string name="ad_content_blockchain_com_the_pit">Sell your Bitcoin Cash (BCH) for USD, EUR, or GBP direct to your bank account</string>
 </resources>
