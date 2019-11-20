@@ -430,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
         TextView tvName = headerView.findViewById(R.id.drawer_title);
-        String drawerTitle = PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, getResources().getString(R.string.app_name));
+        String drawerTitle = PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "");
         tvName.setText(drawerTitle);
         toolbar.setTitle("");
     }
