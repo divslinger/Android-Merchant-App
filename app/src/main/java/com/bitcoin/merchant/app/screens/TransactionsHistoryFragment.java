@@ -140,7 +140,7 @@ public class TransactionsHistoryFragment extends Fragment {
         final String tx = val.getAsString("tx");
         final String address = val.getAsString("iad");
         builder.setTitle(tx);
-        builder.setIcon(R.drawable.ic_launcher);
+        builder.setIcon(R.mipmap.ic_launcher);
         builder.setItems(new CharSequence[]{
                         "View transaction",
                         "View all TX with this address",
