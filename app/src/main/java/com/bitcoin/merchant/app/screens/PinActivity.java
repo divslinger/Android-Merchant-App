@@ -2,6 +2,7 @@ package com.bitcoin.merchant.app.screens;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -10,6 +11,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.OSUtil;
@@ -59,10 +61,30 @@ public class PinActivity extends Activity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && !doCreate) {
-            finish();
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if(!doCreate) {
+                finish();
+            } else {
+                if(!isPinMissing(this)) {
+                    /*
+                    If PIN is already set, and we are in doCreate, then we can assume they are changing their PIN.
+                    Since they are attempting to change their PIN, we can return to SettingsActivity.
+                     */
+                    Intent intent = new Intent(PinActivity.this, SettingsActivity.class);
+                    this.startActivity(intent);
+                    //Then we finish this activity.
+                    this.finish();
+                } else {
+                    //Allow the user to exit app even when creating PIN on first launch. This will simply return to home screen.
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    this.startActivity(intent);
+                }
+            }
             return true;
         }
+
         return false;
     }
 
@@ -92,7 +114,10 @@ public class PinActivity extends Activity {
         String hashed = OSUtil.getSha256(userEnteredPIN);
         PrefsUtil.getInstance(PinActivity.this).setValue(PrefsUtil.MERCHANT_KEY_PIN, hashed);
         PrefsUtil.getInstance(PinActivity.this).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, 0);
-        setResult(RESULT_OK);
+        //To get the change PIN activity to return to the SettingsActivity, we create a new SettingsActivity intent
+        Intent intent = new Intent(PinActivity.this, SettingsActivity.class);
+        this.startActivity(intent);
+        //Then we finish the PinActivity
         finish();
     }
 
@@ -166,7 +191,7 @@ public class PinActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (AppUtil.isReceivingAddressAvailable(this))
+        if (AppUtil.isReceivingAddressAvailable(this) && !doCreate)
             this.onBackPressed();
     }
 
