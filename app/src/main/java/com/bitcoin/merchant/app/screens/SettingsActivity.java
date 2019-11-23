@@ -335,8 +335,11 @@ public class SettingsActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (AppUtil.isReceivingAddressAvailable(this) && !this.isScanning) {
-            this.backButton();
-        }
+        if (AppUtil.isReceivingAddressAvailable(this) && !this.isScanning)
+            goToCashRegisterScreenWhenInBackground();
+    }
+
+    private void goToCashRegisterScreenWhenInBackground() {
+        this.backButton();
     }
 }

@@ -48,6 +48,10 @@ public class AboutActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        goToCashRegisterScreenWhenInBackground();
+    }
+
+    private void goToCashRegisterScreenWhenInBackground() {
         this.onBackPressed();
     }
 }

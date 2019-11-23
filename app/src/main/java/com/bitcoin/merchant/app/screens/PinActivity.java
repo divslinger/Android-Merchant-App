@@ -192,7 +192,11 @@ public class PinActivity extends Activity {
     protected void onPause() {
         super.onPause();
         if (AppUtil.isReceivingAddressAvailable(this) && !doCreate)
-            this.onBackPressed();
+            goToCashRegisterScreenWhenInBackground();
+    }
+
+    private void goToCashRegisterScreenWhenInBackground() {
+        this.onBackPressed();
     }
 
     public void clickPinButton(View view) {
