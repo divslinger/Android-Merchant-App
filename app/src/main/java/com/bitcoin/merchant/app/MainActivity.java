@@ -222,9 +222,9 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         setNavigationDrawer();
         initTableLayout();
         if (PinActivity.isPinMissing(this)) {
-            createPIN();
+            createPin();
         } else if (!AppUtil.isReceivingAddressAvailable(this)) {
-            goToSettings(false);
+            requestPinBeforeGoingToSettings();
         }
         startWebsockets();
         // scan for missing funds at least one
@@ -263,8 +263,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     /**
      * Only used for debugging purposes
-     *
-     * @param tx
      */
     private void resetPaymentTime(String tx) {
         PaymentProcessor processor = new PaymentProcessor(this);
@@ -371,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         } else if (requestCode == PIN_ACTIVITY && resultCode == RESULT_OK) {
             showSettings();
         } else if (requestCode == RESET_PIN_ACTIVITY && resultCode == RESULT_OK) {
-            createPIN();
+            createPin();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -400,21 +398,13 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         return ret;
     }
 
-    private void goToSettings(final boolean create) {
-        if (create) {
-            showSettings();
-        } else {
-            enterPIN();
-        }
-    }
-
-    private void createPIN() {
+    private void createPin() {
         Intent intent = new Intent(MainActivity.this, PinActivity.class);
         intent.putExtra("create", true);
         startActivityForResult(intent, PIN_ACTIVITY);
     }
 
-    private void enterPIN() {
+    private void requestPinBeforeGoingToSettings() {
         Intent intent = new Intent(MainActivity.this, PinActivity.class);
         intent.putExtra("create", false);
         startActivityForResult(intent, PIN_ACTIVITY);
@@ -495,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
                         showPage(TabsPagerAdapter.TAB_TX_HISTORY);
                         break;
                     case R.id.action_settings:
-                        goToSettings(false);
+                        requestPinBeforeGoingToSettings();
                         break;
                     case R.id.action_about:
                         doAbout();
