@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app.screens;
+package com.bitcoin.merchant.app.util;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,8 +7,7 @@ import android.util.Log;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
 import com.bitcoin.merchant.app.database.DBControllerV3;
 import com.bitcoin.merchant.app.database.PaymentRecord;
-import com.bitcoin.merchant.app.util.AmountUtil;
-import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.model.PaymentReceived;
 import com.crashlytics.android.Crashlytics;
 
 import static com.bitcoin.merchant.app.MainActivity.TAG;
@@ -52,9 +51,9 @@ public class PaymentProcessor {
             fiat = formatFiat(bch);
         }
         try {
-            AppUtil util = AppUtil.getInstance(context);
-            if (util.isValidXPub()) {
-                util.getWallet().addUsedAddress(p.addr);
+            AppUtil util = AppUtil.get();
+            if (util.isValidXPub(context)) {
+                util.getWallet(context).addUsedAddress(p.addr);
             }
             String message = "";
             PaymentRecord r = new PaymentRecord(p.timeInSec, p.addr, bch, fiat,

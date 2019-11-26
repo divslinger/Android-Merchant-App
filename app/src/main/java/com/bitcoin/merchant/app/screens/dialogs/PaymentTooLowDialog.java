@@ -3,12 +3,11 @@ package com.bitcoin.merchant.app.screens.dialogs;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.os.Bundle;
 
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
 import com.bitcoin.merchant.app.screens.PaymentInputFragment;
-import com.bitcoin.merchant.app.screens.PaymentRequestActivity;
 import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.MonetaryUtil;
@@ -17,11 +16,13 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
+import static com.bitcoin.merchant.app.MainActivity.getNav;
+
 public class PaymentTooLowDialog {
     private final Activity context;
 
-    public PaymentTooLowDialog(Activity context) {
-        this.context = context;
+    public PaymentTooLowDialog(Activity activity) {
+        this.context = activity;
     }
 
     public void showUnderpayment(final long paymentAmountInSatoshis, Long expectedAmountInSatoshis,
@@ -67,11 +68,10 @@ public class PaymentTooLowDialog {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
                 closingAction.run();
-                Intent intent = new Intent(context, PaymentRequestActivity.class);
-                intent.putExtra(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, _fiatRemainder);
-                intent.putExtra(PaymentInputFragment.AMOUNT_PAYABLE_BTC, bchRemainder);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                context.startActivity(intent);
+                Bundle extras = new Bundle();
+                extras.putDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, _fiatRemainder);
+                extras.putDouble(PaymentInputFragment.AMOUNT_PAYABLE_BTC, bchRemainder);
+                getNav(context).navigate(R.id.payment_request_screen, extras);
             }
         });
         alert.setButton(AlertDialog.BUTTON_NEGATIVE, context.getString(R.string.prompt_ko), new DialogInterface.OnClickListener() {

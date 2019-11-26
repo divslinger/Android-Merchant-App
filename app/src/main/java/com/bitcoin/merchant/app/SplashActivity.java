@@ -24,9 +24,9 @@ public class SplashActivity extends Activity {
                 } catch (InterruptedException ie) {
                 }
                 CurrencyExchange.getInstance(SplashActivity.this);
-                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                Intent mainActivityIntent = new Intent(SplashActivity.this, MainActivity.class);
+                mainActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainActivityIntent);
                 Looper.getMainLooper().loop();
             }
         }.start();

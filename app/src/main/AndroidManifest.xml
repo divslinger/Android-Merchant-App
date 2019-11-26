@@ -20,7 +20,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-
         <activity
             android:name="com.bitcoin.merchant.app.SplashActivity"
             android:label="@string/app_name"
@@ -30,7 +29,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.bitcoin.merchant.app.MainActivity"
             android:label="@string/app_name"
@@ -51,39 +49,16 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name="com.bitcoin.merchant.app.screens.ScanQRCodeActivity"
+            android:name="com.bitcoin.merchant.app.ScanQRCodeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
-
-        <activity
-            android:name="com.bitcoin.merchant.app.screens.SettingsActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"></activity>
-
-        <activity
-            android:name="com.bitcoin.merchant.app.screens.PinActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"></activity>
-
-        <activity
-            android:name="com.bitcoin.merchant.app.screens.AboutActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"></activity>
-
-        <activity
-            android:name="com.bitcoin.merchant.app.screens.PaymentRequestActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"></activity>
-
         <receiver android:name="com.bitcoin.merchant.app.network.NetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
             </intent-filter>
         </receiver>
-
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="f1749788feca88f98b043c2e5c68418f37686dc9"

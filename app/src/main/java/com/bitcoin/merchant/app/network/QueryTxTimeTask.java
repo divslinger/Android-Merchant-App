@@ -9,7 +9,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.model.rest.Block;
 import com.bitcoin.merchant.app.model.rest.Utxo;
-import com.bitcoin.merchant.app.screens.PaymentReceived;
+import com.bitcoin.merchant.app.model.PaymentReceived;
 
 import java.util.List;
 

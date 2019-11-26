@@ -5,7 +5,9 @@ import com.github.kiulian.converter.b58.B58;
 
 import de.tobibrandt.bitcoincash.BitcoinCashAddressFormatter;
 
-public class AddressUtil {
+public abstract class AddressUtil {
+    private AddressUtil() {
+    }
 
     public static boolean isValidCashAddr(String address) {
         return BitcoinCashAddressFormatter.isValidCashAddress(address);

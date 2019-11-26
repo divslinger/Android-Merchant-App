@@ -8,7 +8,8 @@
             android:icon="@drawable/ic_person_white_24dp"
             android:title="@string/menu_profile"/>
         <item
-            android:id="@+id/action_checkout"
+            android:id="@+id/action_cash_register"
+            android:visible="false"
             android:icon="@drawable/register_icon"
             android:title="@string/menu_cash_register"/>
         <item

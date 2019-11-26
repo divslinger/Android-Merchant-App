@@ -10,5 +10,5 @@
     app:contentInsetLeft="72dp"
     app:contentInsetStart="72dp"
     app:navigationContentDescription="@string/abc_action_bar_up_description"
-    app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+    app:navigationIcon="@drawable/ic_menu_black_24dp"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />

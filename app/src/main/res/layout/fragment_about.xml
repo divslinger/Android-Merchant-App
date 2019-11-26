@@ -33,7 +33,7 @@
             android:textColor="@color/textColorPrimary"
             android:textSize="24sp" />
         <TextView
-            android:id="@+id/about"
+            android:id="@+id/about_screen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

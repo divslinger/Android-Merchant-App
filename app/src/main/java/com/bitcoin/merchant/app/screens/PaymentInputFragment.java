@@ -1,6 +1,5 @@
 package com.bitcoin.merchant.app.screens;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,14 +12,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.currency.CountryCurrency;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
+import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.MonetaryUtil;
 import com.bitcoin.merchant.app.util.SnackCustom;
@@ -33,10 +30,9 @@ import java.text.ParseException;
 import java.util.Currency;
 import java.util.Locale;
 
-public class PaymentInputFragment extends Fragment  {
+public class PaymentInputFragment extends ToolbarAwareFragment {
     private static final String TAG = "PaymentInputFragment";
     public static final String DEFAULT_CURRENCY_BCH = "BCH";
-    public static final int RECEIVE_RESULT = 1122;
     public static final String ACTION_INTENT_RESET_AMOUNT = "RESET_AMOUNT";
     private static final double bitcoinLimit = 21_000_000.0;
     public static String AMOUNT_PAYABLE_FIAT = "AMOUNT_PAYABLE_FIAT";
@@ -44,9 +40,9 @@ public class PaymentInputFragment extends Fragment  {
     public double amountPayableFiat;
     public double amountPayableBch;
     private int allowedDecimalPlaces = 2;
-    private View rootView = null;
-    private TextView tvCurrencySymbol = null;
-    private TextView tvAmount = null;
+    private View rootView;
+    private TextView tvCurrencySymbol;
+    private TextView tvAmount;
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -57,16 +53,17 @@ public class PaymentInputFragment extends Fragment  {
             }
         }
     };
-    private Button buttonDecimal = null;
-    private TextView tvBch = null;
-    private NumberFormat nf = null;
-    private DecimalFormat df = null;
-    private DecimalFormatSymbols dfs = null;
-    private String strDecimal = null;
+    private Button buttonDecimal;
+    private TextView tvBch;
+    private NumberFormat nf;
+    private DecimalFormat df;
+    private DecimalFormatSymbols dfs;
+    private String strDecimal;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_payment, container, false);
+        super.onCreateView(inflater, container, savedInstanceState);
+        rootView = inflater.inflate(R.layout.fragment_input_amount, container, false);
         nf = NumberFormat.getInstance(Locale.getDefault());
         dfs = new DecimalFormatSymbols();
         df = new DecimalFormat("#.########", dfs);
@@ -85,18 +82,32 @@ public class PaymentInputFragment extends Fragment  {
         initDecimalButton();
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_INTENT_RESET_AMOUNT);
-        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(receiver, filter);
+        LocalBroadcastManager.getInstance(activity.getApplicationContext()).registerReceiver(receiver, filter);
         tvCurrencySymbol.setText(getCurrencySymbol());
+        setToolbarAsMenuButton();
+        clearToolbarTitle();
         return rootView;
     }
 
     @Override
     public void onDestroyView() {
-        FragmentActivity activity = getActivity();
         if (activity != null) {
             LocalBroadcastManager.getInstance(activity.getApplicationContext()).unregisterReceiver(receiver);
         }
         super.onDestroyView();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Ensure PIN & BCH address are correctly configured
+        if (PinCodeFragment.isPinMissing(activity)) {
+            Bundle args = new Bundle();
+            args.putBoolean(PinCodeFragment.EXTRA_DO_CREATE, true);
+            getNav().navigate(R.id.pin_code_screen, args);
+        } else if (!AppUtil.isReceivingAddressAvailable(activity)) {
+            getNav().navigate(R.id.nav_to_settings_screen_bypass_security);
+        }
     }
 
     @Override
@@ -122,7 +133,7 @@ public class PaymentInputFragment extends Fragment  {
     }
 
     private String getCurrency() {
-        return AppUtil.getCurrency(getActivity());
+        return AppUtil.getCurrency(activity);
     }
 
     private String getCurrencySymbol() {
@@ -198,38 +209,26 @@ public class PaymentInputFragment extends Fragment  {
     }
 
     public void chargeClicked() {
-        final FragmentActivity activity = getActivity();
         if (activity == null) {
             return;
         }
-        if (!AppUtil.getInstance(activity).hasValidReceiver()) {
-            SnackCustom.make(activity, getView(), getActivity().getText(R.string.no_valid_receiver), getActivity().getResources().getString(R.string.prompt_ok), new View.OnClickListener() {
+        if (!AppUtil.get().hasValidReceiver(activity)) {
+            SnackCustom.make(activity, getView(), activity.getText(R.string.no_valid_receiver), activity.getResources().getString(R.string.prompt_ok), new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(activity, SettingsActivity.class);
-                    startActivityForResult(intent, MainActivity.SETTINGS_ACTIVITY);
+                    getNav().navigate(R.id.nav_to_settings_screen_bypass_security);
                 }
             });
             return;
         }
         if (validateAmount()) {
             updateAmounts();
-            Intent intent = new Intent(activity, PaymentRequestActivity.class);
-            intent.putExtra(AMOUNT_PAYABLE_FIAT, amountPayableFiat);
-            intent.putExtra(AMOUNT_PAYABLE_BTC, amountPayableBch);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivityForResult(intent, RECEIVE_RESULT);
+            Bundle extras = new Bundle();
+            extras.putDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, amountPayableFiat);
+            extras.putDouble(PaymentInputFragment.AMOUNT_PAYABLE_BTC, amountPayableBch);
+            getNav().navigate(R.id.nav_to_payment_request_screen, extras);
         } else {
-            SnackCustom.make(activity, getView(), getActivity().getText(R.string.invalid_amount), getActivity().getResources().getString(R.string.prompt_ok), null);
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        //reset amount after receive
-        if (requestCode == RECEIVE_RESULT && resultCode == Activity.RESULT_OK) {
-            tvAmount.setText("0");
+            SnackCustom.make(activity, getView(), activity.getText(R.string.invalid_amount), activity.getResources().getString(R.string.prompt_ok), null);
         }
     }
 
@@ -291,9 +290,9 @@ public class PaymentInputFragment extends Fragment  {
             Log.e(TAG, "", e);
         }
         if (bchValue > bitcoinLimit) {
-            Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
+            Double currencyPrice = CurrencyExchange.getInstance(activity).getCurrencyPrice(getCurrency());
             tvAmount.setText(MonetaryUtil.getInstance().getFiatDecimalFormat().format(bitcoinLimit * currencyPrice));
-            ToastCustom.makeText(getActivity(), getResources().getString(R.string.invalid_amount), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
+            ToastCustom.makeText(activity, getResources().getString(R.string.invalid_amount), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
         }
     }
 
@@ -317,7 +316,7 @@ public class PaymentInputFragment extends Fragment  {
     }
 
     private double toBch(double amount) throws ParseException {
-        Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
+        Double currencyPrice = CurrencyExchange.getInstance(activity).getCurrencyPrice(getCurrency());
         MonetaryUtil util = MonetaryUtil.getInstance();
         return (currencyPrice == 0.0d) ? 0.0d : nf.parse(util.getBchDecimalFormat().format(amount / currencyPrice)).doubleValue();
     }

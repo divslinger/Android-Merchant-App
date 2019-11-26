@@ -2,7 +2,7 @@ package com.bitcoin.merchant.app.util;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -19,32 +19,15 @@ import info.blockchain.wallet.util.FormatsUtil;
 public class AppUtil {
     public static final String TAG = "AppUtil";
     public static final Gson GSON = new Gson();
-    public static final String PACKAGE_BITCOIN_DOT_COM_WALLET = "com.bitcoin.mwallet";
     public static final String DEFAULT_CURRENCY_FIAT = "USD";
-    private static final boolean MISSING_WALLET_SIMULATED = false;
-    private static Context context = null;
-    private static AppUtil instance = null;
+    private static final AppUtil instance = new AppUtil();
     private volatile WalletUtil walletUtil;
 
     private AppUtil() {
     }
 
-    public static AppUtil getInstance(Context ctx) {
-        context = ctx;
-        if (instance == null) {
-            instance = new AppUtil();
-        }
+    public static AppUtil get() {
         return instance;
-    }
-
-    public static boolean isWalletAppInstalled(Activity activity) {
-        PackageManager pm = activity.getPackageManager();
-        try {
-            pm.getPackageInfo(PACKAGE_BITCOIN_DOT_COM_WALLET, 0);
-            return !MISSING_WALLET_SIMULATED;
-        } catch (PackageManager.NameNotFoundException nnfe) {
-            return false;
-        }
     }
 
     public static boolean isValidAddress(String address) {
@@ -146,10 +129,14 @@ public class AppUtil {
         window.setStatusBarColor(activity.getResources().getColor(color));
     }
 
+    public static boolean isEmulator() {
+        return Build.PRODUCT.toLowerCase().contains("sdk");
+    }
+
     /**
      * For performance reasons, we cache the wallet (reported in May 2019 on Lenovo Tab E8)
      */
-    public synchronized WalletUtil getWallet() throws Exception {
+    public synchronized WalletUtil getWallet(Context context) throws Exception {
         String xPub = AppUtil.getReceivingAddress(context);
         if (walletUtil == null || !walletUtil.isSameXPub(xPub)) {
             walletUtil = new WalletUtil(xPub, context);
@@ -157,12 +144,12 @@ public class AppUtil {
         return walletUtil;
     }
 
-    public boolean isValidXPub() {
+    public boolean isValidXPub(Context context) {
         String receiver = getReceivingAddress(context);
         return FormatsUtil.getInstance().isValidXpub(receiver);
     }
 
-    public boolean hasValidReceiver() {
+    public boolean hasValidReceiver(Context context) {
         String receiver = getReceivingAddress(context);
         return AddressUtil.isValidLegacy(receiver) || FormatsUtil.getInstance().isValidXpub(receiver);
     }

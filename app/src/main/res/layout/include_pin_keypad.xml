@@ -1,5 +1,4 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/numericPad"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -27,7 +26,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin"
-            android:onClick="clickPinButton"
             android:text="1"
             android:textSize="@dimen/pinentry_num_text_size"
             android:textStyle="bold" />
@@ -39,7 +37,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin"
-            android:onClick="clickPinButton"
             android:text="2"
             android:textSize="@dimen/pinentry_num_text_size"
             android:textStyle="bold" />
@@ -51,7 +48,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin"
-            android:onClick="clickPinButton"
             android:text="3"
             android:textSize="@dimen/pinentry_num_text_size"
             android:textStyle="bold" />
@@ -71,7 +67,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin"
-            android:onClick="clickPinButton"
             android:text="4"
             android:textSize="@dimen/pinentry_num_text_size"
             android:textStyle="bold" />
@@ -83,7 +78,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin"
-            android:onClick="clickPinButton"
             android:text="5"
             android:textSize="@dimen/pinentry_num_text_size"
             android:textStyle="bold" />
@@ -95,7 +89,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin"
-            android:onClick="clickPinButton"
             android:text="6"
             android:textSize="@dimen/pinentry_num_text_size"
             android:textStyle="bold" />
@@ -115,7 +108,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin"
-            android:onClick="clickPinButton"
             android:text="7"
             android:textSize="@dimen/pinentry_num_text_size"
             android:textStyle="bold" />
@@ -127,7 +119,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin"
-            android:onClick="clickPinButton"
             android:text="8"
             android:textSize="@dimen/pinentry_num_text_size"
             android:textStyle="bold" />
@@ -139,7 +130,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin"
-            android:onClick="clickPinButton"
             android:text="9"
             android:textSize="@dimen/pinentry_num_text_size"
             android:textStyle="bold" />
@@ -159,7 +149,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin"
-            android:onClick="clickPinButton"
             android:text=" "
             android:textSize="@dimen/pinentry_num_text_size"
             android:textStyle="bold" />
@@ -171,7 +160,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin"
-            android:onClick="clickPinButton"
             android:text="0"
             android:textSize="@dimen/pinentry_num_text_size"
             android:textStyle="bold" />
@@ -183,7 +171,6 @@
             android:layout_gravity="center"
             android:layout_weight="1.0"
             android:background="@drawable/selector_button_pin_back"
-            android:onClick="clickPinButton" />
-
+            />
     </TableRow>
 </TableLayout>

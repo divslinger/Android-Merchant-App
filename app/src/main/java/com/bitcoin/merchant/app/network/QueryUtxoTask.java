@@ -12,7 +12,7 @@ import com.bitcoin.merchant.app.database.DBControllerV3;
 import com.bitcoin.merchant.app.database.PaymentRecord;
 import com.bitcoin.merchant.app.model.rest.Utxo;
 import com.bitcoin.merchant.app.model.rest.Utxos;
-import com.bitcoin.merchant.app.screens.PaymentReceived;
+import com.bitcoin.merchant.app.model.PaymentReceived;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 
@@ -54,8 +54,8 @@ public class QueryUtxoTask extends DownloadTask<Utxos> {
 
     @Override
     protected String getUrl() {
-        AppUtil instance = AppUtil.getInstance(context);
-        if (!instance.hasValidReceiver() || instance.isValidXPub()) {
+        AppUtil appUtil = AppUtil.get();
+        if (!appUtil.hasValidReceiver(context) || appUtil.isValidXPub(context)) {
             return null;
         }
         String address = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
