@@ -11,19 +11,29 @@
         tools:layout="@layout/fragment_input_amount">
         <action
             android:id="@+id/nav_to_payment_request_screen"
-            app:destination="@id/payment_request_screen" />
+            app:destination="@id/payment_request_screen"
+            app:enterAnim="@anim/drop_down"
+            app:popExitAnim="@anim/drop_down_out"/>
         <action
             android:id="@+id/nav_to_transactions_screen"
-            app:destination="@id/transactions_screen" />
+            app:destination="@id/transactions_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
         <action
             android:id="@+id/nav_to_settings_screen"
-            app:destination="@id/pin_code_screen" />
+            app:destination="@id/pin_code_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
         <action
             android:id="@+id/nav_to_settings_screen_bypass_security"
-            app:destination="@id/settings_screen" />
+            app:destination="@id/settings_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
         <action
             android:id="@+id/nav_to_about_screen"
-            app:destination="@id/about_screen" />
+            app:destination="@id/about_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
     </fragment>
     <fragment
         android:id="@+id/payment_request_screen"
@@ -48,7 +58,9 @@
             android:id="@+id/nav_to_settings_screen"
             app:destination="@id/settings_screen"
             app:popUpTo="@id/payment_input_screen"
-            app:popUpToInclusive="false" />
+            app:popUpToInclusive="false"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
     </fragment>
     <fragment
         android:id="@+id/about_screen"
@@ -64,6 +76,8 @@
         tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/nav_to_pin_code_screen"
-            app:destination="@id/pin_code_screen" />
+            app:destination="@id/pin_code_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
     </fragment>
 </navigation>
