@@ -212,7 +212,7 @@ public class PaymentInputFragment extends ToolbarAwareFragment {
         if (activity == null) {
             return;
         }
-        if (!AppUtil.get().hasValidReceiver(activity)) {
+        if (!AppUtil.hasValidReceiver(activity)) {
             SnackCustom.make(activity, getView(), activity.getText(R.string.no_valid_receiver), activity.getResources().getString(R.string.prompt_ok), new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

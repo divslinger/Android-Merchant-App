@@ -1,8 +1,8 @@
 package com.bitcoin.merchant.app.util;
 
-import android.content.Context;
 import android.util.Log;
 
+import com.bitcoin.merchant.app.application.CashRegisterApplication;
 import com.bitcoin.merchant.app.database.DBControllerV3;
 import com.github.kiulian.converter.b58.B58;
 
@@ -27,19 +27,19 @@ public class WalletUtil {
     public static final String TAG = "WalletUtil";
     private final String xPub;
     private final DeterministicKey accountKey;
-    private final Context context;
+    private final CashRegisterApplication app;
     // For performance reasons, we cache all used addresses (reported in May 2019 on Lenovo Tab E8)
     private final AddressBank addressBank;
     private int xpubIndex;
 
-    public WalletUtil(String xPub, Context context) throws Exception {
+    public WalletUtil(String xPub, CashRegisterApplication app) throws Exception {
         this.xPub = xPub;
-        this.context = context;
-        this.xpubIndex = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + this.xPub, 0);
+        this.app = app;
+        this.xpubIndex = PrefsUtil.getInstance(app).getValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + this.xPub, 0);
         DeterministicKey key = WalletUtil.createMasterPubKeyFromXPub(xPub);
         //This gets the receive chain from the xpub. If you want to generate change addresses, switch to 1 for the childNumber.
         this.accountKey = HDKeyDerivation.deriveChildKey(key, new ChildNumber(0, false));
-        addressBank = new AddressBank();
+        addressBank = new AddressBank(app.getDb());
     }
 
     private static DeterministicKey createMasterPubKeyFromXPub(String xpubstr) throws AddressFormatException {
@@ -70,7 +70,7 @@ public class WalletUtil {
     }
 
     private void saveWallet(int newIndex) {
-        PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + this.xPub, newIndex);
+        PrefsUtil.getInstance(app).setValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + this.xPub, newIndex);
         Log.d(TAG, "Saving new xpub index " + newIndex);
     }
 
@@ -147,10 +147,10 @@ public class WalletUtil {
     private class AddressBank {
         final Set<String> usedAddresses;
 
-        public AddressBank() {
+        public AddressBank(DBControllerV3 db) {
             Set<String> addresses = new HashSet<>();
             try {
-                addresses = new DBControllerV3(context).getAllAddresses();
+                addresses = db.getAllAddresses();
                 Log.d(TAG, "loaded " + addresses.size() + " addresses from TX history: " + addresses);
             } catch (Exception e) {
                 Log.e(TAG, "Unable to load addresses from TX history");

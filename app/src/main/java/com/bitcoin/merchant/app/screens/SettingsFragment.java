@@ -273,9 +273,8 @@ public class SettingsFragment extends ToolbarAwareFragment {
         new Thread() {
             @Override
             public void run() {
-                AppUtil util = AppUtil.get();
                 try {
-                    boolean synced = util.getWallet(activity).syncXpub();
+                    boolean synced = getApp().getWallet().syncXpub();
                     if (synced) {
                         activity.runOnUiThread(new Runnable() {
                             @Override

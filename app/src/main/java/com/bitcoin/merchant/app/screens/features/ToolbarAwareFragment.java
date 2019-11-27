@@ -16,6 +16,7 @@ import androidx.navigation.NavController;
 
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
+import com.bitcoin.merchant.app.application.CashRegisterApplication;
 import com.bitcoin.merchant.app.util.AppUtil;
 
 public abstract class ToolbarAwareFragment extends Fragment {
@@ -79,6 +80,10 @@ public abstract class ToolbarAwareFragment extends Fragment {
     public void setToolbarTitle(int titleResourceId) {
         setToolbarVisible(true);
         toolbar.setTitle(titleResourceId);
+    }
+
+    public CashRegisterApplication getApp() {
+        return activity.getApp();
     }
 
     protected NavController getNav() {

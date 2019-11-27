@@ -16,18 +16,12 @@ import java.io.InputStreamReader;
 
 import info.blockchain.wallet.util.FormatsUtil;
 
-public class AppUtil {
+public abstract class AppUtil {
     public static final String TAG = "AppUtil";
     public static final Gson GSON = new Gson();
     public static final String DEFAULT_CURRENCY_FIAT = "USD";
-    private static final AppUtil instance = new AppUtil();
-    private volatile WalletUtil walletUtil;
 
     private AppUtil() {
-    }
-
-    public static AppUtil get() {
-        return instance;
     }
 
     public static boolean isValidAddress(String address) {
@@ -94,9 +88,7 @@ public class AppUtil {
     }
 
     public static void setReceivingAddress(Context context, String receiver) {
-        /*
-        We keep the storage format as legacy for compatibility purposes.
-         */
+        // We keep the storage format as legacy for compatibility purposes.
         if (AddressUtil.isValidCashAddr(receiver)) {
             try {
                 receiver = AddressConverter.toLegacyAddress(receiver);
@@ -117,9 +109,8 @@ public class AppUtil {
                 Log.e(TAG, "", e);
             }
         }
-        /*
-        If it's not a valid legacy address from the if statement above, just return as the text we are sending.
-         */
+        // If it's not a valid legacy address from the if statement above,
+        // just return as the text we are sending.
         return address;
     }
 
@@ -133,23 +124,12 @@ public class AppUtil {
         return Build.PRODUCT.toLowerCase().contains("sdk");
     }
 
-    /**
-     * For performance reasons, we cache the wallet (reported in May 2019 on Lenovo Tab E8)
-     */
-    public synchronized WalletUtil getWallet(Context context) throws Exception {
-        String xPub = AppUtil.getReceivingAddress(context);
-        if (walletUtil == null || !walletUtil.isSameXPub(xPub)) {
-            walletUtil = new WalletUtil(xPub, context);
-        }
-        return walletUtil;
-    }
-
-    public boolean isValidXPub(Context context) {
+    public static boolean isValidXPub(Context context) {
         String receiver = getReceivingAddress(context);
         return FormatsUtil.getInstance().isValidXpub(receiver);
     }
 
-    public boolean hasValidReceiver(Context context) {
+    public static boolean hasValidReceiver(Context context) {
         String receiver = getReceivingAddress(context);
         return AddressUtil.isValidLegacy(receiver) || FormatsUtil.getInstance().isValidXpub(receiver);
     }

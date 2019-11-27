@@ -29,6 +29,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
+import com.bitcoin.merchant.app.application.CashRegisterApplication;
 import com.bitcoin.merchant.app.model.PaymentReceived;
 import com.bitcoin.merchant.app.network.ExpectedPayments;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooHighDialog;
@@ -117,7 +118,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         double amountBch = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_BTC, 0.0);
         tvFiatAmount.setText(f.formatFiat(amountFiat));
         tvBtcAmount.setText(f.formatBch(amountBch));
-        getReceiveAddress(activity, amountBch, tvFiatAmount.getText().toString());
+        getReceiveAddress(getApp(), amountBch, tvFiatAmount.getText().toString());
         // Attempt to reconnect in case we were disconnected from Internet
         broadcastManager.sendBroadcast(new Intent(MainActivity.ACTION_INTENT_RECONNECT));
         // Query mempool, in case the previous TX was not received by the socket listeners
@@ -242,7 +243,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
     }
 
     @SuppressLint("StaticFieldLeak")
-    private void getReceiveAddress(final Context context, final double amountBch, final String strFiat) {
+    private void getReceiveAddress(final CashRegisterApplication app, final double amountBch, final String strFiat) {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected void onPreExecute() {
@@ -252,18 +253,17 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
 
             @Override
             protected String doInBackground(Void... params) {
-                //Generate new address/QR code for receive
-                AppUtil util = AppUtil.get();
-                if (util.isValidXPub(context)) {
+                // Generate new address/QR code for receive
+                if (AppUtil.isValidXPub(app)) {
                     try {
-                        receivingAddress = util.getWallet(context).generateAddressFromXPub();
+                        receivingAddress = app.getWallet().generateAddressFromXPub();
                         Log.i(TAG, "BCH-address(xPub) to receive: " + receivingAddress);
                     } catch (Exception e) {
                         receivingAddress = null;
                         Log.e(TAG, "", e);
                     }
                 } else {
-                    receivingAddress = AppUtil.getReceivingAddress(context);
+                    receivingAddress = AppUtil.getReceivingAddress(app);
                 }
                 if (StringUtils.isEmpty(receivingAddress)) {
                     ToastCustom.makeText(activity, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);

@@ -35,6 +35,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.bitcoin.merchant.app.application.CashRegisterApplication;
 import com.bitcoin.merchant.app.database.PaymentRecord;
 import com.bitcoin.merchant.app.model.PaymentReceived;
 import com.bitcoin.merchant.app.network.ExpectedAmounts;
@@ -46,11 +47,10 @@ import com.bitcoin.merchant.app.network.websocket.TxWebSocketHandler;
 import com.bitcoin.merchant.app.network.websocket.WebSocketListener;
 import com.bitcoin.merchant.app.network.websocket.impl.bitcoincom.BitcoinComSocketHandler;
 import com.bitcoin.merchant.app.network.websocket.impl.blockchaininfo.BlockchainInfoSocketSocketHandler;
-import com.bitcoin.merchant.app.screens.PaymentInputFragment;
 import com.bitcoin.merchant.app.screens.TransactionsHistoryFragment;
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AppUtil;
-import com.bitcoin.merchant.app.util.PaymentProcessor;
+import com.bitcoin.merchant.app.application.PaymentProcessor;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.navigation.NavigationView;
@@ -97,13 +97,13 @@ public class MainActivity extends AppCompatActivity
                 getNav().navigate(R.id.transactions_screen);
             }
             if (ACTION_QUERY_MISSING_TX_IN_MEMPOOL.equals(intent.getAction())) {
-                new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED).execute();
+                new QueryUtxoTask(getApp(), QueryUtxoType.UNCONFIRMED).execute();
             }
             if (ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO.equals(intent.getAction())) {
-                new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED, QueryUtxoType.ALL).execute();
+                new QueryUtxoTask(getApp(), QueryUtxoType.UNCONFIRMED, QueryUtxoType.ALL).execute();
             }
             if (ACTION_QUERY_ALL_UXTO.equals(intent.getAction())) {
-                new QueryUtxoTask(MainActivity.this, QueryUtxoType.ALL).execute();
+                new QueryUtxoTask(getApp(), QueryUtxoType.ALL).execute();
             }
         }
     };
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity
 
     private void recordNewTx(PaymentReceived payment) {
         Log.i(TAG, "record potential new Tx:" + payment);
-        PaymentProcessor processor = new PaymentProcessor(this);
+        PaymentProcessor processor = getApp().getPaymentProcessor();
         if (processor.isAlreadyRecorded(payment)) {
             Log.i(TAG, "TX was already in DB: " + payment);
             return; // already in the DB, nothing to do
@@ -159,9 +159,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public CashRegisterApplication getApp() {
+        return (CashRegisterApplication) getApplication();
+    }
+
     private void updateExistingTx(PaymentReceived payment) {
         Log.i(TAG, "update existing Tx:" + payment);
-        PaymentProcessor processor = new PaymentProcessor(this);
+        PaymentProcessor processor = getApp().getPaymentProcessor();
         ContentValues values = processor.getExistingRecord(payment);
         if (values != null) {
             PaymentRecord record = new PaymentRecord(values);
@@ -218,9 +222,9 @@ public class MainActivity extends AppCompatActivity
         // scan for missing funds at least one
         if (!PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_SCANNED_ALL_MISSING_FUNDS, false)) {
             PrefsUtil.getInstance(this).setValue(PrefsUtil.MERCHANT_KEY_SCANNED_ALL_MISSING_FUNDS, true);
-            new QueryUtxoTask(MainActivity.this, QueryUtxoType.ALL).execute();
+            new QueryUtxoTask(getApp(), QueryUtxoType.ALL).execute();
         } else {
-            new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED).execute();
+            new QueryUtxoTask(getApp(), QueryUtxoType.UNCONFIRMED).execute();
         }
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -253,7 +257,7 @@ public class MainActivity extends AppCompatActivity
      * Only used for debugging purposes
      */
     private void resetPaymentTime(String tx) {
-        PaymentProcessor processor = new PaymentProcessor(this);
+        PaymentProcessor processor = getApp().getPaymentProcessor();
         ContentValues values = processor.getExistingRecord(new PaymentReceived("", 0, tx, 0, 0, ExpectedAmounts.UNDEFINED));
         if (values != null) {
             PaymentRecord record = new PaymentRecord(values);

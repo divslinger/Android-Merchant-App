@@ -34,7 +34,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
-import com.bitcoin.merchant.app.database.DBControllerV3;
 import com.bitcoin.merchant.app.database.PaymentRecord;
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.DateUtil;
@@ -256,7 +255,7 @@ public class TransactionsHistoryFragment extends ToolbarAwareFragment {
             String address = PrefsUtil.getInstance(activity).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
             if ((address != null) && (address.length() > 0)) {
                 try {
-                    return new DBControllerV3(activity).getAllPayments();
+                    return getApp().getDb().getAllPayments();
                 } catch (Exception e) {
                     Log.e(TAG, "getAllPayments", e);
                     Crashlytics.logException(e);

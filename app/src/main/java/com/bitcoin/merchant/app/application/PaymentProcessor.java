@@ -1,30 +1,31 @@
-package com.bitcoin.merchant.app.util;
+package com.bitcoin.merchant.app.application;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.util.Log;
 
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
 import com.bitcoin.merchant.app.database.DBControllerV3;
-import com.bitcoin.merchant.app.database.PaymentRecord;
 import com.bitcoin.merchant.app.model.PaymentReceived;
+import com.bitcoin.merchant.app.database.PaymentRecord;
+import com.bitcoin.merchant.app.util.AmountUtil;
+import com.bitcoin.merchant.app.util.AppUtil;
 import com.crashlytics.android.Crashlytics;
 
 import static com.bitcoin.merchant.app.MainActivity.TAG;
 
 public class PaymentProcessor {
-    private final Context context;
+    private final CashRegisterApplication app;
     private final DBControllerV3 db;
 
-    public PaymentProcessor(Context context) {
-        this.context = context;
-        this.db = new DBControllerV3(context);
+    public PaymentProcessor(CashRegisterApplication app) {
+        this.app = app;
+        this.db = app.getDb();
     }
 
     private String formatFiat(double bch) {
-        Double currencyPrice = CurrencyExchange.getInstance(context).getCurrencyPrice(AppUtil.getCurrency(context));
+        Double currencyPrice = CurrencyExchange.getInstance(app).getCurrencyPrice(AppUtil.getCurrency(app));
         double fiat = (Math.abs(bch) / 1e8) * currencyPrice;
-        return new AmountUtil(context).formatFiat(fiat);
+        return new AmountUtil(app).formatFiat(fiat);
     }
 
     public ContentValues getExistingRecord(PaymentReceived payment) {
@@ -51,9 +52,8 @@ public class PaymentProcessor {
             fiat = formatFiat(bch);
         }
         try {
-            AppUtil util = AppUtil.get();
-            if (util.isValidXPub(context)) {
-                util.getWallet(context).addUsedAddress(p.addr);
+            if (AppUtil.isValidXPub(app)) {
+                app.getWallet().addUsedAddress(p.addr);
             }
             String message = "";
             PaymentRecord r = new PaymentRecord(p.timeInSec, p.addr, bch, fiat,
