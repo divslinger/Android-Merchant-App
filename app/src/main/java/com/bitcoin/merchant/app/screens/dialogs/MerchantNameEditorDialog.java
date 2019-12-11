@@ -26,7 +26,7 @@ public class MerchantNameEditorDialog {
         etName.setFilters(fArray);
         etName.setText(PrefsUtil.getInstance(ctx).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""));
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx)
-                .setTitle(R.string.receive_coins_fragment_name)
+                .setTitle(R.string.settings_merchant_name)
                 .setView(etName)
                 .setCancelable(false)
                 .setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {

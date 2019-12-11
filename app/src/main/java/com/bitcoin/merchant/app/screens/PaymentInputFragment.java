@@ -216,7 +216,7 @@ public class PaymentInputFragment extends Fragment  {
             return;
         }
         if (!AppUtil.getInstance(activity).hasValidReceiver()) {
-            SnackCustom.make(activity, getView(), getActivity().getText(R.string.no_valid_receiver), getActivity().getResources().getString(R.string.prompt_ok), new View.OnClickListener() {
+            SnackCustom.make(activity, getView(), getActivity().getText(R.string.obligatory_receiver), getActivity().getResources().getString(R.string.prompt_ok), new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(activity, SettingsActivity.class);
@@ -316,7 +316,7 @@ public class PaymentInputFragment extends Fragment  {
             Log.e(TAG, "", e);
         }
         if (amountPayableFiat == 0.0) {
-            tvBch.setText("Enter an amount");
+            tvBch.setText(R.string.enter_an_amount);
         } else {
             tvBch.setText(df.format(amountPayableBch) + " BCH");
         }
