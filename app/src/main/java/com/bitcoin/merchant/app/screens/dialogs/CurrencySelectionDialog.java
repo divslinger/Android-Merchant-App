@@ -39,7 +39,7 @@ public class CurrencySelectionDialog {
                 CountryCurrency cc = currencies.get(which);
                 String locale = cc.countryLocales.getFirstSupportedLocale();
                 if (locale == null) {
-                    Toast.makeText(ctx, "Not supported", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, ctx.getResources().getString(R.string.not_supported), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 dialog.dismiss();

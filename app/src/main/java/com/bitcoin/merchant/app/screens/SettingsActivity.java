@@ -220,7 +220,7 @@ public class SettingsActivity extends Activity {
                 openCamera();
             } else {
                 this.isScanning = false;
-                String text = "Please grant camera permission to use the QR Scanner";
+                String text = getResources().getString(R.string.grant_camera_permission);
                 Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
             }
         }
@@ -245,7 +245,7 @@ public class SettingsActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if ((resultCode == Activity.RESULT_OK) && (requestCode == ZBAR_SCANNER_REQUEST) && (data != null)) {
             Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode + ", Intent:" + data.getStringExtra(SCAN_RESULT));
-            System.out.println("ADDRESS SCANNED: " + data.getStringExtra(SCAN_RESULT));
+            Log.v(TAG, "Address scanned: " + data.getStringExtra(SCAN_RESULT));
             validateThenSetNewAddress(data.getStringExtra(SCAN_RESULT));
             this.isScanning = false;
         } else {

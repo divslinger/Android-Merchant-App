@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             public void onDrawerStateChanged(int i) {
             }
         });
-        System.out.println("Stored address: " + AppUtil.getReceivingAddress(this));
+        Log.i(TAG, "Stored address: " + AppUtil.getReceivingAddress(this));
     }
 
     /**
@@ -339,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     }
 
     private void initTableLayout() {
-        String[] tabs = new String[]{getResources().getString(R.string.tab_payment), getResources().getString(R.string.tab_history)};
+        String[] tabs = new String[]{"1", "2"};
         TabLayout tabLayout = findViewById(R.id.tabs);
         viewPager = findViewById(R.id.pager);
         PagerAdapter mAdapter = new TabsPagerAdapter(getSupportFragmentManager(), tabs);

@@ -32,9 +32,7 @@ import com.bitcoin.merchant.app.screens.dialogs.PaymentTooHighDialog;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooLowDialog;
 import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
-import com.bitcoin.merchant.app.util.MonetaryUtil;
 import com.bitcoin.merchant.app.util.ToastCustom;
-import com.github.kiulian.converter.AddressConverter;
 import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -175,8 +173,10 @@ public class PaymentRequestActivity extends Activity {
     private void copyQrCodeToClipboard() {
         try {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText(qrCodeUri, qrCodeUri);
-            clipboard.setPrimaryClip(clip);
+            if (clipboard != null) {
+                ClipData clip = ClipData.newPlainText(qrCodeUri, qrCodeUri);
+                clipboard.setPrimaryClip(clip);
+            }
             Log.i(TAG, "Copied to clipboard: " + qrCodeUri);
         } catch (Exception e) {
             Log.i(TAG, "Failed to copy to clipboard: " + qrCodeUri);
@@ -184,24 +184,16 @@ public class PaymentRequestActivity extends Activity {
     }
 
     private void displayQRCode(long lamount) {
-        String uri = AddressConverter.toCashAddress(receivingAddress);
         try {
-            BigInteger bamount = MonetaryUtil.getInstance(this).getUndenominatedAmount(lamount);
-            if (bamount.compareTo(BigInteger.valueOf(21_000_000_000_000_00L)) == 1) {
-                ToastCustom.makeText(this, "Invalid amount", ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
-                return;
-            }
-            if (!bamount.equals(BigInteger.ZERO)) {
-                qrCodeUri = BitcoinCashURI.toURI(receivingAddress, Coin.valueOf(bamount.longValue()), "", "");
-                generateQRCode(qrCodeUri);
-                write2NFC(qrCodeUri);
-            } else {
-                generateQRCode(uri);
-                write2NFC(uri);
-            }
-        } catch (NumberFormatException e) {
-            generateQRCode(uri);
-            write2NFC(uri);
+            BigInteger bamount = BigInteger.valueOf(lamount);
+            if (bamount.compareTo(BigInteger.valueOf(21_000_000_000_000_00L)) >= 1
+                    || bamount.compareTo(BigInteger.ZERO) <= 0)
+                throw new IllegalArgumentException();
+            qrCodeUri = BitcoinCashURI.toURI(receivingAddress, Coin.valueOf(bamount.longValue()), "", "");
+            generateQRCode(qrCodeUri);
+            write2NFC(qrCodeUri);
+        } catch (Exception e) {
+            ToastCustom.makeText(this, getString(R.string.invalid_amount), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
         }
     }
 

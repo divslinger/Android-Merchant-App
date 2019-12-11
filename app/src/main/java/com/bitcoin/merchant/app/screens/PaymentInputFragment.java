@@ -26,10 +26,11 @@ import com.bitcoin.merchant.app.util.MonetaryUtil;
 import com.bitcoin.merchant.app.util.SnackCustom;
 import com.bitcoin.merchant.app.util.ToastCustom;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.Currency;
 import java.util.Locale;
 
@@ -105,6 +106,17 @@ public class PaymentInputFragment extends Fragment  {
         updateAmounts();
         initDecimalButton();
         tvCurrencySymbol.setText(getCurrencySymbol());
+        FragmentActivity activity = getActivity();
+        if (activity != null) {
+            // Query mempool, in case the previous TX was not received by the socket listeners
+            // It will be unnecessary and can be removed after the switch to BIP-70 in the next big release.
+            // Performing the request at the resume time of the application is critical to prevent the following issue:
+            // When clicking on the checkout button, the device queries the mempool/unconfirmed tx for a missed tx,
+            // Unfortunately, if two devices use the same pubKey/address, then it would erroneously detect
+            // the last payment made on the other device as an instant payment for the new payment request
+            // The next line attempts to detect the missed payments on appResume and prior to the checkout operation
+            LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_MISSING_TX_IN_MEMPOOL));
+        }
     }
 
     private void initDecimalButton() {
@@ -191,7 +203,8 @@ public class PaymentInputFragment extends Fragment  {
     private boolean validateAmount() {
         try {
             Double value = nf.parse(tvAmount.getText().toString()).doubleValue();
-            return !value.isInfinite() && !value.isNaN() && value > 0.0;
+            return !value.isInfinite() && !value.isNaN() && value > 0.0
+                    && getCurrencyPrice() > 0.0;
         } catch (Exception e) {
             return false;
         }
@@ -203,7 +216,7 @@ public class PaymentInputFragment extends Fragment  {
             return;
         }
         if (!AppUtil.getInstance(activity).hasValidReceiver()) {
-            SnackCustom.make(activity, getView(), getActivity().getText(R.string.no_valid_receiver), getActivity().getResources().getString(R.string.prompt_ok), new View.OnClickListener() {
+            SnackCustom.make(activity, getView(), getActivity().getText(R.string.obligatory_receiver), getActivity().getResources().getString(R.string.prompt_ok), new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(activity, SettingsActivity.class);
@@ -278,20 +291,15 @@ public class PaymentInputFragment extends Fragment  {
     }
 
     private void checkBitcoinLimit() {
-        double currentValue = 0.0;
+        double bchValue = 0.0;
         try {
-            currentValue = nf.parse(tvAmount.getText().toString()).doubleValue();
+            double amount = nf.parse(tvAmount.getText().toString()).doubleValue();
+            bchValue = toBch(amount);
         } catch (Exception e) {
             Log.e(TAG, "", e);
         }
-        double bchValue = 0.0;
-        try {
-            bchValue = toBch(currentValue);
-        } catch (ParseException e) {
-            Log.e(TAG, "", e);
-        }
         if (bchValue > bitcoinLimit) {
-            Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
+            Double currencyPrice = getCurrencyPrice();
             tvAmount.setText(MonetaryUtil.getInstance().getFiatDecimalFormat().format(bitcoinLimit * currencyPrice));
             ToastCustom.makeText(getActivity(), getResources().getString(R.string.invalid_amount), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
         }
@@ -300,25 +308,27 @@ public class PaymentInputFragment extends Fragment  {
     private void updateAmounts() {
         if (tvAmount == null) return;
         try {
-            double amount = nf.parse(tvAmount.getText().toString()).doubleValue();
-            double bch = toBch(amount);
-            amountPayableFiat = amount;
-            amountPayableBch = bch;
+            amountPayableFiat = nf.parse(tvAmount.getText().toString()).doubleValue();
+            amountPayableBch = toBch(amountPayableFiat);
         } catch (Exception e) {
             amountPayableFiat = 0.0;
             amountPayableBch = 0.0;
             Log.e(TAG, "", e);
         }
         if (amountPayableFiat == 0.0) {
-            tvBch.setText("Enter an amount");
+            tvBch.setText(R.string.enter_an_amount);
         } else {
             tvBch.setText(df.format(amountPayableBch) + " BCH");
         }
     }
 
-    private double toBch(double amount) throws ParseException {
-        Double currencyPrice = CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
-        MonetaryUtil util = MonetaryUtil.getInstance();
-        return (currencyPrice == 0.0d) ? 0.0d : nf.parse(util.getBchDecimalFormat().format(amount / currencyPrice)).doubleValue();
+    private double toBch(double amount) {
+        Double currencyPrice = getCurrencyPrice();
+        return (currencyPrice == 0.0d) ? 0.0d
+                : new BigDecimal(amount).divide(new BigDecimal(currencyPrice), 8, RoundingMode.HALF_EVEN).doubleValue();
+    }
+
+    private Double getCurrencyPrice() {
+        return CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
     }
 }
