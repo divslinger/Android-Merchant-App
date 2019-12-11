@@ -106,6 +106,17 @@ public class PaymentInputFragment extends Fragment  {
         updateAmounts();
         initDecimalButton();
         tvCurrencySymbol.setText(getCurrencySymbol());
+        FragmentActivity activity = getActivity();
+        if (activity != null) {
+            // Query mempool, in case the previous TX was not received by the socket listeners
+            // It will be unnecessary and can be removed after the switch to BIP-70 in the next big release.
+            // Performing the request at the resume time of the application is critical to prevent the following issue:
+            // When clicking on the checkout button, the device queries the mempool/unconfirmed tx for a missed tx,
+            // Unfortunately, if two devices use the same pubKey/address, then it would erroneously detect
+            // the last payment made on the other device as an instant payment for the new payment request
+            // The next line attempts to detect the missed payments on appResume and prior to the checkout operation
+            LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_MISSING_TX_IN_MEMPOOL));
+        }
     }
 
     private void initDecimalButton() {
