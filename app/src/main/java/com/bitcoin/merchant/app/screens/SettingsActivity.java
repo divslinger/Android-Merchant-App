@@ -140,7 +140,7 @@ public class SettingsActivity extends Activity {
         if (AppUtil.isReceivingAddressAvailable(ctx)) {
             summary = AppUtil.convertToBitcoinCash(AppUtil.getReceivingAddress(ctx));
         } else {
-            summary = "...\n\n" + getString(R.string.options_explain_payment_address);
+            summary = "...";
         }
         tvPaymentAddress.setText(summary);
         lvPaymentAddress.setOnClickListener(new View.OnClickListener() {
