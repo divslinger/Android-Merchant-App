@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- -->
 <resources>
-    <string name="app_name">Bitcoin.com Pay</string>
+    <string name="app_name">Bitcoin Cash Register</string>
     <string name="action_settings">Settings</string>
     <string name="pin_code_create_error">Enter two matching 4-digit PIN codes</string>
     <string name="pin_code_enter_error">PIN code incorrect</string>
     <string name="prompt_ok">OK</string>
-    <string name="prompt_ko">CANCEL</string>
+    <string name="prompt_ko">Cancel</string>
     <string name="create_pin">Create passcode</string>
     <string name="confirm_pin">Confirm passcode</string>
     <string name="unrecognized_xpub">Unrecognized public key format</string>

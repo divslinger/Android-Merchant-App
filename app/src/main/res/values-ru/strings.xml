@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Bitcoin.com Pay</string>
+    <string name="app_name">Bitcoin Cash Register</string>
     <string name="action_settings">Настройки</string>
     <string name="pin_code_create_error">Введите два подходящих 4-значных PIN-кода</string>
     <string name="pin_code_enter_error">Неправильный PIN-код</string>
