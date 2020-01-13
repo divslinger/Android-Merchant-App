@@ -1,6 +1,5 @@
 package com.bitcoin.merchant.app.screens;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
@@ -30,14 +29,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
-import com.bitcoin.merchant.app.database.DBControllerV3;
 import com.bitcoin.merchant.app.database.PaymentRecord;
+import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.DateUtil;
 import com.bitcoin.merchant.app.util.MonetaryUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
@@ -49,12 +47,12 @@ import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
-public class TransactionsHistoryFragment extends Fragment {
+public class TransactionsHistoryFragment extends ToolbarAwareFragment {
     private static final String TAG = "TransactionsHistory";
-    private TransactionAdapter adapter = null;
-    private ListView listView = null;
-    private LinearLayout noTxHistoryLv = null;
-    private SwipeRefreshLayout swipeLayout = null;
+    private TransactionAdapter adapter;
+    private ListView listView;
+    private LinearLayout noTxHistoryLv;
+    private SwipeRefreshLayout swipeLayout;
     private final BroadcastReceiver fragmentBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -63,14 +61,16 @@ public class TransactionsHistoryFragment extends Fragment {
             }
         }
     };
-    private Activity thisActivity = null;
     private volatile boolean ready;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         ready = true;
         View rootView = inflater.inflate(getResources().getLayout(R.layout.fragment_transaction), container, false);
         initListView(rootView);
+        setToolbarAsBackButton();
+        setToolbarTitle(R.string.menu_transactions);
         swipeLayout = rootView.findViewById(R.id.swipe_container);
         swipeLayout.setProgressViewEndTarget(false, (int) (getResources().getDisplayMetrics().density * (72 + 20)));
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -83,10 +83,9 @@ public class TransactionsHistoryFragment extends Fragment {
                 R.color.bitcoindotcom_darker_green,
                 R.color.bitcoindotcom_green,
                 R.color.bitcoindotcom_darkest_green);
-        thisActivity = getActivity();
         IntentFilter filter = new IntentFilter();
         filter.addAction(MainActivity.ACTION_QUERY_ALL_UXTO_FINISHED);
-        LocalBroadcastManager.getInstance(thisActivity).registerReceiver(fragmentBroadcastReceiver, filter);
+        LocalBroadcastManager.getInstance(activity).registerReceiver(fragmentBroadcastReceiver, filter);
         return rootView;
     }
 
@@ -94,7 +93,7 @@ public class TransactionsHistoryFragment extends Fragment {
     public void onDestroyView() {
         ready = false;
         super.onDestroyView();
-        LocalBroadcastManager.getInstance(thisActivity).unregisterReceiver(fragmentBroadcastReceiver);
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(fragmentBroadcastReceiver);
     }
 
     private void initListView(View rootView) {
@@ -136,16 +135,16 @@ public class TransactionsHistoryFragment extends Fragment {
 
     private void showTransactionMenu(final long item) {
         final ContentValues val = adapter.mListItems.get((int) item);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         final String tx = val.getAsString("tx");
         final String address = val.getAsString("iad");
         builder.setTitle(tx);
         builder.setIcon(R.mipmap.ic_launcher);
         builder.setItems(new CharSequence[]{
-                        getString(R.string.view_transaction),
-                        getString(R.string.view_address),
-                        getString(R.string.copy_transaction),
-                        getString(R.string.copy_address),
+                        "View transaction",
+                        "View all TX with this address",
+                        "Copy transaction",
+                        "Copy address",
                 },
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -174,8 +173,7 @@ public class TransactionsHistoryFragment extends Fragment {
     }
 
     private void openExplorer(String uri) {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-        startActivity(intent);
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
     }
 
     private void copyToClipboard(String text) {
@@ -187,10 +185,10 @@ public class TransactionsHistoryFragment extends Fragment {
     }
 
     protected boolean isSafe() {
-        if (!ready || thisActivity == null || adapter == null) {
+        if (!ready || activity == null || adapter == null) {
             return false; // view not yet created
         }
-        return !(this.isRemoving() || this.getActivity() == null || this.isDetached() || !this.isAdded() || this.getView() == null);
+        return !(this.isRemoving() || activity == null || this.isDetached() || !this.isAdded() || this.getView() == null);
     }
 
     public void addTx(final ContentValues val) {
@@ -199,7 +197,7 @@ public class TransactionsHistoryFragment extends Fragment {
                 return;
             }
             setTxListVisibility(true);
-            thisActivity.runOnUiThread(new Runnable() {
+            activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (!isSafe()) {
@@ -220,7 +218,7 @@ public class TransactionsHistoryFragment extends Fragment {
                 return;
             }
             setTxListVisibility(true);
-            thisActivity.runOnUiThread(new Runnable() {
+            activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     new LoadTxFromDatabaseTask(false).execute();
@@ -233,7 +231,7 @@ public class TransactionsHistoryFragment extends Fragment {
     }
 
     private void findAllPotentialMissingTx() {
-        LocalBroadcastManager.getInstance(thisActivity).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_ALL_UXTO));
+        LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_ALL_UXTO));
     }
 
     private class LoadTxFromDatabaseTask extends AsyncTask<Void, Void, ArrayList<ContentValues>> {
@@ -254,10 +252,10 @@ public class TransactionsHistoryFragment extends Fragment {
             if (!ready) {
                 return null;
             }
-            String address = PrefsUtil.getInstance(getActivity()).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+            String address = PrefsUtil.getInstance(activity).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
             if ((address != null) && (address.length() > 0)) {
                 try {
-                    return new DBControllerV3(getActivity()).getAllPayments();
+                    return getApp().getDb().getAllPayments();
                 } catch (Exception e) {
                     Log.e(TAG, "getAllPayments", e);
                     Crashlytics.logException(e);
@@ -293,7 +291,7 @@ public class TransactionsHistoryFragment extends Fragment {
         private final LayoutInflater inflater;
 
         TransactionAdapter() {
-            inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         public void addNewPayment(ContentValues val) {
@@ -357,7 +355,7 @@ public class TransactionsHistoryFragment extends Fragment {
             SpannableStringBuilder coinSpan = new SpannableStringBuilder("BCH");
             coinSpan.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             TextView coinView = view.findViewById(R.id.tv_amount_coin);
-            String displayValue = MonetaryUtil.getInstance().getDisplayAmountWithFormatting(amount);
+            String displayValue = MonetaryUtil.getInstance(activity).getDisplayAmountWithFormatting(amount);
             coinView.setText(displayValue + " " + coinSpan);
             // display fiat amount
             TextView fiatView = view.findViewById(R.id.tv_amount_fiat);
@@ -398,5 +396,10 @@ public class TransactionsHistoryFragment extends Fragment {
                 return 1.0f;
             }
         }
+    }
+
+    @Override
+    public boolean canFragmentBeDiscardedWhenInBackground() {
+        return true;
     }
 }

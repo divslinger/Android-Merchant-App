@@ -7,7 +7,7 @@ import com.bitcoin.merchant.app.model.websocket.Tx;
 import com.bitcoin.merchant.app.network.ExpectedAmounts;
 import com.bitcoin.merchant.app.network.ExpectedPayments;
 import com.bitcoin.merchant.app.network.websocket.impl.TxWebSocketHandlerImpl;
-import com.bitcoin.merchant.app.screens.PaymentReceived;
+import com.bitcoin.merchant.app.model.PaymentReceived;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketFactory;

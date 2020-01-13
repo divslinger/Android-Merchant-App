@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app.screens;
+package com.bitcoin.merchant.app.model;
 
 import android.content.Intent;
 

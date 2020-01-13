@@ -1,5 +1,6 @@
 package com.bitcoin.merchant.app;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,10 +30,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.viewpager.widget.PagerAdapter;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
+import com.bitcoin.merchant.app.application.CashRegisterApplication;
 import com.bitcoin.merchant.app.database.PaymentRecord;
+import com.bitcoin.merchant.app.model.PaymentReceived;
 import com.bitcoin.merchant.app.network.ExpectedAmounts;
 import com.bitcoin.merchant.app.network.ExpectedPayments;
 import com.bitcoin.merchant.app.network.NetworkStateReceiver;
@@ -42,23 +47,19 @@ import com.bitcoin.merchant.app.network.websocket.TxWebSocketHandler;
 import com.bitcoin.merchant.app.network.websocket.WebSocketListener;
 import com.bitcoin.merchant.app.network.websocket.impl.bitcoincom.BitcoinComSocketHandler;
 import com.bitcoin.merchant.app.network.websocket.impl.blockchaininfo.BlockchainInfoSocketSocketHandler;
-import com.bitcoin.merchant.app.screens.AboutActivity;
-import com.bitcoin.merchant.app.screens.NonSwipeViewPager;
-import com.bitcoin.merchant.app.screens.PaymentProcessor;
-import com.bitcoin.merchant.app.screens.PaymentReceived;
-import com.bitcoin.merchant.app.screens.PinActivity;
-import com.bitcoin.merchant.app.screens.SettingsActivity;
-import com.bitcoin.merchant.app.screens.TabsPagerAdapter;
 import com.bitcoin.merchant.app.screens.TransactionsHistoryFragment;
+import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.application.PaymentProcessor;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.tabs.TabLayout;
 
 import io.fabric.sdk.android.Fabric;
 
-public class MainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback, WebSocketListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity
+        implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback,
+        WebSocketListener {
     public static final String TAG = "MainActivity";
     private static final String APP_PACKAGE = "com.bitcoin.merchant.app";
     public static final String ACTION_INTENT_SUBSCRIBE_TO_ADDRESS = APP_PACKAGE + "MainActivity.SUBSCRIBE_TO_ADDRESS";
@@ -71,15 +72,10 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     public static final String ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO = APP_PACKAGE + "MainActivity.ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO";
     public static final String ACTION_QUERY_ALL_UXTO = APP_PACKAGE + "MainActivity.ACTION_QUERY_ALL_UXTO";
     public static final String ACTION_QUERY_ALL_UXTO_FINISHED = APP_PACKAGE + "MainActivity.ACTION_QUERY_ALL_UXTO_FINISHED";
-    public static int SETTINGS_ACTIVITY = 1;
-    private static int PIN_ACTIVITY = 2;
-    private static int RESET_PIN_ACTIVITY = 3;
-    private static int ABOUT_ACTIVITY = 4;
     DrawerLayout mDrawerLayout;
     private TxWebSocketHandler bitcoinDotComSocket = null;
     private TxWebSocketHandler blockchainDotInfoSocket = null;
     private NetworkStateReceiver networkStateReceiver;
-    private NonSwipeViewPager viewPager;
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -98,21 +94,32 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
                 updateExistingTx(new PaymentReceived(intent));
             }
             if (ACTION_INTENT_SHOW_HISTORY.equals(intent.getAction())) {
-                showPage(TabsPagerAdapter.TAB_TX_HISTORY);
+                getNav().navigate(R.id.transactions_screen);
             }
             if (ACTION_QUERY_MISSING_TX_IN_MEMPOOL.equals(intent.getAction())) {
-                new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED).execute();
+                new QueryUtxoTask(getApp(), QueryUtxoType.UNCONFIRMED).execute();
             }
             if (ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO.equals(intent.getAction())) {
-                new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED, QueryUtxoType.ALL).execute();
+                new QueryUtxoTask(getApp(), QueryUtxoType.UNCONFIRMED, QueryUtxoType.ALL).execute();
             }
             if (ACTION_QUERY_ALL_UXTO.equals(intent.getAction())) {
-                new QueryUtxoTask(MainActivity.this, QueryUtxoType.ALL).execute();
+                new QueryUtxoTask(getApp(), QueryUtxoType.ALL).execute();
             }
         }
     };
-    //Navigation Drawer
-    private Toolbar toolbar = null;
+    private Toolbar toolbar;
+
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
+    public static NavController getNav(Activity activity) {
+        return Navigation.findNavController(activity, R.id.main_nav_controller);
+    }
+
+    private NavController getNav() {
+        return getNav(this);
+    }
 
     private void reconnectIfNecessary() {
         final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -129,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     private void recordNewTx(PaymentReceived payment) {
         Log.i(TAG, "record potential new Tx:" + payment);
-        PaymentProcessor processor = new PaymentProcessor(this);
+        PaymentProcessor processor = getApp().getPaymentProcessor();
         if (processor.isAlreadyRecorded(payment)) {
             Log.i(TAG, "TX was already in DB: " + payment);
             return; // already in the DB, nothing to do
@@ -152,9 +159,13 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         }
     }
 
+    public CashRegisterApplication getApp() {
+        return (CashRegisterApplication) getApplication();
+    }
+
     private void updateExistingTx(PaymentReceived payment) {
         Log.i(TAG, "update existing Tx:" + payment);
-        PaymentProcessor processor = new PaymentProcessor(this);
+        PaymentProcessor processor = getApp().getPaymentProcessor();
         ContentValues values = processor.getExistingRecord(payment);
         if (values != null) {
             PaymentRecord record = new PaymentRecord(values);
@@ -172,29 +183,13 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     }
 
     private void addTxToHistory(ContentValues tx) {
-        if (viewPager != null) {
-            TabsPagerAdapter pagerAdapter = (TabsPagerAdapter) viewPager.getAdapter();
-            if (pagerAdapter != null) {
-                TransactionsHistoryFragment f = (TransactionsHistoryFragment) pagerAdapter.getItem(TabsPagerAdapter.TAB_TX_HISTORY);
-                f.addTx(tx);
-            }
-        }
+        TransactionsHistoryFragment f = null; // TODO
+        // f.addTx(tx);
     }
 
     private void updateTxToHistory(ContentValues tx) {
-        if (viewPager != null) {
-            TabsPagerAdapter pagerAdapter = (TabsPagerAdapter) viewPager.getAdapter();
-            if (pagerAdapter != null) {
-                TransactionsHistoryFragment f = (TransactionsHistoryFragment) pagerAdapter.getItem(TabsPagerAdapter.TAB_TX_HISTORY);
-                f.updateTx(tx);
-            }
-        }
-    }
-
-    private void showPage(int page) {
-        if (viewPager != null) {
-            viewPager.setCurrentItem(page);
-        }
+        TransactionsHistoryFragment f = null; // TODO
+        // f.updateTx(tx);
     }
 
     public void soundAlert() {
@@ -216,23 +211,20 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
+        if (!AppUtil.isEmulator()) {
+            Fabric.with(this, new Crashlytics());
+        }
         setContentView(R.layout.activity_main);
         setToolbar();
+        setTitle(""); // clear "Bitcoin Cash Register" from toolBar when opens on Payment Input screen
         setNavigationDrawer();
-        initTableLayout();
-        if (PinActivity.isPinMissing(this)) {
-            createPin();
-        } else if (!AppUtil.isReceivingAddressAvailable(this)) {
-            requestPinBeforeGoingToSettings();
-        }
         startWebsockets();
         // scan for missing funds at least one
         if (!PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_SCANNED_ALL_MISSING_FUNDS, false)) {
             PrefsUtil.getInstance(this).setValue(PrefsUtil.MERCHANT_KEY_SCANNED_ALL_MISSING_FUNDS, true);
-            new QueryUtxoTask(MainActivity.this, QueryUtxoType.ALL).execute();
+            new QueryUtxoTask(getApp(), QueryUtxoType.ALL).execute();
         } else {
-            new QueryUtxoTask(MainActivity.this, QueryUtxoType.UNCONFIRMED).execute();
+            new QueryUtxoTask(getApp(), QueryUtxoType.UNCONFIRMED).execute();
         }
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -258,14 +250,14 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             public void onDrawerStateChanged(int i) {
             }
         });
-        Log.i(TAG, "Stored address: " + AppUtil.getReceivingAddress(this));
+        System.out.println("Stored address: " + AppUtil.getReceivingAddress(this));
     }
 
     /**
      * Only used for debugging purposes
      */
     private void resetPaymentTime(String tx) {
-        PaymentProcessor processor = new PaymentProcessor(this);
+        PaymentProcessor processor = getApp().getPaymentProcessor();
         ContentValues values = processor.getExistingRecord(new PaymentReceived("", 0, tx, 0, 0, ExpectedAmounts.UNDEFINED));
         if (values != null) {
             PaymentRecord record = new PaymentRecord(values);
@@ -302,7 +294,13 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
     protected void onResume() {
         super.onResume();
         setMerchantName();
-        showPage(TabsPagerAdapter.TAB_INPUT_AMOUNT);
+        ToolbarAwareFragment fragment = getVisibleFragment();
+        // Note: The navigation starts the payment_input_screen due to config in navigation.xml
+        if (fragment != null && !fragment.canFragmentBeDiscardedWhenInBackground()) {
+            return; // keep current screen, do not pop any screen
+        }
+        // Remove all screens from the stack until we reach the payment_input_screen
+        getNav().popBackStack(R.id.payment_input_screen, false);
     }
 
     @Override
@@ -324,7 +322,6 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        // TODO
         NdefRecord rtdUriRecord = NdefRecord.createUri("market://details?id=" + APP_PACKAGE);
         return new NdefMessage(rtdUriRecord);
     }
@@ -338,46 +335,8 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         super.onDestroy();
     }
 
-    private void initTableLayout() {
-        String[] tabs = new String[]{"1", "2"};
-        TabLayout tabLayout = findViewById(R.id.tabs);
-        viewPager = findViewById(R.id.pager);
-        PagerAdapter mAdapter = new TabsPagerAdapter(getSupportFragmentManager(), tabs);
-        viewPager.setAdapter(mAdapter);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setTabTextColors(getResources().getColor(R.color.white_50), getResources().getColor(R.color.white));
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setTabsFromPagerAdapter(mAdapter);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode + ", Intent:" + data);
-        if (requestCode == SETTINGS_ACTIVITY && resultCode == RESULT_OK) {
-        } else if (requestCode == PIN_ACTIVITY && resultCode == RESULT_OK) {
-            showSettings();
-        } else if (requestCode == RESET_PIN_ACTIVITY && resultCode == RESULT_OK) {
-            createPin();
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    private void showSettings() {
-        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-        startActivityForResult(intent, SETTINGS_ACTIVITY);
+    public void openMenuDrawer() {
+        mDrawerLayout.openDrawer(GravityCompat.START);
     }
 
     @Override
@@ -398,31 +357,12 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         return ret;
     }
 
-    private void createPin() {
-        Intent intent = new Intent(MainActivity.this, PinActivity.class);
-        intent.putExtra("create", true);
-        startActivityForResult(intent, PIN_ACTIVITY);
-    }
-
-    private void requestPinBeforeGoingToSettings() {
-        Intent intent = new Intent(MainActivity.this, PinActivity.class);
-        intent.putExtra("create", false);
-        startActivityForResult(intent, PIN_ACTIVITY);
-    }
-
-    private void doAbout() {
-        Intent intent = new Intent(MainActivity.this, AboutActivity.class);
-        startActivityForResult(intent, ABOUT_ACTIVITY);
-    }
-
     private void setMerchantName() {
         NavigationView navigationView = findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
         TextView tvName = headerView.findViewById(R.id.drawer_title);
         String drawerTitle = PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "");
         tvName.setText(drawerTitle);
-        toolbar.setTitle("");
     }
 
     @Override
@@ -434,16 +374,33 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
 
     public void setToolbar() {
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_menu_black_24dp));
         setSupportActionBar(toolbar);
     }
 
     private void setNavigationDrawer() {
         mDrawerLayout = findViewById(R.id.drawer_layout);
         setMerchantName();
-        // listen for navigation events
         NavigationView navigationView = findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                menuButtonPressed(menuItem);
+                return false;
+            }
+        });
+    }
+
+    public ToolbarAwareFragment getVisibleFragment() {
+        Fragment navHostFragment = getSupportFragmentManager().getPrimaryNavigationFragment();
+        if (navHostFragment == null) {
+            return null;
+        }
+        for (Fragment fragment : navHostFragment.getChildFragmentManager().getFragments()) {
+            if (fragment instanceof ToolbarAwareFragment && fragment.isVisible()) {
+                return (ToolbarAwareFragment) fragment;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -451,11 +408,11 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         if (isNavDrawerOpen()) {
             closeNavDrawer();
         }
-        if (viewPager.getCurrentItem() == TabsPagerAdapter.TAB_TX_HISTORY) {
-            showPage(TabsPagerAdapter.TAB_INPUT_AMOUNT);
-        } else {
-            super.onBackPressed();
+        ToolbarAwareFragment fragment = getVisibleFragment();
+        if (!fragment.isBackAllowed()) {
+            return;
         }
+        super.onBackPressed();
     }
 
     protected boolean isNavDrawerOpen() {
@@ -468,8 +425,7 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
         }
     }
 
-    @Override
-    public boolean onNavigationItemSelected(final MenuItem menuItem) {
+    private void menuButtonPressed(final MenuItem menuItem) {
         // allow some time after closing the drawer before performing real navigation
         // so the user can see what is happening
         mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -478,21 +434,17 @@ public class MainActivity extends AppCompatActivity implements NfcAdapter.Create
             @Override
             public void run() {
                 switch (menuItem.getItemId()) {
-                    case R.id.action_checkout:
-                        showPage(TabsPagerAdapter.TAB_INPUT_AMOUNT);
-                        break;
                     case R.id.action_transactions:
-                        showPage(TabsPagerAdapter.TAB_TX_HISTORY);
+                        getNav().navigate(R.id.nav_to_transactions_screen);
                         break;
                     case R.id.action_settings:
-                        requestPinBeforeGoingToSettings();
+                        getNav().navigate(R.id.nav_to_settings_screen);
                         break;
                     case R.id.action_about:
-                        doAbout();
+                        getNav().navigate(R.id.nav_to_about_screen);
                         break;
                 }
             }
         }, 250);
-        return false;
     }
 }

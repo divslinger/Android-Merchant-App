@@ -1,18 +1,17 @@
 package com.bitcoin.merchant.app.network;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bitcoin.merchant.app.MainActivity;
-import com.bitcoin.merchant.app.database.DBControllerV3;
+import com.bitcoin.merchant.app.application.CashRegisterApplication;
+import com.bitcoin.merchant.app.model.PaymentReceived;
 import com.bitcoin.merchant.app.database.PaymentRecord;
 import com.bitcoin.merchant.app.model.rest.Utxo;
 import com.bitcoin.merchant.app.model.rest.Utxos;
-import com.bitcoin.merchant.app.screens.PaymentReceived;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 
@@ -21,7 +20,7 @@ import java.util.List;
 
 public class QueryUtxoTask extends DownloadTask<Utxos> {
     public static final String TAG = "QueryUtxoTask";
-    private final Context context;
+    private final CashRegisterApplication app;
     private final QueryUtxoType query;
     private final QueryUtxoType nextQuery;
     private final boolean memPool;
@@ -29,9 +28,9 @@ public class QueryUtxoTask extends DownloadTask<Utxos> {
     private final List<Utxo> utxosWithoutTimeButWithBlockHeight = new ArrayList<>();
     private final List<Utxo> utxosWithUpdatedConfirmations = new ArrayList<>();
 
-    public QueryUtxoTask(Context context, QueryUtxoType... queries) {
-        super(context);
-        this.context = context;
+    public QueryUtxoTask(CashRegisterApplication app, QueryUtxoType... queries) {
+        super(app);
+        this.app = app;
         query = queries[0];
         memPool = query == QueryUtxoType.UNCONFIRMED;
         checkExpectedPayment = memPool;
@@ -54,11 +53,10 @@ public class QueryUtxoTask extends DownloadTask<Utxos> {
 
     @Override
     protected String getUrl() {
-        AppUtil instance = AppUtil.getInstance(context);
-        if (!instance.hasValidReceiver() || instance.isValidXPub()) {
+        if (!AppUtil.hasValidReceiver(app) || AppUtil.isValidXPub(app)) {
             return null;
         }
-        String address = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+        String address = PrefsUtil.getInstance(app).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
         String url = memPool
                 ? "https://rest.bitcoin.com/v2/address/unconfirmed/"
                 : "https://rest.bitcoin.com/v2/address/utxo/";
@@ -66,11 +64,10 @@ public class QueryUtxoTask extends DownloadTask<Utxos> {
     }
 
     private void removeKnownTxAndFindTxWithMissingTime(Utxos utxos) {
-        DBControllerV3 db = new DBControllerV3(context);
         List<Utxo> newUtxos = new ArrayList<>();
         for (Utxo utxo : utxos.utxos) {
             try {
-                ContentValues values = db.getPaymentFromTx(utxo.txid);
+                ContentValues values = app.getDb().getPaymentFromTx(utxo.txid);
                 if (values == null) {
                     newUtxos.add(utxo);
                 }
@@ -116,13 +113,13 @@ public class QueryUtxoTask extends DownloadTask<Utxos> {
             }
         }
         if (nextQuery != null) {
-            new QueryUtxoTask(context, nextQuery).execute();
+            new QueryUtxoTask(app, nextQuery).execute();
         }
         if ((utxosWithoutTimeButWithBlockHeight.size() > 0) && (result != null)) {
-            new QueryTxTimeTask(context, query, checkExpectedPayment, result.legacyAddress, utxosWithoutTimeButWithBlockHeight).execute();
+            new QueryTxTimeTask(app, query, checkExpectedPayment, result.legacyAddress, utxosWithoutTimeButWithBlockHeight).execute();
         } else {
             if (query == QueryUtxoType.ALL) {
-                LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_ALL_UXTO_FINISHED));
+                LocalBroadcastManager.getInstance(app).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_ALL_UXTO_FINISHED));
             }
         }
     }
@@ -130,12 +127,12 @@ public class QueryUtxoTask extends DownloadTask<Utxos> {
     private void recordPayment(PaymentReceived payment) {
         Intent intent = new Intent(MainActivity.ACTION_INTENT_RECORD_TX);
         payment.toIntent(intent);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(app).sendBroadcast(intent);
     }
 
     private void updatePayment(PaymentReceived payment) {
         Intent intent = new Intent(MainActivity.ACTION_INTENT_UPDATE_TX);
         payment.toIntent(intent);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(app).sendBroadcast(intent);
     }
 }

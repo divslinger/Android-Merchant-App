@@ -1,7 +1,6 @@
 package com.bitcoin.merchant.app.screens;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -16,23 +15,31 @@ import android.nfc.NfcEvent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
+import com.bitcoin.merchant.app.application.CashRegisterApplication;
+import com.bitcoin.merchant.app.model.PaymentReceived;
 import com.bitcoin.merchant.app.network.ExpectedPayments;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooHighDialog;
 import com.bitcoin.merchant.app.screens.dialogs.PaymentTooLowDialog;
+import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.util.MonetaryUtil;
 import com.bitcoin.merchant.app.util.ToastCustom;
+import com.github.kiulian.converter.AddressConverter;
 import com.google.bitcoin.uri.BitcoinCashURI;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -46,7 +53,7 @@ import java.math.BigInteger;
 
 import static com.bitcoin.merchant.app.MainActivity.TAG;
 
-public class PaymentRequestActivity extends Activity {
+public class PaymentRequestFragment extends ToolbarAwareFragment {
     private LinearLayout waitingLayout;
     private LinearLayout receivedLayout;
     private TextView tvFiatAmount;
@@ -83,57 +90,58 @@ public class PaymentRequestActivity extends Activity {
                     showCheckMark();
                 }
             };
-            new PaymentTooLowDialog(this).showUnderpayment(p.bchReceived, p.bchExpected, closingAction);
+            new PaymentTooLowDialog(activity).showUnderpayment(p.bchReceived, p.bchExpected, closingAction);
         } else if (p.isOverpayment()) {
             showCheckMark();
-            new PaymentTooHighDialog(this).showOverpayment();
+            new PaymentTooHighDialog(activity).showOverpayment();
         } else {
             // expected amount
             showCheckMark();
         }
     }
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_receive);
-        initViews();
-        // avoid to mistakenly discard the window
-        setFinishOnTouchOutside(false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        View v = inflater.inflate(R.layout.fragment_request_payment, container, false);
+        initViews(v);
+        setToolbarVisible(false);
         //Register receiver (Listen for incoming tx)
         IntentFilter filter = new IntentFilter();
         filter.addAction(MainActivity.ACTION_INTENT_EXPECTED_PAYMENT_RECEIVED);
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(activity.getApplicationContext());
         broadcastManager.registerReceiver(receiver, filter);
-        double amountFiat = this.getIntent().getDoubleExtra(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
-        AmountUtil f = new AmountUtil(this);
-        double amountBch = this.getIntent().getDoubleExtra(PaymentInputFragment.AMOUNT_PAYABLE_BTC, 0.0);
+        Bundle args = getArguments();
+        double amountFiat = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
+        AmountUtil f = new AmountUtil(activity);
+        double amountBch = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_BTC, 0.0);
         tvFiatAmount.setText(f.formatFiat(amountFiat));
         tvBtcAmount.setText(f.formatBch(amountBch));
-        getReceiveAddress(PaymentRequestActivity.this, amountBch, tvFiatAmount.getText().toString());
+        getReceiveAddress(getApp(), amountBch, tvFiatAmount.getText().toString());
         // Attempt to reconnect in case we were disconnected from Internet
         broadcastManager.sendBroadcast(new Intent(MainActivity.ACTION_INTENT_RECONNECT));
         // Query mempool, in case the previous TX was not received by the socket listeners
         // It will be unnecessary and can be removed after the switch to BIP-70 in the next big release.
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_MISSING_TX_IN_MEMPOOL));
+        LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_MISSING_TX_IN_MEMPOOL));
+        return v;
     }
 
     @Override
-    protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(receiver);
     }
 
-    private void initViews() {
-        tvFiatAmount = findViewById(R.id.tv_fiat_amount);
-        tvBtcAmount = findViewById(R.id.tv_btc_amount);
-        ivReceivingQr = findViewById(R.id.qr);
-        progressLayout = findViewById(R.id.progressLayout);
-        waitingLayout = findViewById(R.id.layout_waiting);
-        receivedLayout = findViewById(R.id.layout_complete);
-        ivCancel = findViewById(R.id.iv_cancel);
-        ivDone = findViewById(R.id.iv_done);
+    private void initViews(View v) {
+        tvFiatAmount = v.findViewById(R.id.tv_fiat_amount);
+        tvBtcAmount = v.findViewById(R.id.tv_btc_amount);
+        ivReceivingQr = v.findViewById(R.id.qr);
+        progressLayout = v.findViewById(R.id.progressLayout);
+        waitingLayout = v.findViewById(R.id.layout_waiting);
+        receivedLayout = v.findViewById(R.id.layout_complete);
+        ivCancel = v.findViewById(R.id.iv_cancel);
+        ivDone = v.findViewById(R.id.iv_done);
         showGeneratingQrCodeProgress(true);
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
@@ -165,18 +173,16 @@ public class PaymentRequestActivity extends Activity {
 
     private void cancelPayment() {
         Log.d(TAG, "Canceling payment...");
-        onBackPressed();
+        activity.onBackPressed();
         ExpectedPayments.getInstance().removePayment(receivingAddress);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO));
+        LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO));
     }
 
     private void copyQrCodeToClipboard() {
         try {
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            if (clipboard != null) {
-                ClipData clip = ClipData.newPlainText(qrCodeUri, qrCodeUri);
-                clipboard.setPrimaryClip(clip);
-            }
+            ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText(qrCodeUri, qrCodeUri);
+            clipboard.setPrimaryClip(clip);
             Log.i(TAG, "Copied to clipboard: " + qrCodeUri);
         } catch (Exception e) {
             Log.i(TAG, "Failed to copy to clipboard: " + qrCodeUri);
@@ -184,16 +190,24 @@ public class PaymentRequestActivity extends Activity {
     }
 
     private void displayQRCode(long lamount) {
+        String uri = AddressConverter.toCashAddress(receivingAddress);
         try {
-            BigInteger bamount = BigInteger.valueOf(lamount);
-            if (bamount.compareTo(BigInteger.valueOf(21_000_000_000_000_00L)) >= 1
-                    || bamount.compareTo(BigInteger.ZERO) <= 0)
-                throw new IllegalArgumentException();
-            qrCodeUri = BitcoinCashURI.toURI(receivingAddress, Coin.valueOf(bamount.longValue()), "", "");
-            generateQRCode(qrCodeUri);
-            write2NFC(qrCodeUri);
-        } catch (Exception e) {
-            ToastCustom.makeText(this, getString(R.string.invalid_amount), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+            BigInteger bamount = MonetaryUtil.getInstance(activity).getUndenominatedAmount(lamount);
+            if (bamount.compareTo(BigInteger.valueOf(21_000_000_000_000_00L)) >= 1) {
+                ToastCustom.makeText(activity, "Invalid amount", ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+                return;
+            }
+            if (!bamount.equals(BigInteger.ZERO)) {
+                qrCodeUri = BitcoinCashURI.toURI(receivingAddress, Coin.valueOf(bamount.longValue()), "", "");
+                generateQRCode(qrCodeUri);
+                write2NFC(qrCodeUri);
+            } else {
+                generateQRCode(uri);
+                write2NFC(uri);
+            }
+        } catch (NumberFormatException e) {
+            generateQRCode(uri);
+            write2NFC(uri);
         }
     }
 
@@ -229,7 +243,7 @@ public class PaymentRequestActivity extends Activity {
     }
 
     @SuppressLint("StaticFieldLeak")
-    private void getReceiveAddress(final Context context, final double amountBch, final String strFiat) {
+    private void getReceiveAddress(final CashRegisterApplication app, final double amountBch, final String strFiat) {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected void onPreExecute() {
@@ -239,27 +253,26 @@ public class PaymentRequestActivity extends Activity {
 
             @Override
             protected String doInBackground(Void... params) {
-                //Generate new address/QR code for receive
-                AppUtil util = AppUtil.getInstance(PaymentRequestActivity.this);
-                if (util.isValidXPub()) {
+                // Generate new address/QR code for receive
+                if (AppUtil.isValidXPub(app)) {
                     try {
-                        receivingAddress = util.getWallet().generateAddressFromXPub();
+                        receivingAddress = app.getWallet().generateAddressFromXPub();
                         Log.i(TAG, "BCH-address(xPub) to receive: " + receivingAddress);
                     } catch (Exception e) {
                         receivingAddress = null;
                         Log.e(TAG, "", e);
                     }
                 } else {
-                    receivingAddress = AppUtil.getReceivingAddress(context);
+                    receivingAddress = AppUtil.getReceivingAddress(app);
                 }
                 if (StringUtils.isEmpty(receivingAddress)) {
-                    ToastCustom.makeText(PaymentRequestActivity.this, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+                    ToastCustom.makeText(activity, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
                     return null;
                 }
                 //Subscribe to websocket to new address
                 Intent intent = new Intent(MainActivity.ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
                 intent.putExtra("address", receivingAddress);
-                LocalBroadcastManager.getInstance(PaymentRequestActivity.this).sendBroadcast(intent);
+                LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
                 long lAmount = getLongAmount(amountBch);
                 ExpectedPayments.getInstance().addExpectedPayment(receivingAddress, lAmount, strFiat);
                 displayQRCode(lAmount);
@@ -280,25 +293,21 @@ public class PaymentRequestActivity extends Activity {
     }
 
     private void showCheckMark() {
-        setFinishOnTouchOutside(true); // now allow easy dismissal
         waitingLayout.setVisibility(View.GONE);
         receivedLayout.setVisibility(View.VISIBLE);
-        AppUtil.setStatusBarColor(PaymentRequestActivity.this, R.color.bitcoindotcom_green);
+        AppUtil.setStatusBarColor(activity, R.color.bitcoindotcom_green);
         ivDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppUtil.setStatusBarColor(PaymentRequestActivity.this, R.color.gray);
-                Intent intent = new Intent();
-                PaymentRequestActivity.this.setResult(RESULT_OK, intent);
-                PaymentRequestActivity.this.finish();
+                AppUtil.setStatusBarColor(activity, R.color.gray);
+                activity.onBackPressed();
             }
         });
-        setResult(RESULT_OK);
     }
 
     private void write2NFC(final String uri) {
         try {
-            NfcAdapter nfc = NfcAdapter.getDefaultAdapter(PaymentRequestActivity.this);
+            NfcAdapter nfc = NfcAdapter.getDefaultAdapter(activity);
             if (nfc != null && nfc.isNdefPushEnabled()) {
                 nfc.setNdefPushMessageCallback(new NfcAdapter.CreateNdefMessageCallback() {
                     @Override
@@ -306,7 +315,7 @@ public class PaymentRequestActivity extends Activity {
                         NdefRecord uriRecord = NdefRecord.createUri(uri);
                         return new NdefMessage(new NdefRecord[]{uriRecord});
                     }
-                }, PaymentRequestActivity.this);
+                }, activity);
             }
         } catch (Exception e) {
             // usually happens when activity is being closed while background task is executing
@@ -315,8 +324,8 @@ public class PaymentRequestActivity extends Activity {
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(PaymentInputFragment.ACTION_INTENT_RESET_AMOUNT));
+    public boolean isBackAllowed() {
+        LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(PaymentInputFragment.ACTION_INTENT_RESET_AMOUNT));
+        return true;
     }
 }

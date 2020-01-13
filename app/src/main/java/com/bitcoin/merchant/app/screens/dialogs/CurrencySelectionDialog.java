@@ -1,5 +1,6 @@
 package com.bitcoin.merchant.app.screens.dialogs;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,16 +19,18 @@ import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.currency.CountryCurrency;
 import com.bitcoin.merchant.app.currency.CurrencyExchange;
 import com.bitcoin.merchant.app.screens.PaymentInputFragment;
-import com.bitcoin.merchant.app.screens.SettingsActivity;
+import com.bitcoin.merchant.app.screens.SettingsFragment;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 
 import java.util.List;
 
 public class CurrencySelectionDialog {
-    private final SettingsActivity ctx;
+    private final Activity ctx;
+    private final SettingsFragment settingsController;
 
-    public CurrencySelectionDialog(SettingsActivity ctx) {
-        this.ctx = ctx;
+    public CurrencySelectionDialog(SettingsFragment f) {
+        this.settingsController = f;
+        this.ctx = f.activity;
     }
 
     public boolean show() {
@@ -62,7 +65,7 @@ public class CurrencySelectionDialog {
         prefsUtil.setValue(PrefsUtil.MERCHANT_KEY_LOCALE, locale);
         Intent intent = new Intent(PaymentInputFragment.ACTION_INTENT_RESET_AMOUNT);
         LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
-        ctx.setCurrencySummary(cc);
+        settingsController.setCurrencySummary(cc);
     }
 
     private class ArrayAdapterWithIcon extends ArrayAdapter<CountryCurrency> {

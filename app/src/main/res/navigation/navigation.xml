@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/app_navigation"
+    app:startDestination="@id/payment_input_screen">
+    <fragment
+        android:id="@+id/payment_input_screen"
+        android:name="com.bitcoin.merchant.app.screens.PaymentInputFragment"
+        android:label="Cash register"
+        tools:layout="@layout/fragment_input_amount">
+        <action
+            android:id="@+id/nav_to_payment_request_screen"
+            app:destination="@id/payment_request_screen"
+            app:enterAnim="@anim/drop_down"
+            app:popExitAnim="@anim/drop_down_out"/>
+        <action
+            android:id="@+id/nav_to_transactions_screen"
+            app:destination="@id/transactions_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
+        <action
+            android:id="@+id/nav_to_settings_screen"
+            app:destination="@id/pin_code_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
+        <action
+            android:id="@+id/nav_to_settings_screen_bypass_security"
+            app:destination="@id/settings_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
+        <action
+            android:id="@+id/nav_to_about_screen"
+            app:destination="@id/about_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
+    </fragment>
+    <fragment
+        android:id="@+id/payment_request_screen"
+        android:name="com.bitcoin.merchant.app.screens.PaymentRequestFragment"
+        android:label="Payment Request"
+        tools:layout="@layout/fragment_request_payment">
+        <!-- Only BACK action allowed -->
+    </fragment>
+    <fragment
+        android:id="@+id/transactions_screen"
+        android:name="com.bitcoin.merchant.app.screens.TransactionsHistoryFragment"
+        android:label="Transactions"
+        tools:layout="@layout/fragment_transaction">
+        <!-- Only BACK action allowed -->
+    </fragment>
+    <fragment
+        android:id="@+id/pin_code_screen"
+        android:name="com.bitcoin.merchant.app.screens.PinCodeFragment"
+        android:label="PIN"
+        tools:layout="@layout/fragment_pin">
+        <action
+            android:id="@+id/nav_to_settings_screen"
+            app:destination="@id/settings_screen"
+            app:popUpTo="@id/payment_input_screen"
+            app:popUpToInclusive="false"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
+    </fragment>
+    <fragment
+        android:id="@+id/about_screen"
+        android:name="com.bitcoin.merchant.app.screens.AboutFragment"
+        android:label="About"
+        tools:layout="@layout/fragment_about">
+        <!-- Only BACK action allowed -->
+    </fragment>
+    <fragment
+        android:id="@+id/settings_screen"
+        android:name="com.bitcoin.merchant.app.screens.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings">
+        <action
+            android:id="@+id/nav_to_pin_code_screen"
+            app:destination="@id/pin_code_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/drop_down_out"/>
+    </fragment>
+</navigation>

@@ -1,13 +1,13 @@
 package com.bitcoin.merchant.app.database;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.util.Log;
 
-import com.bitcoin.merchant.app.util.OSUtil;
+import com.bitcoin.merchant.app.application.CashRegisterApplication;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.crashlytics.android.Crashlytics;
 
@@ -23,11 +23,11 @@ public class DBControllerV3 extends SQLiteOpenHelper {
     private static final String DB = "paymentsV3.db";
     private static final String TABLE = "payment";
     private static CharSequenceX pw;
-    private final Context context;
+    private String salt;
 
-    public DBControllerV3(Context context) {
-        super(context, DB, null, 1);
-        this.context = context;
+    public DBControllerV3(CashRegisterApplication app) {
+        super(app, DB, null, 1);
+        this.salt = Build.MANUFACTURER + Build.BRAND + Build.MODEL + Build.DEVICE + Build.PRODUCT + Build.SERIAL;
     }
 
     @Override
@@ -160,7 +160,7 @@ public class DBControllerV3 extends SQLiteOpenHelper {
 
     private String decryptValue(String value) {
         if (pw == null) {
-            pw = new CharSequenceX(PrefsUtil.MERCHANT_KEY_PIN + OSUtil.getInstance(context).getFootprint());
+            pw = new CharSequenceX(PrefsUtil.MERCHANT_KEY_PIN + salt);
         }
         return AESUtil.decrypt(value, pw, AESUtil.PinPbkdf2Iterations);
     }

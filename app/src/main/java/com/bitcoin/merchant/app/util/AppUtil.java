@@ -2,7 +2,7 @@ package com.bitcoin.merchant.app.util;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -16,35 +16,12 @@ import java.io.InputStreamReader;
 
 import info.blockchain.wallet.util.FormatsUtil;
 
-public class AppUtil {
+public abstract class AppUtil {
     public static final String TAG = "AppUtil";
     public static final Gson GSON = new Gson();
-    public static final String PACKAGE_BITCOIN_DOT_COM_WALLET = "com.bitcoin.mwallet";
     public static final String DEFAULT_CURRENCY_FIAT = "USD";
-    private static final boolean MISSING_WALLET_SIMULATED = false;
-    private static Context context = null;
-    private static AppUtil instance = null;
-    private volatile WalletUtil walletUtil;
 
     private AppUtil() {
-    }
-
-    public static AppUtil getInstance(Context ctx) {
-        context = ctx;
-        if (instance == null) {
-            instance = new AppUtil();
-        }
-        return instance;
-    }
-
-    public static boolean isWalletAppInstalled(Activity activity) {
-        PackageManager pm = activity.getPackageManager();
-        try {
-            pm.getPackageInfo(PACKAGE_BITCOIN_DOT_COM_WALLET, 0);
-            return !MISSING_WALLET_SIMULATED;
-        } catch (PackageManager.NameNotFoundException nnfe) {
-            return false;
-        }
     }
 
     public static boolean isValidAddress(String address) {
@@ -111,9 +88,7 @@ public class AppUtil {
     }
 
     public static void setReceivingAddress(Context context, String receiver) {
-        /*
-        We keep the storage format as legacy for compatibility purposes.
-         */
+        // We keep the storage format as legacy for compatibility purposes.
         if (AddressUtil.isValidCashAddr(receiver)) {
             try {
                 receiver = AddressConverter.toLegacyAddress(receiver);
@@ -134,9 +109,8 @@ public class AppUtil {
                 Log.e(TAG, "", e);
             }
         }
-        /*
-        If it's not a valid legacy address from the if statement above, just return as the text we are sending.
-         */
+        // If it's not a valid legacy address from the if statement above,
+        // just return as the text we are sending.
         return address;
     }
 
@@ -146,23 +120,16 @@ public class AppUtil {
         window.setStatusBarColor(activity.getResources().getColor(color));
     }
 
-    /**
-     * For performance reasons, we cache the wallet (reported in May 2019 on Lenovo Tab E8)
-     */
-    public synchronized WalletUtil getWallet() throws Exception {
-        String xPub = AppUtil.getReceivingAddress(context);
-        if (walletUtil == null || !walletUtil.isSameXPub(xPub)) {
-            walletUtil = new WalletUtil(xPub, context);
-        }
-        return walletUtil;
+    public static boolean isEmulator() {
+        return Build.PRODUCT.toLowerCase().contains("sdk");
     }
 
-    public boolean isValidXPub() {
+    public static boolean isValidXPub(Context context) {
         String receiver = getReceivingAddress(context);
         return FormatsUtil.getInstance().isValidXpub(receiver);
     }
 
-    public boolean hasValidReceiver() {
+    public static boolean hasValidReceiver(Context context) {
         String receiver = getReceivingAddress(context);
         return AddressUtil.isValidLegacy(receiver) || FormatsUtil.getInstance().isValidXpub(receiver);
     }
