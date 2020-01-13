@@ -19,6 +19,7 @@ import javax.net.ssl.HttpsURLConnection;
 /**
  * Implementation of AsyncTask that runs a network operation on a background thread.
  */
+@Deprecated
 public abstract class DownloadTask<R> {
     private Context activity;
 

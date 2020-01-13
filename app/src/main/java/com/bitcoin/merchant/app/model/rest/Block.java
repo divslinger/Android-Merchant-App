@@ -28,6 +28,7 @@ import java.util.Objects;
 "poolInfo": { "poolName": "BTC.com", "url": "https://btc.com/" }
 }
  */
+@Deprecated
 public class Block {
     // do NOT change names as they are used by Gson
     public String hash;

@@ -6,6 +6,7 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 
 import java.io.IOException;
 
+@Deprecated
 public class EchoWebSocketHandler extends TxWebSocketHandlerImpl {
     public EchoWebSocketHandler() {
         TAG = "NoOpSocket";

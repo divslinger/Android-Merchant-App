@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.bitcoin.merchant.app.R;
 
+@Deprecated
 public class PaymentTooHighDialog {
     private final Activity context;
 

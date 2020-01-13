@@ -62,18 +62,26 @@ public class MainActivity extends AppCompatActivity
         WebSocketListener {
     public static final String TAG = "MainActivity";
     private static final String APP_PACKAGE = "com.bitcoin.merchant.app";
+    @Deprecated
     public static final String ACTION_INTENT_SUBSCRIBE_TO_ADDRESS = APP_PACKAGE + "MainActivity.SUBSCRIBE_TO_ADDRESS";
     public static final String ACTION_INTENT_RECORD_TX = APP_PACKAGE + "MainActivity.ACTION_INTENT_RECORD_TX";
+    @Deprecated
     public static final String ACTION_INTENT_UPDATE_TX = APP_PACKAGE + "MainActivity.ACTION_INTENT_UPDATE_TX";
     public static final String ACTION_INTENT_EXPECTED_PAYMENT_RECEIVED = APP_PACKAGE + "MainActivity.ACTION_INTENT_EXPECTED_PAYMENT_RECEIVED";
     public static final String ACTION_INTENT_RECONNECT = APP_PACKAGE + "MainActivity.ACTION_INTENT_RECONNECT";
     public static final String ACTION_INTENT_SHOW_HISTORY = APP_PACKAGE + "MainActivity.ACTION_INTENT_SHOW_HISTORY";
+    @Deprecated
     public static final String ACTION_QUERY_MISSING_TX_IN_MEMPOOL = APP_PACKAGE + "MainActivity.ACTION_QUERY_MISSING_TX_IN_MEMPOOL";
+    @Deprecated
     public static final String ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO = APP_PACKAGE + "MainActivity.ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO";
+    @Deprecated
     public static final String ACTION_QUERY_ALL_UXTO = APP_PACKAGE + "MainActivity.ACTION_QUERY_ALL_UXTO";
+    @Deprecated
     public static final String ACTION_QUERY_ALL_UXTO_FINISHED = APP_PACKAGE + "MainActivity.ACTION_QUERY_ALL_UXTO_FINISHED";
     DrawerLayout mDrawerLayout;
+    @Deprecated
     private TxWebSocketHandler bitcoinDotComSocket = null;
+    @Deprecated
     private TxWebSocketHandler blockchainDotInfoSocket = null;
     private NetworkStateReceiver networkStateReceiver;
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -163,6 +171,7 @@ public class MainActivity extends AppCompatActivity
         return (CashRegisterApplication) getApplication();
     }
 
+    @Deprecated
     private void updateExistingTx(PaymentReceived payment) {
         Log.i(TAG, "update existing Tx:" + payment);
         PaymentProcessor processor = getApp().getPaymentProcessor();

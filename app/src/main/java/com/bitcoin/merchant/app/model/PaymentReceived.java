@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import com.bitcoin.merchant.app.network.ExpectedAmounts;
 
+@Deprecated
 public class PaymentReceived {
     public final String addr;
     public final long bchReceived;

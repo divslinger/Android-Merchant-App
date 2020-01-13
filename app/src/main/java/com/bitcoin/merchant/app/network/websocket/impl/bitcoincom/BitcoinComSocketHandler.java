@@ -14,6 +14,7 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 
 import java.io.IOException;
 
+@Deprecated
 public class BitcoinComSocketHandler extends TxWebSocketHandlerImpl {
     public BitcoinComSocketHandler() {
         TAG = "BitcoinComSocket";

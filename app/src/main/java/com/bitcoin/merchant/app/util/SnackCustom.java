@@ -7,6 +7,8 @@ import android.view.View;
 import com.bitcoin.merchant.app.R;
 import com.google.android.material.snackbar.Snackbar;
 
+@Deprecated
+// TODO replace/unify with Toast
 public class SnackCustom {
     public static void make(final Context context, final View view, final CharSequence text, String action, View.OnClickListener listener) {
         Snackbar snack = Snackbar.make(view, text, Snackbar.LENGTH_LONG).setAction(action, listener);

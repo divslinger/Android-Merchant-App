@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+@Deprecated
 public class ExpectedPayments {
     private static final ExpectedPayments instance = new ExpectedPayments();
     private final Map<String, ExpectedAmounts> addressToAmounts;

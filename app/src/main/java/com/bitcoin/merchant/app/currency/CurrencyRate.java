@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.TreeMap;
 
+@Deprecated
 public class CurrencyRate {
     public String code;
     public String name;

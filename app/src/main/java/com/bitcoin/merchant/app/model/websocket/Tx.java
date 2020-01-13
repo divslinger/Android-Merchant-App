@@ -6,6 +6,7 @@ import java.util.Arrays;
 // "txid":"ABCDEF...", "fees":0, "confirmations":0, "amount":27420,
 // "outputs": [{"address":"1...", "value":27420}]
 // }
+@Deprecated
 public class Tx {
     // do NOT change names as they are used by Gson
     public String txid;

@@ -23,6 +23,7 @@ import java.util.Arrays;
  */
 // https://rest.bitcoin.com/v2/address/unconfirmed/#
 // https://rest.bitcoin.com/v2/address/utxo/#
+@Deprecated
 public class Utxos {
     // do NOT change names as they are used by Gson
     public String legacyAddress;

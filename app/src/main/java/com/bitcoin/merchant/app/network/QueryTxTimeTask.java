@@ -13,6 +13,7 @@ import com.bitcoin.merchant.app.model.PaymentReceived;
 
 import java.util.List;
 
+@Deprecated
 public class QueryTxTimeTask extends DownloadTask<Block> {
     private final Context context;
     private final boolean checkExpectedPayment;

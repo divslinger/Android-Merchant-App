@@ -18,6 +18,7 @@ import java.util.Locale;
 
 import static com.bitcoin.merchant.app.MainActivity.getNav;
 
+@Deprecated
 public class PaymentTooLowDialog {
     private final Activity context;
 

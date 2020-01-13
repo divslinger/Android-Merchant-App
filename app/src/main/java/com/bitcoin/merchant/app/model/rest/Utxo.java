@@ -2,6 +2,7 @@ package com.bitcoin.merchant.app.model.rest;
 
 import java.util.Objects;
 
+@Deprecated
 public class Utxo {
     // do NOT change names as they are used by Gson
     public String txid;

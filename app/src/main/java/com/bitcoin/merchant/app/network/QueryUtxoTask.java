@@ -18,6 +18,7 @@ import com.bitcoin.merchant.app.util.PrefsUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class QueryUtxoTask extends DownloadTask<Utxos> {
     public static final String TAG = "QueryUtxoTask";
     private final CashRegisterApplication app;

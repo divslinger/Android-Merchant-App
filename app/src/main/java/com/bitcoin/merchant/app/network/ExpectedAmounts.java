@@ -1,5 +1,6 @@
 package com.bitcoin.merchant.app.network;
 
+@Deprecated
 public class ExpectedAmounts {
     public static final ExpectedAmounts UNDEFINED = new ExpectedAmounts(0, null);
     public final long bch;

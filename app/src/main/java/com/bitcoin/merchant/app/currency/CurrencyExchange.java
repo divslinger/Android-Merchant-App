@@ -25,6 +25,7 @@ public class CurrencyExchange {
     public static final String TAG = "CurrencyExchange";
     private static CurrencyExchange instance;
     private final Context context;
+    @Deprecated
     private final Map<String, CurrencyRate> tickerToRate = Collections.synchronizedMap(new TreeMap<String, CurrencyRate>());
     private final CurrencyToLocales currencyToLocales;
     private final Map<String, String> tickerToSymbol;
@@ -106,6 +107,7 @@ public class CurrencyExchange {
     }
 
     // WARNING: country & locale can be null due to legacy reasons
+    @Deprecated
     public CountryCurrency getCountryCurrency(String currency, String country, String locale) {
         CurrencyRate cr = getCurrencyRate(currency);
         if (cr == null) {
@@ -135,6 +137,7 @@ public class CurrencyExchange {
         return (now - lastUpdate) < MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS;
     }
 
+    @Deprecated
     private void checkCurrencyUpdate() {
         if (isUpToDate()) {
             return;
@@ -175,6 +178,7 @@ public class CurrencyExchange {
         editor.commit();
     }
 
+    @Deprecated
     public boolean isTickerSupported(String ticker) {
         return getCurrencyRate(ticker) != null;
     }
@@ -184,6 +188,7 @@ public class CurrencyExchange {
         return name == null ? "" : name;
     }
 
+    @Deprecated
     public Double getCurrencyPrice(String ticker) {
         CurrencyRate rate = getCurrencyRate(ticker);
         Double price = (rate == null) ? null : rate.rate;
@@ -194,6 +199,7 @@ public class CurrencyExchange {
         return tickerToSymbol.get(ticker);
     }
 
+    @Deprecated
     public CurrencyRate getCurrencyRate(String ticker) {
         return (ticker != null) && (ticker.length() > 0) ? tickerToRate.get(ticker) : null;
     }

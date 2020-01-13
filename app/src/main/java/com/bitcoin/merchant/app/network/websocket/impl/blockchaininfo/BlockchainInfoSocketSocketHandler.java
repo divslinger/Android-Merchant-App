@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+@Deprecated
 public class BlockchainInfoSocketSocketHandler extends TxWebSocketHandlerImpl {
     public BlockchainInfoSocketSocketHandler() {
         TAG = "BlockchainInfoSocket";
