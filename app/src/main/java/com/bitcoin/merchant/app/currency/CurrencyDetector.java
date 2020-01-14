@@ -34,11 +34,12 @@ public class CurrencyDetector {
             Log.e(TAG, "Currency", e);
             Crashlytics.logException(e);
             // check if currency can be determined from the country code
-            if ((countryCode != null) && (countryCode.length() >= 2)) {
+            if (countryCode.length() >= 2) {
+                // TODO avoid duplicate loading
                 Map<String, String> countryToCurrency = AppUtil.readFromJsonFile(context, "country_to_currency.json", HashMap.class);
                 currencyCode = countryToCurrency.get(countryCode.trim().substring(0, 2).toUpperCase());
             }
         }
-        return CurrencyExchange.getInstance(context).isTickerSupported(currencyCode) ? currencyCode : "";
+        return CurrencyHelper.getInstance(context).isCurrencySupported(currencyCode) ? currencyCode : "";
     }
 }

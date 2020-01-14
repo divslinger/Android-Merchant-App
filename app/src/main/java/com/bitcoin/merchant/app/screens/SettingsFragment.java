@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -27,7 +26,7 @@ import androidx.core.content.ContextCompat;
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.ScanQRCodeActivity;
 import com.bitcoin.merchant.app.currency.CountryCurrency;
-import com.bitcoin.merchant.app.currency.CurrencyExchange;
+import com.bitcoin.merchant.app.currency.CurrencyHelper;
 import com.bitcoin.merchant.app.screens.dialogs.AddNewAddressDialog;
 import com.bitcoin.merchant.app.screens.dialogs.CurrencySelectionDialog;
 import com.bitcoin.merchant.app.screens.dialogs.MerchantNameEditorDialog;
@@ -71,24 +70,9 @@ public class SettingsFragment extends ToolbarAwareFragment {
         addOptionCurrency();
         addOptionAddress();
         addOptionPin();
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.onBackPressed();
-            }
-        });
-        btnLocalBitcoin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openUrl("https://local.bitcoin.com");
-            }
-        });
-        btnThePit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openUrl("https://exchange.bitcoin.com");
-            }
-        });
+        btnSave.setOnClickListener(v -> activity.onBackPressed());
+        btnLocalBitcoin.setOnClickListener(v -> openUrl("https://local.bitcoin.com"));
+        btnThePit.setOnClickListener(v -> openUrl("https://exchange.bitcoin.com"));
         setToolbarAsBackButton();
         setToolbarTitle(R.string.menu_settings);
         return rootView;
@@ -102,22 +86,12 @@ public class SettingsFragment extends ToolbarAwareFragment {
         String merchantName = PrefsUtil.getInstance(activity).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "...");
         final TextView tvMerchantName = rootView.findViewById(R.id.et_merchant_name);
         tvMerchantName.setText(merchantName);
-        lvMerchantName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new MerchantNameEditorDialog(activity).show(tvMerchantName);
-            }
-        });
+        lvMerchantName.setOnClickListener(v -> new MerchantNameEditorDialog(activity).show(tvMerchantName));
     }
 
     private void addOptionCurrency() {
         setCurrencySummary(activity);
-        lvLocalCurrency.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new CurrencySelectionDialog(SettingsFragment.this).show();
-            }
-        });
+        lvLocalCurrency.setOnClickListener(v -> new CurrencySelectionDialog(SettingsFragment.this).show());
     }
 
     private void addOptionAddress() {
@@ -126,23 +100,13 @@ public class SettingsFragment extends ToolbarAwareFragment {
                 ? AppUtil.convertToBitcoinCash(AppUtil.getReceivingAddress(activity))
                 : "...\n\n" + getString(R.string.options_explain_payment_address);
         tvPaymentAddress.setText(summary);
-        lvPaymentAddress.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new AddNewAddressDialog(SettingsFragment.this).show();
-            }
-        });
+        lvPaymentAddress.setOnClickListener(v -> new AddNewAddressDialog(SettingsFragment.this).show());
     }
 
     private void addOptionPin() {
         final TextView tvPinCode = rootView.findViewById(R.id.et_pin_code);
         tvPinCode.setText("####");
-        lvPinCode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                changePin();
-            }
-        });
+        lvPinCode.setOnClickListener(v -> changePin());
     }
 
     private void changePin() {
@@ -155,7 +119,7 @@ public class SettingsFragment extends ToolbarAwareFragment {
         String currency = AppUtil.getCurrency(context);
         String country = AppUtil.getCountry(context);
         String locale = AppUtil.getLocale(context);
-        CountryCurrency cc = CurrencyExchange.getInstance(context).getCountryCurrency(currency, country, locale);
+        CountryCurrency cc = CurrencyHelper.getInstance(context).getCountryCurrency(currency, country, locale);
         if (cc != null) {
             setCurrencySummary(cc);
         }
@@ -181,11 +145,7 @@ public class SettingsFragment extends ToolbarAwareFragment {
         builder.setTitle(R.string.options_payment_address)
                 .setMessage(R.string.obligatory_receiver)
                 .setCancelable(false)
-                .setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                    }
-                });
+                .setPositiveButton(R.string.prompt_ok, (dialog, whichButton) -> dialog.dismiss());
         builder.create().show();
     }
 
@@ -276,12 +236,7 @@ public class SettingsFragment extends ToolbarAwareFragment {
                 try {
                     boolean synced = getApp().getWallet().syncXpub();
                     if (synced) {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                ToastCustom.makeText(activity, activity.getString(R.string.synced_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_OK);
-                            }
-                        });
+                        activity.runOnUiThread(() -> ToastCustom.makeText(activity, activity.getString(R.string.synced_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_OK));
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "", e);

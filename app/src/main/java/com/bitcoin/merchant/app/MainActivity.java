@@ -2,21 +2,16 @@ package com.bitcoin.merchant.app;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,21 +31,9 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.bitcoin.merchant.app.application.CashRegisterApplication;
-import com.bitcoin.merchant.app.database.PaymentRecord;
-import com.bitcoin.merchant.app.model.PaymentReceived;
-import com.bitcoin.merchant.app.network.ExpectedAmounts;
-import com.bitcoin.merchant.app.network.ExpectedPayments;
-import com.bitcoin.merchant.app.network.NetworkStateReceiver;
-import com.bitcoin.merchant.app.network.QueryUtxoTask;
-import com.bitcoin.merchant.app.network.QueryUtxoType;
-import com.bitcoin.merchant.app.network.websocket.TxWebSocketHandler;
-import com.bitcoin.merchant.app.network.websocket.WebSocketListener;
-import com.bitcoin.merchant.app.network.websocket.impl.bitcoincom.BitcoinComSocketHandler;
-import com.bitcoin.merchant.app.network.websocket.impl.blockchaininfo.BlockchainInfoSocketSocketHandler;
-import com.bitcoin.merchant.app.screens.TransactionsHistoryFragment;
+import com.bitcoin.merchant.app.application.NetworkStateReceiver;
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AppUtil;
-import com.bitcoin.merchant.app.application.PaymentProcessor;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.navigation.NavigationView;
@@ -58,60 +41,17 @@ import com.google.android.material.navigation.NavigationView;
 import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity
-        implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback,
-        WebSocketListener {
+        implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback {
     public static final String TAG = "MainActivity";
     private static final String APP_PACKAGE = "com.bitcoin.merchant.app";
-    @Deprecated
-    public static final String ACTION_INTENT_SUBSCRIBE_TO_ADDRESS = APP_PACKAGE + "MainActivity.SUBSCRIBE_TO_ADDRESS";
-    public static final String ACTION_INTENT_RECORD_TX = APP_PACKAGE + "MainActivity.ACTION_INTENT_RECORD_TX";
-    @Deprecated
-    public static final String ACTION_INTENT_UPDATE_TX = APP_PACKAGE + "MainActivity.ACTION_INTENT_UPDATE_TX";
-    public static final String ACTION_INTENT_EXPECTED_PAYMENT_RECEIVED = APP_PACKAGE + "MainActivity.ACTION_INTENT_EXPECTED_PAYMENT_RECEIVED";
-    public static final String ACTION_INTENT_RECONNECT = APP_PACKAGE + "MainActivity.ACTION_INTENT_RECONNECT";
     public static final String ACTION_INTENT_SHOW_HISTORY = APP_PACKAGE + "MainActivity.ACTION_INTENT_SHOW_HISTORY";
-    @Deprecated
-    public static final String ACTION_QUERY_MISSING_TX_IN_MEMPOOL = APP_PACKAGE + "MainActivity.ACTION_QUERY_MISSING_TX_IN_MEMPOOL";
-    @Deprecated
-    public static final String ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO = APP_PACKAGE + "MainActivity.ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO";
-    @Deprecated
-    public static final String ACTION_QUERY_ALL_UXTO = APP_PACKAGE + "MainActivity.ACTION_QUERY_ALL_UXTO";
-    @Deprecated
-    public static final String ACTION_QUERY_ALL_UXTO_FINISHED = APP_PACKAGE + "MainActivity.ACTION_QUERY_ALL_UXTO_FINISHED";
     DrawerLayout mDrawerLayout;
-    @Deprecated
-    private TxWebSocketHandler bitcoinDotComSocket = null;
-    @Deprecated
-    private TxWebSocketHandler blockchainDotInfoSocket = null;
     private NetworkStateReceiver networkStateReceiver;
     protected BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
-            if (ACTION_INTENT_SUBSCRIBE_TO_ADDRESS.equals(intent.getAction())) {
-                bitcoinDotComSocket.subscribeToAddress(intent.getStringExtra("address"));
-                blockchainDotInfoSocket.subscribeToAddress(intent.getStringExtra("address"));
-            }
-            if (ACTION_INTENT_RECONNECT.equals(intent.getAction())
-                    || ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-                reconnectIfNecessary();
-            }
-            if (ACTION_INTENT_RECORD_TX.equals(intent.getAction())) {
-                recordNewTx(new PaymentReceived(intent));
-            }
-            if (ACTION_INTENT_UPDATE_TX.equals(intent.getAction())) {
-                updateExistingTx(new PaymentReceived(intent));
-            }
             if (ACTION_INTENT_SHOW_HISTORY.equals(intent.getAction())) {
                 getNav().navigate(R.id.transactions_screen);
-            }
-            if (ACTION_QUERY_MISSING_TX_IN_MEMPOOL.equals(intent.getAction())) {
-                new QueryUtxoTask(getApp(), QueryUtxoType.UNCONFIRMED).execute();
-            }
-            if (ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO.equals(intent.getAction())) {
-                new QueryUtxoTask(getApp(), QueryUtxoType.UNCONFIRMED, QueryUtxoType.ALL).execute();
-            }
-            if (ACTION_QUERY_ALL_UXTO.equals(intent.getAction())) {
-                new QueryUtxoTask(getApp(), QueryUtxoType.ALL).execute();
             }
         }
     };
@@ -129,92 +69,9 @@ public class MainActivity extends AppCompatActivity
         return getNav(this);
     }
 
-    private void reconnectIfNecessary() {
-        final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        final NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
-        if (ni != null && ni.isConnectedOrConnecting()) {
-            if (bitcoinDotComSocket != null && !bitcoinDotComSocket.isConnected()) {
-                bitcoinDotComSocket.start();
-            }
-            if (blockchainDotInfoSocket != null && !blockchainDotInfoSocket.isConnected()) {
-                blockchainDotInfoSocket.start();
-            }
-        }
-    }
-
-    private void recordNewTx(PaymentReceived payment) {
-        Log.i(TAG, "record potential new Tx:" + payment);
-        PaymentProcessor processor = getApp().getPaymentProcessor();
-        if (processor.isAlreadyRecorded(payment)) {
-            Log.i(TAG, "TX was already in DB: " + payment);
-            return; // already in the DB, nothing to do
-        }
-        ContentValues tx = processor.recordInDatabase(payment);
-        boolean paymentExpected = payment.bchExpected > 0;
-        if (paymentExpected) {
-            if (payment.bchReceived >= payment.bchExpected) {
-                ExpectedPayments.getInstance().removePayment(payment.addr);
-            }
-            if (payment.confirmations <= 2) {
-                Intent intent = new Intent(MainActivity.ACTION_INTENT_EXPECTED_PAYMENT_RECEIVED);
-                payment.toIntent(intent);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-            }
-        }
-        addTxToHistory(tx);
-        if (paymentExpected) {
-            soundAlert();
-        }
-    }
 
     public CashRegisterApplication getApp() {
         return (CashRegisterApplication) getApplication();
-    }
-
-    @Deprecated
-    private void updateExistingTx(PaymentReceived payment) {
-        Log.i(TAG, "update existing Tx:" + payment);
-        PaymentProcessor processor = getApp().getPaymentProcessor();
-        ContentValues values = processor.getExistingRecord(payment);
-        if (values != null) {
-            PaymentRecord record = new PaymentRecord(values);
-            record.confirmations = Math.max(payment.confirmations, record.confirmations);
-            if ((record.timeInSec == 0) && (payment.timeInSec > 0)) {
-                record.timeInSec = payment.timeInSec;
-            }
-            // Reuse existing content to preserve the db id
-            record.toContentValues(values);
-            processor.updateInDatabase(values);
-            updateTxToHistory(values);
-        } else {
-            Log.e(TAG, "TX not found in DB: " + payment.txHash);
-        }
-    }
-
-    private void addTxToHistory(ContentValues tx) {
-        TransactionsHistoryFragment f = null; // TODO
-        // f.addTx(tx);
-    }
-
-    private void updateTxToHistory(ContentValues tx) {
-        TransactionsHistoryFragment f = null; // TODO
-        // f.updateTx(tx);
-    }
-
-    public void soundAlert() {
-        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        if (audioManager != null && audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
-            MediaPlayer mp;
-            mp = MediaPlayer.create(this, R.raw.alert);
-            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mp.reset();
-                    mp.release();
-                }
-            });
-            mp.start();
-        }
     }
 
     @Override
@@ -228,13 +85,6 @@ public class MainActivity extends AppCompatActivity
         setTitle(""); // clear "Bitcoin Cash Register" from toolBar when opens on Payment Input screen
         setNavigationDrawer();
         startWebsockets();
-        // scan for missing funds at least one
-        if (!PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_SCANNED_ALL_MISSING_FUNDS, false)) {
-            PrefsUtil.getInstance(this).setValue(PrefsUtil.MERCHANT_KEY_SCANNED_ALL_MISSING_FUNDS, true);
-            new QueryUtxoTask(getApp(), QueryUtxoType.ALL).execute();
-        } else {
-            new QueryUtxoTask(getApp(), QueryUtxoType.UNCONFIRMED).execute();
-        }
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View view, float v) {
@@ -262,41 +112,14 @@ public class MainActivity extends AppCompatActivity
         System.out.println("Stored address: " + AppUtil.getReceivingAddress(this));
     }
 
-    /**
-     * Only used for debugging purposes
-     */
-    private void resetPaymentTime(String tx) {
-        PaymentProcessor processor = getApp().getPaymentProcessor();
-        ContentValues values = processor.getExistingRecord(new PaymentReceived("", 0, tx, 0, 0, ExpectedAmounts.UNDEFINED));
-        if (values != null) {
-            PaymentRecord record = new PaymentRecord(values);
-            record.timeInSec = 0;
-            record.toContentValues(values);
-            processor.updateInDatabase(values);
-        }
-    }
-
     private void startWebsockets() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_INTENT_SUBSCRIBE_TO_ADDRESS);
-        filter.addAction(ACTION_INTENT_RECONNECT);
-        filter.addAction(ACTION_INTENT_RECORD_TX);
-        filter.addAction(ACTION_INTENT_UPDATE_TX);
         filter.addAction(ACTION_INTENT_SHOW_HISTORY);
-        filter.addAction(ACTION_QUERY_MISSING_TX_IN_MEMPOOL);
-        filter.addAction(ACTION_QUERY_MISSING_TX_THEN_ALL_UTXO);
-        filter.addAction(ACTION_QUERY_ALL_UXTO);
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
         filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         networkStateReceiver = new NetworkStateReceiver();
         registerReceiver(networkStateReceiver, filter);
-        bitcoinDotComSocket = new BitcoinComSocketHandler();
-        bitcoinDotComSocket.setListener(this);
-        bitcoinDotComSocket.start();
-        blockchainDotInfoSocket = new BlockchainInfoSocketSocketHandler();
-        blockchainDotInfoSocket.setListener(this);
-        blockchainDotInfoSocket.start();
     }
 
     @Override
@@ -337,8 +160,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        bitcoinDotComSocket.stop();
-        blockchainDotInfoSocket.stop();
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
         unregisterReceiver(networkStateReceiver);
         super.onDestroy();
@@ -372,13 +193,6 @@ public class MainActivity extends AppCompatActivity
         TextView tvName = headerView.findViewById(R.id.drawer_title);
         String drawerTitle = PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "");
         tvName.setText(drawerTitle);
-    }
-
-    @Override
-    public void onIncomingPayment(PaymentReceived p) {
-        Intent intent = new Intent(MainActivity.ACTION_INTENT_RECORD_TX);
-        p.toIntent(intent);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public void setToolbar() {

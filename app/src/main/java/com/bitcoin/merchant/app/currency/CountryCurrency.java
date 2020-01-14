@@ -7,12 +7,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class CountryCurrency {
-    public static final Comparator<? super CountryCurrency> BY_NAME = new Comparator<CountryCurrency>() {
-        @Override
-        public int compare(CountryCurrency o1, CountryCurrency o2) {
-            return o1.countryName.compareTo(o2.countryName);
-        }
-    };
+    public static final Comparator<? super CountryCurrency> BY_NAME =
+            (Comparator<CountryCurrency>) (o1, o2) -> o1.countryName.compareTo(o2.countryName);
     private static final Map<String, Integer> countryToImage = new TreeMap<>();
 
     static {
@@ -264,16 +260,22 @@ public class CountryCurrency {
 
     public final String countryName;
     public final CountryLocales countryLocales;
-    public final CurrencyRate currencyRate;
     public final int image;
+    public final String currencyCode;
+    public final String symbol;
     private final String description;
 
-    public CountryCurrency(CountryLocales countryLocales, String countryName, CurrencyRate cr) {
+    public CountryCurrency(CountryLocales countryLocales, String countryName, String currencyCode, String symbol) {
         this.countryName = countryName;
         this.countryLocales = countryLocales;
-        this.currencyRate = cr;
-        this.image = countryToImage.get(countryLocales.country);
-        this.description = countryName + "\n" + cr.toString();
+        this.image = countryToImage.get(countryLocales.countryCode.toUpperCase());
+        this.currencyCode = currencyCode;
+        this.symbol = symbol;
+        this.description = countryName + "\n" + currencyCode + (!hasCustomSymbol() ? "" : " - " + symbol);
+    }
+
+    public boolean hasCustomSymbol() {
+        return !currencyCode.equals(symbol);
     }
 
     private static void add(String country, int resource) {

@@ -2,17 +2,18 @@ package com.bitcoin.merchant.app.currency;
 
 import android.util.Log;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Locale;
 
 public class CountryLocales {
-    public String country;
-    public String locales;
+    @SerializedName("country")
+    public final String countryCode; // 2 characters code
+    @SerializedName("locales")
+    public final String locales;
 
-    public CountryLocales() {
-    }
-
-    public CountryLocales(String country, String locales) {
-        this.country = country;
+    public CountryLocales(String countryCode, String locales) {
+        this.countryCode = countryCode;
         this.locales = locales;
     }
 
@@ -38,7 +39,7 @@ public class CountryLocales {
     @Override
     public String toString() {
         return "CountryLocales{" +
-                "country='" + country + '\'' +
+                "country='" + countryCode + '\'' +
                 ", locales='" + locales + '\'' +
                 '}';
     }

@@ -54,7 +54,7 @@
             android:name="com.bitcoin.merchant.app.ScanQRCodeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
-        <receiver android:name="com.bitcoin.merchant.app.network.NetworkStateReceiver">
+        <receiver android:name="com.bitcoin.merchant.app.application.NetworkStateReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />

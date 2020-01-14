@@ -1,10 +1,7 @@
-package com.bitcoin.merchant.app.network.websocket.impl;
+package org.bitcoindotcom.bchprocessor.bip70;
 
 import android.util.Log;
 
-import com.bitcoin.merchant.app.network.ExpectedPayments;
-import com.bitcoin.merchant.app.network.websocket.TxWebSocketHandler;
-import com.bitcoin.merchant.app.network.websocket.WebSocketListener;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
@@ -21,27 +18,16 @@ import java.util.Set;
  * and without ACTION_INTENT_RECONNECT being sent by the ConnectivityManager.
  * The number of Thread will stay constant about 17 or 18 on OS v5.
  */
-public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
+public abstract class WebSocketHandler {
     private static final long PING_INTERVAL = 20 * 1000L; // ping every 20 seconds
     private final WebSocketFactory webSocketFactory;
-    protected WebSocketListener webSocketListener;
     protected String TAG = "WebSocketHandler";
     private volatile ConnectionHandler handler;
 
-    public TxWebSocketHandlerImpl() {
+    public WebSocketHandler() {
         this.webSocketFactory = new WebSocketFactory();
     }
 
-    private static String getSubscribeMessage(String address) {
-        return "{\"op\":\"addr_sub\", \"addr\":\"" + address + "\"}";
-    }
-
-    @Override
-    public void setListener(WebSocketListener webSocketListener) {
-        this.webSocketListener = webSocketListener;
-    }
-
-    @Override
     public void start() {
         try {
             Log.i(TAG, "start threads:" + Thread.activeCount());
@@ -52,14 +38,18 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
         }
     }
 
-    @Override
+    public void setAutoReconnect(boolean autoReconnect) {
+        if (handler != null) {
+            handler.setAutoReconnect(autoReconnect);
+        }
+    }
+
     public void stop() {
         if (handler != null) {
             handler.stop();
         }
     }
 
-    @Override
     public boolean isConnected() {
         return handler != null && handler.isConnected() && !handler.isBroken();
     }
@@ -70,23 +60,19 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
         }
     }
 
-    @Override
-    public synchronized void subscribeToAddress(String address) {
-        send(getSubscribeMessage(address));
-    }
-
     abstract protected WebSocket createWebSocket(WebSocketFactory factory) throws IOException;
 
     abstract protected void parseTx(String message) throws Exception;
 
     private class ConnectionThread extends Thread {
         public ConnectionThread() {
-            setName("ConnectWebSocket");
+            setName("Bip70WebSocket");
             setDaemon(true);
         }
 
-        @Override
         public void run() {
+            // The loop is only required for the initial connection
+            // after that reconnections are being handled by the WebSocket
             long doubleBackOff = 1000;
             while (true) {
                 try {
@@ -109,43 +95,36 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
         public static final int MINUTE_IN_MS = 60 * 1000;
         private final Set<String> sentMessageSet = new HashSet<>();
         private final WebSocket mConnection;
-        private volatile boolean autoReconnect = true;
         private long timeLastAlive;
+        private volatile boolean autoReconnect = true;
 
         public ConnectionHandler() throws Exception {
             timeLastAlive = System.currentTimeMillis();
-            mConnection = createWebSocket(TxWebSocketHandlerImpl.this.webSocketFactory)
+            mConnection = createWebSocket(WebSocketHandler.this.webSocketFactory)
                     .recreate()
                     .addListener(this);
             mConnection.setPingInterval(PING_INTERVAL);
             mConnection.connect();
-            for (String address : ExpectedPayments.getInstance().getAddresses()) {
-                directSend(getSubscribeMessage(address));
-            }
             timeLastAlive = System.currentTimeMillis();
         }
 
-        @Override
         public void onPongFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
             super.onPongFrame(websocket, frame);
             timeLastAlive = System.currentTimeMillis();
             Log.d(TAG, "PongSuccess threads:" + Thread.activeCount());
         }
 
-        @Override
         public void onPingFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
             super.onPingFrame(websocket, frame);
             timeLastAlive = System.currentTimeMillis();
             Log.d(TAG, "PingSuccess threads:" + Thread.activeCount());
         }
 
-        @Override
         public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
             super.onConnected(websocket, headers);
             Log.i(TAG, "onConnected threads:" + Thread.activeCount());
         }
 
-        @Override
         public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
             super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer);
             Log.e(TAG, "onDisconnected threads:" + Thread.activeCount());
@@ -155,13 +134,16 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
             }
         }
 
-        @Override
         public void onTextMessage(WebSocket websocket, String message) {
             try {
                 parseTx(message);
             } catch (Exception e) {
                 Log.e(TAG, message, e);
             }
+        }
+
+        public void setAutoReconnect(boolean autoReconnect) {
+            this.autoReconnect = autoReconnect;
         }
 
         public boolean isConnected() {

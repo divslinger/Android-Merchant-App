@@ -7,7 +7,7 @@ import android.os.Looper;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.bitcoin.merchant.app.currency.CurrencyExchange;
+import com.bitcoin.merchant.app.currency.CurrencyHelper;
 
 public class SplashActivity extends Activity {
     @Override
@@ -23,7 +23,7 @@ public class SplashActivity extends Activity {
                     sleep(300);
                 } catch (InterruptedException ie) {
                 }
-                CurrencyExchange.getInstance(SplashActivity.this);
+                CurrencyHelper.getInstance(SplashActivity.this);
                 Intent mainActivityIntent = new Intent(SplashActivity.this, MainActivity.class);
                 mainActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(mainActivityIntent);

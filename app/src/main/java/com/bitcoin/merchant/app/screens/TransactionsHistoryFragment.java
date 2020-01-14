@@ -6,7 +6,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
@@ -22,7 +21,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -41,6 +39,8 @@ import com.bitcoin.merchant.app.util.MonetaryUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.crashlytics.android.Crashlytics;
 
+import org.bitcoindotcom.bchprocessor.Action;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +56,7 @@ public class TransactionsHistoryFragment extends ToolbarAwareFragment {
     private final BroadcastReceiver fragmentBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (MainActivity.ACTION_QUERY_ALL_UXTO_FINISHED.equals(intent.getAction())) {
+            if (Action.QUERY_ALL_TX_FROM_BITCOIN_COM_PAY.equals(intent.getAction())) {
                 swipeLayout.setRefreshing(false);
             }
         }
@@ -84,7 +84,7 @@ public class TransactionsHistoryFragment extends ToolbarAwareFragment {
                 R.color.bitcoindotcom_green,
                 R.color.bitcoindotcom_darkest_green);
         IntentFilter filter = new IntentFilter();
-        filter.addAction(MainActivity.ACTION_QUERY_ALL_UXTO_FINISHED);
+        filter.addAction(Action.QUERY_ALL_TX_FROM_BITCOIN_COM_PAY);
         LocalBroadcastManager.getInstance(activity).registerReceiver(fragmentBroadcastReceiver, filter);
         return rootView;
     }
@@ -101,12 +101,7 @@ public class TransactionsHistoryFragment extends ToolbarAwareFragment {
         listView = rootView.findViewById(R.id.txList);
         noTxHistoryLv = rootView.findViewById(R.id.no_tx_history_lv);
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                showTransactionMenu(id);
-            }
-        });
+        listView.setOnItemClickListener((parent, view, position, id) -> showTransactionMenu(id));
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -146,26 +141,24 @@ public class TransactionsHistoryFragment extends ToolbarAwareFragment {
                         "Copy transaction",
                         "Copy address",
                 },
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        switch (which) {
-                            case 0: {
-                                openExplorer("https://explorer.bitcoin.com/bch/tx/" + tx);
-                                break;
-                            }
-                            case 1: {
-                                openExplorer("https://explorer.bitcoin.com/bch/address/" + address);
-                                break;
-                            }
-                            case 2: {
-                                copyToClipboard(tx);
-                                break;
-                            }
-                            case 3: {
-                                copyToClipboard(address);
-                                break;
-                            }
+                (dialog, which) -> {
+                    dialog.dismiss();
+                    switch (which) {
+                        case 0: {
+                            openExplorer("https://explorer.bitcoin.com/bch/tx/" + tx);
+                            break;
+                        }
+                        case 1: {
+                            openExplorer("https://explorer.bitcoin.com/bch/address/" + address);
+                            break;
+                        }
+                        case 2: {
+                            copyToClipboard(tx);
+                            break;
+                        }
+                        case 3: {
+                            copyToClipboard(address);
+                            break;
                         }
                     }
                 });
@@ -191,47 +184,9 @@ public class TransactionsHistoryFragment extends ToolbarAwareFragment {
         return !(this.isRemoving() || activity == null || this.isDetached() || !this.isAdded() || this.getView() == null);
     }
 
-    public void addTx(final ContentValues val) {
-        try {
-            if (!isSafe()) {
-                return;
-            }
-            setTxListVisibility(true);
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (!isSafe()) {
-                        return;
-                    }
-                    adapter.addNewPayment(val);
-                }
-            });
-        } catch (Exception e) {
-            Log.e(TAG, "addTx", e);
-            Crashlytics.logException(e);
-        }
-    }
-
-    public void updateTx(final ContentValues val) {
-        try {
-            if (!isSafe()) {
-                return;
-            }
-            setTxListVisibility(true);
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    new LoadTxFromDatabaseTask(false).execute();
-                }
-            });
-        } catch (Exception e) {
-            Log.e(TAG, "updateTx", e);
-            Crashlytics.logException(e);
-        }
-    }
-
     private void findAllPotentialMissingTx() {
-        LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(MainActivity.ACTION_QUERY_ALL_UXTO));
+        // TODO
+        LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(Action.QUERY_ALL_TX_FROM_BITCOIN_COM_PAY));
     }
 
     private class LoadTxFromDatabaseTask extends AsyncTask<Void, Void, ArrayList<ContentValues>> {
@@ -294,16 +249,6 @@ public class TransactionsHistoryFragment extends ToolbarAwareFragment {
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
-        public void addNewPayment(ContentValues val) {
-            for (ContentValues c : mListItems) {
-                if (val.getAsString("tx").equals(c.getAsString("tx"))) {
-                    return; // already added
-                }
-            }
-            mListItems.add(0, val);
-            notifyDataSetChanged();
-        }
-
         public void reset(ArrayList<ContentValues> vals) {
             mListItems.clear();
             mListItems.addAll(vals);
@@ -355,7 +300,7 @@ public class TransactionsHistoryFragment extends ToolbarAwareFragment {
             SpannableStringBuilder coinSpan = new SpannableStringBuilder("BCH");
             coinSpan.setSpan(new RelativeSizeSpan((float) 0.75), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             TextView coinView = view.findViewById(R.id.tv_amount_coin);
-            String displayValue = MonetaryUtil.getInstance(activity).getDisplayAmountWithFormatting(amount);
+            String displayValue = MonetaryUtil.getInstance().getDisplayAmountWithFormatting(amount);
             coinView.setText(displayValue + " " + coinSpan);
             // display fiat amount
             TextView fiatView = view.findViewById(R.id.tv_amount_fiat);
