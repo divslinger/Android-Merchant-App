@@ -28,25 +28,23 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bitcoin.merchant.app.R;
-import com.bitcoin.merchant.app.application.CashRegisterApplication;
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.DialogUtil;
+import com.bitcoin.merchant.app.util.PaymentTarget;
 import com.bitcoin.merchant.app.util.ToastCustom;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.encode.QRCodeEncoder;
 
-import org.apache.commons.lang3.StringUtils;
 import org.bitcoindotcom.bchprocessor.Action;
 import org.bitcoindotcom.bchprocessor.bip70.Bip70Manager;
 import org.bitcoindotcom.bchprocessor.bip70.Bip70PayService;
-import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceCreation;
+import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceRequest;
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus;
 
 import java.net.SocketTimeoutException;
-import java.util.UUID;
 
 import retrofit2.Response;
 
@@ -144,26 +142,20 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         initViews(v);
         setToolbarVisible(false);
         registerReceiver();
-        bip70PayService = Bip70PayService.create(getResources().getString(R.string.bip70_bitcoin_com_host));
+        bip70PayService = Bip70PayService.Companion.create(getResources().getString(R.string.bip70_bitcoin_com_host));
         bip70Manager = new Bip70Manager(getApp());
-        // send request to create invoice
         Bundle args = getArguments();
         double amountFiat = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
         AmountUtil f = new AmountUtil(activity);
         fiatFormatted = f.formatFiat(amountFiat);
         tvFiatAmount.setText(fiatFormatted);
-        InvoiceCreation invoiceCreation = new InvoiceCreation();
-        String receivingAddress = getReceivingAddress(getApp());
-        if (StringUtils.isEmpty(receivingAddress)) {
+        InvoiceRequest InvoiceRequest = createInvoice(amountFiat, AppUtil.getCurrency(activity));
+        if (InvoiceRequest == null) {
             ToastCustom.makeText(activity, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
-            // TODO test & finish
-            return null;
+            cancelPayment();
+        } else {
+            generateInvoiceAndWaitForPayment(InvoiceRequest);
         }
-        invoiceCreation.apiKey = receivingAddress;
-        invoiceCreation.fiat = AppUtil.getCurrency(activity);
-        invoiceCreation.fiatAmount = "" + amountFiat;
-        invoiceCreation.memo = UUID.randomUUID().toString();
-        generateInvoiceAndWaitForPayment(invoiceCreation);
         return v;
     }
 
@@ -225,26 +217,34 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         }
     }
 
-    private String getReceivingAddress(CashRegisterApplication app) {
-        // Generate new address/QR code for receive
-        String receivingAddress;
-        if (AppUtil.isValidXPub(app)) {
-            try {
-                receivingAddress = app.getWallet().generateAddressFromXPub();
-                Log.i(TAG, "BCH-address(xPub) to receive: " + receivingAddress);
-            } catch (Exception e) {
-                receivingAddress = null;
-                Log.e(TAG, "", e);
-            }
-        } else {
-            receivingAddress = AppUtil.getReceivingAddress(app);
+    private InvoiceRequest createInvoice(double amountFiat, String currency) {
+        PaymentTarget paymentTarget = AppUtil.getPaymentTarget(activity);
+        InvoiceRequest i = new InvoiceRequest("" + amountFiat, currency);
+        switch (paymentTarget.getType()) {
+            case INVALID:
+                return null;
+            case API_KEY:
+                i.apiKey = paymentTarget.getTarget();
+                break;
+            case ADDRESS:
+                i.address = paymentTarget.getLegacyAddress();
+                break;
+            case XPUB:
+                try {
+                    i.address = getApp().getWallet().generateAddressFromXPub();
+                    Log.i(TAG, "BCH-address(xPub) to receive: " + i.address);
+                } catch (Exception e) {
+                    Log.e(TAG, "", e);
+                    return null;
+                }
+                break;
         }
-        return receivingAddress;
+        return i;
     }
 
     @SuppressLint("StaticFieldLeak")
-    private void generateInvoiceAndWaitForPayment(final InvoiceCreation invoiceRequest) {
-        new AsyncTask<InvoiceCreation, Void, Pair<InvoiceStatus, Bitmap>>() {
+    private void generateInvoiceAndWaitForPayment(final InvoiceRequest invoiceRequest) {
+        new AsyncTask<InvoiceRequest, Void, Pair<InvoiceStatus, Bitmap>>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -252,19 +252,21 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
             }
 
             @Override
-            protected Pair<InvoiceStatus, Bitmap> doInBackground(InvoiceCreation... bip70InvoiceCreations) {
-                InvoiceCreation invoiceCreation = bip70InvoiceCreations[0];
+            protected Pair<InvoiceStatus, Bitmap> doInBackground(InvoiceRequest... bip70InvoiceRequests) {
+                InvoiceRequest request = bip70InvoiceRequests[0];
                 InvoiceStatus invoice = null;
                 Bitmap bitmap = null;
                 try {
-                    Response<InvoiceStatus> response = bip70PayService.createInvoice(invoiceCreation).execute();
+                    Response<InvoiceStatus> response = bip70PayService.createInvoice(request).execute();
                     invoice = response.body();
                     if (invoice == null) {
                         throw new Exception("HTTP status:" + response.code() + " message:" + response.message());
                     }
                     qrCodeUri = invoice.getWalletUri();
-                    bitmap = generateQrCode(qrCodeUri);
+                    // TODO display icon showing if we are connected or not
+                    // connect the socket first before showing the bitmap
                     getBip70Manager().startWebsockets(invoice.paymentId);
+                    bitmap = generateQrCode(qrCodeUri);
                 } catch (Exception e) {
                     if (!(e instanceof SocketTimeoutException)) {
                         Log.e(TAG, "", e);

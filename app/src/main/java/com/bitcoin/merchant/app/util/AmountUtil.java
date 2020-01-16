@@ -47,47 +47,4 @@ public class AmountUtil {
     public String formatBch(double amountBch) {
         return MonetaryUtil.getInstance().getBchDecimalFormat().format(amountBch) + " " + DEFAULT_CURRENCY_BCH;
     }
-
-/*
-    private DecimalFormat df;
-    private DecimalFormatSymbols dfs;
-    dfs = new DecimalFormatSymbols();
-    df = new DecimalFormat("#.########", dfs);
-    // TODO
-    private static final double bitcoinLimit = 21_000_000.0;
-    private double toBch(double amount) throws ParseException {
-        Double currencyPrice = CurrencyExchange.getInstance(activity).getCurrencyPrice(getCurrency());
-        MonetaryUtil util = MonetaryUtil.getInstance();
-        return (currencyPrice == 0.0d) ? 0.0d : nf.parse(util.getBchDecimalFormat().format(amount / currencyPrice)).doubleValue();
-    }
-
-    private void checkBitcoinLimit() {
-        double currentValue = 0.0;
-        try {
-            currentValue = nf.parse(tvAmount.getText().toString()).doubleValue();
-        } catch (Exception e) {
-            Log.e(TAG, "", e);
-        }
-        double bchValue = 0.0;
-        try {
-            bchValue = toBch(currentValue);
-        } catch (ParseException e) {
-            Log.e(TAG, "", e);
-        }
-        // TODO
-        if (bchValue > bitcoinLimit) {
-            Double currencyPrice = CurrencyExchange.getInstance(activity).getCurrencyPrice(getCurrency());
-            tvAmount.setText(MonetaryUtil.getInstance().getFiatDecimalFormat().format(bitcoinLimit * currencyPrice));
-            ToastCustom.makeText(activity, getResources().getString(R.string.invalid_amount), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
-        }
-    }
-
-    private String formatFiat(double bch) {
-        Double currencyPrice = CurrencyExchange.getInstance(app).getCurrencyPrice(AppUtil.getCurrency(app));
-        double fiat = (Math.abs(bch) / 1e8) * currencyPrice;
-        return new AmountUtil(app).formatFiat(fiat);
-    }
-
-*/
-
 }

@@ -89,12 +89,15 @@ public class CurrencyHelper {
         if (StringUtils.isEmpty(country) && StringUtils.isEmpty(countryLocales.countryCode)) {
             return null;
         }
-        // TODO check currency
         return createCountryCurrency(country == null ? countryLocales.countryCode : country, countryLocales, currency);
     }
 
     public boolean isCurrencySupported(String ticker) {
         return countryToCurrency.values().contains(ticker);
+    }
+
+    public Map<String, String> getCountryToCurrency() {
+        return countryToCurrency;
     }
 
     public String getCountryName(String countryCode) {
@@ -103,7 +106,7 @@ public class CurrencyHelper {
     }
 
 /*
-// TODO expand JSON with these
+// TODO add symbols to JSON
     public String findSymbol() {
         // The currency symbols displayed on the payment request screen
         // are not able to be grabbed from the Currency class, or from CountryCurrency.

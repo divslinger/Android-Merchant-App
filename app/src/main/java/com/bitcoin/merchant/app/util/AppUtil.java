@@ -3,18 +3,14 @@ package com.bitcoin.merchant.app.util;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.bitcoin.merchant.app.currency.CurrencyDetector;
-import com.github.kiulian.converter.AddressConverter;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-
-import info.blockchain.wallet.util.FormatsUtil;
 
 public abstract class AppUtil {
     public static final String TAG = "AppUtil";
@@ -22,10 +18,6 @@ public abstract class AppUtil {
     public static final String DEFAULT_CURRENCY_FIAT = "USD";
 
     private AppUtil() {
-    }
-
-    public static boolean isValidAddress(String address) {
-        return (address != null && address.length() > 0) && (FormatsUtil.getInstance().isValidXpub(address) || AddressUtil.isValidCashAddr(address) || AddressUtil.isValidLegacy(address));
     }
 
     public static String getCurrency(Context context) {
@@ -76,42 +68,13 @@ public abstract class AppUtil {
         return b.toString();
     }
 
-    public static boolean isReceivingAddressAvailable(Context ctx) {
-        return getReceivingAddress(ctx).length() != 0;
+    public static PaymentTarget getPaymentTarget(Context context) {
+        String value = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
+        return PaymentTarget.Companion.parse(value);
     }
 
-    /**
-     * Gets pubKey or extendedPubKey
-     */
-    public static String getReceivingAddress(Context context) {
-        return PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-    }
-
-    public static void setReceivingAddress(Context context, String receiver) {
-        // We keep the storage format as legacy for compatibility purposes.
-        if (AddressUtil.isValidCashAddr(receiver)) {
-            try {
-                receiver = AddressConverter.toLegacyAddress(receiver);
-            } catch (Exception e) {
-                Log.e(TAG, "", e);
-            }
-        }
-        PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, receiver);
-    }
-
-    public static String convertToBitcoinCash(String address) {
-        FormatsUtil f = FormatsUtil.getInstance();
-        if (address != null && address.length() > 0 &&
-                (!f.isValidXpub(address) && AddressUtil.isValidLegacy(address))) {
-            try {
-                address = AddressUtil.toCashAddress(address);
-            } catch (Exception e) {
-                Log.e(TAG, "", e);
-            }
-        }
-        // If it's not a valid legacy address from the if statement above,
-        // just return as the text we are sending.
-        return address;
+    public static void setPaymentTarget(Context context, PaymentTarget target) {
+        PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, target.getTarget());
     }
 
     public static void setStatusBarColor(Activity activity, int color) {
@@ -122,15 +85,5 @@ public abstract class AppUtil {
 
     public static boolean isEmulator() {
         return Build.PRODUCT.toLowerCase().contains("sdk");
-    }
-
-    public static boolean isValidXPub(Context context) {
-        String receiver = getReceivingAddress(context);
-        return FormatsUtil.getInstance().isValidXpub(receiver);
-    }
-
-    public static boolean hasValidReceiver(Context context) {
-        String receiver = getReceivingAddress(context);
-        return AddressUtil.isValidLegacy(receiver) || FormatsUtil.getInstance().isValidXpub(receiver);
     }
 }

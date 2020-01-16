@@ -29,7 +29,7 @@ public class CashRegisterApplication extends Application {
      * For performance reasons, we cache the wallet (reported in May 2019 on Lenovo Tab E8)
      */
     public WalletUtil getWallet() throws Exception {
-        String xPub = AppUtil.getReceivingAddress(this);
+        String xPub = AppUtil.getPaymentTarget(this).getTarget();
         if (walletUtil == null || !walletUtil.isSameXPub(xPub)) {
             walletUtil = new WalletUtil(xPub, this);
         }

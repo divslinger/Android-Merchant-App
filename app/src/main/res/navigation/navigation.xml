@@ -15,25 +15,25 @@
             app:enterAnim="@anim/drop_down"
             app:popExitAnim="@anim/drop_down_out"/>
         <action
+            android:id="@+id/nav_to_settings_screen"
+            app:destination="@id/pin_code_screen"
+            app:enterAnim="@anim/drop_down"
+            app:popExitAnim="@anim/drop_down_out"/>
+        <action
             android:id="@+id/nav_to_transactions_screen"
             app:destination="@id/transactions_screen"
             app:enterAnim="@anim/slide_in_from_left"
-            app:popExitAnim="@anim/drop_down_out"/>
-        <action
-            android:id="@+id/nav_to_settings_screen"
-            app:destination="@id/pin_code_screen"
-            app:enterAnim="@anim/slide_in_from_left"
-            app:popExitAnim="@anim/drop_down_out"/>
+            app:popExitAnim="@anim/slide_out_from_right"/>
         <action
             android:id="@+id/nav_to_settings_screen_bypass_security"
             app:destination="@id/settings_screen"
             app:enterAnim="@anim/slide_in_from_left"
-            app:popExitAnim="@anim/drop_down_out"/>
+            app:popExitAnim="@anim/slide_out_from_right"/>
         <action
             android:id="@+id/nav_to_about_screen"
             app:destination="@id/about_screen"
             app:enterAnim="@anim/slide_in_from_left"
-            app:popExitAnim="@anim/drop_down_out"/>
+            app:popExitAnim="@anim/slide_out_from_right"/>
     </fragment>
     <fragment
         android:id="@+id/payment_request_screen"
@@ -60,7 +60,7 @@
             app:popUpTo="@id/payment_input_screen"
             app:popUpToInclusive="false"
             app:enterAnim="@anim/slide_in_from_left"
-            app:popExitAnim="@anim/drop_down_out"/>
+            app:popExitAnim="@anim/slide_out_from_right"/>
     </fragment>
     <fragment
         android:id="@+id/about_screen"
@@ -78,6 +78,6 @@
             android:id="@+id/nav_to_pin_code_screen"
             app:destination="@id/pin_code_screen"
             app:enterAnim="@anim/slide_in_from_left"
-            app:popExitAnim="@anim/drop_down_out"/>
+            app:popExitAnim="@anim/slide_out_from_right"/>
     </fragment>
 </navigation>

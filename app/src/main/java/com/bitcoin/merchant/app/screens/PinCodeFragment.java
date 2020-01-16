@@ -175,6 +175,6 @@ public class PinCodeFragment extends ToolbarAwareFragment {
 
     @Override
     public boolean canFragmentBeDiscardedWhenInBackground() {
-        return AppUtil.isReceivingAddressAvailable(getContext()) && !doCreate;
+        return AppUtil.getPaymentTarget(getContext()).isValid() && !doCreate;
     }
 }

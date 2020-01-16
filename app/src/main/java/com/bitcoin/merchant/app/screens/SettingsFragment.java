@@ -33,6 +33,7 @@ import com.bitcoin.merchant.app.screens.dialogs.MerchantNameEditorDialog;
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AddressUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.util.PaymentTarget;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.bitcoin.merchant.app.util.ToastCustom;
 
@@ -96,9 +97,10 @@ public class SettingsFragment extends ToolbarAwareFragment {
 
     private void addOptionAddress() {
         final TextView tvPaymentAddress = rootView.findViewById(R.id.et_payment_address);
-        String summary = AppUtil.isReceivingAddressAvailable(activity)
-                ? AppUtil.convertToBitcoinCash(AppUtil.getReceivingAddress(activity))
-                : "...\n\n" + getString(R.string.options_explain_payment_address);
+        PaymentTarget paymentTarget = AppUtil.getPaymentTarget(activity);
+        String summary = paymentTarget.getType() == PaymentTarget.Type.INVALID
+                ? "...\n\n" + getString(R.string.options_explain_payment_address)
+                : paymentTarget.getBchAddress();
         tvPaymentAddress.setText(summary);
         lvPaymentAddress.setOnClickListener(v -> new AddNewAddressDialog(SettingsFragment.this).show());
     }
@@ -132,7 +134,7 @@ public class SettingsFragment extends ToolbarAwareFragment {
 
     @Override
     public boolean isBackAllowed() {
-        if (!AppUtil.isReceivingAddressAvailable(activity)) {
+        if (!AppUtil.getPaymentTarget(activity).isValid()) {
             notifyUserThatAddressIsRequiredToReceivePayments();
             return false; // forbid
         } else {
@@ -182,48 +184,30 @@ public class SettingsFragment extends ToolbarAwareFragment {
         if ((resultCode == Activity.RESULT_OK) && (requestCode == ZBAR_SCANNER_REQUEST) && (data != null)) {
             Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode + ", Intent:" + data.getStringExtra(SCAN_RESULT));
             System.out.println("ADDRESS SCANNED: " + data.getStringExtra(SCAN_RESULT));
-            validateThenSetNewAddress(data.getStringExtra(SCAN_RESULT));
+            validateThenSetReceiverKey(data.getStringExtra(SCAN_RESULT));
             this.isScanning = false;
         } else {
             Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode);
         }
     }
 
-    public void setNewAddress(String receiver) {
+    public void setAndDisplayPaymentTarget(PaymentTarget target) {
         TextView v = rootView.findViewById(R.id.et_payment_address);
-        v.setText(AppUtil.convertToBitcoinCash(receiver));
-        AppUtil.setReceivingAddress(activity, receiver);
+        v.setText(target.getBchAddress());
+        AppUtil.setPaymentTarget(activity, target);
     }
 
-    public void validateThenSetNewAddress(String address) {
-        //Is this a valid xpub, legacy, or cashaddr?
-        if (AppUtil.isValidAddress(address)) {
-            //If it's not an xpub, we can assume it's a BCH address since the address is valid from the previous if statement.
-            if (!FormatsUtil.getInstance().isValidXpub(address)) {
-                //legacy or cashaddr logic.
-                this.validateCashaddrOrLegacyAddress(address);
-            } else {
-                //xpub logic
-                this.saveXpubAsDestinationAddress(address);
+    public void validateThenSetReceiverKey(String address) {
+        PaymentTarget paymentTarget = PaymentTarget.Companion.parse(address);
+        if (paymentTarget.isValid()) {
+            setAndDisplayPaymentTarget(paymentTarget);
+            if (paymentTarget.isXPub()) {
                 this.beginSyncingXpubWallet();
             }
         } else {
             //If it is not valid, then display to the user that they did not enter a valid xpub, or legacy/cashaddr address.
             ToastCustom.makeText(activity, activity.getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR);
         }
-    }
-
-    private void validateCashaddrOrLegacyAddress(String address) {
-        if (AddressUtil.isValidCashAddr(address)) {
-            String cashAddrPrefix = BitcoinCashAddressFormatter.MAIN_NET_PREFIX + ":";
-            if (!address.startsWith(cashAddrPrefix))
-                address = cashAddrPrefix + address;
-        }
-        setNewAddress(address);
-    }
-
-    private void saveXpubAsDestinationAddress(String xpub) {
-        setNewAddress(xpub);
     }
 
     private void beginSyncingXpubWallet() {
@@ -248,6 +232,6 @@ public class SettingsFragment extends ToolbarAwareFragment {
 
     @Override
     public boolean canFragmentBeDiscardedWhenInBackground() {
-        return AppUtil.isReceivingAddressAvailable(activity) && !this.isScanning;
+        return AppUtil.getPaymentTarget(activity).isValid() && !this.isScanning;
     }
 }

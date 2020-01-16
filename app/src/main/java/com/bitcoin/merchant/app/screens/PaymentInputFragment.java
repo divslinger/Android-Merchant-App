@@ -88,7 +88,7 @@ public class PaymentInputFragment extends ToolbarAwareFragment {
             Bundle args = new Bundle();
             args.putBoolean(PinCodeFragment.EXTRA_DO_CREATE, true);
             getNav().navigate(R.id.pin_code_screen, args);
-        } else if (!AppUtil.isReceivingAddressAvailable(activity)) {
+        } else if (!AppUtil.getPaymentTarget(activity).isValid()) {
             getNav().navigate(R.id.nav_to_settings_screen_bypass_security);
         }
     }
@@ -163,7 +163,7 @@ public class PaymentInputFragment extends ToolbarAwareFragment {
         if (activity == null) {
             return;
         }
-        if (!AppUtil.hasValidReceiver(activity)) {
+        if (!AppUtil.getPaymentTarget(activity).isValid()) {
             SnackCustom.make(activity, getView(), activity.getText(R.string.obligatory_receiver), activity.getResources().getString(R.string.prompt_ok), new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

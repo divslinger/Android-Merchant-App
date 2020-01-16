@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.screens.SettingsFragment;
 import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.util.PaymentTarget;
 
 public class AddNewAddressDialog {
     private static final boolean ENTERING_ADDRESS_BYPASSED = false;
@@ -28,17 +29,13 @@ public class AddNewAddressDialog {
                 .setTitle(R.string.options_add_payment_address)
                 .setView(tvReceiverHelp)
                 .setCancelable(true)
-                .setPositiveButton(R.string.paste, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        enterAddressUsingInputField();
-                        dialog.dismiss();
-                    }
+                .setPositiveButton(R.string.paste, (dialog, whichButton) -> {
+                    enterAddressUsingInputField();
+                    dialog.dismiss();
                 })
-                .setNegativeButton(R.string.scan, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                        settingsController.requestToOpenCamera();
-                    }
+                .setNegativeButton(R.string.scan, (dialog, whichButton) -> {
+                    dialog.dismiss();
+                    settingsController.requestToOpenCamera();
                 });
         if (! ctx.isFinishing()) {
             builder.show();
@@ -51,17 +48,11 @@ public class AddNewAddressDialog {
                 .setTitle(R.string.options_add_payment_address)
                 .setView(etReceiver)
                 .setCancelable(false)
-                .setPositiveButton(R.string.prompt_ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        settingsController.validateThenSetNewAddress(etReceiver.getText().toString().trim());
-                        dialog.dismiss();
-                    }
+                .setPositiveButton(R.string.prompt_ok, (dialog, whichButton) -> {
+                    settingsController.validateThenSetReceiverKey(etReceiver.getText().toString().trim());
+                    dialog.dismiss();
                 })
-                .setNegativeButton(R.string.prompt_ko, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                    }
-                });
+                .setNegativeButton(R.string.prompt_ko, (dialog, whichButton) -> dialog.dismiss());
         if (! ctx.isFinishing()) {
             builder.show();
         }
@@ -69,12 +60,12 @@ public class AddNewAddressDialog {
 
     private void enterAddressUsingInputField() {
         if (ENTERING_ADDRESS_BYPASSED) {
-            settingsController.setNewAddress("1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k");
+            settingsController.setAndDisplayPaymentTarget(PaymentTarget.Companion.parse("1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k"));
         } else {
-            final EditText etReceiver = new EditText(ctx);
-            etReceiver.setSingleLine(true);
-            etReceiver.setText(AppUtil.convertToBitcoinCash(AppUtil.getReceivingAddress(ctx)));
-            showDialogToEnterAddress(etReceiver);
+            final EditText editText = new EditText(ctx);
+            editText.setSingleLine(true);
+            editText.setText(AppUtil.getPaymentTarget(ctx).getBchAddress());
+            showDialogToEnterAddress(editText);
         }
     }
 }

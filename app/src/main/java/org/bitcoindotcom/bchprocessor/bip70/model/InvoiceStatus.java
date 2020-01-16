@@ -1,20 +1,32 @@
 package org.bitcoindotcom.bchprocessor.bip70.model;
 
 import com.bitcoin.merchant.app.util.AppUtil;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.Arrays;
 
 public class InvoiceStatus {
+    @SerializedName("paymentUrl")
     public String paymentUrl;
+    @SerializedName("paymentId")
     public String paymentId;
+    @SerializedName("memo")
     public String memo;
+    @SerializedName("time")
     public String time; // 2019-10-05T21:44:34.009Z
+    @SerializedName("expires")
     public String expires; // 2019-10-05T21:59:34.009Z
+    @SerializedName("status")
     public String status;
+    @SerializedName("fiatSymbol")
     public String fiatSymbol; // "USD"
+    @SerializedName("fiatRate")
     public double fiatRate; // 222.67
+    @SerializedName("txId")
     public String txId;
+    @SerializedName("merchantId")
     public String merchantId;
+    @SerializedName("outputs")
     public InvoiceStatusOutput[] outputs = new InvoiceStatusOutput[0];
 
     public static InvoiceStatus fromJson(String message) {

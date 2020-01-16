@@ -4,13 +4,10 @@ import android.content.Context;
 import android.util.Log;
 
 import com.bitcoin.merchant.app.MainActivity;
-import com.bitcoin.merchant.app.util.AppUtil;
 import com.crashlytics.android.Crashlytics;
 
 import java.util.Currency;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public class CurrencyDetector {
     private static final String TAG = MainActivity.TAG;
@@ -22,6 +19,7 @@ public class CurrencyDetector {
         Locale locale = Locale.getDefault();
         String currencyCode = "";
         String countryCode = "";
+        CurrencyHelper helper = CurrencyHelper.getInstance(context);
         try {
             countryCode = locale.getCountry();
             Log.i(TAG, "Currency Locale.country: " + countryCode);
@@ -35,11 +33,9 @@ public class CurrencyDetector {
             Crashlytics.logException(e);
             // check if currency can be determined from the country code
             if (countryCode.length() >= 2) {
-                // TODO avoid duplicate loading
-                Map<String, String> countryToCurrency = AppUtil.readFromJsonFile(context, "country_to_currency.json", HashMap.class);
-                currencyCode = countryToCurrency.get(countryCode.trim().substring(0, 2).toUpperCase());
+                currencyCode = helper.getCountryToCurrency().get(countryCode.trim().substring(0, 2).toUpperCase());
             }
         }
-        return CurrencyHelper.getInstance(context).isCurrencySupported(currencyCode) ? currencyCode : "";
+        return helper.isCurrencySupported(currencyCode) ? currencyCode : "";
     }
 }

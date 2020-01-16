@@ -25,7 +25,7 @@ public class PaymentProcessor {
     public ContentValues recordInDatabase(InvoiceStatus i, String fiatFormatted) {
         long bch = i.getTotalBchAmount();
         try {
-            if (AppUtil.isValidXPub(app)) {
+            if (AppUtil.getPaymentTarget(app).isXPub()) {
                 for (InvoiceStatusOutput output : i.outputs) {
                     app.getWallet().addUsedAddress(output.address);
                 }

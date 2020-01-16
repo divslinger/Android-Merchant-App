@@ -12,6 +12,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity
             public void onDrawerStateChanged(int i) {
             }
         });
-        System.out.println("Stored address: " + AppUtil.getReceivingAddress(this));
+        Log.d(TAG, "Stored " + AppUtil.getPaymentTarget(this));
     }
 
     private void startWebsockets() {

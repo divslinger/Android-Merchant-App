@@ -185,7 +185,7 @@ public class TransactionsHistoryFragment extends ToolbarAwareFragment {
     }
 
     private void findAllPotentialMissingTx() {
-        // TODO
+        // TODO use merchant server to query all TX
         LocalBroadcastManager.getInstance(activity).sendBroadcast(new Intent(Action.QUERY_ALL_TX_FROM_BITCOIN_COM_PAY));
     }
 
