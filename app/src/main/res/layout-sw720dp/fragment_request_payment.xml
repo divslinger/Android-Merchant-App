@@ -96,6 +96,18 @@
                 android:text=""
                 android:visibility="gone" />
 
+            <TextView
+                android:id="@+id/bip70_timer_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:gravity="center"
+                android:text="15:00"
+                android:textColor="@color/bitcoindotcom_green"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="visible" />
+
         </LinearLayout>
 
         <TextView
