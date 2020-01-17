@@ -2,6 +2,7 @@
   <dictionary name="proxacutor">
     <words>
       <w>bitcoin</w>
+      <w>gson</w>
     </words>
   </dictionary>
 </component>

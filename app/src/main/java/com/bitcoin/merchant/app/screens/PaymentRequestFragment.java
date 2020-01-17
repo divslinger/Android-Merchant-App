@@ -110,11 +110,12 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
      */
     private boolean markInvoiceAsProcessed(InvoiceStatus invoiceStatus) {
         // Check that it has not yet been processed to avoid redundant processing
-        if (invoiceStatus.paymentId != null && invoiceStatus.paymentId.equals(lastProcessedInvoicePaymentId)) {
+        String paymentId = invoiceStatus.getPaymentId();
+        if (paymentId != null && paymentId.equals(lastProcessedInvoicePaymentId)) {
             Log.i(TAG, "Already processed invoice:" + invoiceStatus);
             return true;
         }
-        lastProcessedInvoicePaymentId = invoiceStatus.paymentId;
+        lastProcessedInvoicePaymentId = paymentId;
         return false;
     }
 
@@ -224,15 +225,15 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
             case INVALID:
                 return null;
             case API_KEY:
-                i.apiKey = paymentTarget.getTarget();
+                i.setApiKey(paymentTarget.getTarget());
                 break;
             case ADDRESS:
-                i.address = paymentTarget.getLegacyAddress();
+                i.setAddress(paymentTarget.getLegacyAddress());
                 break;
             case XPUB:
                 try {
-                    i.address = getApp().getWallet().generateAddressFromXPub();
-                    Log.i(TAG, "BCH-address(xPub) to receive: " + i.address);
+                    i.setAddress(getApp().getWallet().generateAddressFromXPub());
+                    Log.i(TAG, "BCH-address(xPub) to receive: " + i.getAddress());
                 } catch (Exception e) {
                     Log.e(TAG, "", e);
                     return null;
@@ -265,7 +266,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     qrCodeUri = invoice.getWalletUri();
                     // TODO display icon showing if we are connected or not
                     // connect the socket first before showing the bitmap
-                    getBip70Manager().startWebsockets(invoice.paymentId);
+                    getBip70Manager().startWebsockets(invoice.getPaymentId());
                     bitmap = generateQrCode(qrCodeUri);
                 } catch (Exception e) {
                     if (!(e instanceof SocketTimeoutException)) {

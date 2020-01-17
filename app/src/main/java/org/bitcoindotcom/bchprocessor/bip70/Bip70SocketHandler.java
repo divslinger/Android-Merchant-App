@@ -30,24 +30,22 @@ public class Bip70SocketHandler extends WebSocketHandler {
     }
 
     @Override
-    protected void parseTx(String message) throws Exception {
+    protected void parseTx(String message) {
         try {
             InvoiceStatus status = InvoiceStatus.fromJson(message);
-            if (status != null) {
-                Log.i(TAG, status.toString());
-                if (status.isPaid()) {
-                    Intent i = new Intent(Action.INVOICE_PAYMENT_ACKNOWLEDGED);
-                    i.putExtra(Action.PARAM_INVOICE_STATUS, message);
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(i);
-                    // it is important to prevent reconnection
-                    setAutoReconnect(false);
-                } else if (status.isExpired()) {
-                    Intent i = new Intent(Action.INVOICE_PAYMENT_EXPIRED);
-                    i.putExtra(Action.PARAM_INVOICE_STATUS, message);
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(i);
-                    // invoice has become invalid, useless to listen any further
-                    setAutoReconnect(false);
-                }
+            Log.i(TAG, status.toString());
+            if (status.isPaid()) {
+                Intent i = new Intent(Action.INVOICE_PAYMENT_ACKNOWLEDGED);
+                i.putExtra(Action.PARAM_INVOICE_STATUS, message);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+                // it is important to prevent reconnection
+                setAutoReconnect(false);
+            } else if (status.isExpired()) {
+                Intent i = new Intent(Action.INVOICE_PAYMENT_EXPIRED);
+                i.putExtra(Action.PARAM_INVOICE_STATUS, message);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+                // invoice has become invalid, useless to listen any further
+                setAutoReconnect(false);
             }
         } catch (Exception e) {
             Log.e(TAG, "InvoiceStatus error:" + e);

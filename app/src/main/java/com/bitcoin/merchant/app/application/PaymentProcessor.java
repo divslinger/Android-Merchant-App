@@ -26,15 +26,15 @@ public class PaymentProcessor {
         long bch = i.getTotalBchAmount();
         try {
             if (AppUtil.getPaymentTarget(app).isXPub()) {
-                for (InvoiceStatusOutput output : i.outputs) {
-                    app.getWallet().addUsedAddress(output.address);
+                for (InvoiceStatusOutput output : i.getOutputs()) {
+                    app.getWallet().addUsedAddress(output.getAddress());
                 }
             }
             String message = "";
             int confirmations = 0;
             String addr = i.getFirstAddress();
             long time = System.currentTimeMillis();
-            PaymentRecord r = new PaymentRecord(time, addr, bch, fiatFormatted, confirmations, message, i.txId);
+            PaymentRecord r = new PaymentRecord(time, addr, bch, fiatFormatted, confirmations, message, i.getTxId());
             ContentValues values = r.toContentValues();
             db.insertPayment(values);
             return values;

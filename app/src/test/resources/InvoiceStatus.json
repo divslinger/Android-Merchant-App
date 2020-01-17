@@ -7,7 +7,14 @@
       "amount": 44910,
       "address": "15p9G7cpWwsvZTjWvsT74F9szU2cbaiCFM",
       "type": "P2PKH"
+    },
+    {
+      "script": "AABBCCDDEEFF",
+      "amount": 5090,
+      "address": "333333333333333333333333333333CFM",
+      "type": "P2SH"
     }
+
   ],
   "time": "2019-10-05T23:24:27.911Z",
   "expires": "2019-10-05T23:39:27.911Z",
