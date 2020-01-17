@@ -13,6 +13,7 @@ import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -45,6 +46,9 @@ import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceRequest;
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus;
 
 import java.net.SocketTimeoutException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import retrofit2.Response;
 
@@ -55,6 +59,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
     private LinearLayout receivedLayout;
     private TextView tvFiatAmount;
     private TextView tvBtcAmount;
+    private TextView tvExpiryTimer;
     private ImageView ivReceivingQr;
     private LinearLayout progressLayout;
     private Button ivCancel;
@@ -182,6 +187,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
     private void initViews(View v) {
         tvFiatAmount = v.findViewById(R.id.tv_fiat_amount);
         tvBtcAmount = v.findViewById(R.id.tv_btc_amount);
+        tvExpiryTimer = v.findViewById(R.id.bip70_timer_tv);
         ivReceivingQr = v.findViewById(R.id.qr);
         progressLayout = v.findViewById(R.id.progressLayout);
         waitingLayout = v.findViewById(R.id.layout_waiting);
@@ -291,6 +297,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                 super.onPostExecute(pair);
                 showGeneratingQrCodeProgress(false);
                 InvoiceStatus i = pair.first;
+                initiateCountdown(i);
                 Bitmap bitmap = pair.second;
                 if (i != null && bitmap != null) {
                     AmountUtil f = new AmountUtil(activity);
@@ -299,6 +306,22 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                 }
             }
         }.execute(invoiceRequest);
+    }
+
+    private void initiateCountdown(InvoiceStatus invoiceStatus) {
+        long timeLimit = invoiceStatus.getExpires().getTime() - invoiceStatus.getTime().getTime();
+        new CountDownTimer(timeLimit, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                long secondsLeft = millisUntilFinished / 1000L;
+                tvExpiryTimer.setText(String.format(getResources().getConfiguration().locale, "%02d:%02d", secondsLeft / 60, secondsLeft % 60));
+            }
+
+            @Override
+            public void onFinish() {
+
+            }
+        }.start();
     }
 
     private void showCheckMark() {
