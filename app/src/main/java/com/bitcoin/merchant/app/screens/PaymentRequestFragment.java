@@ -309,18 +309,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
     }
 
     private void initiateCountdown(InvoiceStatus invoiceStatus) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss'Z'");
-        String startDate = invoiceStatus.time;
-        String expirationDate = invoiceStatus.expires;
-        Date expirationTime = null;
-        Date creationTime = null;
-        try {
-            expirationTime = format.parse(expirationDate);
-            creationTime = format.parse(startDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        long timeLimit = expirationTime.getTime() - creationTime.getTime();
+        long timeLimit = invoiceStatus.getExpires().getTime() - invoiceStatus.getTime().getTime();
         new CountDownTimer(timeLimit, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
