@@ -7,14 +7,12 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.bitcoin.merchant.app.currency.CurrencyDetector;
-import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 public abstract class AppUtil {
     public static final String TAG = "AppUtil";
-    public static final Gson GSON = new Gson();
     public static final String DEFAULT_CURRENCY_FIAT = "USD";
 
     private AppUtil() {
@@ -43,7 +41,7 @@ public abstract class AppUtil {
     }
 
     public static <T> T readFromJsonFile(Context ctx, String fileName, Class<T> classOfT) {
-        return GSON.fromJson(readFromfile(fileName, ctx), classOfT);
+        return GsonUtil.INSTANCE.getGson().fromJson(readFromfile(fileName, ctx), classOfT);
     }
 
     public static String readFromfile(String fileName, Context context) {
@@ -84,6 +82,6 @@ public abstract class AppUtil {
     }
 
     public static boolean isEmulator() {
-        return Build.PRODUCT.toLowerCase().contains("sdk");
+        return Build.PRODUCT != null && Build.PRODUCT.toLowerCase().contains("sdk");
     }
 }

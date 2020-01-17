@@ -1,5 +1,6 @@
 package org.bitcoindotcom.bchprocessor.bip70
 
+import com.bitcoin.merchant.app.util.GsonUtil
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceRequest
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 import retrofit2.Call
@@ -10,15 +11,15 @@ import retrofit2.http.POST
 
 interface Bip70PayService {
     @POST("create_invoice")
-    fun createInvoice(@Body r: InvoiceRequest?): Call<InvoiceStatus?>?
+    fun createInvoice(@Body r: InvoiceRequest): Call<InvoiceStatus?>
 
     companion object {
         fun create(baseUrl: String): Bip70PayService {
-            val retrofit = Retrofit.Builder()
+            return Retrofit.Builder()
                     .baseUrl(baseUrl)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(GsonUtil.gson))
                     .build()
-            return retrofit.create(Bip70PayService::class.java)
+                    .create(Bip70PayService::class.java)
         }
     }
 }

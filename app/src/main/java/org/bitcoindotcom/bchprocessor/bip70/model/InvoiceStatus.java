@@ -1,9 +1,10 @@
 package org.bitcoindotcom.bchprocessor.bip70.model;
 
-import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.util.GsonUtil;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Arrays;
+import java.util.Date;
 
 public class InvoiceStatus {
     @SerializedName("paymentUrl")
@@ -13,9 +14,9 @@ public class InvoiceStatus {
     @SerializedName("memo")
     public String memo;
     @SerializedName("time")
-    public String time; // 2019-10-05T21:44:34.009Z
+    public Date time; // 2019-10-05T21:44:34.009Z
     @SerializedName("expires")
-    public String expires; // 2019-10-05T21:59:34.009Z
+    public Date expires; // 2019-10-05T21:59:34.009Z
     @SerializedName("status")
     public String status;
     @SerializedName("fiatSymbol")
@@ -30,7 +31,7 @@ public class InvoiceStatus {
     public InvoiceStatusOutput[] outputs = new InvoiceStatusOutput[0];
 
     public static InvoiceStatus fromJson(String message) {
-        return AppUtil.GSON.fromJson(message, InvoiceStatus.class);
+        return GsonUtil.INSTANCE.getGson().fromJson(message, InvoiceStatus.class);
     }
 
     public String getFirstAddress() {
