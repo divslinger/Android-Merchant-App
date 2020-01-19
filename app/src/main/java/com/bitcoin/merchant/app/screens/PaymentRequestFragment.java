@@ -296,13 +296,13 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                 super.onPostExecute(pair);
                 showGeneratingQrCodeProgress(false);
                 InvoiceStatus i = pair.first;
-                initiateCountdown(i);
                 Bitmap bitmap = pair.second;
                 if (i != null && bitmap != null) {
                     AmountUtil f = new AmountUtil(activity);
                     tvFiatAmount.setText(f.formatFiat(i.getFiatTotal()));
                     tvBtcAmount.setText(f.formatBch(i.getTotalBchAmount()));
                     ivReceivingQr.setImageBitmap(bitmap);
+                    initiateCountdown(i);
                 }
             }
         }.execute(invoiceRequest);
