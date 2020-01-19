@@ -282,7 +282,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     DialogUtil.show(activity, title, e.getMessage(),
                             () -> cancelPayment());
                 }
-                return new Pair(invoice, bitmap);
+                return new Pair<>(invoice, bitmap);
             }
 
             private Bitmap generateQrCode(String url) throws Exception {
@@ -301,6 +301,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                 Bitmap bitmap = pair.second;
                 if (i != null && bitmap != null) {
                     AmountUtil f = new AmountUtil(activity);
+                    tvFiatAmount.setText(f.formatFiat(i.getFiatTotal()));
                     tvBtcAmount.setText(f.formatBch(i.getTotalBchAmount()));
                     ivReceivingQr.setImageBitmap(bitmap);
                 }
