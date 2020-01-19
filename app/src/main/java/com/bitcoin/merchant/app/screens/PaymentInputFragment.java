@@ -15,9 +15,8 @@ import android.widget.TextView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bitcoin.merchant.app.R;
-import com.bitcoin.merchant.app.currency.CountryCurrency;
-import com.bitcoin.merchant.app.currency.CurrencyHelper;
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
+import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.MonetaryUtil;
 import com.bitcoin.merchant.app.util.SnackCustom;
@@ -117,10 +116,11 @@ public class PaymentInputFragment extends ToolbarAwareFragment {
 
     private String getCurrencySymbol() {
         String currency = AppUtil.getCurrency(getContext());
-        String country = AppUtil.getCountry(getContext());
-        String locale = AppUtil.getLocale(getContext());
-        CountryCurrency cc = CurrencyHelper.getInstance(getContext()).getCountryCurrency(currency, country, locale);
-        return (cc != null) && (cc.symbol != null) ? cc.symbol : "";
+        String fiat = new AmountUtil(activity).formatFiat(0.0);
+        String symbol = fiat.replaceAll("[\\s\\d.,]+", "");
+        // It seems that replaceAll does not handle right-to-left languages like arabic correctly
+        // For this reason, we consider that it is only safe to extract single character symbol
+        return symbol.length() == 1 ? symbol : currency;
     }
 
     private void initializeButtons() {

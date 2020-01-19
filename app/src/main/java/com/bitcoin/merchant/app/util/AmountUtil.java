@@ -33,13 +33,11 @@ public class AmountUtil {
         } catch (Exception e) {
             Log.d(TAG, "Locale not supported for " + currency + " failed to format to fiat: " + amountFiat);
         }
-        String currencySymbol = cc.symbol;
-        currencySymbol = currencySymbol != null ? currencySymbol : currency;
         if (fiat != null) {
             String currencySign = "\u00a4";
-            fiat = fiat.replace(currencySign, currencySymbol);
+            fiat = fiat.replace(currencySign, currency);
         } else {
-            fiat = currencySymbol + " " + MonetaryUtil.getInstance().getFiatDecimalFormat().format(amountFiat);
+            fiat = currency + " " + MonetaryUtil.getInstance().getFiatDecimalFormat().format(amountFiat);
         }
         return fiat;
     }

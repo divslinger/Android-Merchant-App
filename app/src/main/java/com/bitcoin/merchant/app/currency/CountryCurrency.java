@@ -262,20 +262,14 @@ public class CountryCurrency {
     public final CountryLocales countryLocales;
     public final int image;
     public final String currencyCode;
-    public final String symbol;
     private final String description;
 
-    public CountryCurrency(CountryLocales countryLocales, String countryName, String currencyCode, String symbol) {
+    public CountryCurrency(CountryLocales countryLocales, String countryName, String currencyCode) {
         this.countryName = countryName;
         this.countryLocales = countryLocales;
         this.image = countryToImage.get(countryLocales.countryCode.toUpperCase());
         this.currencyCode = currencyCode;
-        this.symbol = symbol;
-        this.description = countryName + "\n" + currencyCode + (!hasCustomSymbol() ? "" : " - " + symbol);
-    }
-
-    public boolean hasCustomSymbol() {
-        return !currencyCode.equals(symbol);
+        this.description = countryName + "\n" + currencyCode;
     }
 
     private static void add(String country, int resource) {

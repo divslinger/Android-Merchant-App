@@ -16,7 +16,6 @@ public class CurrencyHelper {
     public static final String TAG = "CurrencyExchange";
     private static CurrencyHelper instance;
     private final CurrencyToLocales currencyToLocales;
-    private final Map<String, String> currencyToSymbol;
     private final Map<String, String> countryToName;
     private final Map<String, String> countryToCurrency;
 
@@ -25,7 +24,6 @@ public class CurrencyHelper {
     }
 
     private CurrencyHelper(Context context) {
-        currencyToSymbol = AppUtil.readFromJsonFile(context, "currency_to_symbols.json", TreeMap.class);
         countryToName = AppUtil.readFromJsonFile(context, "country_to_name.json", TreeMap.class);
         countryToCurrency = AppUtil.readFromJsonFile(context, "country_to_currency.json", TreeMap.class);
         currencyToLocales = AppUtil.readFromJsonFile(context, "currency_to_locales.json", CurrencyToLocales.class);
@@ -59,8 +57,7 @@ public class CurrencyHelper {
     }
 
     private CountryCurrency createCountryCurrency(String countryCode, CountryLocales countryLocales, String currencyCode) {
-        String symbol = currencyToSymbol.get(currencyCode);
-        return new CountryCurrency(countryLocales, getCountryName(countryCode), currencyCode, symbol != null ? symbol : currencyCode);
+        return new CountryCurrency(countryLocales, getCountryName(countryCode), currencyCode);
     }
 
     private boolean isCountrySupported(String country) {
@@ -92,33 +89,16 @@ public class CurrencyHelper {
         return createCountryCurrency(country == null ? countryLocales.countryCode : country, countryLocales, currency);
     }
 
-    public boolean isCurrencySupported(String ticker) {
+    boolean isCurrencySupported(String ticker) {
         return countryToCurrency.values().contains(ticker);
     }
 
-    public Map<String, String> getCountryToCurrency() {
+    Map<String, String> getCountryToCurrency() {
         return countryToCurrency;
     }
 
-    public String getCountryName(String countryCode) {
+    private String getCountryName(String countryCode) {
         String name = countryToName.get(countryCode);
         return name == null ? "" : name;
     }
-
-/*
-// TODO add symbols to JSON
-    public String findSymbol() {
-        // The currency symbols displayed on the payment request screen
-        // are not able to be grabbed from the Currency class, or from CountryCurrency.
-        // A prime example of this is country AOA. NumberFormat gives Kz for its symbol,
-        // yet you can't grab it from any object.
-        // Here we format a fake balance (0) then remove all digits, periods, commas, etc. to get the symbol.
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(cc.countryLocales.getLocale());
-        Currency instance = Currency.getInstance(currency);
-        formatter.setCurrency(instance);
-        formatter.setMaximumFractionDigits(instance.getDefaultFractionDigits());
-        String formatted = formatter.format(0);
-        return formatted.replaceAll("[\\d., ]", "");
-    }
-*/
 }
