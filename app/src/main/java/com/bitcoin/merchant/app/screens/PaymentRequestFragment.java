@@ -55,6 +55,7 @@ import static com.bitcoin.merchant.app.MainActivity.TAG;
 public class PaymentRequestFragment extends ToolbarAwareFragment {
     private LinearLayout waitingLayout;
     private LinearLayout receivedLayout;
+    private TextView tvConnectionStatus;
     private TextView tvFiatAmount;
     private TextView tvBtcAmount;
     private TextView tvExpiryTimer;
@@ -74,6 +75,9 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
             }
             if (Action.INVOICE_PAYMENT_EXPIRED.equals(intent.getAction())) {
                 expirePayment(InvoiceStatus.fromJson(intent.getStringExtra(Action.PARAM_INVOICE_STATUS)));
+            }
+            if (Action.UPDATE_CONNECTION_STATUS.equals(intent.getAction())) {
+                updateConnectionStatus(intent.getStringExtra(Action.PARAM_CONNECTION_STATUS));
             }
             if (Action.NETWORK_RECONNECT.equals(intent.getAction())) {
                 reconnectIfNecessary();
@@ -96,6 +100,16 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
             return;
         }
         cancelPayment();
+    }
+
+    private void updateConnectionStatus(String status) {
+        Log.i(TAG, "Socket is " + status);
+
+        if(status.equals("connected")) {
+            tvConnectionStatus.setText("Connected");
+        } else if(status.equals("disconnected")) {
+            tvConnectionStatus.setText("Disconnected");
+        }
     }
 
     private void acknowledgePayment(InvoiceStatus i) {
@@ -168,6 +182,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         filter.addAction(Action.INVOICE_PAYMENT_ACKNOWLEDGED);
         filter.addAction(Action.INVOICE_PAYMENT_EXPIRED);
+        filter.addAction(Action.UPDATE_CONNECTION_STATUS);
         filter.addAction(Action.NETWORK_RECONNECT);
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(activity.getApplicationContext());
         broadcastManager.registerReceiver(receiver, filter);
@@ -183,6 +198,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
     }
 
     private void initViews(View v) {
+        tvConnectionStatus = v.findViewById(R.id.tv_connection_status);
         tvFiatAmount = v.findViewById(R.id.tv_fiat_amount);
         tvBtcAmount = v.findViewById(R.id.tv_btc_amount);
         tvExpiryTimer = v.findViewById(R.id.bip70_timer_tv);
@@ -269,7 +285,6 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     }
                     // TODO persist & resume invoice in case of crash
                     qrCodeUri = invoice.getWalletUri();
-                    // TODO display icon showing if we are connected or not
                     // connect the socket first before showing the bitmap
                     getBip70Manager().startWebsockets(invoice.getPaymentId());
                     bitmap = generateQrCode(qrCodeUri);
@@ -317,6 +332,12 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     long secondsLeft = millisUntilFinished / 1000L;
                     Locale locale = getResources().getConfiguration().locale;
                     tvExpiryTimer.setText(String.format(locale, "%02d:%02d", secondsLeft / 60, secondsLeft % 60));
+
+                    if(!bip70Manager.socketHandler.isConnected()) {
+                        updateConnectionStatus("disconnected");
+                    } else {
+                        updateConnectionStatus("connected");
+                    }
                 }
             }
 

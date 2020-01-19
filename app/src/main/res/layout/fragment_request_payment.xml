@@ -16,6 +16,12 @@
         android:padding="35dp">
 
         <TextView
+            android:id="@+id/tv_connection_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Disconnected" />
+
+        <TextView
             android:id="@+id/tv_merchant_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
