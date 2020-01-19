@@ -269,6 +269,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     if (invoice == null) {
                         throw new Exception("HTTP status:" + response.code() + " message:" + response.message());
                     }
+                    // TODO persist & resume invoice in case of crash
                     qrCodeUri = invoice.getWalletUri();
                     // TODO display icon showing if we are connected or not
                     // connect the socket first before showing the bitmap
