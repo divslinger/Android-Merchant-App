@@ -46,9 +46,7 @@ import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceRequest;
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus;
 
 import java.net.SocketTimeoutException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Locale;
 
 import retrofit2.Response;
 
@@ -315,8 +313,11 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         new CountDownTimer(timeLimit, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                long secondsLeft = millisUntilFinished / 1000L;
-                tvExpiryTimer.setText(String.format(getResources().getConfiguration().locale, "%02d:%02d", secondsLeft / 60, secondsLeft % 60));
+                if (isAdded()) {
+                    long secondsLeft = millisUntilFinished / 1000L;
+                    Locale locale = getResources().getConfiguration().locale;
+                    tvExpiryTimer.setText(String.format(locale, "%02d:%02d", secondsLeft / 60, secondsLeft % 60));
+                }
             }
 
             @Override
