@@ -267,6 +267,15 @@ public class MainActivity extends AppCompatActivity
                     case R.id.action_about:
                         getNav().navigate(R.id.nav_to_about_screen);
                         break;
+                    case R.id.action_terms_of_use:
+                        getNav().navigate(R.id.nav_to_terms_of_use);
+                        break;
+                    case R.id.action_service_terms:
+                        getNav().navigate(R.id.nav_to_service_terms);
+                        break;
+                    case R.id.action_privacy_policy:
+                        getNav().navigate(R.id.nav_to_privacy_policy);
+                        break;
                 }
             }
         }, 250);

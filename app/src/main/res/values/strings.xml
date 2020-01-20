@@ -58,4 +58,7 @@
     <string name="copy_transaction">Copy transaction</string>
     <string name="view_address">View address</string>
     <string name="copy_address">Copy address</string>
+    <string name="menu_terms_of_use">Terms of use</string>
+    <string name="menu_service_terms">Service terms</string>
+    <string name="menu_privacy_policy">Privacy policy</string>
 </resources>
