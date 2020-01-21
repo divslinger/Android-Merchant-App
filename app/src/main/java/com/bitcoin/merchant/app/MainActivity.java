@@ -35,6 +35,7 @@ import com.bitcoin.merchant.app.application.CashRegisterApplication;
 import com.bitcoin.merchant.app.application.NetworkStateReceiver;
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AppUtil;
+import com.bitcoin.merchant.app.util.DialogUtil;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.navigation.NavigationView;
@@ -111,6 +112,14 @@ public class MainActivity extends AppCompatActivity
             }
         });
         Log.d(TAG, "Stored " + AppUtil.getPaymentTarget(this));
+
+        if(!PrefsUtil.getInstance(this).has(PrefsUtil.MERCHANT_KEY_EULA) || !PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_EULA, false)) {
+            DialogUtil.show(this, "", getResources().getString(R.string.contract_agreement_summary), getResources().getString(R.string.contract_button_ok), this::agreeToEula);
+        }
+    }
+
+    private void agreeToEula() {
+        PrefsUtil.getInstance(this).setValue(PrefsUtil.MERCHANT_KEY_EULA, true);
     }
 
     private void startWebsockets() {
