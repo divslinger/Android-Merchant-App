@@ -1,39 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/grp1" android:checkableBehavior="single">
+    <group
+        android:id="@+id/grp1"
+        android:checkableBehavior="single">
         <!--hide profile until spec updated-->
         <item
             android:id="@+id/action_profile"
-            android:visible="false"
             android:icon="@drawable/ic_person_white_24dp"
-            android:title="@string/menu_profile"/>
+            android:title="@string/menu_profile"
+            android:visible="false" />
         <item
             android:id="@+id/action_cash_register"
-            android:visible="false"
             android:icon="@drawable/register_icon"
-            android:title="@string/menu_cash_register"/>
+            android:title="@string/menu_cash_register"
+            android:visible="false" />
         <item
             android:id="@+id/action_transactions"
             android:icon="@drawable/transactions_icon"
-            android:title="@string/menu_transactions"/>
+            android:title="@string/menu_transactions" />
         <item
             android:id="@+id/action_settings"
             android:icon="@drawable/settings_icon"
-            android:title="@string/menu_settings"/>
+            android:title="@string/menu_settings" />
     </group>
 
-    <group android:id="@+id/grp2" android:checkableBehavior="single">
-        <!--hide profile until spec updated-->
+    <group
+        android:id="@+id/grp2"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/action_terms_of_use"
+            android:icon="@drawable/ic_contract"
+            android:title="@string/menu_terms_of_use" />
+        <item
+            android:id="@+id/action_service_terms"
+            android:icon="@drawable/ic_contract"
+            android:title="@string/menu_service_terms" />
+        <item
+            android:id="@+id/action_privacy_policy"
+            android:icon="@drawable/ic_contract"
+            android:title="@string/menu_privacy_policy" />
+    </group>
+
+    <group
+        android:id="@+id/grp3"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/action_help"
-            android:visible="false"
             android:icon="@drawable/ic_help_white_24dp"
-            android:title="@string/menu_help"/>
+            android:title="@string/menu_help"
+            android:visible="false" />
         <item
             android:id="@+id/action_about"
             android:icon="@drawable/ic_notification"
-            android:iconTint="@color/bitcoindotcom_green"
-            android:title="@string/menu_about"/>
+            android:title="@string/menu_about" />
     </group>
-
 </menu>

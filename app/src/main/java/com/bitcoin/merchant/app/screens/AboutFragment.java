@@ -22,7 +22,7 @@ public class AboutFragment extends ToolbarAwareFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_about, container, false);
         TextView about = view.findViewById(R.id.about_screen);
-        about.setText(BuildConfig.VERSION_NAME + " - 2019");
+        about.setText(BuildConfig.VERSION_NAME + " - 2020");
         view.findViewById(R.id.about_logo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

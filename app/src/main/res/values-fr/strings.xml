@@ -6,7 +6,7 @@
     <string name="pin_code_create_error">Entrez deux codes PIN à 4 chiffres correspondants</string>
     <string name="pin_code_enter_error">PIN code incorrect</string>
     <string name="prompt_ok">OK</string>
-    <string name="prompt_ko">ANNULER</string>
+    <string name="prompt_ko">Annuler</string>
     <string name="create_pin">Créer un mot de passe</string>
     <string name="confirm_pin">Confirmer le mot de passe</string>
     <string name="unrecognized_xpub">Format de clé publique non reconnu</string>

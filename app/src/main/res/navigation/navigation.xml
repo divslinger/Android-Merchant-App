@@ -34,6 +34,21 @@
             app:destination="@id/about_screen"
             app:enterAnim="@anim/slide_in_from_left"
             app:popExitAnim="@anim/slide_out_from_right"/>
+        <action
+            android:id="@+id/nav_to_terms_of_use"
+            app:destination="@id/terms_of_use_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/slide_out_from_right"/>
+        <action
+            android:id="@+id/nav_to_service_terms"
+            app:destination="@id/service_terms_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/slide_out_from_right"/>
+        <action
+            android:id="@+id/nav_to_privacy_policy"
+            app:destination="@id/privacy_policy_screen"
+            app:enterAnim="@anim/slide_in_from_left"
+            app:popExitAnim="@anim/slide_out_from_right"/>
     </fragment>
     <fragment
         android:id="@+id/payment_request_screen"
@@ -67,6 +82,27 @@
         android:name="com.bitcoin.merchant.app.screens.AboutFragment"
         android:label="About"
         tools:layout="@layout/fragment_about">
+        <!-- Only BACK action allowed -->
+    </fragment>
+    <fragment
+        android:id="@+id/terms_of_use_screen"
+        android:name="com.bitcoin.merchant.app.screens.legal.TermsOfUseFragment"
+        android:label="Terms of use"
+        tools:layout="@layout/fragment_legal">
+        <!-- Only BACK action allowed -->
+    </fragment>
+    <fragment
+        android:id="@+id/service_terms_screen"
+        android:name="com.bitcoin.merchant.app.screens.legal.ServiceTermsFragment"
+        android:label="Service terms"
+        tools:layout="@layout/fragment_legal">
+        <!-- Only BACK action allowed -->
+    </fragment>
+    <fragment
+        android:id="@+id/privacy_policy_screen"
+        android:name="com.bitcoin.merchant.app.screens.legal.PrivacyPolicyFragment"
+        android:label="Privacy policy"
+        tools:layout="@layout/fragment_legal">
         <!-- Only BACK action allowed -->
     </fragment>
     <fragment
