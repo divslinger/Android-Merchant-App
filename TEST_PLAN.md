@@ -5,7 +5,7 @@ These Android tests have been divided in sections:
 * **TODO** Payment REQUEST
 * **TODO** Settings
 * Transactions
-* XXX Navigation 
+* Navigation 
 * Compatibility
 
 Some tests requires a fresh install without data from the previous installation. 
@@ -170,13 +170,61 @@ This requires to both uninstall the app and to clear the app cache.
 1. BACK button behavior 
    * TODO 
 1. ABOUT: navigate to screen
-   * TODO 
+   * launch app & do required setup
+   * Go to 'About' screen
+   * Confirm that it displays app name "Bitcoin Cash Register", version & year
+   * Click on device 'Home' button to put the app in background
+   * Resume the paused app
+   * Confirm that it opens on the Payment INPUT screen with an amount of 0
 1. PRIVACY POLICY: navigate to screen
-   * TODO 
+   * launch app & do required setup
+   * Go to 'Privacy Policy' screen
+   * Confirm that it displays the correct content or web page 
+   * Click on device 'Home' button to put the app in background
+   * Resume the paused app
+   * Confirm that it opens on the Payment INPUT screen with an amount of 0
 1. SERVICE TERMS: navigate to screen
-   * TODO 
+   * **NOT READY** webpage url is NOT yet defined
+   * launch app & do required setup
+   * Go to 'Service Terms' screen
+   * Confirm that it displays the 'Service Terms' web page 
+   * Click on device 'Home' button to put the app in background
+   * Resume the paused app
+   * Confirm that it opens on the Payment INPUT screen with an amount of 0
 1. TERMS OF USE: navigate to screen
-   * TODO 
+   * launch app & do required setup
+   * Go to 'Terms of use' screen
+   * Confirm that it displays the 'Terms of use' web page 
+   * Click on device 'Home' button to put the app in background
+   * Resume the paused app
+   * Confirm that it opens on the Payment INPUT screen with an amount of 0
+1. TRANSACTIONS: navigate to screen 
+   * launch app & do required setup
+   * Go to 'Transactions' screen
+   * Click on device 'Home' button to put the app in background
+   * Resume the paused app
+   * Confirm that it opens on the Payment INPUT screen with an amount of 0
+1. SETTINGS: navigate to screen
+   * launch app & do required setup for Pin code & Payment Target
+   * Go to 'Settings' screen
+   * Click on device 'Home' button to put the app in background
+   * Resume the paused app
+   * Confirm that it opens on the Payment INPUT screen with an amount of 0
+1. Payment INPUT: navigate to screen
+   * launch app
+   * Go to 'Payment INPUT' screen
+   * Enter amount: 99
+   * Click on device 'Home' button to put the app in background
+   * Resume the paused app
+   * Confirm that it opens on the 'Payment INPUT' screen with an amount of 99
+1. Payment REQUEST: navigate to screen
+   * launch app
+   * Go to 'Payment INPUT' screen
+   * Enter amount: 10
+   * Click charge to arrive on the 'Payment REQUEST' screen
+   * Click on device 'Home' button to put the app in background
+   * Resume the paused app
+   * Confirm that it opens on the 'Payment REQUEST' screen with an amount of 10
 
 #### Compatibility
 1. Use an Android device with OS 10
