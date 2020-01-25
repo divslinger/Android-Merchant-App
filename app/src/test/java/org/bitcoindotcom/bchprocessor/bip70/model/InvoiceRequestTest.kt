@@ -1,8 +1,8 @@
 package org.bitcoindotcom.bchprocessor.bip70.model
 
 import com.bitcoin.merchant.app.util.GsonUtil
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 internal class InvoiceRequestTest {
     @Test
@@ -11,8 +11,8 @@ internal class InvoiceRequestTest {
         val fiat = "USD"
         val ir = InvoiceRequest(amount, fiat);
         println(ir)
-        Assert.assertEquals(amount, ir.amount)
-        Assert.assertEquals(fiat, ir.fiat)
+        assertEquals(amount, ir.amount)
+        assertEquals(fiat, ir.fiat)
     }
 
     @Test
@@ -21,7 +21,7 @@ internal class InvoiceRequestTest {
         println(jsonString)
         val o = GsonUtil.gson.fromJson(jsonString, InvoiceRequest::class.java);
         println(o)
-        Assert.assertEquals(o.address, "1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k")
+        assertEquals(o.address, "1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k")
     }
 
     @Test
@@ -30,6 +30,6 @@ internal class InvoiceRequestTest {
         println(jsonString)
         val o = GsonUtil.gson.fromJson(jsonString, InvoiceRequest::class.java);
         println(o)
-        Assert.assertEquals(o.apiKey, "sexqvmkxafvzhzfageoojrkchdekfwmuqpfqywsf")
+        assertEquals(o.apiKey, "sexqvmkxafvzhzfageoojrkchdekfwmuqpfqywsf")
     }
 }

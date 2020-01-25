@@ -11,5 +11,6 @@ import org.junit.runner.RunWith
 class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
+        println("AndroidJUnit4 test passed")
     }
 }
