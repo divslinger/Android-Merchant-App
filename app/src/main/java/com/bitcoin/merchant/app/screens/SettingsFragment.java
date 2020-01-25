@@ -49,7 +49,6 @@ public class SettingsFragment extends ToolbarAwareFragment {
     private LinearLayout lvPaymentAddress;
     private LinearLayout lvLocalCurrency;
     private LinearLayout lvPinCode;
-    private Button btnSave;
     private RelativeLayout btnLocalBitcoin;
     private RelativeLayout btnThePit;
     private boolean isScanning;
@@ -64,14 +63,12 @@ public class SettingsFragment extends ToolbarAwareFragment {
         lvPaymentAddress = rootView.findViewById(R.id.lv_payment_address);
         lvLocalCurrency = rootView.findViewById(R.id.lv_fiat_currency);
         lvPinCode = rootView.findViewById(R.id.lv_pin_code);
-        btnSave = rootView.findViewById(R.id.btn_save);
         btnLocalBitcoin = rootView.findViewById(R.id.localbch_ad);
         btnThePit = rootView.findViewById(R.id.bce_ad);
         addOptionName();
         addOptionCurrency();
         addOptionAddress();
         addOptionPin();
-        btnSave.setOnClickListener(v -> activity.onBackPressed());
         btnLocalBitcoin.setOnClickListener(v -> openUrl("https://local.bitcoin.com"));
         btnThePit.setOnClickListener(v -> openUrl("https://exchange.bitcoin.com"));
         setToolbarAsBackButton();
