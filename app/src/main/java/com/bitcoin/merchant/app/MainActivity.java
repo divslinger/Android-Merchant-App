@@ -116,6 +116,10 @@ public class MainActivity extends AppCompatActivity
         if(!PrefsUtil.getInstance(this).has(PrefsUtil.MERCHANT_KEY_EULA) || !PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_EULA, false)) {
             DialogUtil.show(this, "", getResources().getString(R.string.contract_agreement_summary), getResources().getString(R.string.contract_button_ok), this::agreeToEula);
         }
+
+        if(PrefsUtil.getInstance(this).has(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE)) {
+            //TODO restore payment request screen when invoice ID is detected, then delete this Pref.
+        }
     }
 
     private void agreeToEula() {
