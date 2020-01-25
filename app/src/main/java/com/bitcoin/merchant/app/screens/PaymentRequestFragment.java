@@ -29,11 +29,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.DialogUtil;
+import com.bitcoin.merchant.app.util.GsonUtil;
 import com.bitcoin.merchant.app.util.PaymentTarget;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.bitcoin.merchant.app.util.ToastCustom;
@@ -158,6 +160,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        PrefsUtil.getInstance(activity).removeValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE);
         View v = inflater.inflate(R.layout.fragment_request_payment, container, false);
         initViews(v);
         setToolbarVisible(false);
@@ -165,17 +168,27 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         bip70PayService = Bip70PayService.Companion.create(getResources().getString(R.string.bip70_bitcoin_com_host));
         bip70Manager = new Bip70Manager(getApp());
         Bundle args = getArguments();
-        double amountFiat = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
         AmountUtil f = new AmountUtil(activity);
+        double amountFiat = 0;
+        InvoiceRequest invoiceRequest = null;
+        if(args.containsKey(PaymentInputFragment.AMOUNT_PAYABLE_FIAT)) {
+            amountFiat = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
+            invoiceRequest = createInvoice(amountFiat, AppUtil.getCurrency(activity));
+        } else if(args.containsKey(PaymentInputFragment.PERSIST_INVOICE)) {
+            String invoiceJson = args.getString(PaymentInputFragment.PERSIST_INVOICE, "{}");
+            invoiceRequest = InvoiceRequest.fromJson(invoiceJson);
+            amountFiat = Double.parseDouble(invoiceRequest.getAmount());
+        }
+
         fiatFormatted = f.formatFiat(amountFiat);
         tvFiatAmount.setText(fiatFormatted);
-        InvoiceRequest InvoiceRequest = createInvoice(amountFiat, AppUtil.getCurrency(activity));
-        if (InvoiceRequest == null) {
+        if (invoiceRequest == null) {
             ToastCustom.makeText(activity, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
             cancelPayment();
         } else {
-            generateInvoiceAndWaitForPayment(InvoiceRequest);
+            generateInvoiceAndWaitForPayment(invoiceRequest);
         }
+
         return v;
     }
 
@@ -285,8 +298,6 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     if (invoice == null) {
                         throw new Exception("HTTP status:" + response.code() + " message:" + response.message());
                     }
-                    // TODO persist & resume invoice in case of crash
-                    PrefsUtil.getInstance(activity).setValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, invoice.getPaymentId());
                     qrCodeUri = invoice.getWalletUri();
                     // connect the socket first before showing the bitmap
                     getBip70Manager().startWebsockets(invoice.getPaymentId());
@@ -296,6 +307,8 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                         Log.e(TAG, "", e);
                     }
                     String title = "Error during invoice creation";
+                    Log.i(TAG, "Saving invoice...");
+                    PrefsUtil.getInstance(activity).setValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, GsonUtil.INSTANCE.getGson().toJson(request));
                     DialogUtil.show(activity, title, e.getMessage(),
                             () -> cancelPayment());
                 }
