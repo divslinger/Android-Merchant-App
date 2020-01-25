@@ -19,6 +19,7 @@ public class PrefsUtil implements PersistantPrefs {
     // unused public static final String MERCHANT_KEY_PUSH_NOTIFS = "push_notifications";
     public static final String MERCHANT_KEY_ACCOUNT_INDEX = "account_idx";
     public static final String MERCHANT_KEY_EULA = "eula";
+    public static final String MERCHANT_KEY_PERSIST_INVOICE = "persist_invoice";
     private static Context context = null;
     private static PrefsUtil instance = null;
 

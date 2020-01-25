@@ -7,6 +7,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -34,6 +35,7 @@ import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.DialogUtil;
 import com.bitcoin.merchant.app.util.PaymentTarget;
+import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.bitcoin.merchant.app.util.ToastCustom;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.android.Contents;
@@ -284,6 +286,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                         throw new Exception("HTTP status:" + response.code() + " message:" + response.message());
                     }
                     // TODO persist & resume invoice in case of crash
+                    PrefsUtil.getInstance(activity).setValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, invoice.getPaymentId());
                     qrCodeUri = invoice.getWalletUri();
                     // connect the socket first before showing the bitmap
                     getBip70Manager().startWebsockets(invoice.getPaymentId());
