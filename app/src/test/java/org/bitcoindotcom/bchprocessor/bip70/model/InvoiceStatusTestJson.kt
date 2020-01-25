@@ -1,8 +1,9 @@
 package org.bitcoindotcom.bchprocessor.bip70.model
 
 import com.bitcoin.merchant.app.util.GsonUtil
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 
 internal class InvoiceStatusTestJson {
     @Test
@@ -15,9 +16,9 @@ internal class InvoiceStatusTestJson {
         val fullJson = GsonUtil.gson.toJsonTree(invoiceStatus).asJsonObject;
         println(fullJson)
         println(time)
-        Assert.assertEquals(fullJson["time"].asString, time)
+        assertEquals(fullJson["time"].asString, time)
         println(expires)
-        Assert.assertEquals(fullJson["expires"].asString, expires)
+        assertEquals(fullJson["expires"].asString, expires)
     }
 
     @Test
@@ -26,13 +27,13 @@ internal class InvoiceStatusTestJson {
         println(jsonString)
         val o = GsonUtil.gson.fromJson(jsonString, InvoiceStatus::class.java);
         println(o)
-        Assert.assertEquals(o.outputs.size, 2)
-        Assert.assertTrue(o.isPaid)
-        Assert.assertEquals(o.fiatSymbol, "USD")
-        Assert.assertEquals(o.fiatRate, 222.67, 0.0)
-        Assert.assertEquals(o.fiatTotal, 0.1, 0.0)
-        Assert.assertEquals(o.paymentUrl, "https://pay.bitcoin.com/i/C9kVtnhDYdiGig5Q2rXJ44")
-        Assert.assertEquals(o.paymentId, "C9kVtnhDYdiGig5Q2rXJ44")
-        Assert.assertEquals(o.txId, "a71a8c008ff5dba3d5cc5929485d2860b836f559c782effeef0daec666db7ea7")
+        assertEquals(o.outputs.size, 2)
+        assertTrue(o.isPaid)
+        assertEquals(o.fiatSymbol, "USD")
+        assertEquals(o.fiatRate, 222.67, 0.0)
+        assertEquals(o.fiatTotal, 0.1, 0.0)
+        assertEquals(o.paymentUrl, "https://pay.bitcoin.com/i/C9kVtnhDYdiGig5Q2rXJ44")
+        assertEquals(o.paymentId, "C9kVtnhDYdiGig5Q2rXJ44")
+        assertEquals(o.txId, "a71a8c008ff5dba3d5cc5929485d2860b836f559c782effeef0daec666db7ea7")
     }
 }
