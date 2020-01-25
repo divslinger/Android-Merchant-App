@@ -42,7 +42,7 @@ public class WalletUtil {
         addressBank = new AddressBank(app.getDb());
     }
 
-    private static DeterministicKey createMasterPubKeyFromXPub(String xpubstr) throws AddressFormatException {
+    public static DeterministicKey createMasterPubKeyFromXPub(String xpubstr) throws AddressFormatException {
         byte[] xpubBytes = Base58.decodeChecked(xpubstr);
         ByteBuffer bb = ByteBuffer.wrap(xpubBytes);
         int prefix = bb.getInt();
