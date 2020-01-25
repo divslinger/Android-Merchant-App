@@ -19,6 +19,7 @@ import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.MonetaryUtil;
+import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.bitcoin.merchant.app.util.SnackCustom;
 
 import java.text.NumberFormat;
@@ -68,6 +69,13 @@ public class PaymentInputFragment extends ToolbarAwareFragment {
         tvCurrencySymbol.setText(getCurrencySymbol());
         setToolbarAsMenuButton();
         clearToolbarTitle();
+
+        if(PrefsUtil.getInstance(activity).has(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE)) {
+            //TODO restore payment request screen when invoice ID is detected, then delete this Pref.
+
+            PrefsUtil.getInstance(activity).removeValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE);
+        }
+
         return rootView;
     }
 
