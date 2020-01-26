@@ -116,7 +116,10 @@ This requires to both uninstall the app and to clear the app cache.
    * Wait 3 seconds and ensure that the app did not crash
    * Verify amount has been properly reset to 0 on the Payment INPUT screen
 1. Verify auto-cancellation after TIMER EXPIRY
-   * TODO 
+   * Enter any amount on the Payment Input screen
+   * Click the "Charge" button to enter the Payment Request screen
+   * Wait for the timer below the QR code to reach 0:00
+   * Make sure the Payment Request screen closes itself when the timer reaches 0:00
 1. Verify that 2 payments using xPubKey ends up in 2 different addresses 
    * TODO 
 
