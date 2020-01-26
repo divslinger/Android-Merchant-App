@@ -88,8 +88,15 @@ This requires to both uninstall the app and to clear the app cache.
    * Grab a wallet of your choice on a separate device and pay the invoice by scanning the QR code
    * Upon payment, the Bitcoin Cash Register device should now have a green screen with a white checkmark, and your device should make a noticeable ding sound.
 1. Automatic RESUME AFTER CRASH
-   * **NOT READY** I'm almost done with this system. -pokkst
-   * TODO
+   * Turn off internet connection on the merchant device.
+   * Enter any amount on the Payment Input screen
+   * Click the "Charge" button to enter the Payment Request screen
+   * Upon seeing the "Error during invoice generation" popup, do not press continue.
+   * Swipe down on your Android device to bring the notification shade into view.
+   * Turn on your internet connection
+   * Wait for the internet connection to be established
+   * Press continue on the "Error during invoice generation" popup
+   * The invoice should now be properly generated.
 1. Automatic RECONNECT after internet disconnection
    * Enter any amount on the Payment Input screen
    * Click the "Charge" button to enter the Payment Request screen
