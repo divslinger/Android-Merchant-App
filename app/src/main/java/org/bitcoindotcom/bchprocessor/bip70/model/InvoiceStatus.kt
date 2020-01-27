@@ -22,8 +22,10 @@ class InvoiceStatus(
         @SerializedName("merchantId") var merchantId: String? = null,
         @SerializedName("outputs") var outputs: List<InvoiceStatusOutput> = ArrayList(0)) {
 
+    val isInitialized: Boolean
+        get() = paymentUrl.isNotEmpty() && status != null && fiatTotal != 0.0 && outputs.isNotEmpty();
     val firstAddress: String?
-        get() = if (outputs.size > 0) outputs[0].address else null
+        get() = if (outputs.isNotEmpty()) outputs[0].address else null
 
     val totalBchAmount: Long
         get() {

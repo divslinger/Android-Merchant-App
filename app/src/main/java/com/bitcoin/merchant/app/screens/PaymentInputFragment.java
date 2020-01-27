@@ -19,10 +19,7 @@ import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.MonetaryUtil;
-import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.bitcoin.merchant.app.util.SnackCustom;
-
-import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus;
 
 import java.text.NumberFormat;
 import java.util.Currency;
@@ -32,7 +29,6 @@ public class PaymentInputFragment extends ToolbarAwareFragment {
     private static final String TAG = "PaymentInputFragment";
     public static final String ACTION_INTENT_RESET_AMOUNT = "RESET_AMOUNT";
     public static String AMOUNT_PAYABLE_FIAT = "AMOUNT_PAYABLE_FIAT";
-    public static String PERSIST_INVOICE = "PERSIST_INVOICE";
     public double amountPayableFiat;
     private int allowedDecimalPlaces = 2;
     private View rootView;
@@ -93,14 +89,10 @@ public class PaymentInputFragment extends ToolbarAwareFragment {
             getNav().navigate(R.id.pin_code_screen, args);
         } else if (!AppUtil.getPaymentTarget(activity).isValid()) {
             getNav().navigate(R.id.nav_to_settings_screen_bypass_security);
-        }
-
-        if(PrefsUtil.getInstance(activity).has(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE)) {
-            String invoiceJson = PrefsUtil.getInstance(activity).getValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, "");
-            Bundle extras = new Bundle();
-            extras.putString(PaymentInputFragment.PERSIST_INVOICE, invoiceJson);
-            getNav().navigate(R.id.nav_to_payment_request_screen, extras);
-            PrefsUtil.getInstance(activity).removeValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE);
+        } else {
+            if (AppUtil.getActiveInvoice(activity) != null) {
+                getNav().navigate(R.id.nav_to_payment_request_screen);
+            }
         }
     }
 

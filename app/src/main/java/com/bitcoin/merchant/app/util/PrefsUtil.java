@@ -16,7 +16,6 @@ public class PrefsUtil implements PersistantPrefs {
     public static final String MERCHANT_KEY_MERCHANT_RECEIVER = "receiving_address";
     public static final String MERCHANT_KEY_SCANNED_ALL_MISSING_FUNDS = "scanned_for_missing_funds";
     public static final String MERCHANT_KEY_XPUB_INDEX = "xpub_index";
-    // unused public static final String MERCHANT_KEY_PUSH_NOTIFS = "push_notifications";
     public static final String MERCHANT_KEY_ACCOUNT_INDEX = "account_idx";
     public static final String MERCHANT_KEY_EULA = "eula";
     public static final String MERCHANT_KEY_PERSIST_INVOICE = "persist_invoice";

@@ -3,10 +3,13 @@ package com.bitcoin.merchant.app.util;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.bitcoin.merchant.app.currency.CurrencyDetector;
+
+import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -68,7 +71,7 @@ public abstract class AppUtil {
 
     public static PaymentTarget getPaymentTarget(Context context) {
         String value = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "");
-        return PaymentTarget.Companion.parse(value);
+        return PaymentTarget.parse(value);
     }
 
     public static void setPaymentTarget(Context context, PaymentTarget target) {
@@ -83,5 +86,25 @@ public abstract class AppUtil {
 
     public static boolean isEmulator() {
         return Build.PRODUCT != null && Build.PRODUCT.toLowerCase().contains("sdk");
+    }
+
+    public static InvoiceStatus getActiveInvoice(Context context) {
+        String invoiceJson = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, "");
+        InvoiceStatus invoice = invoiceJson.isEmpty() ? null : InvoiceStatus.fromJson(invoiceJson);
+        if (invoice != null) {
+            Log.i(TAG, "Loading active invoice...");
+        }
+        return invoice;
+    }
+
+    public static void setActiveInvoice(Context context, InvoiceStatus i) {
+        if (i.isInitialized()) {
+            Log.i(TAG, "Saving active invoice...");
+            PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, GsonUtil.INSTANCE.getGson().toJson(i));
+        }
+    }
+
+    public static void deleteActiveInvoice(Context context) {
+        PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, "");
     }
 }

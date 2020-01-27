@@ -33,7 +33,6 @@ import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.DialogUtil;
-import com.bitcoin.merchant.app.util.GsonUtil;
 import com.bitcoin.merchant.app.util.PaymentTarget;
 import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.bitcoin.merchant.app.util.ToastCustom;
@@ -162,26 +161,32 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         bip70Manager = new Bip70Manager(getApp());
         Bundle args = getArguments();
         AmountUtil f = new AmountUtil(activity);
-        double amountFiat = 0;
-        InvoiceRequest invoiceRequest = null;
         // TODO check NPE
-        if (args.containsKey(PaymentInputFragment.AMOUNT_PAYABLE_FIAT)) {
-            amountFiat = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
-            invoiceRequest = createInvoice(amountFiat, AppUtil.getCurrency(activity));
-        } else if (args.containsKey(PaymentInputFragment.PERSIST_INVOICE)) {
-            String invoiceJson = args.getString(PaymentInputFragment.PERSIST_INVOICE, "{}");
-            invoiceRequest = InvoiceRequest.fromJson(invoiceJson);
-            amountFiat = Double.parseDouble(invoiceRequest.getAmount());
-        }
-        fiatFormatted = f.formatFiat(amountFiat);
-        tvFiatAmount.setText(fiatFormatted);
-        if (invoiceRequest == null) {
-            ToastCustom.makeText(activity, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
-            cancelPayment();
+        double amountFiat = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
+        if (amountFiat > 0.0) {
+            AppUtil.deleteActiveInvoice(activity);
+            InvoiceRequest invoiceRequest = createInvoice(amountFiat, AppUtil.getCurrency(activity));
+            if (invoiceRequest == null) {
+                unableToDisplayInvoice();
+            } else {
+                fiatFormatted = f.formatFiat(amountFiat);
+                tvFiatAmount.setText(fiatFormatted);
+                generateInvoiceAndWaitForPayment(invoiceRequest);
+            }
         } else {
-            generateInvoiceAndWaitForPayment(invoiceRequest);
+            InvoiceStatus activeInvoice = AppUtil.getActiveInvoice(activity);
+            if (activeInvoice == null) {
+                unableToDisplayInvoice();
+            } else {
+                generateQrCodeAndWaitForPayment(activeInvoice);
+            }
         }
         return v;
+    }
+
+    private void unableToDisplayInvoice() {
+        ToastCustom.makeText(activity, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
+        cancelPayment();
     }
 
     private void registerReceiver() {
@@ -229,6 +234,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
 
     private void cancelPayment() {
         Log.d(TAG, "Canceling payment...");
+        AppUtil.deleteActiveInvoice(activity);
         activity.onBackPressed();
     }
 
@@ -280,8 +286,8 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
             }
 
             @Override
-            protected Pair<InvoiceStatus, Bitmap> doInBackground(InvoiceRequest... bip70InvoiceRequests) {
-                InvoiceRequest request = bip70InvoiceRequests[0];
+            protected Pair<InvoiceStatus, Bitmap> doInBackground(InvoiceRequest... requests) {
+                InvoiceRequest request = requests[0];
                 InvoiceStatus invoice = null;
                 Bitmap bitmap = null;
                 try {
@@ -289,46 +295,88 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     invoice = response.body();
                     if (invoice == null) {
                         throw new Exception("HTTP status:" + response.code() + " message:" + response.message());
+                    } else {
+                        AppUtil.setActiveInvoice(activity, invoice);
                     }
                     qrCodeUri = invoice.getWalletUri();
                     // connect the socket first before showing the bitmap
                     getBip70Manager().startWebsockets(invoice.getPaymentId());
-                    bitmap = generateQrCode(qrCodeUri);
+                    bitmap = getQrCodeBitmap(qrCodeUri);
                 } catch (Exception e) {
                     if (!(e instanceof SocketTimeoutException)) {
                         Log.e(TAG, "", e);
                     }
                     String title = "Error during invoice creation";
-                    Log.i(TAG, "Saving invoice...");
-                    PrefsUtil.getInstance(activity).setValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, GsonUtil.INSTANCE.getGson().toJson(request));
                     DialogUtil.show(activity, title, e.getMessage(),
                             () -> cancelPayment());
                 }
                 return new Pair<>(invoice, bitmap);
             }
 
-            private Bitmap generateQrCode(String url) throws Exception {
-                int qrCodeDimension = 260;
-                Log.d(TAG, "paymentUrl:" + url);
-                QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(url, null, Contents.Type.TEXT, BarcodeFormat.QR_CODE.toString(), qrCodeDimension);
-                return qrCodeEncoder.encodeAsBitmap();
+            @Override
+            protected void onPostExecute(Pair<InvoiceStatus, Bitmap> pair) {
+                super.onPostExecute(pair);
+                showGeneratingQrCodeProgress(false);
+                showQrCodeAndAmountFields(pair);
+            }
+        }.execute(invoiceRequest);
+    }
+
+    private Bitmap getQrCodeBitmap(String url) throws Exception {
+        int qrCodeDimension = 260;
+        Log.d(TAG, "paymentUrl:" + url);
+        QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(url, null, Contents.Type.TEXT, BarcodeFormat.QR_CODE.toString(), qrCodeDimension);
+        return qrCodeEncoder.encodeAsBitmap();
+    }
+
+    private void showQrCodeAndAmountFields(Pair<InvoiceStatus, Bitmap> pair) {
+        InvoiceStatus i = pair.first;
+        Bitmap bitmap = pair.second;
+        if (i != null && bitmap != null) {
+            AmountUtil f = new AmountUtil(activity);
+            tvFiatAmount.setText(f.formatFiat(i.getFiatTotal()));
+            tvBtcAmount.setText(f.formatBch(i.getTotalBchAmount()));
+            ivReceivingQr.setImageBitmap(bitmap);
+            initiateCountdown(i);
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private void generateQrCodeAndWaitForPayment(final InvoiceStatus invoiceStatus) {
+        new AsyncTask<InvoiceStatus, Void, Pair<InvoiceStatus, Bitmap>>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                showGeneratingQrCodeProgress(true);
+            }
+
+            @Override
+            protected Pair<InvoiceStatus, Bitmap> doInBackground(InvoiceStatus... invoices) {
+                InvoiceStatus invoice = invoices[0];
+                Bitmap bitmap = null;
+                try {
+                    qrCodeUri = invoice.getWalletUri();
+                    // connect the socket first before showing the bitmap
+                    getBip70Manager().startWebsockets(invoice.getPaymentId());
+                    bitmap = getQrCodeBitmap(qrCodeUri);
+                } catch (Exception e) {
+                    if (!(e instanceof SocketTimeoutException)) {
+                        Log.e(TAG, "", e);
+                    }
+                    String title = "Error during QR code creation";
+                    DialogUtil.show(activity, title, e.getMessage(),
+                            () -> cancelPayment());
+                }
+                return new Pair<>(invoice, bitmap);
             }
 
             @Override
             protected void onPostExecute(Pair<InvoiceStatus, Bitmap> pair) {
                 super.onPostExecute(pair);
                 showGeneratingQrCodeProgress(false);
-                InvoiceStatus i = pair.first;
-                Bitmap bitmap = pair.second;
-                if (i != null && bitmap != null) {
-                    AmountUtil f = new AmountUtil(activity);
-                    tvFiatAmount.setText(f.formatFiat(i.getFiatTotal()));
-                    tvBtcAmount.setText(f.formatBch(i.getTotalBchAmount()));
-                    ivReceivingQr.setImageBitmap(bitmap);
-                    initiateCountdown(i);
-                }
+                showQrCodeAndAmountFields(pair);
             }
-        }.execute(invoiceRequest);
+        }.execute(invoiceStatus);
     }
 
     private void initiateCountdown(InvoiceStatus invoiceStatus) {
@@ -354,6 +402,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         waitingLayout.setVisibility(View.GONE);
         receivedLayout.setVisibility(View.VISIBLE);
         AppUtil.setStatusBarColor(activity, R.color.bitcoindotcom_green);
+        AppUtil.deleteActiveInvoice(activity);
         ivDone.setOnClickListener(v -> {
             AppUtil.setStatusBarColor(activity, R.color.gray);
             activity.onBackPressed();

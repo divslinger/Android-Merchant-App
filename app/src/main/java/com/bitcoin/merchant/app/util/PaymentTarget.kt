@@ -44,6 +44,7 @@ data class PaymentTarget(val type: Type, val target: String) {
             return FormatsUtil.getInstance().isValidXpub(value)
         }
 
+        @JvmStatic
         fun parse(value: String?): PaymentTarget {
             if (value == null || StringUtils.isEmpty(value))
                 return PaymentTarget(Type.INVALID, "")
