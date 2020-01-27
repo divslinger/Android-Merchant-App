@@ -4,10 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 
 public class DialogUtil {
-    public static void show(Activity activity, String title, String message) {
-        show(activity, title, message, null);
-    }
-
     public static void show(Activity activity, String title, String message, final Runnable runner) {
         show(activity, title, message, activity.getString(android.R.string.ok), runner);
     }
