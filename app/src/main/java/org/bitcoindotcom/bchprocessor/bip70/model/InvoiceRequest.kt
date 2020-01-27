@@ -13,7 +13,7 @@ data class InvoiceRequest @JvmOverloads constructor (
         @SerializedName("address") var address: String? = null) {
     companion object {
         @JvmStatic
-        fun fromJson(message: String?): InvoiceRequest {
+        fun fromJson(message: String): InvoiceRequest {
             return GsonUtil.gson.fromJson(message, InvoiceRequest::class.java)
         }
     }

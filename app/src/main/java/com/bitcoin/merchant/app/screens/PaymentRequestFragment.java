@@ -7,7 +7,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -29,7 +28,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AmountUtil;
@@ -59,7 +57,7 @@ import static com.bitcoin.merchant.app.MainActivity.TAG;
 public class PaymentRequestFragment extends ToolbarAwareFragment {
     private LinearLayout waitingLayout;
     private LinearLayout receivedLayout;
-    private TextView tvConnectionStatus;
+    private ImageView tvConnectionStatus;
     private TextView tvFiatAmount;
     private TextView tvBtcAmount;
     private TextView tvExpiryTimer;
@@ -81,7 +79,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                 expirePayment(InvoiceStatus.fromJson(intent.getStringExtra(Action.PARAM_INVOICE_STATUS)));
             }
             if (Action.UPDATE_CONNECTION_STATUS.equals(intent.getAction())) {
-                updateConnectionStatus(intent.getStringExtra(Action.PARAM_CONNECTION_STATUS));
+                updateConnectionStatus(intent.getBooleanExtra(Action.PARAM_CONNECTION_STATUS_ENABLED, false));
             }
             if (Action.NETWORK_RECONNECT.equals(intent.getAction())) {
                 reconnectIfNecessary();
@@ -106,14 +104,9 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         cancelPayment();
     }
 
-    private void updateConnectionStatus(String status) {
-        Log.i(TAG, "Socket is " + status);
-
-        if(status.equals("connected")) {
-            tvConnectionStatus.setText("Connected");
-        } else if(status.equals("disconnected")) {
-            tvConnectionStatus.setText("Disconnected");
-        }
+    private void updateConnectionStatus(boolean enabled) {
+        Log.i(TAG, "Socket " + (enabled ? "connected" : "disconnected"));
+        tvConnectionStatus.setImageResource(enabled ? R.drawable.connected : R.drawable.disconnected);
     }
 
     private void acknowledgePayment(InvoiceStatus i) {
@@ -171,15 +164,15 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         AmountUtil f = new AmountUtil(activity);
         double amountFiat = 0;
         InvoiceRequest invoiceRequest = null;
-        if(args.containsKey(PaymentInputFragment.AMOUNT_PAYABLE_FIAT)) {
+        // TODO check NPE
+        if (args.containsKey(PaymentInputFragment.AMOUNT_PAYABLE_FIAT)) {
             amountFiat = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
             invoiceRequest = createInvoice(amountFiat, AppUtil.getCurrency(activity));
-        } else if(args.containsKey(PaymentInputFragment.PERSIST_INVOICE)) {
+        } else if (args.containsKey(PaymentInputFragment.PERSIST_INVOICE)) {
             String invoiceJson = args.getString(PaymentInputFragment.PERSIST_INVOICE, "{}");
             invoiceRequest = InvoiceRequest.fromJson(invoiceJson);
             amountFiat = Double.parseDouble(invoiceRequest.getAmount());
         }
-
         fiatFormatted = f.formatFiat(amountFiat);
         tvFiatAmount.setText(fiatFormatted);
         if (invoiceRequest == null) {
@@ -188,7 +181,6 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         } else {
             generateInvoiceAndWaitForPayment(invoiceRequest);
         }
-
         return v;
     }
 
@@ -348,18 +340,12 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     long secondsLeft = millisUntilFinished / 1000L;
                     Locale locale = getResources().getConfiguration().locale;
                     tvExpiryTimer.setText(String.format(locale, "%02d:%02d", secondsLeft / 60, secondsLeft % 60));
-
-                    if(!bip70Manager.socketHandler.isConnected()) {
-                        updateConnectionStatus("disconnected");
-                    } else {
-                        updateConnectionStatus("connected");
-                    }
+                    updateConnectionStatus(bip70Manager.socketHandler.isConnected());
                 }
             }
 
             @Override
             public void onFinish() {
-
             }
         }.start();
     }

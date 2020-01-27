@@ -48,7 +48,7 @@ public class Bip70SocketHandler extends WebSocketHandler {
                 setAutoReconnect(false);
             } else if (status.isOpen()) {
                 Intent i = new Intent(Action.UPDATE_CONNECTION_STATUS);
-                i.putExtra(Action.PARAM_CONNECTION_STATUS, "connected");
+                i.putExtra(Action.PARAM_CONNECTION_STATUS_ENABLED, true);
                 LocalBroadcastManager.getInstance(context).sendBroadcast(i);
             }
         } catch (Exception e) {

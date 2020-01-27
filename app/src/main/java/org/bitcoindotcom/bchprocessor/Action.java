@@ -7,6 +7,6 @@ public interface Action {
     String UPDATE_CONNECTION_STATUS = PACKAGE + "Action.UPDATE_CONNECTION_STATUS";
     String NETWORK_RECONNECT = PACKAGE + "Action.NETWORK_RECONNECT";
     String PARAM_INVOICE_STATUS = "invoiceStatus";
-    String PARAM_CONNECTION_STATUS = "connectionStatus";
+    String PARAM_CONNECTION_STATUS_ENABLED = "connectionStatus";
     String QUERY_ALL_TX_FROM_BITCOIN_COM_PAY = "queryTxFromBitcoinPayServer";
 }
