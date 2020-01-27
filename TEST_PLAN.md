@@ -2,7 +2,7 @@ These Android tests have been divided in sections:
 * Setup
 * Detection
 * **TODO** Payment INPUT
-* **TODO** Payment REQUEST
+* Payment REQUEST
 * **TODO** Settings
 * Transactions
 * Navigation 
@@ -78,13 +78,37 @@ This requires to both uninstall the app and to clear the app cache.
    
 #### Payment REQUEST    
 1. create invoice shows QR code & correct FIAT amount 
-   * TODO 
-1. Verify CHECKMARK & SOUND after payment is sent 
-   * TODO 
+   * Enter 5.00 USD on the Payment Input screen
+   * Click the "Charge" button to enter the Payment Request screen
+   * Verify the amount label at the top of the Payment Request screen matches the amount you entered in Step 1. (5.00 USD)
+1. Verify CHECKMARK & SOUND after payment is sent
+   * Make sure your device's volume is at the MAX setting
+   * Enter any amount on the Payment Input screen
+   * Click the "Charge" button to enter the Payment Request screen
+   * Grab a wallet of your choice on a separate device and pay the invoice by scanning the QR code
+   * Upon payment, the Bitcoin Cash Register device should now have a green screen with a white checkmark, and your device should make a noticeable ding sound.
 1. Automatic RESUME AFTER CRASH
-   * TODO 
+   * Turn off internet connection on the merchant device.
+   * Enter any amount on the Payment Input screen
+   * Click the "Charge" button to enter the Payment Request screen
+   * Upon seeing the "Error during invoice generation" popup, do not press continue.
+   * Swipe down on your Android device to bring the notification shade into view.
+   * Turn on your internet connection
+   * Wait for the internet connection to be established
+   * Press continue on the "Error during invoice generation" popup
+   * The invoice should now be properly generated.
 1. Automatic RECONNECT after internet disconnection
-   * TODO 
+   * Enter any amount on the Payment Input screen
+   * Click the "Charge" button to enter the Payment Request screen
+   * Swipe down on your Android device to bring the notification shade into view.
+   * Turn off your internet connection
+   * Wait 5 seconds
+   * Repeat Step 3
+   * Turn on your internet connection
+   * Wait for the internet connection to be established
+   * Make sure the connection label on the Payment Request screen says "Connected"
+   * Make payment by scanning the QR code that is displayed on the Payment Request screen.
+   * Ensure that the checkmark screen is shown upon payment.
 1. Verify invoice CANCELLATION doesn't crash
    * enter any amount on the Payment INPUT screen
    * Click the 'CHARGE' button to enter Payment REQUEST screen
@@ -92,9 +116,19 @@ This requires to both uninstall the app and to clear the app cache.
    * Wait 3 seconds and ensure that the app did not crash
    * Verify amount has been properly reset to 0 on the Payment INPUT screen
 1. Verify auto-cancellation after TIMER EXPIRY
-   * TODO 
+   * Enter any amount on the Payment Input screen
+   * Click the "Charge" button to enter the Payment Request screen
+   * Wait for the timer below the QR code to reach 0:00
+   * Make sure the Payment Request screen closes itself when the timer reaches 0:00
 1. Verify that 2 payments using xPubKey ends up in 2 different addresses 
-   * TODO 
+   * Enter any amount on the Payment Input screen
+   * Click the "Charge" button to enter the Payment Request screen
+   * Pay the invoice
+   * Go to the Transactions screen
+   * View the transaction on the block explorer
+   * Make note of the address in the output belonging to you
+   * Repeat Steps 1 through 6
+   * Compare the addresses and ensure they do NOT match
 
 #### Settings    
 1. Verify that access to settings screen is SECURED BY PIN-CODE

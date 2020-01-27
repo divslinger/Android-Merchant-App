@@ -140,6 +140,13 @@
             android:textStyle="bold"
             android:stateListAnimator="@null"/>
 
+        <TextView
+            android:id="@+id/tv_connection_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Disconnected" />
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

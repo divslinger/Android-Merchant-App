@@ -7,6 +7,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -28,12 +29,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.bitcoin.merchant.app.MainActivity;
 import com.bitcoin.merchant.app.R;
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment;
 import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.DialogUtil;
+import com.bitcoin.merchant.app.util.GsonUtil;
 import com.bitcoin.merchant.app.util.PaymentTarget;
+import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.bitcoin.merchant.app.util.ToastCustom;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.android.Contents;
@@ -55,6 +59,7 @@ import static com.bitcoin.merchant.app.MainActivity.TAG;
 public class PaymentRequestFragment extends ToolbarAwareFragment {
     private LinearLayout waitingLayout;
     private LinearLayout receivedLayout;
+    private TextView tvConnectionStatus;
     private TextView tvFiatAmount;
     private TextView tvBtcAmount;
     private TextView tvExpiryTimer;
@@ -74,6 +79,9 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
             }
             if (Action.INVOICE_PAYMENT_EXPIRED.equals(intent.getAction())) {
                 expirePayment(InvoiceStatus.fromJson(intent.getStringExtra(Action.PARAM_INVOICE_STATUS)));
+            }
+            if (Action.UPDATE_CONNECTION_STATUS.equals(intent.getAction())) {
+                updateConnectionStatus(intent.getStringExtra(Action.PARAM_CONNECTION_STATUS));
             }
             if (Action.NETWORK_RECONNECT.equals(intent.getAction())) {
                 reconnectIfNecessary();
@@ -96,6 +104,16 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
             return;
         }
         cancelPayment();
+    }
+
+    private void updateConnectionStatus(String status) {
+        Log.i(TAG, "Socket is " + status);
+
+        if(status.equals("connected")) {
+            tvConnectionStatus.setText("Connected");
+        } else if(status.equals("disconnected")) {
+            tvConnectionStatus.setText("Disconnected");
+        }
     }
 
     private void acknowledgePayment(InvoiceStatus i) {
@@ -142,6 +160,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        PrefsUtil.getInstance(activity).removeValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE);
         View v = inflater.inflate(R.layout.fragment_request_payment, container, false);
         initViews(v);
         setToolbarVisible(false);
@@ -149,17 +168,27 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         bip70PayService = Bip70PayService.Companion.create(getResources().getString(R.string.bip70_bitcoin_com_host));
         bip70Manager = new Bip70Manager(getApp());
         Bundle args = getArguments();
-        double amountFiat = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
         AmountUtil f = new AmountUtil(activity);
+        double amountFiat = 0;
+        InvoiceRequest invoiceRequest = null;
+        if(args.containsKey(PaymentInputFragment.AMOUNT_PAYABLE_FIAT)) {
+            amountFiat = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
+            invoiceRequest = createInvoice(amountFiat, AppUtil.getCurrency(activity));
+        } else if(args.containsKey(PaymentInputFragment.PERSIST_INVOICE)) {
+            String invoiceJson = args.getString(PaymentInputFragment.PERSIST_INVOICE, "{}");
+            invoiceRequest = InvoiceRequest.fromJson(invoiceJson);
+            amountFiat = Double.parseDouble(invoiceRequest.getAmount());
+        }
+
         fiatFormatted = f.formatFiat(amountFiat);
         tvFiatAmount.setText(fiatFormatted);
-        InvoiceRequest InvoiceRequest = createInvoice(amountFiat, AppUtil.getCurrency(activity));
-        if (InvoiceRequest == null) {
+        if (invoiceRequest == null) {
             ToastCustom.makeText(activity, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
             cancelPayment();
         } else {
-            generateInvoiceAndWaitForPayment(InvoiceRequest);
+            generateInvoiceAndWaitForPayment(invoiceRequest);
         }
+
         return v;
     }
 
@@ -168,6 +197,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         filter.addAction(Action.INVOICE_PAYMENT_ACKNOWLEDGED);
         filter.addAction(Action.INVOICE_PAYMENT_EXPIRED);
+        filter.addAction(Action.UPDATE_CONNECTION_STATUS);
         filter.addAction(Action.NETWORK_RECONNECT);
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(activity.getApplicationContext());
         broadcastManager.registerReceiver(receiver, filter);
@@ -183,6 +213,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
     }
 
     private void initViews(View v) {
+        tvConnectionStatus = v.findViewById(R.id.tv_connection_status);
         tvFiatAmount = v.findViewById(R.id.tv_fiat_amount);
         tvBtcAmount = v.findViewById(R.id.tv_btc_amount);
         tvExpiryTimer = v.findViewById(R.id.bip70_timer_tv);
@@ -267,9 +298,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     if (invoice == null) {
                         throw new Exception("HTTP status:" + response.code() + " message:" + response.message());
                     }
-                    // TODO persist & resume invoice in case of crash
                     qrCodeUri = invoice.getWalletUri();
-                    // TODO display icon showing if we are connected or not
                     // connect the socket first before showing the bitmap
                     getBip70Manager().startWebsockets(invoice.getPaymentId());
                     bitmap = generateQrCode(qrCodeUri);
@@ -278,6 +307,8 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                         Log.e(TAG, "", e);
                     }
                     String title = "Error during invoice creation";
+                    Log.i(TAG, "Saving invoice...");
+                    PrefsUtil.getInstance(activity).setValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, GsonUtil.INSTANCE.getGson().toJson(request));
                     DialogUtil.show(activity, title, e.getMessage(),
                             () -> cancelPayment());
                 }
@@ -296,13 +327,13 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                 super.onPostExecute(pair);
                 showGeneratingQrCodeProgress(false);
                 InvoiceStatus i = pair.first;
-                initiateCountdown(i);
                 Bitmap bitmap = pair.second;
                 if (i != null && bitmap != null) {
                     AmountUtil f = new AmountUtil(activity);
                     tvFiatAmount.setText(f.formatFiat(i.getFiatTotal()));
                     tvBtcAmount.setText(f.formatBch(i.getTotalBchAmount()));
                     ivReceivingQr.setImageBitmap(bitmap);
+                    initiateCountdown(i);
                 }
             }
         }.execute(invoiceRequest);
@@ -317,6 +348,12 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     long secondsLeft = millisUntilFinished / 1000L;
                     Locale locale = getResources().getConfiguration().locale;
                     tvExpiryTimer.setText(String.format(locale, "%02d:%02d", secondsLeft / 60, secondsLeft % 60));
+
+                    if(!bip70Manager.socketHandler.isConnected()) {
+                        updateConnectionStatus("disconnected");
+                    } else {
+                        updateConnectionStatus("connected");
+                    }
                 }
             }
 

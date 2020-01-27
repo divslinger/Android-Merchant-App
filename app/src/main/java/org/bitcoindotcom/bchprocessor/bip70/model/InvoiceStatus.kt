@@ -12,7 +12,7 @@ class InvoiceStatus(
         @SerializedName("memo") var memo: String? = null,
         @SerializedName("time") var time: Date = Date(),
         @SerializedName("expires") var expires: Date = Date(),
-        @SerializedName("status") var status: String = Status.expired.name,
+        @SerializedName("status") var status: String? = null,
         @SerializedName("network") var network: String? = "main",
         @SerializedName("currency") var currency: String? = "BCH",
         @SerializedName("fiatSymbol") var fiatSymbol: String = "USD",
