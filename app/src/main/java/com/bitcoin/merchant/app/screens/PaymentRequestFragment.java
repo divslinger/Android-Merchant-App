@@ -34,7 +34,6 @@ import com.bitcoin.merchant.app.util.AmountUtil;
 import com.bitcoin.merchant.app.util.AppUtil;
 import com.bitcoin.merchant.app.util.DialogUtil;
 import com.bitcoin.merchant.app.util.PaymentTarget;
-import com.bitcoin.merchant.app.util.PrefsUtil;
 import com.bitcoin.merchant.app.util.ToastCustom;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.android.Contents;
@@ -47,7 +46,9 @@ import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceRequest;
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus;
 
 import java.net.SocketTimeoutException;
+import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Response;
 
@@ -379,8 +380,17 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         }.execute(invoiceStatus);
     }
 
+    private long getTimeLimit(InvoiceStatus invoiceStatus) {
+        // Do NOT use invoiceStatus.getTime() because it won't reflect the current time
+        // when a persisted invoice is restored
+        Calendar expireGmt = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        expireGmt.setTime(invoiceStatus.getExpires());
+        long currentTimeInUtcMillis = System.currentTimeMillis() - TimeZone.getDefault().getRawOffset();
+        return expireGmt.getTimeInMillis() - currentTimeInUtcMillis;
+    }
+
     private void initiateCountdown(InvoiceStatus invoiceStatus) {
-        long timeLimit = invoiceStatus.getExpires().getTime() - invoiceStatus.getTime().getTime();
+        long timeLimit = getTimeLimit(invoiceStatus);
         new CountDownTimer(timeLimit, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
