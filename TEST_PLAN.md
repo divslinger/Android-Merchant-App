@@ -2,7 +2,7 @@ These Android tests have been divided in sections:
 * Setup
 * Detection
 * **TODO** Payment INPUT
-* **TODO** Payment REQUEST
+* Payment REQUEST
 * **TODO** Settings
 * Transactions
 * Navigation 
@@ -121,7 +121,14 @@ This requires to both uninstall the app and to clear the app cache.
    * Wait for the timer below the QR code to reach 0:00
    * Make sure the Payment Request screen closes itself when the timer reaches 0:00
 1. Verify that 2 payments using xPubKey ends up in 2 different addresses 
-   * TODO 
+   * Enter any amount on the Payment Input screen
+   * Click the "Charge" button to enter the Payment Request screen
+   * Pay the invoice
+   * Go to the Transactions screen
+   * View the transaction on the block explorer
+   * Make note of the address in the output belonging to you
+   * Repeat Steps 1 through 6
+   * Compare the addresses and ensure they do NOT match
 
 #### Settings    
 1. Verify that access to settings screen is SECURED BY PIN-CODE
