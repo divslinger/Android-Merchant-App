@@ -112,9 +112,10 @@ public class MainActivity extends AppCompatActivity
             }
         });
         Log.d(TAG, "Stored " + AppUtil.getPaymentTarget(this));
-
-        if(!PrefsUtil.getInstance(this).has(PrefsUtil.MERCHANT_KEY_EULA) || !PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_EULA, false)) {
-            DialogUtil.show(this, "", getResources().getString(R.string.contract_agreement_summary), getResources().getString(R.string.contract_button_ok), this::agreeToEula);
+        if (!PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_EULA, false)) {
+            DialogUtil.show(this, "",
+                    getResources().getString(R.string.contract_agreement_summary),
+                    getResources().getString(R.string.contract_button_ok), this::agreeToEula);
         }
     }
 
