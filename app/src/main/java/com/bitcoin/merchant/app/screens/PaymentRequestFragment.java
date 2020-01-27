@@ -161,8 +161,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         bip70Manager = new Bip70Manager(getApp());
         Bundle args = getArguments();
         AmountUtil f = new AmountUtil(activity);
-        // TODO check NPE
-        double amountFiat = args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0);
+        double amountFiat = args != null ? args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0) : 0.0;
         if (amountFiat > 0.0) {
             AppUtil.deleteActiveInvoice(activity);
             InvoiceRequest invoiceRequest = createInvoice(amountFiat, AppUtil.getCurrency(activity));
