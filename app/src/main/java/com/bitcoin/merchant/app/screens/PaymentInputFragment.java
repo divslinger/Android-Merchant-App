@@ -89,10 +89,6 @@ public class PaymentInputFragment extends ToolbarAwareFragment {
             getNav().navigate(R.id.pin_code_screen, args);
         } else if (!AppUtil.getPaymentTarget(activity).isValid()) {
             getNav().navigate(R.id.nav_to_settings_screen_bypass_security);
-        } else {
-            if (AppUtil.getActiveInvoice(activity) != null) {
-                getNav().navigate(R.id.nav_to_payment_request_screen);
-            }
         }
     }
 
@@ -102,6 +98,11 @@ public class PaymentInputFragment extends ToolbarAwareFragment {
         updateAmounts();
         initDecimalButton();
         tvCurrencySymbol.setText(getCurrencySymbol());
+        // This code MUST be executed after MainActivity.onResume()
+        // because it removes all screens above the PaymentInputFragment
+        if (AppUtil.getActiveInvoice(activity) != null) {
+            getNav().navigate(R.id.nav_to_payment_request_screen);
+        }
     }
 
     private void initDecimalButton() {

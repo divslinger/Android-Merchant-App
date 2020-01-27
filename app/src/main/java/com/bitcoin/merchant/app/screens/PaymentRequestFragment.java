@@ -100,7 +100,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         if (markInvoiceAsProcessed(invoiceStatus)) {
             return;
         }
-        cancelPayment();
+        exitScreen();
     }
 
     private void updateConnectionStatus(boolean enabled) {
@@ -122,6 +122,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
      * @return true if it was already processed, false otherwise
      */
     private boolean markInvoiceAsProcessed(InvoiceStatus invoiceStatus) {
+        AppUtil.deleteActiveInvoice(activity);
         // Check that it has not yet been processed to avoid redundant processing
         String paymentId = invoiceStatus.getPaymentId();
         if (paymentId != null && paymentId.equals(lastProcessedInvoicePaymentId)) {
@@ -152,7 +153,6 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        PrefsUtil.getInstance(activity).removeValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE);
         View v = inflater.inflate(R.layout.fragment_request_payment, container, false);
         initViews(v);
         setToolbarVisible(false);
@@ -163,11 +163,14 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         AmountUtil f = new AmountUtil(activity);
         double amountFiat = args != null ? args.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0) : 0.0;
         if (amountFiat > 0.0) {
-            AppUtil.deleteActiveInvoice(activity);
             InvoiceRequest invoiceRequest = createInvoice(amountFiat, AppUtil.getCurrency(activity));
             if (invoiceRequest == null) {
                 unableToDisplayInvoice();
             } else {
+                // do NOT delete active invoice too early
+                // because this Fragment is always instantiated below the PaymentRequest
+                // when resuming from a crash on the PaymentRequest
+                AppUtil.deleteActiveInvoice(activity);
                 fiatFormatted = f.formatFiat(amountFiat);
                 tvFiatAmount.setText(fiatFormatted);
                 generateInvoiceAndWaitForPayment(invoiceRequest);
@@ -185,7 +188,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
 
     private void unableToDisplayInvoice() {
         ToastCustom.makeText(activity, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR);
-        cancelPayment();
+        exitScreen();
     }
 
     private void registerReceiver() {
@@ -219,7 +222,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         ivCancel = v.findViewById(R.id.iv_cancel);
         ivDone = v.findViewById(R.id.iv_done);
         showGeneratingQrCodeProgress(true);
-        ivCancel.setOnClickListener(view -> cancelPayment());
+        ivCancel.setOnClickListener(view -> deleteActiveInvoiceAndExitScreen());
         ivReceivingQr.setOnClickListener(view -> copyQrCodeToClipboard());
         waitingLayout.setVisibility(View.VISIBLE);
         receivedLayout.setVisibility(View.GONE);
@@ -230,9 +233,12 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         this.ivReceivingQr.setVisibility(enabled ? View.GONE : View.VISIBLE);
     }
 
-    private void cancelPayment() {
-        Log.d(TAG, "Canceling payment...");
+    private void deleteActiveInvoiceAndExitScreen() {
         AppUtil.deleteActiveInvoice(activity);
+        exitScreen();
+    }
+
+    private void exitScreen() {
         activity.onBackPressed();
     }
 
@@ -304,9 +310,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     if (!(e instanceof SocketTimeoutException)) {
                         Log.e(TAG, "", e);
                     }
-                    String title = "Error during invoice creation";
-                    DialogUtil.show(activity, title, e.getMessage(),
-                            () -> cancelPayment());
+                    DialogUtil.show(activity, "Error", e.getMessage(), () -> exitScreen());
                 }
                 return new Pair<>(invoice, bitmap);
             }
@@ -361,9 +365,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
                     if (!(e instanceof SocketTimeoutException)) {
                         Log.e(TAG, "", e);
                     }
-                    String title = "Error during QR code creation";
-                    DialogUtil.show(activity, title, e.getMessage(),
-                            () -> cancelPayment());
+                    DialogUtil.show(activity, "Error", e.getMessage(), () -> exitScreen());
                 }
                 return new Pair<>(invoice, bitmap);
             }
@@ -403,7 +405,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         AppUtil.deleteActiveInvoice(activity);
         ivDone.setOnClickListener(v -> {
             AppUtil.setStatusBarColor(activity, R.color.gray);
-            activity.onBackPressed();
+            exitScreen();
         });
     }
 

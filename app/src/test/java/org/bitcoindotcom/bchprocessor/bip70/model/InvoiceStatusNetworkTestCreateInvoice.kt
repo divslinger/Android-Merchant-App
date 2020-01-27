@@ -2,7 +2,6 @@ package org.bitcoindotcom.bchprocessor.bip70.model
 
 import com.bitcoin.merchant.app.util.GsonUtil
 import org.bitcoindotcom.bchprocessor.bip70.Bip70PayService
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class InvoiceStatusNetworkTestCreateInvoice {
