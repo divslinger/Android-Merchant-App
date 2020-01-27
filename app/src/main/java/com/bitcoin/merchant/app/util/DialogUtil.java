@@ -9,7 +9,7 @@ public class DialogUtil {
     }
 
     public static void show(Activity activity, String title, String message, final Runnable runner) {
-        show(activity, title, message, "OK", runner);
+        show(activity, title, message, activity.getString(android.R.string.ok), runner);
     }
 
     public static void show(Activity activity, String title, String message, String positiveText, final Runnable runner) {
