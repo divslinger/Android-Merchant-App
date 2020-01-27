@@ -47,9 +47,7 @@ public class Bip70SocketHandler extends WebSocketHandler {
                 // invoice has become invalid, useless to listen any further
                 setAutoReconnect(false);
             } else if (status.isOpen()) {
-                Intent i = new Intent(Action.UPDATE_CONNECTION_STATUS);
-                i.putExtra(Action.PARAM_CONNECTION_STATUS_ENABLED, true);
-                LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+                notifyConnectionStatus(context, true);
             }
         } catch (Exception e) {
             Log.e(TAG, "InvoiceStatus error:" + e);

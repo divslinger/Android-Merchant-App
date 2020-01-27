@@ -64,7 +64,7 @@ public class PaymentInputFragment extends ToolbarAwareFragment {
         initDecimalButton();
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_INTENT_RESET_AMOUNT);
-        LocalBroadcastManager.getInstance(activity.getApplicationContext()).registerReceiver(receiver, filter);
+        LocalBroadcastManager.getInstance(activity).registerReceiver(receiver, filter);
         tvCurrencySymbol.setText(getCurrencySymbol());
         setToolbarAsMenuButton();
         clearToolbarTitle();
@@ -74,7 +74,7 @@ public class PaymentInputFragment extends ToolbarAwareFragment {
     @Override
     public void onDestroyView() {
         if (activity != null) {
-            LocalBroadcastManager.getInstance(activity.getApplicationContext()).unregisterReceiver(receiver);
+            LocalBroadcastManager.getInstance(activity).unregisterReceiver(receiver);
         }
         super.onDestroyView();
     }

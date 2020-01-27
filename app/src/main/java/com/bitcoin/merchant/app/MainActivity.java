@@ -1,8 +1,6 @@
 package com.bitcoin.merchant.app;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
@@ -14,10 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +22,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -46,17 +40,8 @@ public class MainActivity extends AppCompatActivity
         implements NfcAdapter.CreateNdefMessageCallback, NfcAdapter.OnNdefPushCompleteCallback {
     public static final String TAG = "MainActivity";
     private static final String APP_PACKAGE = "com.bitcoin.merchant.app";
-    public static final String ACTION_INTENT_SHOW_HISTORY = APP_PACKAGE + "MainActivity.ACTION_INTENT_SHOW_HISTORY";
-    DrawerLayout mDrawerLayout;
+    private DrawerLayout mDrawerLayout;
     private NetworkStateReceiver networkStateReceiver;
-    protected BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, final Intent intent) {
-            if (ACTION_INTENT_SHOW_HISTORY.equals(intent.getAction())) {
-                getNav().navigate(R.id.transactions_screen);
-            }
-        }
-    };
     private Toolbar toolbar;
 
     public Toolbar getToolbar() {
@@ -70,7 +55,6 @@ public class MainActivity extends AppCompatActivity
     private NavController getNav() {
         return getNav(this);
     }
-
 
     public CashRegisterApplication getApp() {
         return (CashRegisterApplication) getApplication();
@@ -86,31 +70,7 @@ public class MainActivity extends AppCompatActivity
         setToolbar();
         setTitle(""); // clear "Bitcoin Cash Register" from toolBar when opens on Payment Input screen
         setNavigationDrawer();
-        startWebsockets();
-        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(@NonNull View view, float v) {
-                if (v > 0) {
-                    AppUtil.setStatusBarColor(MainActivity.this, R.color.bitcoindotcom_green);
-                } else {
-                    AppUtil.setStatusBarColor(MainActivity.this, R.color.gray);
-                }
-            }
-
-            @Override
-            public void onDrawerOpened(@NonNull View view) {
-                AppUtil.setStatusBarColor(MainActivity.this, R.color.bitcoindotcom_green);
-            }
-
-            @Override
-            public void onDrawerClosed(@NonNull View view) {
-                AppUtil.setStatusBarColor(MainActivity.this, R.color.gray);
-            }
-
-            @Override
-            public void onDrawerStateChanged(int i) {
-            }
-        });
+        listenToConnectivityChanges();
         Log.d(TAG, "Stored " + AppUtil.getPaymentTarget(this));
         if (!PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_EULA, false)) {
             DialogUtil.show(this, "",
@@ -123,14 +83,17 @@ public class MainActivity extends AppCompatActivity
         PrefsUtil.getInstance(this).setValue(PrefsUtil.MERCHANT_KEY_EULA, true);
     }
 
-    private void startWebsockets() {
+    private void listenToConnectivityChanges() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_INTENT_SHOW_HISTORY);
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
-        filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         networkStateReceiver = new NetworkStateReceiver();
         registerReceiver(networkStateReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(networkStateReceiver);
+        super.onDestroy();
     }
 
     @Override
@@ -155,12 +118,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onNdefPushComplete(NfcEvent event) {
         final String eventString = "onNdefPushComplete\n" + event.toString();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), eventString, Toast.LENGTH_SHORT).show();
-            }
-        });
+        runOnUiThread(() -> Toast.makeText(getApplicationContext(), eventString, Toast.LENGTH_SHORT).show());
     }
 
     @Override
@@ -169,33 +127,8 @@ public class MainActivity extends AppCompatActivity
         return new NdefMessage(rtdUriRecord);
     }
 
-    @Override
-    protected void onDestroy() {
-        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
-        unregisterReceiver(networkStateReceiver);
-        super.onDestroy();
-    }
-
     public void openMenuDrawer() {
         mDrawerLayout.openDrawer(GravityCompat.START);
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        boolean ret = super.dispatchTouchEvent(event);
-        View view = this.getCurrentFocus();
-        if (view instanceof EditText) {
-            View w = this.getCurrentFocus();
-            int[] scrcoords = new int[2];
-            w.getLocationOnScreen(scrcoords);
-            float x = event.getRawX() + w.getLeft() - scrcoords[0];
-            float y = event.getRawY() + w.getTop() - scrcoords[1];
-            if (event.getAction() == MotionEvent.ACTION_UP && (x < w.getLeft() || x >= w.getRight() || y < w.getTop() || y > w.getBottom())) {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getWindow().getCurrentFocus().getWindowToken(), 0);
-            }
-        }
-        return ret;
     }
 
     private void setMerchantName() {
@@ -215,11 +148,29 @@ public class MainActivity extends AppCompatActivity
         mDrawerLayout = findViewById(R.id.drawer_layout);
         setMerchantName();
         NavigationView navigationView = findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
+            menuButtonPressed(menuItem);
+            return false;
+        });
+        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                menuButtonPressed(menuItem);
-                return false;
+            public void onDrawerSlide(@NonNull View view, float v) {
+                int color = v > 0 ? R.color.bitcoindotcom_green : R.color.gray;
+                AppUtil.setStatusBarColor(MainActivity.this, color);
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View view) {
+                AppUtil.setStatusBarColor(MainActivity.this, R.color.bitcoindotcom_green);
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View view) {
+                AppUtil.setStatusBarColor(MainActivity.this, R.color.gray);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int i) {
             }
         });
     }
@@ -243,7 +194,7 @@ public class MainActivity extends AppCompatActivity
             closeNavDrawer();
         }
         ToolbarAwareFragment fragment = getVisibleFragment();
-        if (!fragment.isBackAllowed()) {
+        if (fragment != null && !fragment.isBackAllowed()) {
             return;
         }
         super.onBackPressed();

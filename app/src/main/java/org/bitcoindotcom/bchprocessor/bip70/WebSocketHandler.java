@@ -1,11 +1,17 @@
 package org.bitcoindotcom.bchprocessor.bip70;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
+
+import org.bitcoindotcom.bchprocessor.Action;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -180,5 +186,11 @@ public abstract class WebSocketHandler {
             // considered broken when older than 1 minute and with no ping or pong during that time
             return (timeLastAlive + MINUTE_IN_MS) < System.currentTimeMillis();
         }
+    }
+
+    public static void notifyConnectionStatus(Context context, boolean connected) {
+        Intent i = new Intent(Action.UPDATE_CONNECTION_STATUS);
+        i.putExtra(Action.PARAM_CONNECTION_STATUS_ENABLED, connected);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(i);
     }
 }

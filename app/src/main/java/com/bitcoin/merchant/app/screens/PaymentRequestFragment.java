@@ -104,7 +104,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
     }
 
     private void updateConnectionStatus(boolean enabled) {
-        Log.i(TAG, "Socket " + (enabled ? "connected" : "disconnected"));
+        Log.d(TAG, "Socket " + (enabled ? "connected" : "disconnected"));
         tvConnectionStatus.setImageResource(enabled ? R.drawable.connected : R.drawable.disconnected);
     }
 
@@ -195,8 +195,7 @@ public class PaymentRequestFragment extends ToolbarAwareFragment {
         filter.addAction(Action.INVOICE_PAYMENT_EXPIRED);
         filter.addAction(Action.UPDATE_CONNECTION_STATUS);
         filter.addAction(Action.NETWORK_RECONNECT);
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(activity.getApplicationContext());
-        broadcastManager.registerReceiver(receiver, filter);
+        LocalBroadcastManager.getInstance(activity).registerReceiver(receiver, filter);
     }
 
     @Override

@@ -9,6 +9,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import org.bitcoindotcom.bchprocessor.Action;
 
 /**
+ * NB: this class is referenced in the AndroidManifest.xml to listen to connectivity/WIFI changes.
  * Created by riaanvos on 11/12/15.
  */
 public class NetworkStateReceiver extends BroadcastReceiver {

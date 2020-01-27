@@ -24,6 +24,9 @@ public class Bip70Manager {
                 socketHandler.start();
             }
         }
+        if (socketHandler != null) {
+            WebSocketHandler.notifyConnectionStatus(app, socketHandler.isConnected());
+        }
     }
 
     public void startWebsockets(String invoiceId) {
