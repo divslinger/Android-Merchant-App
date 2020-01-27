@@ -7,8 +7,8 @@
     <string name="pin_code_enter_error">رمز الPIN غير صحيح</string>
     <string name="prompt_ok">حسناً</string>
     <string name="prompt_ko">إلغاء</string>
-    <string name="create_pin">Create passcode</string>
-    <string name="confirm_pin">Confirm passcode</string>
+    <string name="create_pin">Create PIN Code</string>
+    <string name="confirm_pin">Confirm PIN Code</string>
     <string name="unrecognized_xpub">Unrecognized public key format</string>
     <string name="payment_received">Payment complete. Thank you.</string>
     <string name="unable_to_generate_address">An address cannot be generated at this time. Please check your installation and try again.</string>
@@ -30,7 +30,7 @@
     <string name="button_done">Done</string>
     <string name="powered_by">Powered by</string>
     <string name="bitcoindotcom">Bitcoin.com</string>
-    <string name="enter_pin">Enter passcode</string>
+    <string name="enter_pin">Enter PIN Code</string>
     <string name="syncing_xpub">Syncing xpub…</string>
     <string name="synced_xpub">xpub synced!</string>
     <string name="no_history_text">There is no transaction history.</string>
