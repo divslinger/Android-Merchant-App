@@ -52,7 +52,6 @@
     <string name="ad_title_local_bitcoin_cash">比特幣現金</string>
     <string name="ad_content_local_bitcoin_cash">賣掉您的比特幣現金（BCH）以兌換現金</string>
     <string name="not_supported">不支持</string>
-    <string name="enter_an_amount">輸入金額</string>
     <string name="grant_camera_permission">請授與相機使用QR碼掃描的權限</string>
     <string name="view_transaction">查看交易紀錄</string>
     <string name="copy_transaction">複製交易紀錄</string>

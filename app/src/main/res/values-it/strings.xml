@@ -52,7 +52,6 @@
     <string name="ad_title_local_bitcoin_cash">Local Bitcoin Cash</string>
     <string name="ad_content_local_bitcoin_cash">Sell your Bitcoin Cash (BCH) for Cash</string>
     <string name="not_supported">Not supported</string>
-    <string name="enter_an_amount">Enter an amount</string>
     <string name="grant_camera_permission">Please grant camera permission to use the QR code Scanner</string>
     <string name="view_transaction">View transaction</string>
     <string name="copy_transaction">Copy transaction</string>

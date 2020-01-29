@@ -10,7 +10,7 @@ object GsonUtil {
     private fun createInstance(): Gson {
         var builder = GsonBuilder()
         builder.setDateFormat(DATE_FORMAT_8601)
-        if (AppUtil.isEmulator()) {
+        if (AppUtil.isEmulator) {
             builder = builder.setPrettyPrinting()
         }
         return builder.create()

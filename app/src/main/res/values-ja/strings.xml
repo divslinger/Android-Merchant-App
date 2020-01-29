@@ -51,7 +51,6 @@
     <string name="ad_title_local_bitcoin_cash">Local Bitcoin Cash</string>
     <string name="ad_content_local_bitcoin_cash">お持ちのビットコインキャッシュ (BCH) を現金のために売却することができます</string>
     <string name="not_supported">サポートされていません</string>
-    <string name="enter_an_amount">金額を入力してください</string>
     <string name="grant_camera_permission">カメラにQRコードスキャナーを使用する許可を与えてください</string>
     <string name="view_transaction">トランザクションを表示</string>
     <string name="copy_transaction">コピー取引</string>

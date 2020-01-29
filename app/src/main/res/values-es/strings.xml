@@ -52,7 +52,6 @@
     <string name="ad_title_local_bitcoin_cash">Bitcoin Cash local</string>
     <string name="ad_content_local_bitcoin_cash">Vende tu Bitcoin Cash (BCH) por dinero en efectivo</string>
     <string name="not_supported">No soportado</string>
-    <string name="enter_an_amount">Ingrese una cantidad</string>
     <string name="grant_camera_permission">Otorgue permiso a la cámara para usar el escáner de código QR</string>
     <string name="view_transaction">Ver transacción</string>
     <string name="copy_transaction">Copiar transacción</string>

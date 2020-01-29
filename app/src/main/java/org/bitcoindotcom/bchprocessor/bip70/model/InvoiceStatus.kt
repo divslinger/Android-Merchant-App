@@ -16,7 +16,7 @@ data class InvoiceStatus @JvmOverloads constructor (
         @SerializedName("network") var network: String? = "",
         @SerializedName("currency") var currency: String? = "",
         @SerializedName("fiatSymbol") var fiatSymbol: String? = "",
-        @SerializedName("fiatRate") var fiatRate: Double? = 0.0,
+        @SerializedName("fiatRate") var fiatRate: Double = 0.0,
         @SerializedName("fiatTotal") var fiatTotal: Double = 0.0,
         @SerializedName("txId") var txId: String? = null,
         @SerializedName("merchantId") var merchantId: String? = null,
@@ -53,7 +53,6 @@ data class InvoiceStatus @JvmOverloads constructor (
     }
 
     companion object {
-        @JvmStatic
         fun fromJson(message: String?): InvoiceStatus {
             return gson.fromJson(message, InvoiceStatus::class.java)
         }

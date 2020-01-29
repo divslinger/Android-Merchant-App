@@ -44,7 +44,7 @@ internal class InvoiceStatusTestJson {
         assertEquals(o.paymentAsset, "BCH")
         assertEquals(o.memo, "Payment request for invoice C9kVtnhDYdiGig5Q2rXJ44")
         assertEquals(o.fiatSymbol, "USD")
-        assertEquals(o.fiatRate!!, 222.67, 0.0)
+        assertEquals(o.fiatRate, 222.67, 0.0)
         assertEquals(o.fiatTotal, 0.1, 0.0)
         assertEquals(o.paymentUrl, "https://pay.bitcoin.com/i/C9kVtnhDYdiGig5Q2rXJ44")
         assertEquals(o.paymentId, "C9kVtnhDYdiGig5Q2rXJ44")

@@ -52,7 +52,6 @@
     <string name="ad_title_local_bitcoin_cash">本地比特币现金</string>
     <string name="ad_content_local_bitcoin_cash">卖掉您的比特币现金(BCH) 以兑换现金</string>
     <string name="not_supported">不支持</string>
-    <string name="enter_an_amount">输入金额</string>
     <string name="grant_camera_permission">请授予相机使用QR码扫描的权限</string>
     <string name="view_transaction">查看交易</string>
     <string name="copy_transaction">复制交易</string>
