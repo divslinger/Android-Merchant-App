@@ -93,8 +93,8 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     private fun initDecimalButton() {
         strDecimal = MonetaryUtil.instance.decimalFormatSymbols.decimalSeparator.toString()
         try {
-            val instance = Currency.getInstance(AppUtil.getCurrency(activity))
-            allowedDecimalPlaces = instance.defaultFractionDigits
+            val currency = Currency.getInstance(AppUtil.getCountryCurrencyLocale(activity).currency)
+            allowedDecimalPlaces = currency.defaultFractionDigits
             val enabled = allowedDecimalPlaces > 0
             val buttonView = rootView.findViewById<View>(R.id.buttonDecimal)
             buttonView.isEnabled = enabled
@@ -108,7 +108,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     // For this reason, we consider that it is only safe to extract single character symbol
     private val currencySymbol: String
         get() {
-            val currency = AppUtil.getCurrency(activity)
+            val currency = AppUtil.getCountryCurrencyLocale(activity).currency
             val fiat = AmountUtil(activity).formatFiat(0.0)
             val symbol = fiat.replace("[\\s\\d.,]+".toRegex(), "")
             // It seems that replaceAll does not handle right-to-left languages like arabic correctly

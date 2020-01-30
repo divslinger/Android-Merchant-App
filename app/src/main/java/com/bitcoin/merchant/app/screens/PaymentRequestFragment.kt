@@ -140,7 +140,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         val amountFiat = args?.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0)
                 ?: 0.0
         if (amountFiat > 0.0) {
-            val invoiceRequest = createInvoice(amountFiat, AppUtil.getCurrency(activity))
+            val invoiceRequest = createInvoice(amountFiat, AppUtil.getCountryCurrencyLocale(activity).currency)
             if (invoiceRequest == null) {
                 unableToDisplayInvoice()
             } else {

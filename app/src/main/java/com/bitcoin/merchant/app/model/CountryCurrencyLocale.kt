@@ -8,11 +8,11 @@ import com.google.gson.annotations.SerializedName
 import java.util.*
 import kotlin.math.min
 
-data class CountryCurrency(@SerializedName("name") var name: String = "",
-                           @SerializedName("iso") var iso: String = "",
-                           @SerializedName("currency") var currency: String = "",
-                           @SerializedName("lang") var lang: String = "") {
-    class CountryCurrencyList : ArrayList<CountryCurrency>(256)
+data class CountryCurrencyLocale(@SerializedName("name") var name: String = "",
+                                 @SerializedName("iso") var iso: String = "",
+                                 @SerializedName("currency") var currency: String = "",
+                                 @SerializedName("lang") var lang: String = "") {
+    class CountryCurrencyList : ArrayList<CountryCurrencyLocale>(256)
 
     val locale: Locale
         get() {
@@ -26,10 +26,13 @@ data class CountryCurrency(@SerializedName("name") var name: String = "",
 
     companion object {
         const val TAG = "CountryCurrency"
+        const val DEFAULT_CURRENCY = "USD"
+        const val DEFAULT_COUNTRY = "US"
+        const val DEFAULT_LOCALE = "en_US"
         /**
          * It will return an empty string when not found or when currency is unknown.
          */
-        fun findCurrencyFromLocale(context: Context): String {
+        fun getFromLocale(context: Context): CountryCurrencyLocale {
             val locale = Locale.getDefault()
             var currencyCode: String? = ""
             var countryIso = ""
@@ -41,14 +44,23 @@ data class CountryCurrency(@SerializedName("name") var name: String = "",
                 Log.i(TAG, "Currency Code: " + currencyCode + " for locale: " + locale.displayName)
                 Log.i(TAG, "Currency Symbol: " + currency.symbol)
                 Log.i(TAG, "Currency Default Fraction Digits: " + currency.defaultFractionDigits)
+                if (isCurrencySupported(context, currencyCode) && isCountrySupported(context, countryIso))
+                    return get(context, currencyCode!!, countryIso, locale.toLanguageTag())
             } catch (e: Exception) {
                 Log.e(TAG, "Currency", e)
                 // check if currency can be determined from the country code
                 if (countryIso.length >= 2) {
-                    currencyCode = getCurrency(context, countryIso);
+                    return fromCountry(context, countryIso);
                 }
             }
-            return if (isCurrencySupported(context, currencyCode)) (currencyCode ?: "") else ""
+            return fromCurrency(context, currencyCode ?: DEFAULT_CURRENCY)
+        }
+
+        private fun isCountrySupported(context: Context, isoCode: String?): Boolean {
+            getAll(context).forEach {
+                if (it.iso == isoCode) return true
+            }
+            return false
         }
 
         private fun isCurrencySupported(context: Context, currencyCode: String?): Boolean {
@@ -58,13 +70,30 @@ data class CountryCurrency(@SerializedName("name") var name: String = "",
             return false
         }
 
-        private fun getCurrency(context: Context, countryIso: String): String {
-            var iso = countryIso.trim { it <= ' ' }
-            iso = iso.substring(0, min(2, iso.length)).toUpperCase()
+        private fun fromCountry(context: Context, countryIso: String): CountryCurrencyLocale {
+            val iso = normalizeCountryIso(countryIso)
             getAll(context).forEach {
-                if (it.iso == iso) return it.currency
+                if (it.iso == iso) return it
             }
-            return AppUtil.DEFAULT_CURRENCY_FIAT
+            return fromCurrency(context, DEFAULT_CURRENCY)
+        }
+
+        private fun fromCurrency(context: Context, currency: String): CountryCurrencyLocale {
+            val currency = normalizeCurrencyIso(currency)
+            getAll(context).forEach {
+                if (it.currency == currency) return it
+            }
+            return get(context, DEFAULT_CURRENCY, DEFAULT_COUNTRY, DEFAULT_LOCALE)
+        }
+
+        private fun normalizeCurrencyIso(currency: String): String {
+            val iso = currency.trim { it <= ' ' }
+            return iso.substring(0, min(3, iso.length)).toUpperCase()
+        }
+
+        private fun normalizeCountryIso(countryIso: String): String {
+            val iso = countryIso.trim { it <= ' ' }
+            return iso.substring(0, min(2, iso.length)).toUpperCase()
         }
 
         private var ALL: CountryCurrencyList? = null
@@ -77,8 +106,8 @@ data class CountryCurrency(@SerializedName("name") var name: String = "",
             return ALL!!
         }
 
-        fun get(context: Context, currency: String, countryIso: String, langLocale: String): CountryCurrency {
-            var cc: CountryCurrency? = null
+        fun get(context: Context, currency: String, countryIso: String, langLocale: String): CountryCurrencyLocale {
+            var cc: CountryCurrencyLocale? = null
             val all = getAll(context)
             all.forEach {
                 if (it.iso == countryIso && it.currency == currency) {

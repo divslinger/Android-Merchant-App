@@ -3,7 +3,6 @@ package com.bitcoin.merchant.app.screens
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -20,7 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.ScanQRCodeActivity
-import com.bitcoin.merchant.app.model.CountryCurrency
+import com.bitcoin.merchant.app.model.CountryCurrencyLocale
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.model.PaymentTarget
@@ -68,7 +67,7 @@ class SettingsFragment : ToolbarAwareFragment() {
     }
 
     private fun addOptionCurrency() {
-        setCurrencySummary(activity)
+        setCurrencySummary(AppUtil.getCountryCurrencyLocale(activity))
         lvLocalCurrency.setOnClickListener { CurrencySelectionDialog(this@SettingsFragment).show() }
     }
 
@@ -92,14 +91,7 @@ class SettingsFragment : ToolbarAwareFragment() {
         nav.navigate(R.id.nav_to_pin_code_screen, args)
     }
 
-    private fun setCurrencySummary(context: Context) {
-        val currency = AppUtil.getCurrency(context)
-        val country = AppUtil.getCountryIso(context)
-        val locale = AppUtil.getLocale(context)
-        CountryCurrency.get(context, currency, country, locale).let { setCurrencySummary(it) }
-    }
-
-    fun setCurrencySummary(countryCurrency: CountryCurrency) {
+    fun setCurrencySummary(countryCurrency: CountryCurrencyLocale) {
         val currencyView = rootView.findViewById<TextView>(R.id.et_local_currency)
         currencyView.text = countryCurrency.toString()
     }

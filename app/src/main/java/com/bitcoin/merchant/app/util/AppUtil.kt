@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import android.view.WindowManager
-import com.bitcoin.merchant.app.model.CountryCurrency
+import com.bitcoin.merchant.app.model.CountryCurrencyLocale
 import com.bitcoin.merchant.app.model.PaymentTarget
 import org.bitcoindotcom.bchprocessor.bip70.GsonHelper.gson
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
@@ -14,28 +14,23 @@ import java.io.InputStreamReader
 
 object AppUtil {
     const val TAG = "AppUtil"
-    const val DEFAULT_CURRENCY_FIAT = "USD"
-    fun getCurrency(context: Context): String {
-        var currency: String = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "")
-        if (currency.isEmpty()) { // auto-detect currency
-            currency = CountryCurrency.findCurrencyFromLocale(context)
-            if (currency.isEmpty()) {
-                currency = DEFAULT_CURRENCY_FIAT
-            }
-            // save to avoid further auto-detection
-            PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, currency)
-        }
-        return currency
+    fun getCountryCurrencyLocale(context: Context): CountryCurrencyLocale {
+        val p = PrefsUtil.getInstance(context)
+        val currency = p.getValue(PrefsUtil.MERCHANT_KEY_CURRENCY, "")
+        val country = p.getValue(PrefsUtil.MERCHANT_KEY_COUNTRY, "")
+        val locale = p.getValue(PrefsUtil.MERCHANT_KEY_LANG_LOCALE, "")
+        return if (currency.isEmpty() || country.isEmpty()) {
+            // detect & save to avoid further auto-detection
+            setCountryCurrencyLocale(context, CountryCurrencyLocale.getFromLocale(context))
+        } else CountryCurrencyLocale.get(context, currency, country, locale)
     }
 
-    // TODO check usage null=>""
-    fun getCountryIso(context: Context): String {
-        return PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_COUNTRY, "")
-    }
-
-    // TODO check usage null=>""
-    fun getLocale(context: Context): String {
-        return PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_LANG_LOCALE, "")
+    fun setCountryCurrencyLocale(ctx: Context, ccl: CountryCurrencyLocale) : CountryCurrencyLocale {
+        val p = PrefsUtil.getInstance(ctx)
+        p.setValue(PrefsUtil.MERCHANT_KEY_CURRENCY, ccl.currency)
+        p.setValue(PrefsUtil.MERCHANT_KEY_COUNTRY, ccl.iso)
+        p.setValue(PrefsUtil.MERCHANT_KEY_LANG_LOCALE, ccl.lang)
+        return ccl
     }
 
     fun <T> readFromJsonFile(ctx: Context, fileName: String, classOfT: Class<T>): T {
@@ -43,28 +38,13 @@ object AppUtil {
     }
 
     private fun readFromfile(fileName: String, context: Context): String {
-        val b = StringBuilder()
-        var input: BufferedReader? = null
-        try {
-            input = BufferedReader(InputStreamReader(context.resources.assets.open(fileName)))
-            var line: String?
-            while (input.readLine().also { line = it } != null) {
-                b.append(line)
-            }
-        } catch (e: Exception) {
-            e.message
-        } finally {
-            try {
-                input?.close()
-            } catch (e2: Exception) {
-                e2.message
-            }
+        BufferedReader(InputStreamReader(context.resources.assets.open(fileName))).use {
+            return it.readText()
         }
-        return b.toString()
     }
 
     fun getPaymentTarget(context: Context): PaymentTarget {
-        val value: String = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "")
+        val value = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "")
         return PaymentTarget.parse(value)
     }
 
@@ -82,7 +62,7 @@ object AppUtil {
         get() = Build.PRODUCT != null && Build.PRODUCT.toLowerCase().contains("sdk")
 
     fun getActiveInvoice(context: Context): InvoiceStatus? {
-        val invoiceJson: String = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, "")
+        val invoiceJson = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, "")
         val invoice = if (invoiceJson.isEmpty()) null else InvoiceStatus.fromJson(invoiceJson)
         if (invoice != null) {
             Log.i(TAG, "Loading active invoice...")
