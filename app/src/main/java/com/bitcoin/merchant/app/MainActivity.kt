@@ -50,12 +50,9 @@ open class MainActivity : AppCompatActivity() {
         title = "" // clear "Bitcoin Cash Register" from toolBar when opens on Payment Input screen
         listenToConnectivityChanges()
         Log.d(TAG, "Stored " + AppUtil.getPaymentTarget(this))
+        // PrefsUtil.getInstance(this).setValue(PrefsUtil.MERCHANT_KEY_EULA, false)
         if (!PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_EULA, false)) {
-            DialogUtil.show(this, "",
-                    resources.getString(R.string.contract_agreement_summary),
-                    resources.getString(R.string.contract_button_ok),
-                    { PrefsUtil.getInstance(this).setValue(PrefsUtil.MERCHANT_KEY_EULA, true) }
-            )
+            DialogUtil.showEndUserLegalAgreement(this)
         }
     }
 

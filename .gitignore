@@ -62,3 +62,4 @@ proguard/
 /build
 /captures
 .externalNativeBuild
+/.idea/
