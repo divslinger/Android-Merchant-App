@@ -78,8 +78,8 @@ data class CountryCurrencyLocale(@SerializedName("name") var name: String = "",
             return fromCurrency(context, DEFAULT_CURRENCY)
         }
 
-        private fun fromCurrency(context: Context, currency: String): CountryCurrencyLocale {
-            val currency = normalizeCurrencyIso(currency)
+        private fun fromCurrency(context: Context, currencyIso: String): CountryCurrencyLocale {
+            val currency = normalizeCurrencyIso(currencyIso)
             getAll(context).forEach {
                 if (it.currency == currency) return it
             }
