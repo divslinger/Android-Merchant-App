@@ -12,7 +12,7 @@ import android.widget.ListAdapter
 import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.R
-import com.bitcoin.merchant.app.util.CountryCurrency
+import com.bitcoin.merchant.app.model.CountryCurrency
 import com.bitcoin.merchant.app.screens.PaymentInputFragment
 import com.bitcoin.merchant.app.screens.SettingsFragment
 import com.bitcoin.merchant.app.util.PrefsUtil

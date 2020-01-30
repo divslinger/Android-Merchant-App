@@ -20,15 +20,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.ScanQRCodeActivity
-import com.bitcoin.merchant.app.util.CountryCurrency
+import com.bitcoin.merchant.app.model.CountryCurrency
 import com.bitcoin.merchant.app.screens.dialogs.AddNewAddressDialog
 import com.bitcoin.merchant.app.screens.dialogs.CurrencySelectionDialog
 import com.bitcoin.merchant.app.screens.dialogs.MerchantNameEditorDialog
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
-import com.bitcoin.merchant.app.util.PaymentTarget
+import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.util.PrefsUtil
-import com.bitcoin.merchant.app.util.ToastCustom
+import com.bitcoin.merchant.app.screens.dialogs.ToastHelper
 
 class SettingsFragment : ToolbarAwareFragment() {
     private lateinit var rootView: View
@@ -176,7 +176,7 @@ class SettingsFragment : ToolbarAwareFragment() {
                 beginSyncingXpubWallet()
             }
         } else { //If it is not valid, then display to the user that they did not enter a valid xpub, or legacy/cashaddr address.
-            ToastCustom.makeText(activity, activity.getString(R.string.unrecognized_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR)
+            ToastHelper.makeText(activity, activity.getString(R.string.unrecognized_xpub), ToastHelper.LENGTH_SHORT, ToastHelper.TYPE_ERROR)
         }
     }
 
@@ -188,14 +188,14 @@ class SettingsFragment : ToolbarAwareFragment() {
                 try {
                     val synced = app.wallet.syncXpub()
                     if (synced) {
-                        activity.runOnUiThread { ToastCustom.makeText(activity, activity.getString(R.string.synced_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_OK) }
+                        activity.runOnUiThread { ToastHelper.makeText(activity, activity.getString(R.string.synced_xpub), ToastHelper.LENGTH_SHORT, ToastHelper.TYPE_OK) }
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "", e)
                 }
             }
         }.start()
-        ToastCustom.makeText(activity, activity.getString(R.string.syncing_xpub), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_GENERAL)
+        ToastHelper.makeText(activity, activity.getString(R.string.syncing_xpub), ToastHelper.LENGTH_SHORT, ToastHelper.TYPE_GENERAL)
     }
 
     override fun canFragmentBeDiscardedWhenInBackground(): Boolean {

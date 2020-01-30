@@ -1,6 +1,6 @@
 package org.bitcoindotcom.bchprocessor.bip70.model
 
-import com.bitcoin.merchant.app.util.GsonUtil
+import org.bitcoindotcom.bchprocessor.bip70.GsonHelper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -19,7 +19,7 @@ internal class InvoiceRequestTest {
     fun checkJsonAddress() {
         val jsonString = javaClass.getResource("/InvoiceRequestAddress.json")?.readText()
         println(jsonString)
-        val o = GsonUtil.gson.fromJson(jsonString, InvoiceRequest::class.java);
+        val o = GsonHelper.gson.fromJson(jsonString, InvoiceRequest::class.java);
         println(o)
         assertEquals(o.address, "1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k")
         assertEquals(o.webhook, "http://127.0.0.1/unused/webhook")
@@ -32,7 +32,7 @@ internal class InvoiceRequestTest {
     fun checkJsonApiKey() {
         val jsonString = javaClass.getResource("/InvoiceRequestApiKey.json")?.readText()
         println(jsonString)
-        val o = GsonUtil.gson.fromJson(jsonString, InvoiceRequest::class.java);
+        val o = GsonHelper.gson.fromJson(jsonString, InvoiceRequest::class.java);
         println(o)
         assertEquals(o.apiKey, "sexqvmkxafvzhzfageoojrkchdekfwmuqpfqywsf")
         assertEquals(o.webhook, "http://127.0.0.1/unused/webhook")

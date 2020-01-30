@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app.util
+package com.bitcoin.merchant.app.screens.dialogs
 
 import android.content.Context
 import android.os.Looper
@@ -7,7 +7,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.bitcoin.merchant.app.R
 
-object ToastCustom {
+object ToastHelper {
     const val TYPE_ERROR = "TYPE_ERROR"
     const val TYPE_GENERAL = "TYPE_GENERAL"
     const val TYPE_OK = "TYPE_OK"
@@ -35,7 +35,7 @@ object ToastCustom {
             }
             toast.setView(v)
             toast.show()
-            this.toast = toast;
+            ToastHelper.toast = toast;
             Looper.loop()
         }).start()
     }

@@ -1,8 +1,9 @@
-package com.bitcoin.merchant.app.util
+package com.bitcoin.merchant.app.model
 
 import android.content.Context
 import android.util.Log
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.util.AppUtil
 import com.google.gson.annotations.SerializedName
 import java.util.*
 import kotlin.math.min

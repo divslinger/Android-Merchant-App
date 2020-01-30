@@ -18,7 +18,7 @@ import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AmountUtil
 import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.util.MonetaryUtil
-import com.bitcoin.merchant.app.util.SnackCustom
+import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import java.text.NumberFormat
 import java.util.*
 
@@ -157,7 +157,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
             return
         }
         if (!AppUtil.getPaymentTarget(activity).isValid) {
-            SnackCustom.make(activity, rootView,
+            SnackHelper.make(activity, rootView,
                     activity.getText(R.string.obligatory_receiver),
                     activity.resources.getString(R.string.prompt_ok),
                     View.OnClickListener { nav.navigate(R.id.nav_to_settings_screen_bypass_security) })
@@ -169,7 +169,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
             extras.putDouble(AMOUNT_PAYABLE_FIAT, amountPayableFiat)
             nav.navigate(R.id.nav_to_payment_request_screen, extras)
         } else {
-            SnackCustom.make(activity, rootView, activity.getText(R.string.invalid_amount),
+            SnackHelper.make(activity, rootView, activity.getText(R.string.invalid_amount),
                     activity.resources.getString(R.string.prompt_ok), null)
         }
     }

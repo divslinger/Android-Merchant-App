@@ -1,9 +1,10 @@
-package com.bitcoin.merchant.app.util
+package org.bitcoindotcom.bchprocessor.bip70
 
+import com.bitcoin.merchant.app.util.AppUtil
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
-object GsonUtil {
+object GsonHelper {
     private const val DATE_FORMAT_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
     val gson = createInstance()
 

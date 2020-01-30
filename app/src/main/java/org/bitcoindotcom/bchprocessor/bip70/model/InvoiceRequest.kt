@@ -1,6 +1,6 @@
 package org.bitcoindotcom.bchprocessor.bip70.model
 
-import com.bitcoin.merchant.app.util.GsonUtil
+import org.bitcoindotcom.bchprocessor.bip70.GsonHelper
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
@@ -14,7 +14,7 @@ data class InvoiceRequest @JvmOverloads constructor (
     companion object {
         @JvmStatic
         fun fromJson(message: String): InvoiceRequest {
-            return GsonUtil.gson.fromJson(message, InvoiceRequest::class.java)
+            return GsonHelper.gson.fromJson(message, InvoiceRequest::class.java)
         }
     }
 }

@@ -21,12 +21,15 @@ import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.model.PaymentTarget
+import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
+import com.bitcoin.merchant.app.screens.dialogs.ToastHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.*
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.client.android.Contents
 import com.google.zxing.client.android.encode.QRCodeEncoder
-import org.bitcoindotcom.bchprocessor.Action
+import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
 import org.bitcoindotcom.bchprocessor.bip70.Bip70Manager
 import org.bitcoindotcom.bchprocessor.bip70.Bip70PayService
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceRequest
@@ -52,16 +55,16 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private var qrCodeUri: String? = null
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (Action.INVOICE_PAYMENT_ACKNOWLEDGED == intent.action) {
-                acknowledgePayment(InvoiceStatus.fromJson(intent.getStringExtra(Action.PARAM_INVOICE_STATUS)))
+            if (Bip70Action.INVOICE_PAYMENT_ACKNOWLEDGED == intent.action) {
+                acknowledgePayment(InvoiceStatus.fromJson(intent.getStringExtra(Bip70Action.PARAM_INVOICE_STATUS)))
             }
-            if (Action.INVOICE_PAYMENT_EXPIRED == intent.action) {
-                expirePayment(InvoiceStatus.fromJson(intent.getStringExtra(Action.PARAM_INVOICE_STATUS)))
+            if (Bip70Action.INVOICE_PAYMENT_EXPIRED == intent.action) {
+                expirePayment(InvoiceStatus.fromJson(intent.getStringExtra(Bip70Action.PARAM_INVOICE_STATUS)))
             }
-            if (Action.UPDATE_CONNECTION_STATUS == intent.action) {
-                updateConnectionStatus(intent.getBooleanExtra(Action.PARAM_CONNECTION_STATUS_ENABLED, false))
+            if (Bip70Action.UPDATE_CONNECTION_STATUS == intent.action) {
+                updateConnectionStatus(intent.getBooleanExtra(Bip70Action.PARAM_CONNECTION_STATUS_ENABLED, false))
             }
-            if (Action.NETWORK_RECONNECT == intent.action) {
+            if (Bip70Action.NETWORK_RECONNECT == intent.action) {
                 reconnectIfNecessary()
             }
             // TODO fix this
@@ -162,17 +165,17 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     }
 
     private fun unableToDisplayInvoice() {
-        ToastCustom.makeText(activity, getText(R.string.unable_to_generate_address), ToastCustom.LENGTH_LONG, ToastCustom.TYPE_ERROR)
+        ToastHelper.makeText(activity, getText(R.string.unable_to_generate_address), ToastHelper.LENGTH_LONG, ToastHelper.TYPE_ERROR)
         exitScreen()
     }
 
     private fun registerReceiver() {
         val filter = IntentFilter()
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION) // TODO fix
-        filter.addAction(Action.INVOICE_PAYMENT_ACKNOWLEDGED)
-        filter.addAction(Action.INVOICE_PAYMENT_EXPIRED)
-        filter.addAction(Action.UPDATE_CONNECTION_STATUS)
-        filter.addAction(Action.NETWORK_RECONNECT)
+        filter.addAction(Bip70Action.INVOICE_PAYMENT_ACKNOWLEDGED)
+        filter.addAction(Bip70Action.INVOICE_PAYMENT_EXPIRED)
+        filter.addAction(Bip70Action.UPDATE_CONNECTION_STATUS)
+        filter.addAction(Bip70Action.NETWORK_RECONNECT)
         LocalBroadcastManager.getInstance(activity).registerReceiver(receiver, filter)
     }
 
@@ -273,7 +276,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                     if (e !is SocketTimeoutException) {
                         Log.e(MainActivity.TAG, "", e)
                     }
-                    DialogUtil.show(activity, "Error", e.message) { exitScreen() }
+                    DialogHelper.show(activity, "Error", e.message) { exitScreen() }
                 }
                 return Pair(invoice, bitmap)
             }
@@ -326,7 +329,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                     if (e !is SocketTimeoutException) {
                         Log.e(MainActivity.TAG, "", e)
                     }
-                    DialogUtil.show(activity, "Error", e.message) { exitScreen() }
+                    DialogHelper.show(activity, "Error", e.message) { exitScreen() }
                 }
                 return Pair(invoice, bitmap)
             }

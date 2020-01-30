@@ -11,7 +11,7 @@ import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.util.PrefsUtil
-import com.bitcoin.merchant.app.util.ToastCustom
+import com.bitcoin.merchant.app.screens.dialogs.ToastHelper
 import java.util.*
 
 class PinCodeFragment : ToolbarAwareFragment() {
@@ -91,7 +91,7 @@ class PinCodeFragment : ToolbarAwareFragment() {
             nav.navigate(R.id.nav_to_settings_screen)
         } else {
             delayAction(Runnable {
-                ToastCustom.makeText(activity, getString(R.string.pin_code_enter_error), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR)
+                ToastHelper.makeText(activity, getString(R.string.pin_code_enter_error), ToastHelper.LENGTH_SHORT, ToastHelper.TYPE_ERROR)
                 clearPinBoxes()
                 userEnteredPIN = ""
                 userEnteredPINConfirm = null
@@ -120,7 +120,7 @@ class PinCodeFragment : ToolbarAwareFragment() {
     }
 
     private fun pinCodesMismatchedDuringCreation() {
-        ToastCustom.makeText(activity, getString(R.string.pin_code_create_error), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR)
+        ToastHelper.makeText(activity, getString(R.string.pin_code_create_error), ToastHelper.LENGTH_SHORT, ToastHelper.TYPE_ERROR)
         clearPinBoxes()
         userEnteredPIN = ""
         userEnteredPINConfirm = null

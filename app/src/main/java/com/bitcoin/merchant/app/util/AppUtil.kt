@@ -5,7 +5,9 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import android.view.WindowManager
-import com.bitcoin.merchant.app.util.GsonUtil.gson
+import com.bitcoin.merchant.app.model.CountryCurrency
+import com.bitcoin.merchant.app.model.PaymentTarget
+import org.bitcoindotcom.bchprocessor.bip70.GsonHelper.gson
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 import java.io.BufferedReader
 import java.io.InputStreamReader

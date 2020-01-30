@@ -1,6 +1,5 @@
 package org.bitcoindotcom.bchprocessor.bip70
 
-import com.bitcoin.merchant.app.util.GsonUtil
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceRequest
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 import retrofit2.Call
@@ -17,7 +16,7 @@ interface Bip70PayService {
         fun create(baseUrl: String): Bip70PayService {
             return Retrofit.Builder()
                     .baseUrl(baseUrl)
-                    .addConverterFactory(GsonConverterFactory.create(GsonUtil.gson))
+                    .addConverterFactory(GsonConverterFactory.create(GsonHelper.gson))
                     .build()
                     .create(Bip70PayService::class.java)
         }

@@ -1,6 +1,6 @@
 package org.bitcoindotcom.bchprocessor.bip70.model
 
-import com.bitcoin.merchant.app.util.GsonUtil
+import org.bitcoindotcom.bchprocessor.bip70.GsonHelper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -11,9 +11,9 @@ internal class InvoiceStatusTestJson {
         val time = "2019-10-05T21:44:34.009Z";
         val expires = "2019-01-09T01:02:03.456Z";
         val partialJson = """{"time":"$time", "expires":"$expires"}"""
-        val invoiceStatus = GsonUtil.gson.fromJson(partialJson, InvoiceStatus::class.java)
+        val invoiceStatus = GsonHelper.gson.fromJson(partialJson, InvoiceStatus::class.java)
         println(invoiceStatus)
-        val fullJson = GsonUtil.gson.toJsonTree(invoiceStatus).asJsonObject;
+        val fullJson = GsonHelper.gson.toJsonTree(invoiceStatus).asJsonObject;
         println(fullJson)
         println(time)
         assertEquals(fullJson["time"].asString, time)
@@ -25,7 +25,7 @@ internal class InvoiceStatusTestJson {
     fun checkJson() {
         val jsonString = javaClass.getResource("/InvoiceStatus.json")?.readText()
         println(jsonString)
-        val o = GsonUtil.gson.fromJson(jsonString, InvoiceStatus::class.java);
+        val o = GsonHelper.gson.fromJson(jsonString, InvoiceStatus::class.java);
         println(o)
         assertEquals(o.outputs.size, 2)
         assertTrue(o.isPaid)

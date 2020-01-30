@@ -2,6 +2,7 @@ package com.bitcoin.merchant.app.util
 
 import android.content.Context
 import android.util.Log
+import com.bitcoin.merchant.app.model.CountryCurrency
 import java.text.NumberFormat
 import java.util.*
 

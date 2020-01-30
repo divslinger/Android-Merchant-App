@@ -7,7 +7,7 @@ import android.widget.TextView
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.screens.SettingsFragment
 import com.bitcoin.merchant.app.util.AppUtil
-import com.bitcoin.merchant.app.util.PaymentTarget
+import com.bitcoin.merchant.app.model.PaymentTarget
 
 class AddNewAddressDialog(private val settingsController: SettingsFragment) {
     companion object {

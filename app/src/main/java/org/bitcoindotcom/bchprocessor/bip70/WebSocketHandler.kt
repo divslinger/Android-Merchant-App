@@ -8,7 +8,7 @@ import com.neovisionaries.ws.client.WebSocket
 import com.neovisionaries.ws.client.WebSocketAdapter
 import com.neovisionaries.ws.client.WebSocketFactory
 import com.neovisionaries.ws.client.WebSocketFrame
-import org.bitcoindotcom.bchprocessor.Action
+import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
 import java.io.IOException
 import java.util.*
 
@@ -183,8 +183,8 @@ abstract class WebSocketHandler {
     companion object {
         private const val PING_INTERVAL = 20 * 1000L // ping every 20 seconds
         fun notifyConnectionStatus(context: Context, connected: Boolean) {
-            val i = Intent(Action.UPDATE_CONNECTION_STATUS)
-            i.putExtra(Action.PARAM_CONNECTION_STATUS_ENABLED, connected)
+            val i = Intent(Bip70Action.UPDATE_CONNECTION_STATUS)
+            i.putExtra(Bip70Action.PARAM_CONNECTION_STATUS_ENABLED, connected)
             LocalBroadcastManager.getInstance(context).sendBroadcast(i)
         }
     }

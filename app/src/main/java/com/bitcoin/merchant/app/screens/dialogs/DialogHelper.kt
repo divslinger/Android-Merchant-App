@@ -1,4 +1,4 @@
-package com.bitcoin.merchant.app.util
+package com.bitcoin.merchant.app.screens.dialogs
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -8,8 +8,9 @@ import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.screens.legal.PrivacyPolicyFragment
 import com.bitcoin.merchant.app.screens.legal.ServiceTermsFragment
 import com.bitcoin.merchant.app.screens.legal.TermsOfUseFragment
+import com.bitcoin.merchant.app.util.PrefsUtil
 
-object DialogUtil {
+object DialogHelper {
     fun show(activity: Activity, title: String?, message: String?, runner: () -> Unit) {
         activity.runOnUiThread {
             val builder = AlertDialog.Builder(activity)

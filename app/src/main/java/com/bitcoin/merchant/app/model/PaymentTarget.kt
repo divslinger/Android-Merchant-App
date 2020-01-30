@@ -1,6 +1,8 @@
-package com.bitcoin.merchant.app.util
+package com.bitcoin.merchant.app.model
 
 import android.util.Log
+import com.bitcoin.merchant.app.util.AddressUtil
+import com.bitcoin.merchant.app.util.AppUtil
 import com.github.kiulian.converter.AddressConverter
 import info.blockchain.wallet.util.FormatsUtil
 import org.apache.commons.lang3.StringUtils

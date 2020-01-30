@@ -1,6 +1,6 @@
 package org.bitcoindotcom.bchprocessor.bip70.model
 
-import com.bitcoin.merchant.app.util.GsonUtil
+import org.bitcoindotcom.bchprocessor.bip70.GsonHelper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -13,7 +13,7 @@ internal class InvoiceStatusOutputTestJson {
         val type = "P2PKH"
         val jsonString = javaClass.getResource("/InvoiceStatusOutput.json")?.readText()
         println(jsonString)
-        val o = GsonUtil.gson.fromJson(jsonString, InvoiceStatusOutput::class.java);
+        val o = GsonHelper.gson.fromJson(jsonString, InvoiceStatusOutput::class.java);
         println(o)
         assertEquals(o.script, script)
         assertEquals(o.amount, amount)

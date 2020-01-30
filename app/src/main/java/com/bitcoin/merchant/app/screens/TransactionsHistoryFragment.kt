@@ -15,7 +15,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import android.widget.AdapterView.OnItemClickListener
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
@@ -26,7 +25,7 @@ import com.bitcoin.merchant.app.util.DateUtil
 import com.bitcoin.merchant.app.util.MonetaryUtil
 import com.bitcoin.merchant.app.util.PrefsUtil
 import com.crashlytics.android.Crashlytics
-import org.bitcoindotcom.bchprocessor.Action
+import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -37,7 +36,7 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
     private lateinit var swipeLayout: SwipeRefreshLayout
     private val fragmentBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (Action.QUERY_ALL_TX_FROM_BITCOIN_COM_PAY == intent.action) {
+            if (Bip70Action.QUERY_ALL_TX_FROM_BITCOIN_COM_PAY == intent.action) {
                 swipeLayout.isRefreshing = false
             }
         }
@@ -60,7 +59,7 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
                 R.color.bitcoindotcom_green,
                 R.color.bitcoindotcom_darkest_green)
         val filter = IntentFilter()
-        filter.addAction(Action.QUERY_ALL_TX_FROM_BITCOIN_COM_PAY)
+        filter.addAction(Bip70Action.QUERY_ALL_TX_FROM_BITCOIN_COM_PAY)
         LocalBroadcastManager.getInstance(activity).registerReceiver(fragmentBroadcastReceiver, filter)
         return rootView
     }
@@ -147,7 +146,7 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
         } else !(this.isRemoving || activity == null || this.isDetached || !this.isAdded || this.view == null)
 
     private fun findAllPotentialMissingTx() { // TODO use merchant server to query all TX
-        LocalBroadcastManager.getInstance(activity).sendBroadcast(Intent(Action.QUERY_ALL_TX_FROM_BITCOIN_COM_PAY))
+        LocalBroadcastManager.getInstance(activity).sendBroadcast(Intent(Bip70Action.QUERY_ALL_TX_FROM_BITCOIN_COM_PAY))
     }
 
     private inner class LoadTxFromDatabaseTask(private val queryServer: Boolean)

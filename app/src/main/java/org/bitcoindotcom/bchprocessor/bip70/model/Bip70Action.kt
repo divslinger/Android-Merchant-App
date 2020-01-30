@@ -1,6 +1,6 @@
-package org.bitcoindotcom.bchprocessor
+package org.bitcoindotcom.bchprocessor.bip70.model
 
-interface Action {
+interface Bip70Action {
     companion object {
         const val PACKAGE = "org.bitcoindotcom.bchprocessor"
         const val INVOICE_PAYMENT_ACKNOWLEDGED = PACKAGE + "Action.INVOICE_PAYMENT_ACKNOWLEDGED"

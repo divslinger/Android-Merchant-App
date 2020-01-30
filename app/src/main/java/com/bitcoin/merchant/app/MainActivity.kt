@@ -21,7 +21,7 @@ import com.bitcoin.merchant.app.application.CashRegisterApplication
 import com.bitcoin.merchant.app.application.NetworkStateReceiver
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
-import com.bitcoin.merchant.app.util.DialogUtil
+import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.util.PrefsUtil
 import com.crashlytics.android.Crashlytics
 import com.google.android.material.navigation.NavigationView
@@ -52,7 +52,7 @@ open class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Stored " + AppUtil.getPaymentTarget(this))
         // PrefsUtil.getInstance(this).setValue(PrefsUtil.MERCHANT_KEY_EULA, false)
         if (!PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_EULA, false)) {
-            DialogUtil.showEndUserLegalAgreement(this)
+            DialogHelper.showEndUserLegalAgreement(this)
         }
     }
 

@@ -1,6 +1,6 @@
 package org.bitcoindotcom.bchprocessor.bip70.model
 
-import com.bitcoin.merchant.app.util.GsonUtil.gson
+import org.bitcoindotcom.bchprocessor.bip70.GsonHelper.gson
 import com.google.gson.annotations.SerializedName
 import java.util.*
 import kotlin.collections.ArrayList
