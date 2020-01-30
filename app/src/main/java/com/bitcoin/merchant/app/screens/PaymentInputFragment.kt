@@ -156,21 +156,15 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         if (!isAdded) {
             return
         }
-        if (!AppUtil.getPaymentTarget(activity).isValid) {
-            SnackHelper.make(activity, rootView,
-                    activity.getText(R.string.obligatory_receiver),
-                    activity.resources.getString(R.string.prompt_ok),
-                    View.OnClickListener { nav.navigate(R.id.nav_to_settings_screen_bypass_security) })
-            return
-        }
         if (validateAmount()) {
             updateAmounts()
             val extras = Bundle()
             extras.putDouble(AMOUNT_PAYABLE_FIAT, amountPayableFiat)
             nav.navigate(R.id.nav_to_payment_request_screen, extras)
         } else {
-            SnackHelper.make(activity, rootView, activity.getText(R.string.invalid_amount),
-                    activity.resources.getString(R.string.prompt_ok), null)
+            SnackHelper.show(activity, rootView,
+                    activity.getText(R.string.invalid_amount),
+                    activity.resources.getString(R.string.prompt_ok))
         }
     }
 

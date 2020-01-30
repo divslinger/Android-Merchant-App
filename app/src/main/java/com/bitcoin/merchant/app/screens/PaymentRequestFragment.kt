@@ -23,7 +23,6 @@ import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
-import com.bitcoin.merchant.app.screens.dialogs.ToastHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.*
 import com.google.zxing.BarcodeFormat
@@ -165,8 +164,9 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     }
 
     private fun unableToDisplayInvoice() {
-        ToastHelper.makeText(activity, getText(R.string.unable_to_generate_address), ToastHelper.LENGTH_LONG, ToastHelper.TYPE_ERROR)
-        exitScreen()
+        DialogHelper.show(activity, getString(R.string.error), getString(R.string.unable_to_generate_address)) {
+            exitScreen()
+        }
     }
 
     private fun registerReceiver() {
@@ -276,7 +276,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                     if (e !is SocketTimeoutException) {
                         Log.e(MainActivity.TAG, "", e)
                     }
-                    DialogHelper.show(activity, "Error", e.message) { exitScreen() }
+                    DialogHelper.show(activity, activity.getString(R.string.error), e.message) { exitScreen() }
                 }
                 return Pair(invoice, bitmap)
             }
@@ -329,7 +329,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                     if (e !is SocketTimeoutException) {
                         Log.e(MainActivity.TAG, "", e)
                     }
-                    DialogHelper.show(activity, "Error", e.message) { exitScreen() }
+                    DialogHelper.show(activity, activity.getString(R.string.error), e.message) { exitScreen() }
                 }
                 return Pair(invoice, bitmap)
             }

@@ -10,12 +10,10 @@
 
     <color name="dropshadow_grey">#CCCCCC</color>
 
-    <color name="toast_error_background">#EFD5D6</color>
-    <color name="toast_error_text">#963033</color>
-    <color name="toast_warning_background">#FBF7DB</color>
-    <color name="toast_warning_text">#775B2A</color>
-    <color name="toast_info_background">#D8F296</color>
-    <color name="toast_info_text">#4F772F</color>
+    <color name="snack_error_background">#C00000</color>
+    <color name="snack_error_text">#fff</color>
+    <color name="snack_info_background">#009B6C</color>
+    <color name="snack_info_text">#fff</color>
     <color name="bitcoindotcom_light_green">#00D897</color>
     <color name="bitcoindotcom_green">#00c58a</color>
     <color name="bitcoindotcom_darker_green">#009B6C</color>

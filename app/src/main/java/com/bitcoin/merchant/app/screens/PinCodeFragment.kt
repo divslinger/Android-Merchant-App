@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.util.PrefsUtil
-import com.bitcoin.merchant.app.screens.dialogs.ToastHelper
 import java.util.*
 
 class PinCodeFragment : ToolbarAwareFragment() {
@@ -19,10 +19,11 @@ class PinCodeFragment : ToolbarAwareFragment() {
     private var userEnteredPINConfirm: String? = null
     private lateinit var titleView: TextView
     private lateinit var pinBoxArray: Array<TextView>
+    private lateinit var rootView: View
     private var doCreate = false
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        val rootView = inflater.inflate(R.layout.fragment_pin, container, false)
+        rootView = inflater.inflate(R.layout.fragment_pin, container, false)
         val args = arguments
         if (args != null) {
             doCreate = args.getBoolean(EXTRA_DO_CREATE)
@@ -90,8 +91,9 @@ class PinCodeFragment : ToolbarAwareFragment() {
         if (stored == hashed) {
             nav.navigate(R.id.nav_to_settings_screen)
         } else {
+            val text = getString(R.string.pin_code_enter_error)
+            SnackHelper.show(activity, rootView, text, error = true);
             delayAction(Runnable {
-                ToastHelper.makeText(activity, getString(R.string.pin_code_enter_error), ToastHelper.LENGTH_SHORT, ToastHelper.TYPE_ERROR)
                 clearPinBoxes()
                 userEnteredPIN = ""
                 userEnteredPINConfirm = null
@@ -120,7 +122,8 @@ class PinCodeFragment : ToolbarAwareFragment() {
     }
 
     private fun pinCodesMismatchedDuringCreation() {
-        ToastHelper.makeText(activity, getString(R.string.pin_code_create_error), ToastHelper.LENGTH_SHORT, ToastHelper.TYPE_ERROR)
+        val text = getString(R.string.pin_code_create_error)
+        SnackHelper.show(activity, rootView, text, error = true)
         clearPinBoxes()
         userEnteredPIN = ""
         userEnteredPINConfirm = null

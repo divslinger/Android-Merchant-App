@@ -21,14 +21,11 @@ import androidx.core.content.ContextCompat
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.ScanQRCodeActivity
 import com.bitcoin.merchant.app.model.CountryCurrency
-import com.bitcoin.merchant.app.screens.dialogs.AddNewAddressDialog
-import com.bitcoin.merchant.app.screens.dialogs.CurrencySelectionDialog
-import com.bitcoin.merchant.app.screens.dialogs.MerchantNameEditorDialog
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.model.PaymentTarget
+import com.bitcoin.merchant.app.screens.dialogs.*
 import com.bitcoin.merchant.app.util.PrefsUtil
-import com.bitcoin.merchant.app.screens.dialogs.ToastHelper
 
 class SettingsFragment : ToolbarAwareFragment() {
     private lateinit var rootView: View
@@ -175,27 +172,32 @@ class SettingsFragment : ToolbarAwareFragment() {
             if (paymentTarget.isXPub) {
                 beginSyncingXpubWallet()
             }
-        } else { //If it is not valid, then display to the user that they did not enter a valid xpub, or legacy/cashaddr address.
-            ToastHelper.makeText(activity, activity.getString(R.string.unrecognized_xpub), ToastHelper.LENGTH_SHORT, ToastHelper.TYPE_ERROR)
+        } else {
+            //If it is not valid, then display to the user that they did not enter a valid xpub, or legacy/cashaddr address.
+            val text = activity.getString(R.string.unrecognized_xpub)
+            SnackHelper.show(activity, rootView, text, error = true)
         }
     }
 
-    private fun beginSyncingXpubWallet() { // When a merchant sets an xpub as their address in the settings,
-// sync the wallet up to the freshest address so users won't be sending to older addresses.
-// We do this by polling Bitcoin.com's REST API until we find a fresh address.
+    private fun beginSyncingXpubWallet() {
+        // When a merchant sets an xpub as their address in the settings,
+        // sync the wallet up to the freshest address so users won't be sending to older addresses.
+        // We do this by polling Bitcoin.com's REST API until we find a fresh address.
         object : Thread() {
             override fun run() {
                 try {
                     val synced = app.wallet.syncXpub()
                     if (synced) {
-                        activity.runOnUiThread { ToastHelper.makeText(activity, activity.getString(R.string.synced_xpub), ToastHelper.LENGTH_SHORT, ToastHelper.TYPE_OK) }
+                        val text = activity.getString(R.string.synced_xpub)
+                        SnackHelper.show(activity, rootView, text)
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "", e)
                 }
             }
         }.start()
-        ToastHelper.makeText(activity, activity.getString(R.string.syncing_xpub), ToastHelper.LENGTH_SHORT, ToastHelper.TYPE_GENERAL)
+        val text = activity.getString(R.string.syncing_xpub)
+        SnackHelper.show(activity, rootView, text)
     }
 
     override fun canFragmentBeDiscardedWhenInBackground(): Boolean {
