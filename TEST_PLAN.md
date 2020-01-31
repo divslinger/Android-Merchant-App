@@ -64,7 +64,9 @@ This requires to both uninstall the app and to clear the app cache.
    
 #### Payment INPUT    
 1. Verify that amount of 0 are forbidden 
-   * TODO 
+   * Enter 0 USD on the Payment INPUT screen
+   * Click the "Charge" button
+   * Ensure that a red banner at the bottom says "Invalid amount"
 1. USD CURRENCY formatting & keyboard 
    * TODO 
 1. JPY CURRENCY formatting & keyboard 
@@ -74,8 +76,12 @@ This requires to both uninstall the app and to clear the app cache.
 1. Verify automatic return to Payment INPUT screen when app is paused 
    * TODO 
 1. Verify amount is reset after payment
-   * TODO 
-   
+   * Enter any amount on the Payment INPUT screen
+   * Click the "Charge" button to enter the Payment REQUEST screen
+   * Grab a wallet of your choice on a separate device and pay the invoice by scanning the QR code
+   * When the green checkmark screen appears, press "Done" to exit the screen
+   * Ensure the amount on the Payment INPUT screen is 0
+
 #### Payment REQUEST    
 1. create invoice shows QR code & correct FIAT amount 
    * Enter 5.00 USD on the Payment INPUT screen
@@ -140,7 +146,12 @@ This requires to both uninstall the app and to clear the app cache.
 
 #### Settings    
 1. Verify that access to settings screen is SECURED BY PIN-CODE
-   * TODO 
+   * Open the app
+   * Slide the drawer open from the left
+   * Click the "Settings" button
+   * The PIN screen should open
+   * Enter an INCORRECT PIN
+   * A message should pop up notifying you of the incorrect PIN
 1. Verify PIN-CODE change
    * TODO 
 1. changing COMPANY/MERCHANT name
