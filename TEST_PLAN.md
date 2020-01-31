@@ -161,13 +161,29 @@ This requires to both uninstall the app and to clear the app cache.
 1. payment target using API KEY
    * TODO 
 1. payment target using PubKey/BCH format with "bitcoincash:" prefix 
-   * TODO 
+   * Enter the SETTINGS screen
+   * Change your DESTINATION ADDRESS to a CASHADDR address WITH the "bitcoincash:" prefix
+   * Ensure the address is saved
+   * Attempt to generate an invoice on the Payment INPUT screen
+   * If all goes well, then this works :)
 1. payment target using PubKey/BCH format without "bitcoincash:" prefix
-   * TODO    
+   * Enter the SETTINGS screen
+   * Change your DESTINATION ADDRESS to a CASHADDR address WITHOUT the "bitcoincash:" prefix
+   * Ensure the address is saved
+   * Attempt to generate an invoice on the Payment INPUT screen
+   * If all goes well, then this works :)
 1. payment target using PubKey using legacy format
-   * TODO    
+   * Enter the SETTINGS screen
+   * Change your DESTINATION ADDRESS to a LEGACY address
+   * Ensure the address is saved
+   * Attempt to generate an invoice on the Payment INPUT screen
+   * If all goes well, then this works :)
 1. payment target using P2SH
-   * TODO 
+   * Enter the SETTINGS screen
+   * Change your DESTINATION ADDRESS to a CASHADDR P2SH address
+   * Ensure the address is saved
+   * Attempt to generate an invoice on the Payment INPUT screen
+   * If all goes well, then this works :)
 1. payment target using xPubKey
    * test 2 address
 1. Camera to scan address xPubKey
