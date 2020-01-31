@@ -152,6 +152,8 @@ This requires to both uninstall the app and to clear the app cache.
    * The PIN screen should open
    * Enter an INCORRECT PIN
    * A message should pop up notifying you of the incorrect PIN
+   * Enter the CORRECT PIN
+   * Ensure you are setting to the SETTINGS screen
 1. Verify PIN-CODE change
    * TODO 
 1. changing COMPANY/MERCHANT name
