@@ -164,7 +164,8 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         } else {
             SnackHelper.show(activity, rootView,
                     activity.getText(R.string.invalid_amount),
-                    activity.resources.getString(R.string.prompt_ok))
+                    activity.resources.getString(R.string.prompt_ok),
+                    error = true)
         }
     }
 
