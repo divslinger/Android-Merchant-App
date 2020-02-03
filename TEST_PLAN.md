@@ -64,14 +64,43 @@ This requires to both uninstall the app and to clear the app cache.
    
 #### Payment INPUT    
 1. Verify that amount of 0 are forbidden 
-   * TODO 
-1. USD CURRENCY formatting & keyboard 
-   * TODO 
-1. JPY CURRENCY formatting & keyboard 
-   * TODO 
+   * Go to the Payment INPUT screen
+   * Ensure that the amount is 0
+   * Click on 'Check-out'
+   * Confirm that a temporary error message appears in RED notifying that the amount is invalid
+1. USD CURRENCY formatting & keyboard
+   * Go to the Settings screen
+   * Select country: US with currency: USD
+   * Go to the Payment INPUT screen
+   * Ensure that the amount is 1234,56
+   * Confirm that it doesn't introduce a 3rd decimal when pressing any digit
+   * Click on 'Check-out'
+   * Confirm that the amount is displayed EXACTLY as $1,234.56
+1. JPY CURRENCY formatting & keyboard
+   * Go to the Settings screen
+   * Select country: Japan with currency: JPY
+   * Go to the Payment INPUT screen
+   * Ensure that the amount is 1234
+   * Confirm that the decimal button on the left of button '0' is greyed and does nothing
+   * Click on 'Check-out'
+   * Confirm that the amount is displayed EXACTLY as ¥1,234
 1. EUR CURRENCY formatting & keyboard
-   * TODO 
-1. Verify automatic return to Payment INPUT screen when app is paused 
+   * Go to the Settings screen
+   * Select country: Belgium with currency: EUR
+   * Go to the Payment INPUT screen
+   * Ensure that the amount is 1234,56
+   * Confirm that it doesn't introduce a 3rd decimal when pressing any digit
+   * Click on 'Check-out'
+   * Confirm that the amount is displayed EXACTLY as 1.234,56 € (Notice inversion of ./, compared to USD)
+1. JOD CURRENCY formatting & keyboard
+   * Go to the Settings screen
+   * Select country: Jordan with currency: JOD
+   * Go to the Payment INPUT screen
+   * Ensure that the amount is 1234,567
+   * Confirm that it doesn't introduce a 4rd decimal when pressing any digit
+   * Click on 'Check-out'
+   * Confirm that the amount is displayed as 1234,567 (it will varies depending on how the phone supports Arabic)
+1. Verify automatic return to Payment INPUT screen when app is paused
    * TODO 
 1. Verify amount is reset after payment
    * TODO 
