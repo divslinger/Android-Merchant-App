@@ -56,4 +56,10 @@
     <string name="copy_transaction">コピー取引</string>
     <string name="view_address">住所を表示</string>
     <string name="copy_address">住所をコピー</string>
+    <string name="menu_terms_of_use">利用規約</string>
+    <string name="menu_service_terms">サービス利用規約</string>
+    <string name="menu_privacy_policy">プライバシーポリシー</string>
+    <string name="contract_agreement_summary">これ以降進むことにより、利用規約、サービス利用規約、およびプライバシーポリシーに同意します。</string>
+    <string name="contract_button_ok">同意する</string>
+    <string name="error">error</string>
 </resources>
