@@ -50,7 +50,6 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         ivCharge.setOnClickListener { chargeClicked() }
         tvBch = rootView.findViewById(R.id.tv_bch)
         initializeButtons()
-        updateAmounts()
         initDecimalButton()
         val filter = IntentFilter()
         filter.addAction(ACTION_INTENT_RESET_AMOUNT)
@@ -141,6 +140,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
             backspacePressed()
             updateAmounts()
         }
+        updateAmounts()
     }
 
     private fun validateAmount(): Boolean {
@@ -209,7 +209,6 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     }
 
     private fun updateAmounts() {
-        if (!::tvAmount.isInitialized || !::nf.isInitialized) return
         amountPayableFiat = try {
             getAmountFromUI()
         } catch (e: Exception) {
