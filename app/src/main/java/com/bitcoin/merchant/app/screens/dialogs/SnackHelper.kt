@@ -10,8 +10,8 @@ object SnackHelper {
              error: Boolean = false,
              listener: View.OnClickListener? = null) {
         activity.runOnUiThread {
-            val view = activity.visibleFragment?.view
-            if (view != null) {
+            if (!activity.isFinishing) {
+                val view = activity.rootView
                 val duration = if (error) Snackbar.LENGTH_LONG else Snackbar.LENGTH_SHORT
                 val snack = Snackbar.make(view, text, duration)
                         .setAction(action, listener)

@@ -9,6 +9,7 @@ import android.os.Handler
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -32,6 +33,8 @@ open class MainActivity : AppCompatActivity() {
     private lateinit var networkStateReceiver: NetworkStateReceiver
     lateinit var toolbar: Toolbar
         private set
+    lateinit var rootView: ViewGroup
+        private set
 
     private val nav: NavController
         get() = getNav(this)
@@ -45,6 +48,7 @@ open class MainActivity : AppCompatActivity() {
             Fabric.with(this, Crashlytics())
         }
         setContentView(R.layout.activity_main)
+        rootView = findViewById(R.id.content_frame);
         setToolbar()
         setNavigationDrawer()
         title = "" // clear "Bitcoin Cash Register" from toolBar when opens on Payment Input screen
