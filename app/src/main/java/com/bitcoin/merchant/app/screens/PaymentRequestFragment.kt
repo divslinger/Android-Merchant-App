@@ -380,7 +380,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
 
     override val isBackAllowed: Boolean
         get() {
-            LocalBroadcastManager.getInstance(activity).sendBroadcast(Intent(PaymentInputFragment.ACTION_INTENT_RESET_AMOUNT))
-            return true
+            // Ensure that pressing 'BACK' button stays on the 'Payment REQUEST' screen to NOT lose the active invoice
+            return false
         }
 }
