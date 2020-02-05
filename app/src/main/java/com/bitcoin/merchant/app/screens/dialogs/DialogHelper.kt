@@ -29,9 +29,9 @@ object DialogHelper {
 
     fun showEndUserLegalAgreement(activity: Activity) {
         val resources = activity.resources
-        val link1 = """<a href="${ServiceTermsFragment.URL}">${resources.getString(R.string.menu_service_terms)}</a>."""
-        val link2 = """<a href="${TermsOfUseFragment.URL}">${resources.getString(R.string.menu_terms_of_use)}</a>."""
-        val link3 = """<a href="${PrivacyPolicyFragment.URL}">${resources.getString(R.string.menu_privacy_policy)}</a>."""
+        val link1 = """<a href="${resources.getString(R.string.url_service_terms)}">${resources.getString(R.string.menu_service_terms)}</a>"""
+        val link2 = """<a href="${resources.getString(R.string.url_terms_of_use)}">${resources.getString(R.string.menu_terms_of_use)}</a>"""
+        val link3 = """<a href="${resources.getString(R.string.url_privacy_policy)}">${resources.getString(R.string.menu_privacy_policy)}</a>"""
         val message = resources.getString(R.string.contract_agreement_summary, link1, link2, link3);
         val dialog: AlertDialog = AlertDialog.Builder(activity)
                 .setMessage(Html.fromHtml(message))
