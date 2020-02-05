@@ -34,9 +34,8 @@
     <string name="syncing_xpub">Synchroniser xpub…</string>
     <string name="synced_xpub">xpub synchronisé!</string>
     <string name="no_history_text">Il n\'y a pas d\'historique de transaction.</string>
-    <string name="options_explain_payment_address">Une adresse de destination peut être soit une adresse Bitcoin Cash, soit une clé publique étendue (xpub)</string>
+    <string name="options_explain_payment_address">Une adresse de destination peut être soit une adresse Bitcoin Cash, soit une clé publique étendue (xpub) ou une clé d\'API pour marchant ou un code de pairage</string>
     <string name="options_add_payment_address">Ajouter une adresse de destination</string>
-    <string name="options_add_payment_address_text">Vous pouvez utiliser n\'importe quelle adresse Bitcoin Cash depuis votre portefeuille ou une clé publique étendue (xpub)</string>
     <string name="button_save">Sauver</string>
     <string name="payment_enter_an_amount">Entrez un montant</string>
     <string name="menu_profile">Profil</string>
@@ -57,14 +56,15 @@
     <string name="copy_transaction">Copier la transaction</string>
     <string name="view_address">Afficher l\'adresse</string>
     <string name="copy_address">Copier l\'adresse</string>
-    <string name="menu_terms_of_use">Terms of use</string>
-    <string name="menu_service_terms">Service terms</string>
-    <string name="menu_privacy_policy">Privacy policy</string>
-    <string name="contract_agreement_summary">By continuing, I agree to the
+    <string name="menu_terms_of_use">Conditions d\'utilisation</string>
+    <string name="menu_service_terms">Conditions des services</string>
+    <string name="menu_privacy_policy">Police de confidentialité</string>
+    <string name="contract_agreement_summary">En continuant, J\'accepte les
         <xliff:g id="ref_terms_of_use">%s</xliff:g>
         , <xliff:g id="ref_service_terms">%s</xliff:g>
-        and <xliff:g id="ref_privacy_policy">%s</xliff:g>
+        et la <xliff:g id="ref_privacy_policy">%s</xliff:g>
     </string>
-    <string name="contract_button_ok">I agree</string>
-    <string name="error">error</string>
+    <string name="contract_button_ok">Je suis d\'accord</string>
+    <string name="error">Erreur</string>
+    <string name="notify_changes_have_been_saved">Changement sauvegardé</string>
 </resources>

@@ -5,9 +5,9 @@ import android.app.AlertDialog
 import android.widget.EditText
 import android.widget.TextView
 import com.bitcoin.merchant.app.R
-import com.bitcoin.merchant.app.screens.SettingsFragment
-import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.model.PaymentTarget
+import com.bitcoin.merchant.app.screens.SettingsFragment
+import com.bitcoin.merchant.app.util.Settings
 
 class AddNewAddressDialog(private val settingsController: SettingsFragment) {
     companion object {
@@ -57,7 +57,7 @@ class AddNewAddressDialog(private val settingsController: SettingsFragment) {
         } else {
             val editText = EditText(ctx)
             editText.isSingleLine = true
-            editText.setText(AppUtil.getPaymentTarget(ctx).bchAddress)
+            editText.setText(Settings.getPaymentTarget(ctx).bchAddress)
             showDialogToEnterAddress(editText)
         }
     }

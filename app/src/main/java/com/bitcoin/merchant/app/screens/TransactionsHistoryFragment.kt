@@ -23,7 +23,7 @@ import com.bitcoin.merchant.app.database.PaymentRecord
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.DateUtil
 import com.bitcoin.merchant.app.util.MonetaryUtil
-import com.bitcoin.merchant.app.util.PrefsUtil
+import com.bitcoin.merchant.app.util.Settings
 import com.crashlytics.android.Crashlytics
 import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
 import java.util.*
@@ -148,8 +148,8 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
 
         override fun doInBackground(vararg params: Void?): ArrayList<ContentValues>? {
             if (!isSafe) return null
-            val address: String = PrefsUtil.getInstance(activity).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "")
-            if (address.isNotEmpty()) {
+            val address = Settings.getPaymentTarget(activity)
+            if (address.isValid) {
                 try {
                     return app.db.allPayments
                 } catch (e: Exception) {

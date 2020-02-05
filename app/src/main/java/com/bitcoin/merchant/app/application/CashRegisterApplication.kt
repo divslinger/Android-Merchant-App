@@ -2,7 +2,7 @@ package com.bitcoin.merchant.app.application
 
 import android.app.Application
 import com.bitcoin.merchant.app.database.DBControllerV3
-import com.bitcoin.merchant.app.util.AppUtil
+import com.bitcoin.merchant.app.util.Settings
 import com.bitcoin.merchant.app.util.WalletUtil
 
 class CashRegisterApplication : Application() {
@@ -25,7 +25,7 @@ class CashRegisterApplication : Application() {
     @get:Throws(Exception::class)
     val wallet: WalletUtil
         get() {
-            val xPub = AppUtil.getPaymentTarget(this).target
+            val xPub = Settings.getPaymentTarget(this).target
             if (walletUtil == null || !walletUtil!!.isSameXPub(xPub)) {
                 walletUtil = WalletUtil(xPub, this)
             }

@@ -20,11 +20,13 @@ import androidx.core.content.ContextCompat
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.ScanQRCodeActivity
 import com.bitcoin.merchant.app.model.CountryCurrencyLocale
-import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
-import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.model.PaymentTarget
-import com.bitcoin.merchant.app.screens.dialogs.*
-import com.bitcoin.merchant.app.util.PrefsUtil
+import com.bitcoin.merchant.app.screens.dialogs.AddNewAddressDialog
+import com.bitcoin.merchant.app.screens.dialogs.CurrencySelectionDialog
+import com.bitcoin.merchant.app.screens.dialogs.MerchantNameEditorDialog
+import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
+import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
+import com.bitcoin.merchant.app.util.Settings
 
 class SettingsFragment : ToolbarAwareFragment() {
     private lateinit var rootView: View
@@ -60,21 +62,23 @@ class SettingsFragment : ToolbarAwareFragment() {
     }
 
     private fun addOptionName() {
-        val merchantName: String = PrefsUtil.getInstance(activity).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "...")
+        val merchantName: String = Settings.getMerchantName(activity)
         val tvMerchantName = rootView.findViewById<TextView>(R.id.et_merchant_name)
-        tvMerchantName.text = merchantName
+        tvMerchantName.text = if (merchantName.isNotEmpty()) merchantName else "..."
         lvMerchantName.setOnClickListener { MerchantNameEditorDialog(activity).show(tvMerchantName) }
     }
 
     private fun addOptionCurrency() {
-        setCurrencySummary(AppUtil.getCountryCurrencyLocale(activity))
+        setCurrencySummary(Settings.getCountryCurrencyLocale(activity))
         lvLocalCurrency.setOnClickListener { CurrencySelectionDialog(this@SettingsFragment).show() }
     }
 
     private fun addOptionAddress() {
         val tvPaymentAddress = rootView.findViewById<TextView>(R.id.et_payment_address)
-        val paymentTarget = AppUtil.getPaymentTarget(activity)
-        val summary = if (paymentTarget.type === PaymentTarget.Type.INVALID) "...\n\n" + getString(R.string.options_explain_payment_address) else paymentTarget.bchAddress
+        val paymentTarget = Settings.getPaymentTarget(activity)
+        val summary = if (paymentTarget.type === PaymentTarget.Type.INVALID)
+            "...\n\n" + getString(R.string.options_explain_payment_address)
+        else paymentTarget.bchAddress
         tvPaymentAddress.text = summary
         lvPaymentAddress.setOnClickListener { AddNewAddressDialog(this@SettingsFragment).show() }
     }
@@ -97,7 +101,7 @@ class SettingsFragment : ToolbarAwareFragment() {
     }
 
     override val isBackAllowed: Boolean
-        get() = if (!AppUtil.getPaymentTarget(activity).isValid) {
+        get() = if (!Settings.getPaymentTarget(activity).isValid) {
             notifyUserThatAddressIsRequiredToReceivePayments()
             false // forbid
         } else {
@@ -154,7 +158,10 @@ class SettingsFragment : ToolbarAwareFragment() {
     fun setAndDisplayPaymentTarget(target: PaymentTarget) {
         val v = rootView.findViewById<TextView>(R.id.et_payment_address)
         v.text = target.bchAddress
-        AppUtil.setPaymentTarget(activity, target)
+        if (Settings.getPaymentTarget(activity) != target) {
+            Settings.setPaymentTarget(activity, target)
+            SnackHelper.show(activity, activity.getString(R.string.notify_changes_have_been_saved))
+        }
     }
 
     fun validateThenSetReceiverKey(address: String?) {
@@ -165,9 +172,8 @@ class SettingsFragment : ToolbarAwareFragment() {
                 beginSyncingXpubWallet()
             }
         } else {
-            //If it is not valid, then display to the user that they did not enter a valid xpub, or legacy/cashaddr address.
-            val text = activity.getString(R.string.unrecognized_xpub)
-            SnackHelper.show(activity, rootView, text, error = true)
+            // If it is not valid, then display to the user that they did not enter a valid xpub, or legacy/cashaddr address.
+            SnackHelper.show(activity, activity.getString(R.string.unrecognized_xpub), error = true)
         }
     }
 
@@ -180,20 +186,18 @@ class SettingsFragment : ToolbarAwareFragment() {
                 try {
                     val synced = app.wallet.syncXpub()
                     if (synced) {
-                        val text = activity.getString(R.string.synced_xpub)
-                        SnackHelper.show(activity, rootView, text)
+                        SnackHelper.show(activity, activity.getString(R.string.synced_xpub))
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "", e)
                 }
             }
         }.start()
-        val text = activity.getString(R.string.syncing_xpub)
-        SnackHelper.show(activity, rootView, text)
+        SnackHelper.show(activity, activity.getString(R.string.syncing_xpub))
     }
 
     override fun canFragmentBeDiscardedWhenInBackground(): Boolean {
-        return AppUtil.getPaymentTarget(activity).isValid && !isScanning
+        return Settings.getPaymentTarget(activity).isValid && !isScanning
     }
 
     companion object {

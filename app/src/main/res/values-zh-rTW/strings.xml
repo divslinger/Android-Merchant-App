@@ -36,7 +36,6 @@
     <string name="no_history_text">沒有交易記錄。</string>
     <string name="options_explain_payment_address">目標地址可以是任一比特幣現金地址，也可以是擴展公共密鑰（xpub）</string>
     <string name="options_add_payment_address">增加收款地址</string>
-    <string name="options_add_payment_address_text">您可以使用任一比特幣現金地址，也可以使用擴展公共密鑰（xpub）</string>
     <string name="button_save">儲存</string>
     <string name="payment_enter_an_amount">輸入金額</string>
     <string name="menu_profile">商店資料</string>
@@ -66,5 +65,6 @@
         and <xliff:g id="ref_privacy_policy">%s</xliff:g>
     </string>
     <string name="contract_button_ok">I agree</string>
-    <string name="error">error</string>
+    <string name="error">Error</string>
+    <string name="notify_changes_have_been_saved">Change has been saved</string>
 </resources>

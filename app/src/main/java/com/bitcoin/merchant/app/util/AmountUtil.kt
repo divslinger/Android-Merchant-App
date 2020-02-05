@@ -7,7 +7,7 @@ import java.util.*
 
 class AmountUtil(private val context: Context) {
     fun formatFiat(amountFiat: Double): String {
-        val ccl = AppUtil.getCountryCurrencyLocale(context)
+        val ccl = Settings.getCountryCurrencyLocale(context)
         var fiat: String? = null
         try {
             val formatter = NumberFormat.getCurrencyInstance(ccl.locale)

@@ -14,11 +14,11 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AmountUtil
-import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.util.MonetaryUtil
-import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
+import com.bitcoin.merchant.app.util.Settings
 import java.text.NumberFormat
 import java.util.*
 
@@ -73,7 +73,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
             val args = Bundle()
             args.putBoolean(PinCodeFragment.EXTRA_DO_CREATE, true)
             nav.navigate(R.id.pin_code_screen, args)
-        } else if (!AppUtil.getPaymentTarget(activity).isValid) {
+        } else if (!Settings.getPaymentTarget(activity).isValid) {
             nav.navigate(R.id.nav_to_settings_screen_bypass_security)
         }
     }
@@ -85,7 +85,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         tvCurrencySymbol.text = currencySymbol
         // This code MUST be executed after MainActivity.onResume()
         // because it removes all screens above the PaymentInputFragment
-        if (AppUtil.getActiveInvoice(activity) != null) {
+        if (Settings.getActiveInvoice(activity) != null) {
             nav.navigate(R.id.nav_to_payment_request_screen)
         }
     }
@@ -93,7 +93,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     private fun initDecimalButton() {
         strDecimal = MonetaryUtil.instance.decimalFormatSymbols.decimalSeparator.toString()
         try {
-            val currency = Currency.getInstance(AppUtil.getCountryCurrencyLocale(activity).currency)
+            val currency = Currency.getInstance(Settings.getCountryCurrencyLocale(activity).currency)
             allowedDecimalPlaces = currency.defaultFractionDigits
             val enabled = allowedDecimalPlaces > 0
             val buttonView = rootView.findViewById<View>(R.id.buttonDecimal)
@@ -108,7 +108,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     // For this reason, we consider that it is only safe to extract single character symbol
     private val currencySymbol: String
         get() {
-            val currency = AppUtil.getCountryCurrencyLocale(activity).currency
+            val currency = Settings.getCountryCurrencyLocale(activity).currency
             val fiat = AmountUtil(activity).formatFiat(0.0)
             val symbol = fiat.replace("[\\s\\d.,]+".toRegex(), "")
             // It seems that replaceAll does not handle right-to-left languages like arabic correctly
@@ -163,8 +163,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
             extras.putDouble(AMOUNT_PAYABLE_FIAT, amountPayableFiat)
             nav.navigate(R.id.nav_to_payment_request_screen, extras)
         } else {
-            SnackHelper.show(activity, rootView,
-                    activity.getText(R.string.invalid_amount),
+            SnackHelper.show(activity, activity.getText(R.string.invalid_amount),
                     activity.resources.getString(R.string.prompt_ok),
                     error = true)
         }

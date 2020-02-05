@@ -10,8 +10,7 @@ import android.widget.TextView
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
-import com.bitcoin.merchant.app.util.AppUtil
-import com.bitcoin.merchant.app.util.PrefsUtil
+import com.bitcoin.merchant.app.util.Settings
 import java.util.*
 
 class PinCodeFragment : ToolbarAwareFragment() {
@@ -29,11 +28,7 @@ class PinCodeFragment : ToolbarAwareFragment() {
             doCreate = args.getBoolean(EXTRA_DO_CREATE)
         }
         titleView = rootView.findViewById(R.id.titleBox)
-        if (doCreate) {
-            titleView.setText(R.string.create_pin)
-        } else {
-            titleView.setText(R.string.enter_pin)
-        }
+        titleView.text = if (doCreate) activity.getText(R.string.create_pin) else activity.getText(R.string.enter_pin)
         pinBoxArray = arrayOf(
                 rootView.findViewById(R.id.pinBox0),
                 rootView.findViewById(R.id.pinBox1),
@@ -57,7 +52,7 @@ class PinCodeFragment : ToolbarAwareFragment() {
         return rootView
     }
 
-    fun digitPressed(num: String) {
+    private fun digitPressed(num: String) {
         if (userEnteredPIN.length == pinBoxArray.size) {
             return
         }
@@ -79,20 +74,19 @@ class PinCodeFragment : ToolbarAwareFragment() {
     }
 
     private fun newPinHasBeenConfirmed() {
-        val hashed = userEnteredPIN
-        PrefsUtil.getInstance(activity).setValue(PrefsUtil.MERCHANT_KEY_PIN, hashed)
-        PrefsUtil.getInstance(activity).setValue(PrefsUtil.MERCHANT_KEY_ACCOUNT_INDEX, 0)
+        if (Settings.getPinCode(activity) != userEnteredPIN) {
+            Settings.setPinCode(activity, userEnteredPIN)
+            SnackHelper.show(activity, activity.getString(R.string.notify_changes_have_been_saved))
+        }
         nav.navigate(R.id.nav_to_settings_screen)
     }
 
     private fun validatePin() {
-        val hashed = userEnteredPIN
-        val stored: String = PrefsUtil.getInstance(activity).getValue(PrefsUtil.MERCHANT_KEY_PIN, "")
-        if (stored == hashed) {
+        val stored: String = Settings.getPinCode(activity)
+        if (stored == userEnteredPIN) {
             nav.navigate(R.id.nav_to_settings_screen)
         } else {
-            val text = getString(R.string.pin_code_enter_error)
-            SnackHelper.show(activity, rootView, text, error = true);
+            SnackHelper.show(activity, getString(R.string.pin_code_enter_error), error = true);
             delayAction(Runnable {
                 clearPinBoxes()
                 userEnteredPIN = ""
@@ -122,8 +116,7 @@ class PinCodeFragment : ToolbarAwareFragment() {
     }
 
     private fun pinCodesMismatchedDuringCreation() {
-        val text = getString(R.string.pin_code_create_error)
-        SnackHelper.show(activity, rootView, text, error = true)
+        SnackHelper.show(activity, getString(R.string.pin_code_create_error), error = true)
         clearPinBoxes()
         userEnteredPIN = ""
         userEnteredPINConfirm = null
@@ -136,7 +129,7 @@ class PinCodeFragment : ToolbarAwareFragment() {
     }
 
     private fun clearPinBoxes() {
-        if (userEnteredPIN.length > 0) {
+        if (userEnteredPIN.isNotEmpty()) {
             for (aPinBoxArray in pinBoxArray) {
                 aPinBoxArray.background = null //reset pin buttons blank
             }
@@ -144,14 +137,13 @@ class PinCodeFragment : ToolbarAwareFragment() {
     }
 
     override fun canFragmentBeDiscardedWhenInBackground(): Boolean {
-        return AppUtil.getPaymentTarget(activity).isValid && !doCreate
+        return Settings.getPaymentTarget(activity).isValid && !doCreate
     }
 
     companion object {
         const val EXTRA_DO_CREATE = "doCreate"
         fun isPinMissing(ctx: Context): Boolean {
-            val pin: String = PrefsUtil.getInstance(ctx).getValue(PrefsUtil.MERCHANT_KEY_PIN, "")
-            return pin == ""
+            return Settings.getPinCode(ctx).isEmpty()
         }
     }
 }

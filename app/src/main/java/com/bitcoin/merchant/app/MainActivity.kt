@@ -22,7 +22,7 @@ import com.bitcoin.merchant.app.application.NetworkStateReceiver
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
-import com.bitcoin.merchant.app.util.PrefsUtil
+import com.bitcoin.merchant.app.util.Settings
 import com.crashlytics.android.Crashlytics
 import com.google.android.material.navigation.NavigationView
 import io.fabric.sdk.android.Fabric
@@ -49,9 +49,8 @@ open class MainActivity : AppCompatActivity() {
         setNavigationDrawer()
         title = "" // clear "Bitcoin Cash Register" from toolBar when opens on Payment Input screen
         listenToConnectivityChanges()
-        Log.d(TAG, "Stored " + AppUtil.getPaymentTarget(this))
-        // PrefsUtil.getInstance(this).setValue(PrefsUtil.MERCHANT_KEY_EULA, false)
-        if (!PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_EULA, false)) {
+        Log.d(TAG, "Stored " + Settings.getPaymentTarget(this))
+        if (!Settings.isEulaAccepted(this)) {
             DialogHelper.showEndUserLegalAgreement(this)
         }
     }
@@ -93,8 +92,7 @@ open class MainActivity : AppCompatActivity() {
         val navigationView = findViewById<NavigationView>(R.id.navigation_view)
         val headerView = navigationView.getHeaderView(0)
         val tvName = headerView.findViewById<TextView>(R.id.drawer_title)
-        val drawerTitle: String = PrefsUtil.getInstance(this).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "")
-        tvName.text = drawerTitle
+        tvName.text = Settings.getMerchantName(this);
     }
 
     fun setToolbar() {
@@ -128,7 +126,7 @@ open class MainActivity : AppCompatActivity() {
         })
     }
 
-    private val visibleFragment: ToolbarAwareFragment?
+    val visibleFragment: ToolbarAwareFragment?
         get() {
             val navHostFragment = supportFragmentManager.primaryNavigationFragment ?: return null
             for (fragment in navHostFragment.childFragmentManager.fragments) {

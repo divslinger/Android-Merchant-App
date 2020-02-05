@@ -34,9 +34,8 @@
     <string name="syncing_xpub">Syncing xpub…</string>
     <string name="synced_xpub">xpub synced!</string>
     <string name="no_history_text">There is no transaction history.</string>
-    <string name="options_explain_payment_address">A destination address can either be a Bitcoin Cash address, or an Extended Public Key (xpub)</string>
+    <string name="options_explain_payment_address">A destination address can either be a Bitcoin Cash address, or an Extended Public Key (xpub) or a merchant API key or pairing code</string>
     <string name="options_add_payment_address">Add destination address</string>
-    <string name="options_add_payment_address_text">You can use any Bitcoin Cash address from your wallet, or an Extended Public Key (xpub)</string>
     <string name="button_save">Save</string>
     <string name="payment_enter_an_amount">Enter an amount</string>
     <string name="menu_profile">Profile</string>
@@ -66,5 +65,6 @@
         and <xliff:g id="ref_privacy_policy">%s</xliff:g>
     </string>
     <string name="contract_button_ok">I agree</string>
-    <string name="error">error</string>
+    <string name="error">Error</string>
+    <string name="notify_changes_have_been_saved">Change has been saved</string>
 </resources>

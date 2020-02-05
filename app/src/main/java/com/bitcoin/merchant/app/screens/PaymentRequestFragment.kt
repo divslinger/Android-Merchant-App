@@ -24,13 +24,15 @@ import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
-import com.bitcoin.merchant.app.util.*
+import com.bitcoin.merchant.app.util.AmountUtil
+import com.bitcoin.merchant.app.util.AppUtil
+import com.bitcoin.merchant.app.util.Settings
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.client.android.Contents
 import com.google.zxing.client.android.encode.QRCodeEncoder
-import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
 import org.bitcoindotcom.bchprocessor.bip70.Bip70Manager
 import org.bitcoindotcom.bchprocessor.bip70.Bip70PayService
+import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceRequest
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 import retrofit2.Response
@@ -108,7 +110,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
      * @return true if it was already processed, false otherwise
      */
     private fun markInvoiceAsProcessed(invoiceStatus: InvoiceStatus): Boolean {
-        AppUtil.deleteActiveInvoice(activity)
+        Settings.deleteActiveInvoice(activity)
         // Check that it has not yet been processed to avoid redundant processing
         if (lastProcessedInvoicePaymentId == invoiceStatus.paymentId) {
             Log.i(MainActivity.TAG, "Already processed invoice:$invoiceStatus")
@@ -143,20 +145,20 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         val amountFiat = args?.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0)
                 ?: 0.0
         if (amountFiat > 0.0) {
-            val invoiceRequest = createInvoice(amountFiat, AppUtil.getCountryCurrencyLocale(activity).currency)
+            val invoiceRequest = createInvoice(amountFiat, Settings.getCountryCurrencyLocale(activity).currency)
             if (invoiceRequest == null) {
                 unableToDisplayInvoice()
             } else {
                 // do NOT delete active invoice too early
                 // because this Fragment is always instantiated below the PaymentRequest
                 // when resuming from a crash on the PaymentRequest
-                AppUtil.deleteActiveInvoice(activity)
+                Settings.deleteActiveInvoice(activity)
                 fiatFormatted = f.formatFiat(amountFiat)
                 tvFiatAmount.text = fiatFormatted
                 generateInvoiceAndWaitForPayment(invoiceRequest)
             }
         } else {
-            val activeInvoice = AppUtil.getActiveInvoice(activity)
+            val activeInvoice = Settings.getActiveInvoice(activity)
             if (activeInvoice == null) {
                 unableToDisplayInvoice()
             } else {
@@ -214,7 +216,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     }
 
     private fun deleteActiveInvoiceAndExitScreen() {
-        AppUtil.deleteActiveInvoice(activity)
+        Settings.deleteActiveInvoice(activity)
         exitScreen()
     }
 
@@ -236,7 +238,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     }
 
     private fun createInvoice(amountFiat: Double, currency: String): InvoiceRequest? {
-        val paymentTarget = AppUtil.getPaymentTarget(activity)
+        val paymentTarget = Settings.getPaymentTarget(activity)
         val i = InvoiceRequest("" + amountFiat, currency)
         when (paymentTarget.type) {
             PaymentTarget.Type.INVALID -> return null
@@ -271,7 +273,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                     if (invoice == null) {
                         throw Exception("HTTP status:" + response.code() + " message:" + response.message())
                     } else {
-                        AppUtil.setActiveInvoice(activity, invoice)
+                        Settings.setActiveInvoice(activity, invoice)
                     }
                     qrCodeUri = invoice.walletUri
                     // connect the socket first before showing the bitmap
@@ -376,7 +378,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         waitingLayout.visibility = View.GONE
         receivedLayout.visibility = View.VISIBLE
         AppUtil.setStatusBarColor(activity, R.color.bitcoindotcom_green)
-        AppUtil.deleteActiveInvoice(activity)
+        Settings.deleteActiveInvoice(activity)
         ivDone.setOnClickListener {
             AppUtil.setStatusBarColor(activity, R.color.gray)
             exitScreen()

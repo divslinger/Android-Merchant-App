@@ -34,9 +34,8 @@
     <string name="syncing_xpub">xpubを同期しています...</string>
     <string name="synced_xpub">xpubが同期されました！</string>
     <string name="no_history_text">取引履歴がありません。</string>
-    <string name="options_explain_payment_address">支払い先アドレスは、あなたが管理しているビットコインキャッシュのアドレスもしくはウォレットの拡張公開鍵 (xPub) のことを言います。\n\n各取引毎に新規アドレスを生成することで会計処理を簡単にしつつ、プライバシーを強化できるため、ウォレットの拡張公開鍵を支払先アドレスとして設定する方法が最善となります。</string>
+    <string name="options_explain_payment_address">A destination address can either be a Bitcoin Cash address, or an Extended Public Key (xpub) or a merchant API key or pairing code</string>
     <string name="options_add_payment_address">支払先アドレスを設定する</string>
-    <string name="options_add_payment_address_text">ウォレットの拡張公開鍵またはウォレットのどのビットコインキャッシュアドレスでも利用可能です。ウォレットに表示されているアドレスを貼り付けるか、QRコードを読み取ってください。</string>
     <string name="button_save">保存</string>
     <string name="payment_enter_an_amount">金額を入力</string>
     <string name="menu_profile">プロフィール</string>
@@ -66,5 +65,6 @@
         and <xliff:g id="ref_privacy_policy">%s</xliff:g>
     </string>
     <string name="contract_button_ok">同意する</string>
-    <string name="error">error</string>
+    <string name="error">Error</string>
+    <string name="notify_changes_have_been_saved">Change has been saved</string>
 </resources>

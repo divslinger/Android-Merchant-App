@@ -32,7 +32,7 @@ class WalletUtil(private val xPub: String, private val app: CashRegisterApplicat
     }
 
     private fun saveWallet(newIndex: Int) {
-        PrefsUtil.getInstance(app).setValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + xPub, newIndex)
+        Settings.setXPubIndex(app, xPub, newIndex);
         Log.d(TAG, "Saving new xpub index $newIndex")
     }
 
@@ -147,7 +147,7 @@ class WalletUtil(private val xPub: String, private val app: CashRegisterApplicat
     }
 
     init {
-        xpubIndex = PrefsUtil.getInstance(app).getValue(PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + xPub, 0)
+        xpubIndex = Settings.getXPubIndex(app, xPub);
         val key = createMasterPubKeyFromXPub(xPub)
         //This gets the receive chain from the xpub. If you want to generate change addresses, switch to 1 for the childNumber.
         accountKey = HDKeyDerivation.deriveChildKey(key, ChildNumber(0, false))

@@ -2,12 +2,13 @@ package com.bitcoin.merchant.app.model
 
 import android.util.Log
 import com.bitcoin.merchant.app.util.AddressUtil
-import com.bitcoin.merchant.app.util.AppUtil
+import com.bitcoin.merchant.app.util.Settings
 import com.github.kiulian.converter.AddressConverter
 import info.blockchain.wallet.util.FormatsUtil
 import org.apache.commons.lang3.StringUtils
 
 data class PaymentTarget(val type: Type, val target: String) {
+    val TAG = "PaymentTarget"
     val isValid = type != Type.INVALID
     val isXPub = type == Type.XPUB
     val isApiKey = type == Type.API_KEY
@@ -25,7 +26,7 @@ data class PaymentTarget(val type: Type, val target: String) {
                 try {
                     return AddressUtil.toCashAddress(target)
                 } catch (e: java.lang.Exception) {
-                    Log.e(AppUtil.TAG, "", e)
+                    Log.e(TAG, "", e)
                 }
             }
             return target;

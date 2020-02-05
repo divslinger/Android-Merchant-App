@@ -15,7 +15,7 @@ import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.model.CountryCurrencyLocale
 import com.bitcoin.merchant.app.screens.PaymentInputFragment
 import com.bitcoin.merchant.app.screens.SettingsFragment
-import com.bitcoin.merchant.app.util.AppUtil
+import com.bitcoin.merchant.app.util.Settings
 
 class CurrencySelectionDialog(private val settingsController: SettingsFragment) {
     private val ctx = settingsController.activity
@@ -37,7 +37,10 @@ class CurrencySelectionDialog(private val settingsController: SettingsFragment) 
     }
 
     private fun save(cc: CountryCurrencyLocale) {
-        AppUtil.setCountryCurrencyLocale(ctx, cc)
+        if (Settings.getCountryCurrencyLocale(ctx) != cc) {
+            Settings.setCountryCurrencyLocale(ctx, cc)
+            SnackHelper.show(ctx, ctx.getString(R.string.notify_changes_have_been_saved))
+        }
         val intent = Intent(PaymentInputFragment.ACTION_INTENT_RESET_AMOUNT)
         LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent)
         settingsController.setCurrencySummary(cc)

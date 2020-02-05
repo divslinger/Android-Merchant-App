@@ -1,37 +1,36 @@
 package com.bitcoin.merchant.app.screens.dialogs
 
-import android.app.Activity
 import android.app.AlertDialog
-import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
 import android.widget.EditText
 import android.widget.TextView
+import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
-import com.bitcoin.merchant.app.util.PrefsUtil
+import com.bitcoin.merchant.app.util.Settings
 
-class MerchantNameEditorDialog(private val ctx: Activity) {
+class MerchantNameEditorDialog(private val activity: MainActivity) {
     fun show(namePref: TextView): Boolean {
-        val etName = EditText(ctx)
+        val etName = EditText(activity)
         etName.isSingleLine = true
-        val maxLength = 70
-        val fArray = arrayOfNulls<InputFilter>(1)
-        fArray[0] = LengthFilter(maxLength)
-        etName.filters = fArray
-        etName.setText(PrefsUtil.getInstance(ctx).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, ""))
-        val builder = AlertDialog.Builder(ctx)
+        etName.filters = arrayOf(LengthFilter(70))
+        etName.setText(Settings.getMerchantName(activity))
+        val builder = AlertDialog.Builder(activity)
                 .setTitle(R.string.settings_merchant_name)
                 .setView(etName)
                 .setCancelable(false)
                 .setPositiveButton(R.string.prompt_ok) { dialog, whichButton ->
                     val name = etName.text.toString()
-                    if (name.length > 0) {
-                        PrefsUtil.getInstance(ctx).setValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, name)
+                    if (name.isNotEmpty()) {
+                        if (Settings.getMerchantName(activity) != name) {
+                            Settings.setMerchantName(activity, name);
+                            SnackHelper.show(activity, activity.getString(R.string.notify_changes_have_been_saved))
+                        }
                         namePref.text = name
                     }
                     dialog.dismiss()
                 }
                 .setNegativeButton(R.string.prompt_ko) { dialog, whichButton -> dialog.dismiss() }
-        if (!ctx.isFinishing) {
+        if (!activity.isFinishing) {
             builder.show()
         }
         return true

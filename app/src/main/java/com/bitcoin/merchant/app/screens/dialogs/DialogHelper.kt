@@ -5,10 +5,7 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.text.Html
 import com.bitcoin.merchant.app.R
-import com.bitcoin.merchant.app.screens.legal.PrivacyPolicyFragment
-import com.bitcoin.merchant.app.screens.legal.ServiceTermsFragment
-import com.bitcoin.merchant.app.screens.legal.TermsOfUseFragment
-import com.bitcoin.merchant.app.util.PrefsUtil
+import com.bitcoin.merchant.app.util.Settings
 
 object DialogHelper {
     fun show(activity: Activity, title: String?, message: String?, runner: () -> Unit) {
@@ -42,7 +39,7 @@ object DialogHelper {
                 }
                 .setPositiveButton(resources.getString(R.string.contract_button_ok)) { dialog, _ ->
                     dialog.dismiss()
-                    PrefsUtil.getInstance(activity).setValue(PrefsUtil.MERCHANT_KEY_EULA, true)
+                    Settings.setEulaAccepted(activity, true);
                 }
                 .create()
         dialog.show()
