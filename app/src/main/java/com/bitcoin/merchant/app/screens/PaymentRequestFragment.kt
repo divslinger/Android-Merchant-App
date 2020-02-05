@@ -38,6 +38,9 @@ import java.net.SocketTimeoutException
 import java.util.*
 
 class PaymentRequestFragment : ToolbarAwareFragment() {
+    // Ensure that pressing 'BACK' button stays on the 'Payment REQUEST' screen to NOT lose the active invoice
+    // unless we are exiting the screen
+    private var backButtonAllowed: Boolean = false
     private lateinit var waitingLayout: LinearLayout
     private lateinit var receivedLayout: LinearLayout
     private lateinit var tvConnectionStatus: ImageView
@@ -216,7 +219,9 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     }
 
     private fun exitScreen() {
+        backButtonAllowed = true
         activity.onBackPressed()
+        backButtonAllowed = false
     }
 
     private fun copyQrCodeToClipboard() {
@@ -380,7 +385,6 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
 
     override val isBackAllowed: Boolean
         get() {
-            // Ensure that pressing 'BACK' button stays on the 'Payment REQUEST' screen to NOT lose the active invoice
-            return false
+            return backButtonAllowed
         }
 }
