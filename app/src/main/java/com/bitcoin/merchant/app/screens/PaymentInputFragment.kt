@@ -170,12 +170,8 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     }
 
     private fun backspacePressed() {
-        val amountText = tvAmount.text.toString()
-        if (amountText.length > 1) {
-            tvAmount.text = amountText.substring(0, amountText.length - 1)
-        } else {
-            tvAmount.text = "0"
-        }
+        val v = tvAmount.text.toString()
+        tvAmount.text = if (v.length > 1) v.substring(0, v.length - 1)  else "0"
     }
 
     private fun decimalPressed() {
@@ -214,11 +210,11 @@ class PaymentInputFragment : ToolbarAwareFragment() {
 
     private fun updateAmounts() {
         if (!::tvAmount.isInitialized || !::nf.isInitialized) return
-        try {
-            amountPayableFiat = getAmountFromUI()
+        amountPayableFiat = try {
+            getAmountFromUI()
         } catch (e: Exception) {
-            amountPayableFiat = 0.0
             Log.e(TAG, "", e)
+            0.0
         }
         if (amountPayableFiat == 0.0) {
             tvBch.text = getString(R.string.payment_enter_an_amount)

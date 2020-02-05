@@ -161,7 +161,7 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
                 return null
             }
             val address: String = PrefsUtil.getInstance(activity).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "")
-            if (address != null && address.length > 0) {
+            if (address.isNotEmpty()) {
                 try {
                     return app.db.allPayments
                 } catch (e: Exception) {
@@ -196,10 +196,10 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
 
     private inner class TransactionAdapter internal constructor() : BaseAdapter() {
         val mListItems: MutableList<ContentValues> = ArrayList()
-        private val inflater: LayoutInflater
-        fun reset(vals: ArrayList<ContentValues>) {
+        private val inflater: LayoutInflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        fun reset(values: ArrayList<ContentValues>) {
             mListItems.clear()
-            mListItems.addAll(vals)
+            mListItems.addAll(values)
             notifyDataSetChanged()
         }
 
@@ -285,10 +285,6 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
             } else {
                 1.0f
             }
-        }
-
-        init {
-            inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         }
     }
 
