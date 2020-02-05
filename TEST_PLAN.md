@@ -3,7 +3,7 @@ These Android tests have been divided in sections:
 * Detection
 * Payment INPUT
 * Payment REQUEST
-* **TODO** Settings
+* Settings
 * Transactions
 * Navigation 
 * Compatibility
@@ -64,45 +64,65 @@ This requires to both uninstall the app and to clear the app cache.
    
 #### Payment INPUT: before any test, launch app & do required setup     
 1. Verify that amount of 0 are forbidden 
-   * Go to the 'Payment INPUT' screen
+   * Go to 'Payment INPUT' screen
    * Ensure that the amount is 0
    * Click on 'Check-out'
    * Confirm that a temporary error message appears in RED notifying that the amount is invalid
 1. USD CURRENCY formatting & keyboard
-   * Go to the 'Settings' screen
+   * Go to 'Settings' screen
    * Select country: US with currency: USD
-   * Go to the 'Payment INPUT' screen
-   * Ensure that the amount is 1234,56
+   * Go to 'Payment INPUT' screen
+   * Enter the amount of 1234,56
    * Confirm that the decimal button ',' on the left of button '0' is NOT greyed and works
    * Confirm that it doesn't introduce a 3rd decimal when pressing any digit
    * Click on 'Check-out'
    * Confirm that the amount is displayed EXACTLY as $1,234.56
+   * Click 'Cancel' to return to the 'Payment INPUT' screen
+   * Enter the amount of 0,99
+   * Click on 'Check-out'
+   * Configure your wallet to use US currency: USD
+   * Scan the QR code with your wallet and verify same exact amount is displayed on your wallet $0.99
 1. JPY CURRENCY formatting & keyboard
-   * Go to the 'Settings' screen
+   * Go to 'Settings' screen
    * Select country: Japan with currency: JPY
-   * Go to the 'Payment INPUT' screen
-   * Ensure that the amount is 1234
+   * Go to 'Payment INPUT' screen
+   * Enter the amount of 1234
    * Confirm that the decimal button ',' on the left of button '0' is greyed and does nothing
    * Click on 'Check-out'
    * Confirm that the amount is displayed EXACTLY as ¥1,234
+   * Click 'Cancel' to return to the 'Payment INPUT' screen
+   * Enter the amount of 95 JPY
+   * Click on 'Check-out'
+   * Configure your wallet to use Japan currency: JPY
+   * Scan the QR code with your wallet and verify same exact amount is displayed on your wallet 95 JPY
 1. EUR CURRENCY formatting & keyboard
-   * Go to the 'Settings' screen
-   * Select country: Belgium with currency: EUR
-   * Go to the 'Payment INPUT' screen
-   * Ensure that the amount is 1234,56
+   * Go to 'Settings' screen
+   * Select country: France with currency: EUR
+   * Go to 'Payment INPUT' screen
+   * Enter the amount of 1234,56
    * Confirm that the decimal button ',' on the left of button '0' is NOT greyed and works
    * Confirm that it doesn't introduce a 3rd decimal when pressing any digit
    * Click on 'Check-out'
    * Confirm that the amount is displayed EXACTLY as 1.234,56 € (Notice inversion of ./, compared to USD)
+   * Click 'Cancel' to return to the 'Payment INPUT' screen
+   * Enter the amount of 0,50 EUR
+   * Click on 'Check-out'
+   * Configure your wallet to use France currency: EUR
+   * Scan the QR code with your wallet and verify same exact amount is displayed on your wallet 0,50 EUR
 1. JOD CURRENCY formatting & keyboard
-   * Go to the 'Settings' screen
+   * Go to 'Settings' screen
    * Select country: Jordan with currency: JOD
-   * Go to the 'Payment INPUT' screen
-   * Ensure that the amount is 1234,567
+   * Go to 'Payment INPUT' screen
+   * Enter the amount of 1234,567
    * Confirm that the decimal button ',' on the left of button '0' is NOT greyed and works
    * Confirm that it doesn't introduce a 4rd decimal when pressing any digit
    * Click on 'Check-out'
    * Confirm that the amount is displayed as 1234,567 (it will varies depending on how the phone supports Arabic)
+   * Click 'Cancel' to return to the 'Payment INPUT' screen
+   * Enter the amount of 0,349 JOD
+   * Click on 'Check-out'
+   * Configure your wallet to use Jordan currency: JOD
+   * Scan the QR code with your wallet and verify same exact amount is displayed on your wallet 0,349 JOD
 
 #### Payment REQUEST: before any test, launch app & do required setup    
 1. create invoice shows QR code & correct FIAT amount 
@@ -163,7 +183,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Enter any amount on the 'Payment INPUT' screen
    * Click the "Charge" button to enter the 'Payment REQUEST' screen
    * Pay the invoice
-   * Go to the 'Transactions' screen
+   * Go to 'Transactions' screen
    * View the transaction on the block explorer
    * Make note of the address in the output belonging to you
    * Repeat Steps 1 through 6
@@ -171,31 +191,127 @@ This requires to both uninstall the app and to clear the app cache.
 
 #### Settings    
 1. Verify that access to 'Settings' screen is SECURED BY PIN code
-   * TODO 
+   * Launch app & do required setup (setting PING code + target payment address)
+   * Go to 'Settings' screen
+   * Confirm that it requires to enter PIN code before accessing the screen
+   * Confirm that entering an incorrect PIN code shows an error message and denies access to the screen
+   * Confirm that entering the correct PIN code grants access to the screen
 1. Verify PIN-CODE change
-   * TODO 
+   * Launch app & do required setup
+   * Click on 'Settings' screen
+   * Enter the correct PIN code to pass 'PIN code' screen and enter the 'Settings' screen
+   * Click on 'PIN Code' button to change the PIN code
+   * Enter a NEW PIN code (like 1234)
+   * Enter a NON matching confirmation PIN code (like 5678)
+   * Confirm that an error message says that the 2 codes are not matching
+   * Enter a NEW PIN code (like 3333)
+   * Enter a MATCHING confirmation PIN code (like 3333)
+   * Confirm that it goes back the 'Settings' screen
+   * Click 'BACK' to exit the 'Settings' screen
+   * Go to 'Settings' screen
+   * Confirm that the new PIN code is required to enter the screen
 1. changing COMPANY/MERCHANT name
-   * TODO 
-1. payment target using API KEY
-   * TODO 
-1. payment target using PubKey/BCH format with "bitcoincash:" prefix 
-   * TODO 
-1. payment target using PubKey/BCH format without "bitcoincash:" prefix
-   * TODO    
-1. payment target using PubKey using legacy format
-   * TODO    
-1. payment target using P2SH
-   * TODO 
-1. payment target using xPubKey
-   * test 2 address
-1. Camera to scan address xPubKey
-   * TODO 
-1. Camera to scan address API KEY
-   * TODO 
-1. Camera to scan address PubKey
-   * TODO 
+   * Launch app & do required setup
+   * Click on 'Settings' screen
+   * Enter the correct PIN code to pass 'PIN code' screen and enter the 'Settings' screen
+   * Click on 'Merchant name' button to change the name displayed in the drawer or left side menu
+   * Enter a new name and Click on 'Cancel'
+   * Confirm that the name has not changed
+   * Click on 'Merchant name' button to change the name displayed in the drawer or left side menu
+   * Enter a new name and Click on 'OK'
+   * Confirm that the name has changed on the 'Settings' screen
+   * Kill the app, Relaunch it
+   * Confirm that change has been kept in the 'Settings' screen
+1. Paste value in payment target and cancel
+   * Launch app & do required setup
+   * Enter 'Settings' screen
+   * Click on 'Destination address' button
+   * Paste a cash address like this one: bitcoincash:qzg0jqca4c38uzmkqlqwqgnpemdup9u8hsjyvyc0tz
+   * Click 'Cancel' button
+1. Paste INVALID value in payment target using: RANDOM data
+   * Launch app & do required setup
+   * Enter 'Settings' screen
+   * Click on 'Destination address' button
+   * Click on 'Paste' button
+   * Paste invalid value:  0123456
+   * Click 'OK' button 
+   * Confirm that it fails with an ERROR message
+1. Paste INVALID value in payment target using: TEST address
+   * Similar to previous test with input:
+   *      bchtest:qzgmyjle755g2v5kptrg02asx5f8k8fg55xlze46jr
+   * Confirm that it fails with an ERROR message
+1. Paste INVALID value in payment target using: TEST address without prefix
+   * Similar to previous test with input:
+   *      qzgmyjle755g2v5kptrg02asx5f8k8fg55xlze46jr
+   * Confirm that it fails with an ERROR message
+1. Paste INVALID value in payment target using: TEST address LEGACY
+   * Similar to previous test with input:
+   *      mtoKs9V381UAhUia3d7Vb9GNak8Qvmcsme
+   * Confirm that it does NOT WORK with it
+1. Paste payment target using: PubKey/BCH format with "bitcoincash:" prefix
+   * Launch app & do required setup
+   * Enter 'Settings' screen
+   * Click on 'Destination address' button
+   * Click on 'Paste' button
+   * Paste a valid cash address like this one:
+   *      bitcoincash:qzg0jqca4c38uzmkqlqwqgnpemdup9u8hsjyvyc0tz
+   *  OR  bitcoincash:qrjautd36xzp2gm9phrgthal4fjp7e6ckcmmajrkcc
+   * Click 'OK' button
+   * Confirm that the address has been changed and that there is a success notification
+1. Paste payment target using: PubKey/BCH format WITHOUT "bitcoincash:" prefix
+   * Same as previous test with input:
+   *      qzg0jqca4c38uzmkqlqwqgnpemdup9u8hsjyvyc0tz
+   *  OR  qrjautd36xzp2gm9phrgthal4fjp7e6ckcmmajrkcc
+   * Confirm that the address has been changed and that there is a success notification
+1. Paste payment target using: PubKey using LEGACY format
+   * Same as previous test with input:
+   *      1EDYcHyFgvFm9ZGqdLwjKxZtZUph5i7EQq
+   *  OR  1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k
+   * Confirm that the address has been changed and that there is a success notification
+1. Paste payment target using: P2SH
+   * Same as previous test with input:
+   *      3CSUDH5yW1KHJmMDHfCCWShWgJkbVnfvnJ (legacy)
+   *  OR  bitcoincash:pp67j94cfvnfg727etymlst9jts3uhfdkurqvtj2un (cashaddress)
+   * Confirm that the address has been changed and that there is a success notification
+1. Paste payment target using: API KEY
+   * Same as previous test with input:
+   *      dtgmfljtkcbwwvkbegpakhwseymimpalanmqjtae
+   *  OR  bvcdndeyaropfdlcjeutwghghkyuomespvrctayf
+   * Confirm that the address has been changed and that there is a success notification
+1. Paste payment target using: xPubKey
+   * Same as previous test with input:
+   *      xpub6CUGRUonZSQ4TWtTMmzXdrXDtypWKiKrhko4egpiMZbpiaQL2jkwSB1icqYh2cfDfVxdx4df189oLKnC5fSwqPfgyP3hooxujYzAu3fDVmz
+   * Confirm that the address has been changed and that there are 2 success notifications: "syncing xpub" + "xpub synced"
+1. Camera to scan payment target using address: PubKey
+   * Launch app & do required setup
+   * Enter 'Settings' screen
+   * Click on 'Destination address' button
+   * Click on 'Scan' button
+   * Scan one of the following QR code generated from http://goqr.me/
+   *      bitcoincash:qzg0jqca4c38uzmkqlqwqgnpemdup9u8hsjyvyc0tz
+   *  OR  bitcoincash:qrjautd36xzp2gm9phrgthal4fjp7e6ckcmmajrkcc
+   *  OR  qzg0jqca4c38uzmkqlqwqgnpemdup9u8hsjyvyc0tz
+   *  OR  qrjautd36xzp2gm9phrgthal4fjp7e6ckcmmajrkcc
+   *  OR  1EDYcHyFgvFm9ZGqdLwjKxZtZUph5i7EQq
+   *  OR  1MxRuANd5CmHWcveTwQaAJ36sStEQ5QM5k
+   * Click 'OK' button
+   * Confirm that the address has been changed and that there is a success notification
+1. Camera to scan payment target using address: P2SH
+   * Same as previous test with input:
+   *      3CSUDH5yW1KHJmMDHfCCWShWgJkbVnfvnJ (legacy)
+   *  OR  bitcoincash:pp67j94cfvnfg727etymlst9jts3uhfdkurqvtj2un (cashaddress)
+   * Confirm that the address has been changed and that there is a success notification
+1. Camera to scan payment target using address: API KEY
+   * Same as previous test with input:
+   *      dtgmfljtkcbwwvkbegpakhwseymimpalanmqjtae
+   *  OR  bvcdndeyaropfdlcjeutwghghkyuomespvrctayf
+   * Confirm that the address has been changed and that there is a success notification
+1. Camera to scan payment target using address: xPubKey
+   * Same as previous test with input:
+   *      xpub6CUGRUonZSQ4TWtTMmzXdrXDtypWKiKrhko4egpiMZbpiaQL2jkwSB1icqYh2cfDfVxdx4df189oLKnC5fSwqPfgyP3hooxujYzAu3fDVmz
+   * Confirm that the address has been changed and that there are 2 success notifications: "syncing xpub" + "xpub synced"
 
-#### Transactions    
+#### Transactions
 1. Verify empty TX list
    * Force stop + Clear data + Uninstall app
    * Install & launch app & do required setup
@@ -237,7 +353,7 @@ This requires to both uninstall the app and to clear the app cache.
 
 #### Navigation
 1. ABOUT: navigate to screen
-   * launch app & do required setup
+   * Launch app & do required setup
    * Go to 'About' screen
    * Confirm that it displays app name "Bitcoin Cash Register", version & year
    * Click on device 'Home' button to put the app in background
@@ -247,7 +363,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Click 'BACK' button
    * Confirm that it goes back to the 'Payment INPUT' screen 
 1. PRIVACY POLICY: navigate to screen
-   * launch app & do required setup
+   * Launch app & do required setup
    * Go to 'Privacy Policy' screen
    * Confirm that it displays the correct content or web page 
    * Click on device 'Home' button to put the app in background
@@ -258,7 +374,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Confirm that it goes back to the 'Payment INPUT' screen 
 1. SERVICE TERMS: navigate to screen
    * **NOT READY** webpage url is NOT yet defined
-   * launch app & do required setup
+   * Launch app & do required setup
    * Go to 'Service Terms' screen
    * Confirm that it displays the 'Service Terms' web page 
    * Click on device 'Home' button to put the app in background
@@ -268,7 +384,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Click 'BACK' button
    * Confirm that it goes back to the 'Payment INPUT' screen 
 1. TERMS OF USE: navigate to screen
-   * launch app & do required setup
+   * Launch app & do required setup
    * Go to 'Terms of use' screen
    * Confirm that it displays the 'Terms of use' web page 
    * Click on device 'Home' button to put the app in background
@@ -278,7 +394,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Click 'BACK' button
    * Confirm that it goes back to the 'Payment INPUT' screen 
 1. TRANSACTIONS: navigate to screen 
-   * launch app & do required setup
+   * Launch app & do required setup
    * Go to 'Transactions' screen
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
@@ -287,7 +403,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Click 'BACK' button
    * Confirm that it goes back to the 'Payment INPUT' screen 
 1. SETTINGS: navigate to screen
-   * launch app & do required setup for Pin code & Payment Target
+   * Launch app & do required setup for Pin code & Payment Target
    * Go to 'Settings' screen
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
@@ -296,7 +412,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Click 'BACK' button
    * Confirm that it goes back to the 'Payment INPUT' screen 
 1. Payment INPUT: navigate to screen
-   * launch app
+   * Launch app
    * Go to 'Payment INPUT' screen
    * Enter amount: 99
    * Click on device 'Home' button to put the app in background
@@ -305,7 +421,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Click 'BACK' button
    * Confirm that it exits the app
 1. Payment REQUEST: navigate to screen
-   * launch app
+   * Launch app
    * Go to 'Payment INPUT' screen
    * Enter amount: 10
    * Click charge to arrive on the 'Payment REQUEST' screen
