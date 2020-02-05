@@ -251,7 +251,7 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
         }
 
         private fun getIcon(bch: Long, confirmations: Int): Int {
-            return if (bch < 0L) { // under/over payment
+            return if (bch < 0L) { // under/over payment, legacy: can't happen anymore with BIP-70
                 R.drawable.ic_warning_black_18dp
             } else if (confirmations <= 0) {
                 R.drawable.ic_done_white_24dp
@@ -263,7 +263,7 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
         }
 
         private fun getAlpha(bch: Long, confirmations: Int): Float {
-            return if (bch < 0L) { // under/over payment
+            return if (bch < 0L) { // under/over payment, legacy: can't happen anymore with BIP-70
                 1.0f
             } else if (confirmations <= 0) {
                 0f
