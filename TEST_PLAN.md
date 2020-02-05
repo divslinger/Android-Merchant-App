@@ -62,7 +62,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Confirm that texts are in 'FRENCH' language  
    * Confirm that Local Currency is 'EUR'
    
-#### Payment INPUT    
+#### Payment INPUT: before any test, launch app & do required setup     
 1. Verify that amount of 0 are forbidden 
    * Go to the 'Payment INPUT' screen
    * Ensure that the amount is 0
@@ -73,6 +73,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Select country: US with currency: USD
    * Go to the 'Payment INPUT' screen
    * Ensure that the amount is 1234,56
+   * Confirm that the decimal button ',' on the left of button '0' is NOT greyed and works
    * Confirm that it doesn't introduce a 3rd decimal when pressing any digit
    * Click on 'Check-out'
    * Confirm that the amount is displayed EXACTLY as $1,234.56
@@ -81,7 +82,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Select country: Japan with currency: JPY
    * Go to the 'Payment INPUT' screen
    * Ensure that the amount is 1234
-   * Confirm that the decimal button on the left of button '0' is greyed and does nothing
+   * Confirm that the decimal button ',' on the left of button '0' is greyed and does nothing
    * Click on 'Check-out'
    * Confirm that the amount is displayed EXACTLY as ¥1,234
 1. EUR CURRENCY formatting & keyboard
@@ -89,6 +90,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Select country: Belgium with currency: EUR
    * Go to the 'Payment INPUT' screen
    * Ensure that the amount is 1234,56
+   * Confirm that the decimal button ',' on the left of button '0' is NOT greyed and works
    * Confirm that it doesn't introduce a 3rd decimal when pressing any digit
    * Click on 'Check-out'
    * Confirm that the amount is displayed EXACTLY as 1.234,56 € (Notice inversion of ./, compared to USD)
@@ -97,11 +99,12 @@ This requires to both uninstall the app and to clear the app cache.
    * Select country: Jordan with currency: JOD
    * Go to the 'Payment INPUT' screen
    * Ensure that the amount is 1234,567
+   * Confirm that the decimal button ',' on the left of button '0' is NOT greyed and works
    * Confirm that it doesn't introduce a 4rd decimal when pressing any digit
    * Click on 'Check-out'
    * Confirm that the amount is displayed as 1234,567 (it will varies depending on how the phone supports Arabic)
 
-#### Payment REQUEST    
+#### Payment REQUEST: before any test, launch app & do required setup    
 1. create invoice shows QR code & correct FIAT amount 
    * Enter 5.00 USD on the 'Payment INPUT' screen
    * Click the "Charge" button to enter the 'Payment REQUEST' screen
@@ -167,7 +170,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Compare the addresses and confirm they do NOT match
 
 #### Settings    
-1. Verify that access to 'Settings' screen is SECURED BY PIN-CODE
+1. Verify that access to 'Settings' screen is SECURED BY PIN code
    * TODO 
 1. Verify PIN-CODE change
    * TODO 
@@ -191,10 +194,6 @@ This requires to both uninstall the app and to clear the app cache.
    * TODO 
 1. Camera to scan address PubKey
    * TODO 
-1. changing CURRENCY
-   * TODO Verify decimal for EURO & USD and none for JPY
-   * Verify availability of "," for USD
-   * Verify formatting of "," for USD
 
 #### Transactions    
 1. Verify empty TX list
@@ -237,8 +236,6 @@ This requires to both uninstall the app and to clear the app cache.
    * Confirm that it opens a browser and display info about the same TX
 
 #### Navigation
-1. BACK button behavior 
-   * TODO 
 1. ABOUT: navigate to screen
    * launch app & do required setup
    * Go to 'About' screen
@@ -246,6 +243,9 @@ This requires to both uninstall the app and to clear the app cache.
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
    * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
+   * Go to 'About' screen
+   * Click 'BACK' button
+   * Confirm that it goes back to the 'Payment INPUT' screen 
 1. PRIVACY POLICY: navigate to screen
    * launch app & do required setup
    * Go to 'Privacy Policy' screen
@@ -253,6 +253,9 @@ This requires to both uninstall the app and to clear the app cache.
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
    * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
+   * Go to 'Privacy Policy' screen
+   * Click 'BACK' button
+   * Confirm that it goes back to the 'Payment INPUT' screen 
 1. SERVICE TERMS: navigate to screen
    * **NOT READY** webpage url is NOT yet defined
    * launch app & do required setup
@@ -261,6 +264,9 @@ This requires to both uninstall the app and to clear the app cache.
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
    * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
+   * Go to 'Service Terms' screen
+   * Click 'BACK' button
+   * Confirm that it goes back to the 'Payment INPUT' screen 
 1. TERMS OF USE: navigate to screen
    * launch app & do required setup
    * Go to 'Terms of use' screen
@@ -268,18 +274,27 @@ This requires to both uninstall the app and to clear the app cache.
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
    * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
+   * Go to 'Terms of use' screen
+   * Click 'BACK' button
+   * Confirm that it goes back to the 'Payment INPUT' screen 
 1. TRANSACTIONS: navigate to screen 
    * launch app & do required setup
    * Go to 'Transactions' screen
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
    * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
+   * Go to 'Transactions' screen
+   * Click 'BACK' button
+   * Confirm that it goes back to the 'Payment INPUT' screen 
 1. SETTINGS: navigate to screen
    * launch app & do required setup for Pin code & Payment Target
    * Go to 'Settings' screen
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
    * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
+   * Go to 'Settings' screen
+   * Click 'BACK' button
+   * Confirm that it goes back to the 'Payment INPUT' screen 
 1. Payment INPUT: navigate to screen
    * launch app
    * Go to 'Payment INPUT' screen
@@ -287,6 +302,8 @@ This requires to both uninstall the app and to clear the app cache.
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
    * Confirm that it opens on the 'Payment INPUT' screen with an amount of 99
+   * Click 'BACK' button
+   * Confirm that it exits the app
 1. Payment REQUEST: navigate to screen
    * launch app
    * Go to 'Payment INPUT' screen
@@ -295,6 +312,8 @@ This requires to both uninstall the app and to clear the app cache.
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
    * Confirm that it opens on the 'Payment REQUEST' screen with an amount of 10
+   * Click 'BACK' button
+   * Confirm that it does NOT go back to the 'Payment INPUT' screen and stays on the 'Payment REQUEST' screen otherwise the invoice would get lost
 
 #### Compatibility
 1. Use an Android device with OS 10
@@ -302,7 +321,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Enter a specific amount
    * Click Charge to generate an invoice/QR code
    * Pay the invoice
-   * Confirm that the checkmark is shown after the payment is sent 
+   * Confirm that the CheckMark is shown after the payment is sent 
 1. Use an Android device with OS 9.x
    * perform same test as 'Use an Android device with OS 10' 
 1. Use an Android device with OS 8.x
