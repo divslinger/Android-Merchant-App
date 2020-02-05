@@ -148,7 +148,7 @@ class SettingsFragment : ToolbarAwareFragment() {
         if (resultCode == Activity.RESULT_OK && requestCode == ZBAR_SCANNER_REQUEST && data != null) {
             Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode + ", Intent:" + data.getStringExtra(SCAN_RESULT))
             println("ADDRESS SCANNED: " + data.getStringExtra(SCAN_RESULT))
-            validateThenSetReceiverKey(data.getStringExtra(SCAN_RESULT))
+            validateThenSetPaymentTarget(data.getStringExtra(SCAN_RESULT))
             isScanning = false
         } else {
             Log.v(TAG, "requestCode:$requestCode, resultCode:$resultCode")
@@ -164,7 +164,7 @@ class SettingsFragment : ToolbarAwareFragment() {
         }
     }
 
-    fun validateThenSetReceiverKey(address: String?) {
+    fun validateThenSetPaymentTarget(address: String?) {
         val paymentTarget = PaymentTarget.parse(address)
         if (paymentTarget.isValid) {
             setAndDisplayPaymentTarget(paymentTarget)

@@ -42,7 +42,7 @@ class AddNewAddressDialog(private val settingsController: SettingsFragment) {
                 .setView(etReceiver)
                 .setCancelable(false)
                 .setPositiveButton(R.string.prompt_ok) { dialog, _ ->
-                    settingsController.validateThenSetReceiverKey(etReceiver.text.toString().trim { it <= ' ' })
+                    settingsController.validateThenSetPaymentTarget(etReceiver.text.toString().trim { it <= ' ' })
                     dialog.dismiss()
                 }
                 .setNegativeButton(R.string.prompt_ko) { dialog, _ -> dialog.dismiss() }
