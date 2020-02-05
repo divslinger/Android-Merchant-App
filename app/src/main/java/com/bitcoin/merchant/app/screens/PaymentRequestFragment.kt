@@ -55,6 +55,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private lateinit var bip70PayService: Bip70PayService
     private var lastProcessedInvoicePaymentId: String? = null
     private var qrCodeUri: String? = null
+    private var fiatFormatted: String? = null
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (Bip70Action.INVOICE_PAYMENT_ACKNOWLEDGED == intent.action) {
@@ -81,7 +82,6 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             bip70Manager.reconnectIfNecessary()
         }
     }
-    private var fiatFormatted: String? = null
     private fun expirePayment(invoiceStatus: InvoiceStatus) {
         if (markInvoiceAsProcessed(invoiceStatus)) {
             return
