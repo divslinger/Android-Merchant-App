@@ -23,6 +23,7 @@ import java.text.NumberFormat
 import java.util.*
 
 class PaymentInputFragment : ToolbarAwareFragment() {
+    private val MAX_ALLOWED_NUMBER_OF_DIGIT = 12
     private var amountPayableFiat = 0.0
     private var allowedDecimalPlaces = 2
     private lateinit var rootView: View
@@ -204,6 +205,9 @@ class PaymentInputFragment : ToolbarAwareFragment() {
             if (decimalPart.length >= allowedDecimalPlaces) {
                 return
             }
+        }
+        if (amountText.length >= MAX_ALLOWED_NUMBER_OF_DIGIT) {
+            return  // to avoid conversion error from server
         }
         tvAmount.append(digit)
     }
