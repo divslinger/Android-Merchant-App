@@ -1,7 +1,7 @@
 These Android tests have been divided in sections: 
 * Setup
 * Detection
-* **TODO** Payment INPUT
+* Payment INPUT
 * Payment REQUEST
 * **TODO** Settings
 * Transactions
@@ -22,21 +22,21 @@ This requires to both uninstall the app and to clear the app cache.
 1. Setting initial PIN-CODE & Verify user can not leave settings until payment target is set
    * Force stop + Clear data + Uninstall app
    * Install & Launch app
-   * Confirm that it opens on PIN-CODE screen to create passcode
+   * Confirm that it opens on 'PIN code' screen to create passcode
    * Enter Pin code: 1111
    * Enter Pin code: 2222 to fail confirmation
    * Confirm that an error message appears similar to "PIN code must match"
    * Enter Pin code: 1111
    * Enter Pin code: 1111 to confirm
-   * Confirm that the current screen is the Settings screen
+   * Confirm that the current screen is the 'Settings' screen
    * Press the device BACK button
-   * Confirm that an error message prevent from leaving the Settings screen and click OK
+   * Confirm that an error message prevent from leaving the 'Settings' screen and click OK
    * Press the toolbar top left BACK button
-   * Confirm that an error message prevent from leaving the Settings screen and click OK
-   * Click the device 'Overview' button representing a square: It opens a list of thumbnail images of apps.
+   * Confirm that an error message prevent from leaving the 'Settings' screen and click OK
+   * Click the 'Overview' button (OS button) representing a square: It opens a list of thumbnail images of apps.
    * Flick the app or Click 'X' button to kill it or 'Force stop' the app
    * Launch app again
-   * Confirm that it opens on the Settings screen
+   * Confirm that it opens on the 'Settings' screen
     
 #### Detection    
 1. Verify language & currency are set based on OS language & country
@@ -64,62 +64,61 @@ This requires to both uninstall the app and to clear the app cache.
    
 #### Payment INPUT    
 1. Verify that amount of 0 are forbidden 
-   * Go to the Payment INPUT screen
+   * Go to the 'Payment INPUT' screen
    * Ensure that the amount is 0
    * Click on 'Check-out'
    * Confirm that a temporary error message appears in RED notifying that the amount is invalid
 1. USD CURRENCY formatting & keyboard
-   * Go to the Settings screen
+   * Go to the 'Settings' screen
    * Select country: US with currency: USD
-   * Go to the Payment INPUT screen
+   * Go to the 'Payment INPUT' screen
    * Ensure that the amount is 1234,56
    * Confirm that it doesn't introduce a 3rd decimal when pressing any digit
    * Click on 'Check-out'
    * Confirm that the amount is displayed EXACTLY as $1,234.56
 1. JPY CURRENCY formatting & keyboard
-   * Go to the Settings screen
+   * Go to the 'Settings' screen
    * Select country: Japan with currency: JPY
-   * Go to the Payment INPUT screen
+   * Go to the 'Payment INPUT' screen
    * Ensure that the amount is 1234
    * Confirm that the decimal button on the left of button '0' is greyed and does nothing
    * Click on 'Check-out'
    * Confirm that the amount is displayed EXACTLY as ¥1,234
 1. EUR CURRENCY formatting & keyboard
-   * Go to the Settings screen
+   * Go to the 'Settings' screen
    * Select country: Belgium with currency: EUR
-   * Go to the Payment INPUT screen
+   * Go to the 'Payment INPUT' screen
    * Ensure that the amount is 1234,56
    * Confirm that it doesn't introduce a 3rd decimal when pressing any digit
    * Click on 'Check-out'
    * Confirm that the amount is displayed EXACTLY as 1.234,56 € (Notice inversion of ./, compared to USD)
 1. JOD CURRENCY formatting & keyboard
-   * Go to the Settings screen
+   * Go to the 'Settings' screen
    * Select country: Jordan with currency: JOD
-   * Go to the Payment INPUT screen
+   * Go to the 'Payment INPUT' screen
    * Ensure that the amount is 1234,567
    * Confirm that it doesn't introduce a 4rd decimal when pressing any digit
    * Click on 'Check-out'
    * Confirm that the amount is displayed as 1234,567 (it will varies depending on how the phone supports Arabic)
-1. Verify automatic return to Payment INPUT screen when app is paused
-   * TODO 
-1. Verify amount is reset after payment
-   * TODO 
-   
+
 #### Payment REQUEST    
 1. create invoice shows QR code & correct FIAT amount 
-   * Enter 5.00 USD on the Payment INPUT screen
-   * Click the "Charge" button to enter the Payment REQUEST screen
-   * Verify the amount label at the top of the Payment REQUEST screen matches the amount you entered in Step 1. (5.00 USD)
+   * Enter 5.00 USD on the 'Payment INPUT' screen
+   * Click the "Charge" button to enter the 'Payment REQUEST' screen
+   * Verify the amount label at the top of the 'Payment REQUEST' screen matches the amount you entered in Step 1. (5.00 USD)
 1. Verify CHECKMARK & SOUND after payment is sent
    * Make sure your device's volume is at the MAX setting
-   * Enter any amount on the Payment INPUT screen
-   * Click the "Charge" button to enter the Payment REQUEST screen
+   * Enter any amount on the 'Payment INPUT' screen
+   * Click the "Charge" button to enter the 'Payment REQUEST' screen
    * Grab a wallet of your choice on a separate device and pay the invoice by scanning the QR code
-   * Upon payment, the Bitcoin Cash Register device should now have a green screen with a white checkmark, and your device should make a noticeable ding sound.
+   * Pay the invoice by scanning the displayed QR code using any wallet supporting BIP-70
+   * Confirm that the screen shows a white CheckMark with a green background
+   * Confirm that you hear noticeable ding sound
+   * After returning to the 'Payment INPUT' screen, confirm that the amount is reset to 0
 1. Invoice generation continue after internet disconnection
    * Turn off internet connection on the merchant device.
-   * Enter any amount on the Payment INPUT screen
-   * Click the "Charge" button to enter the Payment REQUEST screen
+   * Enter any amount on the 'Payment INPUT' screen
+   * Click the "Charge" button to enter the 'Payment REQUEST' screen
    * Upon seeing the "Error during invoice generation" popup, do not press continue.
    * Swipe down on your Android device to bring the notification shade into view.
    * Turn on your internet connection
@@ -127,14 +126,14 @@ This requires to both uninstall the app and to clear the app cache.
    * Press continue on the "Error during invoice generation" popup
    * The invoice should now be properly generated.
 1. Automatic RESUME AFTER CRASH
-   * Enter 8 USD on the Payment INPUT screen
-   * Click the "Charge" button to enter the Payment REQUEST screen
+   * Enter 8 USD on the 'Payment INPUT' screen
+   * Click the "Charge" button to enter the 'Payment REQUEST' screen
    * Kill/Force close the app
    * Launch the app again 
-   * Confirm that the app opens on the Payment REQUEST screen with an amount of 8 USD
+   * Confirm that the app opens on the 'Payment REQUEST' screen with an amount of 8 USD
 1. Automatic RECONNECT after internet disconnection
-   * Enter any amount on the Payment INPUT screen
-   * Click the "Charge" button to enter the Payment REQUEST screen
+   * Enter any amount on the 'Payment INPUT' screen
+   * Click the "Charge" button to enter the 'Payment REQUEST' screen
    * Confirm connection icon is green/Connected
    * Swipe down on your Android device to bring the notification shade into view.
    * Turn off your internet connection
@@ -144,31 +143,31 @@ This requires to both uninstall the app and to clear the app cache.
    * Turn on your internet connection
    * Wait for the internet connection to be established
    * Confirm connection icon is green/Connected
-   * Make payment by scanning the QR code that is displayed.
-   * Ensure that the CheckMark screen is shown upon payment.
+   * Pay the invoice by scanning the displayed QR code using any wallet supporting BIP-70
+   * Confirm that the screen shows a CheckMark upon payment.
 1. Verify invoice CANCELLATION doesn't crash
-   * enter any amount on the Payment INPUT screen
-   * Click the 'CHARGE' button to enter Payment REQUEST screen
-   * Click the 'CANCEL' button button to exit Payment REQUEST screen
+   * enter any amount on the 'Payment INPUT' screen
+   * Click the 'CHARGE' button to enter 'Payment REQUEST' screen
+   * Click the 'CANCEL' button button to exit 'Payment REQUEST' screen
    * Wait 3 seconds and ensure that the app did not crash
-   * Verify amount has been properly reset to 0 on the Payment INPUT screen
+   * Verify amount has been properly reset to 0 on the 'Payment INPUT' screen
 1. Verify auto-cancellation after TIMER EXPIRY
-   * Enter any amount on the Payment INPUT screen
-   * Click the "Charge" button to enter the Payment REQUEST screen
+   * Enter any amount on the 'Payment INPUT' screen
+   * Click the "Charge" button to enter the 'Payment REQUEST' screen
    * Wait for the timer below the QR code to reach 0:00
-   * Make sure the Payment REQUEST screen closes itself when the timer reaches 0:00
+   * Make sure the 'Payment REQUEST' screen closes itself when the timer reaches 0:00
 1. Verify that 2 payments using xPubKey ends up in 2 different addresses 
-   * Enter any amount on the Payment INPUT screen
-   * Click the "Charge" button to enter the Payment REQUEST screen
+   * Enter any amount on the 'Payment INPUT' screen
+   * Click the "Charge" button to enter the 'Payment REQUEST' screen
    * Pay the invoice
-   * Go to the Transactions screen
+   * Go to the 'Transactions' screen
    * View the transaction on the block explorer
    * Make note of the address in the output belonging to you
    * Repeat Steps 1 through 6
-   * Compare the addresses and ensure they do NOT match
+   * Compare the addresses and confirm they do NOT match
 
 #### Settings    
-1. Verify that access to settings screen is SECURED BY PIN-CODE
+1. Verify that access to 'Settings' screen is SECURED BY PIN-CODE
    * TODO 
 1. Verify PIN-CODE change
    * TODO 
@@ -204,7 +203,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Go to Transactions screen
    * Ensure that the list is empty and display a message saying that there is no TX available
 1. Verify newly paid invoice is added to the list
-   * Go to Payment INPUT screen
+   * Go to 'Payment INPUT' screen
    * Enter a specific amount
    * Click Charge to generate an invoice/QR code
    * Pay the invoice
@@ -246,14 +245,14 @@ This requires to both uninstall the app and to clear the app cache.
    * Confirm that it displays app name "Bitcoin Cash Register", version & year
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
-   * Confirm that it opens on the Payment INPUT screen with an amount of 0
+   * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
 1. PRIVACY POLICY: navigate to screen
    * launch app & do required setup
    * Go to 'Privacy Policy' screen
    * Confirm that it displays the correct content or web page 
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
-   * Confirm that it opens on the Payment INPUT screen with an amount of 0
+   * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
 1. SERVICE TERMS: navigate to screen
    * **NOT READY** webpage url is NOT yet defined
    * launch app & do required setup
@@ -261,26 +260,26 @@ This requires to both uninstall the app and to clear the app cache.
    * Confirm that it displays the 'Service Terms' web page 
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
-   * Confirm that it opens on the Payment INPUT screen with an amount of 0
+   * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
 1. TERMS OF USE: navigate to screen
    * launch app & do required setup
    * Go to 'Terms of use' screen
    * Confirm that it displays the 'Terms of use' web page 
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
-   * Confirm that it opens on the Payment INPUT screen with an amount of 0
+   * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
 1. TRANSACTIONS: navigate to screen 
    * launch app & do required setup
    * Go to 'Transactions' screen
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
-   * Confirm that it opens on the Payment INPUT screen with an amount of 0
+   * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
 1. SETTINGS: navigate to screen
    * launch app & do required setup for Pin code & Payment Target
    * Go to 'Settings' screen
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
-   * Confirm that it opens on the Payment INPUT screen with an amount of 0
+   * Confirm that it opens on the 'Payment INPUT' screen with an amount of 0
 1. Payment INPUT: navigate to screen
    * launch app
    * Go to 'Payment INPUT' screen
@@ -299,7 +298,7 @@ This requires to both uninstall the app and to clear the app cache.
 
 #### Compatibility
 1. Use an Android device with OS 10
-   * Go to Payment INPUT screen
+   * Go to 'Payment INPUT' screen
    * Enter a specific amount
    * Click Charge to generate an invoice/QR code
    * Pay the invoice
