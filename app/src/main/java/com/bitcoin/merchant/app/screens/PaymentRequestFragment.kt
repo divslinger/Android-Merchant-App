@@ -279,6 +279,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                     // connect the socket first before showing the bitmap
                     bip70Manager.startWebsockets(invoice.paymentId)
                     bitmap = getQrCodeBitmap(invoice.walletUri)
+
+
                 } catch (e: Exception) {
                     if (e !is SocketTimeoutException) {
                         Log.e(MainActivity.TAG, "", e)
