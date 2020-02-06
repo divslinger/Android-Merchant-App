@@ -16,10 +16,12 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.bitcoin.merchant.app.application.CashRegisterApplication
 import com.bitcoin.merchant.app.application.NetworkStateReceiver
+import com.bitcoin.merchant.app.screens.SettingsFragment
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
@@ -174,6 +176,18 @@ open class MainActivity : AppCompatActivity() {
                 R.id.action_privacy_policy -> nav.navigate(R.id.nav_to_privacy_policy)
             }
         }, 250)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == SettingsFragment.ZBAR_SCANNER_REQUEST && data != null) {
+            Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode + ", Intent:" + data.getStringExtra(SettingsFragment.SCAN_RESULT))
+            val i = Intent(SettingsFragment.SET_ADDRESS)
+            i.putExtra("ADDRESS", data.getStringExtra(SettingsFragment.SCAN_RESULT))
+            LocalBroadcastManager.getInstance(this).sendBroadcast(i)
+        } else {
+            Log.v(TAG, "requestCode:$requestCode, resultCode:$resultCode")
+        }
     }
 
     companion object {

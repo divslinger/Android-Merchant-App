@@ -1,9 +1,11 @@
 package com.bitcoin.merchant.app.screens
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -17,6 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.ScanQRCodeActivity
 import com.bitcoin.merchant.app.model.CountryCurrencyLocale
@@ -37,6 +40,17 @@ class SettingsFragment : ToolbarAwareFragment() {
     private lateinit var btnLocalBitcoin: RelativeLayout
     private lateinit var btnThePit: RelativeLayout
     private var isScanning = false
+
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (SET_ADDRESS == intent.action) {
+                if(intent.extras != null) {
+                    this@SettingsFragment.setAddressFromScan(intent.getStringExtra("ADDRESS"))
+                }
+            }
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         rootView = inflater.inflate(R.layout.fragment_settings, container, false)
@@ -54,7 +68,14 @@ class SettingsFragment : ToolbarAwareFragment() {
         btnThePit.setOnClickListener { openUrl("https://exchange.bitcoin.com") }
         setToolbarAsBackButton()
         setToolbarTitle(R.string.menu_settings)
+        registerReceiver()
         return rootView
+    }
+
+    private fun registerReceiver() {
+        val filter = IntentFilter()
+        filter.addAction(SET_ADDRESS)
+        LocalBroadcastManager.getInstance(activity).registerReceiver(receiver, filter)
     }
 
     private fun openUrl(url: String) {
@@ -139,20 +160,8 @@ class SettingsFragment : ToolbarAwareFragment() {
     }
 
     private fun openCamera() {
-        val intent = Intent(activity, ScanQRCodeActivity::class.java)
-        startActivityForResult(intent, ZBAR_SCANNER_REQUEST)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == ZBAR_SCANNER_REQUEST && data != null) {
-            Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode + ", Intent:" + data.getStringExtra(SCAN_RESULT))
-            println("ADDRESS SCANNED: " + data.getStringExtra(SCAN_RESULT))
-            validateThenSetPaymentTarget(data.getStringExtra(SCAN_RESULT))
-            isScanning = false
-        } else {
-            Log.v(TAG, "requestCode:$requestCode, resultCode:$resultCode")
-        }
+        val qrHelper = ScanQRCodeActivity()
+        qrHelper.startQRScan(activity, ZBAR_SCANNER_REQUEST)
     }
 
     fun setAndDisplayPaymentTarget(target: PaymentTarget) {
@@ -196,6 +205,11 @@ class SettingsFragment : ToolbarAwareFragment() {
         SnackHelper.show(activity, activity.getString(R.string.syncing_xpub))
     }
 
+    fun setAddressFromScan(address: String) {
+        validateThenSetPaymentTarget(address)
+        isScanning = false
+    }
+
     override fun canFragmentBeDiscardedWhenInBackground(): Boolean {
         return Settings.getPaymentTarget(activity).isValid && !isScanning
     }
@@ -204,6 +218,8 @@ class SettingsFragment : ToolbarAwareFragment() {
         const val SCAN_RESULT = "SCAN_RESULT"
         private const val TAG = "SettingsActivity"
         private const val CAMERA_PERMISSION = 1111
-        private const val ZBAR_SCANNER_REQUEST = 2026
+        const val ZBAR_SCANNER_REQUEST = 2026
+        const val PACKAGE = "org.bitcoindotcom.bchprocessor"
+        const val SET_ADDRESS = PACKAGE + "Action.SET_ADDRESS"
     }
 }
