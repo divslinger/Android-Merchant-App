@@ -1,9 +1,9 @@
 package com.bitcoin.merchant.app.screens.dialogs
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.widget.EditText
 import android.widget.TextView
+import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.screens.SettingsFragment
@@ -14,7 +14,7 @@ class AddNewAddressDialog(private val settingsController: SettingsFragment) {
         private const val ENTERING_ADDRESS_BYPASSED = false
     }
 
-    private val ctx: Activity = settingsController.activity
+    private val ctx: MainActivity = settingsController.activity
     fun show() {
         val tvReceiverHelp = TextView(ctx)
         tvReceiverHelp.text = ctx.getString(R.string.options_explain_payment_address)
@@ -29,7 +29,7 @@ class AddNewAddressDialog(private val settingsController: SettingsFragment) {
                 }
                 .setNegativeButton(R.string.scan) { dialog, _ ->
                     dialog.dismiss()
-                    settingsController.requestToOpenCamera()
+                    ctx.app.qrCodeScanner.requestToOpenCamera(ctx)
                 }
         if (!ctx.isFinishing) {
             builder.show()

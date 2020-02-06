@@ -2,6 +2,7 @@ package com.bitcoin.merchant.app.application
 
 import android.app.Application
 import com.bitcoin.merchant.app.database.DBControllerV3
+import com.bitcoin.merchant.app.util.ScanQRUtil
 import com.bitcoin.merchant.app.util.Settings
 import com.bitcoin.merchant.app.util.WalletUtil
 
@@ -11,6 +12,7 @@ class CashRegisterApplication : Application() {
         private set
     lateinit var db: DBControllerV3
         private set
+    val qrCodeScanner by lazy { ScanQRUtil() }
 
     override fun onCreate() {
         super.onCreate()

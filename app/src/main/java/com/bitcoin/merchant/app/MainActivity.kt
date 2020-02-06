@@ -21,10 +21,10 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.bitcoin.merchant.app.application.CashRegisterApplication
 import com.bitcoin.merchant.app.application.NetworkStateReceiver
-import com.bitcoin.merchant.app.screens.SettingsFragment
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
+import com.bitcoin.merchant.app.util.ScanQRUtil
 import com.bitcoin.merchant.app.util.Settings
 import com.crashlytics.android.Crashlytics
 import com.google.android.material.navigation.NavigationView
@@ -178,21 +178,27 @@ open class MainActivity : AppCompatActivity() {
         }, 250)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == SettingsFragment.ZBAR_SCANNER_REQUEST && data != null) {
-            Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode + ", Intent:" + data.getStringExtra(SettingsFragment.SCAN_RESULT))
-            val i = Intent(SettingsFragment.SET_ADDRESS)
-            i.putExtra(SettingsFragment.ADDRESS_EXTRA, data.getStringExtra(SettingsFragment.SCAN_RESULT))
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        app.qrCodeScanner.onRequestPermissionsResult(this, requestCode, permissions, grantResults)
+    }
+
+    override fun onActivityResult(requestCode: Int, result: Int, data: Intent?) {
+        super.onActivityResult(requestCode, result, data)
+        if (result == Activity.RESULT_OK && requestCode == ScanQRUtil.ZXING_SCAN_REQUEST && data != null) {
+            val paymentTarget = data.getStringExtra(ScanQRUtil.ZXING_SCAN_RESULT)
+            Log.v(TAG, "requestCode:$requestCode, resultCode:$result, paymentTarget:$paymentTarget")
+            val i = Intent(Action.SET_PAYMENT_TARGET)
+            i.putExtra(Action.PARAM_PAYMENT_TARGET, paymentTarget)
             LocalBroadcastManager.getInstance(this).sendBroadcast(i)
         } else {
-            Log.v(TAG, "requestCode:$requestCode, resultCode:$resultCode")
+            Log.v(TAG, "requestCode:$requestCode, resultCode:$result")
         }
     }
 
     companion object {
         const val TAG = "MainActivity"
-        private const val APP_PACKAGE = "com.bitcoin.merchant.app"
+        const val APP_PACKAGE = "com.bitcoin.merchant.app"
         fun getNav(activity: Activity): NavController {
             return Navigation.findNavController(activity, R.id.main_nav_controller)
         }

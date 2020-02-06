@@ -1,12 +1,10 @@
 package com.bitcoin.merchant.app.screens
 
-import android.Manifest
 import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -16,12 +14,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.bitcoin.merchant.app.Action
 import com.bitcoin.merchant.app.R
-import com.bitcoin.merchant.app.util.ScanQRUtil
 import com.bitcoin.merchant.app.model.CountryCurrencyLocale
 import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.screens.dialogs.AddNewAddressDialog
@@ -32,6 +27,7 @@ import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.Settings
 
 class SettingsFragment : ToolbarAwareFragment() {
+    private val TAG = "SettingsFragment"
     private lateinit var rootView: View
     private lateinit var lvMerchantName: LinearLayout
     private lateinit var lvPaymentAddress: LinearLayout
@@ -39,13 +35,12 @@ class SettingsFragment : ToolbarAwareFragment() {
     private lateinit var lvPinCode: LinearLayout
     private lateinit var btnLocalBitcoin: RelativeLayout
     private lateinit var btnThePit: RelativeLayout
-    private var isScanning = false
 
-    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+    private val paymentTargetReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (SET_ADDRESS == intent.action) {
-                if(intent.extras != null) {
-                    this@SettingsFragment.setAddressFromScan(intent.getStringExtra(ADDRESS_EXTRA))
+            if (Action.SET_PAYMENT_TARGET == intent.action) {
+                if (intent.extras != null) {
+                    setPaymentTargetFromScan(intent.getStringExtra(Action.PARAM_PAYMENT_TARGET))
                 }
             }
         }
@@ -68,19 +63,13 @@ class SettingsFragment : ToolbarAwareFragment() {
         btnThePit.setOnClickListener { openUrl(activity.getString(R.string.url_exchange_bitcoin_com)) }
         setToolbarAsBackButton()
         setToolbarTitle(R.string.menu_settings)
-        registerReceiver()
+        LocalBroadcastManager.getInstance(activity).registerReceiver(paymentTargetReceiver, IntentFilter(Action.SET_PAYMENT_TARGET))
         return rootView
     }
 
     override fun onDestroyView() {
-        LocalBroadcastManager.getInstance(activity).unregisterReceiver(receiver)
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(paymentTargetReceiver)
         super.onDestroyView()
-    }
-
-    private fun registerReceiver() {
-        val filter = IntentFilter()
-        filter.addAction(SET_ADDRESS)
-        LocalBroadcastManager.getInstance(activity).registerReceiver(receiver, filter)
     }
 
     private fun openUrl(url: String) {
@@ -143,31 +132,6 @@ class SettingsFragment : ToolbarAwareFragment() {
         builder.create().show()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode == CAMERA_PERMISSION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera()
-            } else {
-                isScanning = false
-                val text = "Please grant camera permission to use the QR Scanner"
-                Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    fun requestToOpenCamera() {
-        isScanning = true
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION)
-        } else {
-            openCamera()
-        }
-    }
-
-    private fun openCamera() {
-        ScanQRUtil().startQRScan(activity, ZBAR_SCANNER_REQUEST)
-    }
-
     fun setAndDisplayPaymentTarget(target: PaymentTarget) {
         val v = rootView.findViewById<TextView>(R.id.et_payment_address)
         v.text = target.bchAddress
@@ -209,22 +173,14 @@ class SettingsFragment : ToolbarAwareFragment() {
         SnackHelper.show(activity, activity.getString(R.string.syncing_xpub))
     }
 
-    fun setAddressFromScan(address: String) {
-        validateThenSetPaymentTarget(address)
-        isScanning = false
+    fun setPaymentTargetFromScan(target: String?) {
+        if (target != null) {
+            validateThenSetPaymentTarget(target)
+        }
+        app.qrCodeScanner.isScanning = false
     }
 
     override fun canFragmentBeDiscardedWhenInBackground(): Boolean {
-        return Settings.getPaymentTarget(activity).isValid && !isScanning
-    }
-
-    companion object {
-        const val SCAN_RESULT = "SCAN_RESULT"
-        private const val TAG = "SettingsActivity"
-        private const val CAMERA_PERMISSION = 1111
-        const val ZBAR_SCANNER_REQUEST = 2026
-        const val PACKAGE = "org.bitcoindotcom.bchprocessor"
-        const val SET_ADDRESS = PACKAGE + "Action.SET_ADDRESS"
-        const val ADDRESS_EXTRA = PACKAGE + "ADDRESS"
+        return Settings.getPaymentTarget(activity).isValid && !app.qrCodeScanner.isScanning
     }
 }
