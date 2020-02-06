@@ -183,7 +183,7 @@ open class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK && requestCode == SettingsFragment.ZBAR_SCANNER_REQUEST && data != null) {
             Log.v(TAG, "requestCode:" + requestCode + ", resultCode:" + resultCode + ", Intent:" + data.getStringExtra(SettingsFragment.SCAN_RESULT))
             val i = Intent(SettingsFragment.SET_ADDRESS)
-            i.putExtra("ADDRESS", data.getStringExtra(SettingsFragment.SCAN_RESULT))
+            i.putExtra(SettingsFragment.ADDRESS_EXTRA, data.getStringExtra(SettingsFragment.SCAN_RESULT))
             LocalBroadcastManager.getInstance(this).sendBroadcast(i)
         } else {
             Log.v(TAG, "requestCode:$requestCode, resultCode:$resultCode")

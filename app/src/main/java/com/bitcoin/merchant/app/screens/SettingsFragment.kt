@@ -21,7 +21,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.R
-import com.bitcoin.merchant.app.ScanQRCodeActivity
+import com.bitcoin.merchant.app.util.ScanQRUtil
 import com.bitcoin.merchant.app.model.CountryCurrencyLocale
 import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.screens.dialogs.AddNewAddressDialog
@@ -45,7 +45,7 @@ class SettingsFragment : ToolbarAwareFragment() {
         override fun onReceive(context: Context, intent: Intent) {
             if (SET_ADDRESS == intent.action) {
                 if(intent.extras != null) {
-                    this@SettingsFragment.setAddressFromScan(intent.getStringExtra("ADDRESS"))
+                    this@SettingsFragment.setAddressFromScan(intent.getStringExtra(ADDRESS_EXTRA))
                 }
             }
         }
@@ -70,6 +70,11 @@ class SettingsFragment : ToolbarAwareFragment() {
         setToolbarTitle(R.string.menu_settings)
         registerReceiver()
         return rootView
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(receiver)
     }
 
     private fun registerReceiver() {
@@ -160,7 +165,7 @@ class SettingsFragment : ToolbarAwareFragment() {
     }
 
     private fun openCamera() {
-        val qrHelper = ScanQRCodeActivity()
+        val qrHelper = ScanQRUtil()
         qrHelper.startQRScan(activity, ZBAR_SCANNER_REQUEST)
     }
 
@@ -221,5 +226,6 @@ class SettingsFragment : ToolbarAwareFragment() {
         const val ZBAR_SCANNER_REQUEST = 2026
         const val PACKAGE = "org.bitcoindotcom.bchprocessor"
         const val SET_ADDRESS = PACKAGE + "Action.SET_ADDRESS"
+        const val ADDRESS_EXTRA = PACKAGE + "ADDRESS"
     }
 }
