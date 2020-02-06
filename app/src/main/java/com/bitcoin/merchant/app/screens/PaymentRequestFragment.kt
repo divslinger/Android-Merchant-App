@@ -279,6 +279,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                     // connect the socket first before showing the bitmap
                     bip70Manager.startWebsockets(invoice.paymentId)
                     bitmap = getQrCodeBitmap(invoice.walletUri)
+
+
                 } catch (e: Exception) {
                     if (e !is SocketTimeoutException) {
                         Log.e(MainActivity.TAG, "", e)
@@ -383,6 +385,17 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             AppUtil.setStatusBarColor(activity, R.color.gray)
             exitScreen()
         }
+    }
+
+    private fun startShareIntent(paymentUrl: String) {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, "Please pay your invoice here: $paymentUrl")
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(shareIntent)
     }
 
     override val isBackAllowed: Boolean
