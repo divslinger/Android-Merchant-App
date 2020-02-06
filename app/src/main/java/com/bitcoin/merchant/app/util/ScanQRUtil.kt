@@ -7,7 +7,13 @@ import com.journeyapps.barcodescanner.CaptureActivity
 
 class ScanQRUtil {
     fun startQRScan(activity: Activity, requestCode: Int) {
-        IntentIntegrator(activity).setPrompt("Scan QR").setBeepEnabled(false).setDesiredBarcodeFormats(BarcodeFormat.QR_CODE.name).setOrientationLocked(true).setCameraId(0).setCaptureActivity(CaptureActivity::class.java).setRequestCode(requestCode).initiateScan()
+        IntentIntegrator(activity).setPrompt("Scan QR")
+                .setBeepEnabled(false)
+                .setDesiredBarcodeFormats(BarcodeFormat.QR_CODE.name)
+                .setOrientationLocked(true)
+                .setCameraId(0)
+                .setCaptureActivity(CaptureActivity::class.java)
+                .setRequestCode(requestCode)
+                .initiateScan()
     }
-
 }
