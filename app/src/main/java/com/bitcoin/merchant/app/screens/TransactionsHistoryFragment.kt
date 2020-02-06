@@ -23,7 +23,7 @@ import com.bitcoin.merchant.app.database.PaymentRecord
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.DateUtil
 import com.bitcoin.merchant.app.util.MonetaryUtil
-import com.bitcoin.merchant.app.util.PrefsUtil
+import com.bitcoin.merchant.app.util.Settings
 import com.crashlytics.android.Crashlytics
 import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
 import java.util.*
@@ -75,12 +75,12 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
         listView = rootView.findViewById(R.id.txList)
         noTxHistoryLv = rootView.findViewById(R.id.no_tx_history_lv)
         listView.setAdapter(adapter)
-        listView.setOnItemClickListener { parent: AdapterView<*>?, view: View?, position: Int, id: Long -> showTransactionMenu(id) }
+        listView.setOnItemClickListener { _, _, _, id -> showTransactionMenu(id) }
         listView.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {}
             override fun onScroll(view: AbsListView, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
                 if (listView.getChildAt(0) != null) {
-                    swipeLayout.isEnabled = listView.getFirstVisiblePosition() == 0 && listView.getChildAt(0).top == 0
+                    swipeLayout.isEnabled = listView.firstVisiblePosition == 0 && listView.getChildAt(0).top == 0
                 }
             }
         })
@@ -98,11 +98,11 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
     }
 
     private fun showTransactionMenu(item: Long) {
-        val `val` = adapter.mListItems[item.toInt()]
+        val tx = adapter.mListItems[item.toInt()]
         val builder = AlertDialog.Builder(activity)
-        val tx = `val`.getAsString("tx")
-        val address = `val`.getAsString("iad")
-        builder.setTitle(tx)
+        val txId = tx.getAsString("tx")
+        val address = tx.getAsString("iad")
+        builder.setTitle(txId)
         builder.setIcon(R.mipmap.ic_launcher)
         builder.setItems(arrayOf<CharSequence>(
                 "View transaction",
@@ -112,18 +112,10 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
         ) { dialog: DialogInterface, which: Int ->
             dialog.dismiss()
             when (which) {
-                0 -> {
-                    openExplorer("https://explorer.bitcoin.com/bch/tx/$tx")
-                }
-                1 -> {
-                    openExplorer("https://explorer.bitcoin.com/bch/address/$address")
-                }
-                2 -> {
-                    copyToClipboard(tx)
-                }
-                3 -> {
-                    copyToClipboard(address)
-                }
+                0 -> openExplorer("https://explorer.bitcoin.com/bch/tx/$txId")
+                1 -> openExplorer("https://explorer.bitcoin.com/bch/address/$address")
+                2 -> copyToClipboard(txId)
+                3 -> copyToClipboard(address)
             }
         }
         builder.create().show()
@@ -141,9 +133,7 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
 
     // view not yet created
     protected val isSafe: Boolean
-        protected get() = if (!ready || activity == null || adapter == null) {
-            false // view not yet created
-        } else !(this.isRemoving || activity == null || this.isDetached || !this.isAdded || this.view == null)
+        protected get() = ready && !this.isRemoving && !this.isDetached && this.isAdded && this.view != null
 
     private fun findAllPotentialMissingTx() { // TODO use merchant server to query all TX
         LocalBroadcastManager.getInstance(activity).sendBroadcast(Intent(Bip70Action.QUERY_ALL_TX_FROM_BITCOIN_COM_PAY))
@@ -157,11 +147,9 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
         }
 
         override fun doInBackground(vararg params: Void?): ArrayList<ContentValues>? {
-            if (!ready) {
-                return null
-            }
-            val address: String = PrefsUtil.getInstance(activity).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "")
-            if (address != null && address.length > 0) {
+            if (!isSafe) return null
+            val address = Settings.getPaymentTarget(activity)
+            if (address.isValid) {
                 try {
                     return app.db.allPayments
                 } catch (e: Exception) {
@@ -174,32 +162,30 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
 
         override fun onPostExecute(result: ArrayList<ContentValues>?) {
             super.onPostExecute(result)
-            if (ready) {
-                if (result != null && adapter != null) {
-                    adapter.reset(result)
-                    if (result.size != 0) {
-                        setTxListVisibility(true)
-                    }
-                }
-                if (queryServer) {
-                    findAllPotentialMissingTx()
-                } else {
-                    if (result != null && result.size != 0) {
-                        setTxListVisibility(true)
-                    }
-                    swipeLayout.isRefreshing = false
+            if (!isSafe) return
+            if (result != null) {
+                adapter.reset(result)
+                if (result.size != 0) {
+                    setTxListVisibility(true)
                 }
             }
+            if (queryServer) {
+                findAllPotentialMissingTx()
+            } else {
+                if (result != null && result.size != 0) {
+                    setTxListVisibility(true)
+                }
+                swipeLayout.isRefreshing = false
+            }
         }
-
     }
 
     private inner class TransactionAdapter internal constructor() : BaseAdapter() {
         val mListItems: MutableList<ContentValues> = ArrayList()
-        private val inflater: LayoutInflater
-        fun reset(vals: ArrayList<ContentValues>) {
+        private val inflater: LayoutInflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        fun reset(values: ArrayList<ContentValues>) {
             mListItems.clear()
-            mListItems.addAll(vals)
+            mListItems.addAll(values)
             notifyDataSetChanged()
         }
 
@@ -215,12 +201,11 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
             return position.toLong()
         }
 
-        override fun getView(position: Int, convertView: View, parent: ViewGroup): View {
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = convertView
                     ?: inflater.inflate(R.layout.list_item_transaction, parent, false)
             try {
-                val vals = mListItems[position]
-                val r = PaymentRecord(vals)
+                val r = PaymentRecord(mListItems[position])
                 setupView(view, r.bchAmount, r.fiatAmount, r.timeInSec, r.confirmations)
             } catch (e: Exception) {
                 Log.e(TAG, "getView", e)
@@ -266,7 +251,7 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
         }
 
         private fun getIcon(bch: Long, confirmations: Int): Int {
-            return if (bch < 0L) { // under/over payment
+            return if (bch < 0L) { // under/over payment, legacy: can't happen anymore with BIP-70
                 R.drawable.ic_warning_black_18dp
             } else if (confirmations <= 0) {
                 R.drawable.ic_done_white_24dp
@@ -278,17 +263,13 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
         }
 
         private fun getAlpha(bch: Long, confirmations: Int): Float {
-            return if (bch < 0L) { // under/over payment
+            return if (bch < 0L) { // under/over payment, legacy: can't happen anymore with BIP-70
                 1.0f
             } else if (confirmations <= 0) {
                 0f
             } else {
                 1.0f
             }
-        }
-
-        init {
-            inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         }
     }
 

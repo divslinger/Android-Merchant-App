@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
 import android.util.Log
 import com.bitcoin.merchant.app.application.CashRegisterApplication
-import com.bitcoin.merchant.app.util.PrefsUtil
 import com.crashlytics.android.Crashlytics
 import info.blockchain.wallet.crypto.AESUtil
 import info.blockchain.wallet.util.CharSequenceX
@@ -135,7 +134,7 @@ class DBControllerV3(app: CashRegisterApplication?) : SQLiteOpenHelper(app, DB, 
 
     private fun decryptValue(value: String): String {
         if (pw == null) {
-            pw = CharSequenceX(PrefsUtil.MERCHANT_KEY_PIN + salt)
+            pw = CharSequenceX("pin" + salt) // legacy code
         }
         return AESUtil.decrypt(value, pw, AESUtil.PinPbkdf2Iterations)
     }

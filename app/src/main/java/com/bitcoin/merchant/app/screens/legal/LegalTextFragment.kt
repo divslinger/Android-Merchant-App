@@ -18,7 +18,7 @@ abstract class LegalTextFragment : ToolbarAwareFragment() {
     }
 
     protected open fun setupWebView(webView: WebView) {
-        webView.loadUrl("https://www.bitcoin.com/")
+        webView.loadUrl("")
     }
 
     override fun canFragmentBeDiscardedWhenInBackground(): Boolean {
