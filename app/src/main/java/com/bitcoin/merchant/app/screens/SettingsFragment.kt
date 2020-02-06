@@ -64,8 +64,8 @@ class SettingsFragment : ToolbarAwareFragment() {
         addOptionCurrency()
         addOptionAddress()
         addOptionPin()
-        btnLocalBitcoin.setOnClickListener { openUrl("https://local.bitcoin.com") }
-        btnThePit.setOnClickListener { openUrl("https://exchange.bitcoin.com") }
+        btnLocalBitcoin.setOnClickListener { openUrl(activity.getString(R.string.url_local_bitcoin_com)) }
+        btnThePit.setOnClickListener { openUrl(activity.getString(R.string.url_exchange_bitcoin_com)) }
         setToolbarAsBackButton()
         setToolbarTitle(R.string.menu_settings)
         registerReceiver()
@@ -73,8 +73,8 @@ class SettingsFragment : ToolbarAwareFragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         LocalBroadcastManager.getInstance(activity).unregisterReceiver(receiver)
+        super.onDestroyView()
     }
 
     private fun registerReceiver() {
@@ -165,8 +165,7 @@ class SettingsFragment : ToolbarAwareFragment() {
     }
 
     private fun openCamera() {
-        val qrHelper = ScanQRUtil()
-        qrHelper.startQRScan(activity, ZBAR_SCANNER_REQUEST)
+        ScanQRUtil().startQRScan(activity, ZBAR_SCANNER_REQUEST)
     }
 
     fun setAndDisplayPaymentTarget(target: PaymentTarget) {

@@ -6,4 +6,6 @@
     <string name="url_terms_of_use" translatable="false">https://www.bitcoin.com/legal/</string>
     <string name="url_service_terms" translatable="false">https://www.bitcoin.com/bitcoin-cash-register/service-terms/</string>
     <string name="url_privacy_policy" translatable="false">https://www.bitcoin.com/privacy-policy/</string>
+    <string name="url_local_bitcoin_com" translatable="false">https://local.bitcoin.com</string>
+    <string name="url_exchange_bitcoin_com" translatable="false">https://exchange.bitcoin.com</string>
 </resources>
