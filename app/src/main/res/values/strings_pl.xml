@@ -8,8 +8,8 @@
     <string name="pin_code_enter_error">Kod PIN nieprawidłowy</string>
     <string name="prompt_ok">OK</string>
     <string name="prompt_ko">Anuluj</string>
-    <string name="create_pin">Utwórz PIN Code</string>
-    <string name="confirm_pin">Potwierdź PIN Code</string>
+    <string name="create_pin">Utwórz kod PIN</string>
+    <string name="confirm_pin">Potwierdź kod PIN</string>
     <string name="unrecognized_xpub">Nierozpoznany format klucza publicznego</string>
     <string name="payment_received">Płatność zakończona. Dziękuję.</string>
     <string name="unable_to_generate_address">Adres nie może zostać wygenerowany w obecnej chwili. Proszę, sprawdź poprawność swojej instalacji i spróbuj ponownie.</string>
