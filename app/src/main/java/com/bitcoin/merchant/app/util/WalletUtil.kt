@@ -121,11 +121,12 @@ class WalletUtil(private val urlRestBitcoinCom: String, private val xPub: String
         }
 
         init {
-            var addresses: Set<String?>? = HashSet()
+            var addresses: Set<String>
             try {
                 addresses = db.allAddresses
                 Log.d(TAG, "loaded ${addresses.size} addresses from TX history: $addresses")
             } catch (e: Exception) {
+                addresses = HashSet()
                 Log.e(TAG, "Unable to load addresses from TX history")
             }
             usedAddresses = Collections.synchronizedSet(addresses)
