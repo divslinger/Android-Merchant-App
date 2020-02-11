@@ -18,7 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bitcoin.merchant.app.R
-import com.bitcoin.merchant.app.database.PaymentRecord
+import com.bitcoin.merchant.app.database.toPaymentRecord
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.DateUtil
 import com.bitcoin.merchant.app.util.MonetaryUtil
@@ -193,7 +193,7 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
             val view = convertView
                     ?: inflater.inflate(R.layout.list_item_transaction, parent, false)
             try {
-                val r = PaymentRecord(mListItems[position])
+                val r = mListItems[position].toPaymentRecord()
                 setupView(view, r.bchAmount, r.fiatAmount, r.timeInSec, r.confirmations)
             } catch (e: Exception) {
                 Log.e(TAG, "getView", e)
