@@ -2,8 +2,6 @@ package com.bitcoin.merchant.app.model
 
 import android.util.Log
 import com.bitcoin.merchant.app.util.AddressUtil
-import com.bitcoin.merchant.app.util.Settings
-import com.github.kiulian.converter.AddressConverter
 import info.blockchain.wallet.util.FormatsUtil
 import org.apache.commons.lang3.StringUtils
 
@@ -29,7 +27,7 @@ data class PaymentTarget(val type: Type, val target: String) {
                     Log.e(TAG, "", e)
                 }
             }
-            return target;
+            return target
         }
 
     enum class Type {
@@ -38,12 +36,12 @@ data class PaymentTarget(val type: Type, val target: String) {
 
 
     companion object {
-        fun isApiKey(value: String): Boolean {
+        private fun isApiKey(value: String): Boolean {
             return !StringUtils.isEmpty(value)
                     && value.matches(Regex.fromLiteral("[a-z]{40}"))
         }
 
-        fun isXPub(value: String): Boolean {
+        private fun isXPub(value: String): Boolean {
             return FormatsUtil.getInstance().isValidXpub(value)
         }
 
@@ -56,7 +54,7 @@ data class PaymentTarget(val type: Type, val target: String) {
             if (AddressUtil.isValidLegacy(value))
                 return PaymentTarget(Type.ADDRESS, value)
             if (AddressUtil.isValidCashAddr(value))
-                return PaymentTarget(Type.ADDRESS, AddressConverter.toLegacyAddress(value))
+                return PaymentTarget(Type.ADDRESS, AddressUtil.toLegacyAddress(value))
             if (isApiKey(value))
                 return PaymentTarget(Type.API_KEY, value)
             return PaymentTarget(Type.INVALID, "")
