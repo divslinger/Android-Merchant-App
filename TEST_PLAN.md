@@ -127,12 +127,12 @@ This requires to both uninstall the app and to clear the app cache.
 #### Payment REQUEST: before any test, launch app & do required setup    
 1. create invoice shows QR code & correct FIAT amount 
    * Enter 5.00 USD on the 'Payment INPUT' screen
-   * Click the "Charge" button to enter the 'Payment REQUEST' screen
+   * Click the "Charge/Checkout" button to enter the 'Payment REQUEST' screen
    * Verify the amount label at the top of the 'Payment REQUEST' screen matches the amount you entered in Step 1. (5.00 USD)
 1. Verify CHECKMARK & SOUND after payment is sent
    * Make sure your device's volume is at the MAX setting
    * Enter any amount on the 'Payment INPUT' screen
-   * Click the "Charge" button to enter the 'Payment REQUEST' screen
+   * Click the "Charge/Checkout" button to enter the 'Payment REQUEST' screen
    * Grab a wallet of your choice on a separate device and pay the invoice by scanning the QR code
    * Pay the invoice by scanning the displayed QR code using any wallet supporting BIP-70
    * Confirm that the screen shows a white CheckMark with a green background
@@ -141,7 +141,7 @@ This requires to both uninstall the app and to clear the app cache.
 1. Invoice generation continue after internet disconnection
    * Turn off internet connection on the merchant device.
    * Enter any amount on the 'Payment INPUT' screen
-   * Click the "Charge" button to enter the 'Payment REQUEST' screen
+   * Click the "Charge/Checkout" button to enter the 'Payment REQUEST' screen
    * Upon seeing the "Error during invoice generation" popup, do not press continue.
    * Swipe down on your Android device to bring the notification shade into view.
    * Turn on your internet connection
@@ -150,13 +150,13 @@ This requires to both uninstall the app and to clear the app cache.
    * The invoice should now be properly generated.
 1. Automatic RESUME AFTER CRASH
    * Enter 8 USD on the 'Payment INPUT' screen
-   * Click the "Charge" button to enter the 'Payment REQUEST' screen
+   * Click the "Charge/Checkout" button to enter the 'Payment REQUEST' screen
    * Kill/Force close the app
    * Launch the app again 
    * Confirm that the app opens on the 'Payment REQUEST' screen with an amount of 8 USD
 1. Automatic RECONNECT after internet disconnection
    * Enter any amount on the 'Payment INPUT' screen
-   * Click the "Charge" button to enter the 'Payment REQUEST' screen
+   * Click the "Charge/Checkout" button to enter the 'Payment REQUEST' screen
    * Confirm connection icon is green/Connected
    * Swipe down on your Android device to bring the notification shade into view.
    * Turn off your internet connection
@@ -170,18 +170,18 @@ This requires to both uninstall the app and to clear the app cache.
    * Confirm that the screen shows a CheckMark upon payment.
 1. Verify invoice CANCELLATION doesn't crash
    * enter any amount on the 'Payment INPUT' screen
-   * Click the 'CHARGE' button to enter 'Payment REQUEST' screen
-   * Click the 'CANCEL' button button to exit 'Payment REQUEST' screen
+   * Click the 'Charge/Checkout' button to enter 'Payment REQUEST' screen
+   * Click the 'Cancel' button button to exit 'Payment REQUEST' screen
    * Wait 3 seconds and ensure that the app did not crash
    * Verify amount has been properly reset to 0 on the 'Payment INPUT' screen
 1. Verify auto-cancellation after TIMER EXPIRY
    * Enter any amount on the 'Payment INPUT' screen
-   * Click the "Charge" button to enter the 'Payment REQUEST' screen
+   * Click the "Charge/Checkout" button to enter the 'Payment REQUEST' screen
    * Wait for the timer below the QR code to reach 0:00
    * Make sure the 'Payment REQUEST' screen closes itself when the timer reaches 0:00
 1. Verify that 2 payments using xPubKey ends up in 2 different addresses 
    * Enter any amount on the 'Payment INPUT' screen
-   * Click the "Charge" button to enter the 'Payment REQUEST' screen
+   * Click the "Charge/Checkout" button to enter the 'Payment REQUEST' screen
    * Pay the invoice
    * Go to 'Transactions' screen
    * View the transaction on the block explorer
@@ -320,7 +320,7 @@ This requires to both uninstall the app and to clear the app cache.
 1. Verify newly paid invoice is added to the list
    * Go to 'Payment INPUT' screen
    * Enter the amount USD 0,05
-   * Click Charge to generate an invoice/QR code
+   * Click "Charge/Checkout" to generate an invoice/QR code
    * Pay the invoice
    * Go to Transactions screen
    * Ensure that the amount is correctly displayed as USD 0,05 (dollar sign is OK)
@@ -426,7 +426,7 @@ This requires to both uninstall the app and to clear the app cache.
    * Launch app
    * Go to 'Payment INPUT' screen
    * Enter amount: 10
-   * Click charge to arrive on the 'Payment REQUEST' screen
+   * Click "Charge/Checkout" to arrive on the 'Payment REQUEST' screen
    * Click on device 'Home' button to put the app in background
    * Resume the paused app
    * Confirm that it opens on the 'Payment REQUEST' screen with an amount of 10
@@ -437,7 +437,7 @@ This requires to both uninstall the app and to clear the app cache.
 1. Use an Android device with OS 10
    * Go to 'Payment INPUT' screen
    * Enter a specific amount
-   * Click Charge to generate an invoice/QR code
+   * Click "Charge/Checkout" to generate an invoice/QR code
    * Pay the invoice
    * Confirm that the CheckMark is shown after the payment is sent 
 1. Use an Android device with OS 9.x
