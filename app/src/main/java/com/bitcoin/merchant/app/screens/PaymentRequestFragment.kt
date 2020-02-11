@@ -368,6 +368,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     }
 
     private fun showCheckMark() {
+        tvConnectionStatus.visibility = View.GONE // hide it white top bar on green background
         waitingLayout.visibility = View.GONE
         receivedLayout.visibility = View.VISIBLE
         AppUtil.setStatusBarColor(activity, R.color.bitcoindotcom_green)
