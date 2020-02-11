@@ -50,7 +50,7 @@ open class MainActivity : AppCompatActivity() {
             Fabric.with(this, Crashlytics())
         }
         setContentView(R.layout.activity_main)
-        rootView = findViewById(R.id.content_frame);
+        rootView = findViewById(R.id.content_frame)
         setToolbar()
         setNavigationDrawer()
         title = "" // clear "Bitcoin Cash Register" from toolBar when opens on Payment Input screen
@@ -62,10 +62,8 @@ open class MainActivity : AppCompatActivity() {
     }
 
     private fun listenToConnectivityChanges() {
-        val filter = IntentFilter()
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         networkStateReceiver = NetworkStateReceiver()
-        registerReceiver(networkStateReceiver, filter)
+        registerReceiver(networkStateReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
     }
 
     override fun onDestroy() {
@@ -98,10 +96,10 @@ open class MainActivity : AppCompatActivity() {
         val navigationView = findViewById<NavigationView>(R.id.navigation_view)
         val headerView = navigationView.getHeaderView(0)
         val tvName = headerView.findViewById<TextView>(R.id.drawer_title)
-        tvName.text = Settings.getMerchantName(this);
+        tvName.text = Settings.getMerchantName(this)
     }
 
-    fun setToolbar() {
+    private fun setToolbar() {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
     }
@@ -132,7 +130,7 @@ open class MainActivity : AppCompatActivity() {
         })
     }
 
-    val visibleFragment: ToolbarAwareFragment?
+    private val visibleFragment: ToolbarAwareFragment?
         get() {
             val navHostFragment = supportFragmentManager.primaryNavigationFragment ?: return null
             for (fragment in navHostFragment.childFragmentManager.fragments) {
@@ -154,10 +152,10 @@ open class MainActivity : AppCompatActivity() {
         super.onBackPressed()
     }
 
-    protected val isNavDrawerOpen: Boolean
+    private val isNavDrawerOpen: Boolean
         get() = mDrawerLayout.isDrawerOpen(GravityCompat.START)
 
-    protected fun closeNavDrawer() {
+    private fun closeNavDrawer() {
         mDrawerLayout.closeDrawer(GravityCompat.START)
     }
 

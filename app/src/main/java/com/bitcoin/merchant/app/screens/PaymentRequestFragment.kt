@@ -6,7 +6,6 @@ import android.graphics.Color.BLACK
 import android.graphics.Color.WHITE
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -71,18 +70,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 updateConnectionStatus(intent.getBooleanExtra(Bip70Action.PARAM_CONNECTION_STATUS_ENABLED, false))
             }
             if (Bip70Action.NETWORK_RECONNECT == intent.action) {
-                reconnectIfNecessary()
+                bip70Manager.reconnectIfNecessary()
             }
-            // TODO fix this
-            if (ConnectivityManager.CONNECTIVITY_ACTION == intent.action) {
-                if (intent.extras != null) {
-                    reconnectIfNecessary()
-                }
-            }
-        }
-
-        private fun reconnectIfNecessary() {
-            bip70Manager.reconnectIfNecessary()
         }
     }
 
@@ -198,7 +187,6 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
 
     private fun registerReceiver() {
         val filter = IntentFilter()
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION) // TODO fix
         filter.addAction(Bip70Action.INVOICE_PAYMENT_ACKNOWLEDGED)
         filter.addAction(Bip70Action.INVOICE_PAYMENT_EXPIRED)
         filter.addAction(Bip70Action.UPDATE_CONNECTION_STATUS)
