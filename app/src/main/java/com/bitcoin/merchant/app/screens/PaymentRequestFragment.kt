@@ -22,6 +22,7 @@ import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
+import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AmountUtil
 import com.bitcoin.merchant.app.util.AppUtil
@@ -241,6 +242,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             val clipboard = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText(qrCodeUri, qrCodeUri)
             clipboard.setPrimaryClip(clip)
+            val emojiClipboard = String(Character.toChars(0x1F4CB))
+            SnackHelper.show(activity, emojiClipboard + " ${qrCodeUri}");
             Log.i(MainActivity.TAG, "Copied to clipboard: $qrCodeUri")
         } catch (e: Exception) {
             Log.i(MainActivity.TAG, "Failed to copy to clipboard: $qrCodeUri")
