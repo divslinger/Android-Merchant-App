@@ -1,6 +1,5 @@
 package com.bitcoin.merchant.app.database
 
-import android.content.ContentValues
 import java.util.*
 
 class PaymentRecord {

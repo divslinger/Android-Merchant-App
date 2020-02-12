@@ -2,6 +2,7 @@ package com.bitcoin.merchant.app.util
 
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class DateUtil private constructor() {
     private val pastYearsFormat = SimpleDateFormat("E dd MMM @ HH:mm")
@@ -9,37 +10,34 @@ class DateUtil private constructor() {
     private val previousDaysFormat = SimpleDateFormat("E dd MMM @ HH:mm")
     private val yesterdayFormat = SimpleDateFormat("HH:mm")
     private val todayFormat = SimpleDateFormat("HH:mm")
-    fun format(timeInSec: Long): String {
-        if (timeInSec == 0L) {
+    private val hours24 = TimeUnit.HOURS.toMillis(24)
+    fun format(timeInMillis: Long): String {
+        if (timeInMillis == 0L) {
             return ""
         }
-        val hours24 = 60L * 60L * 24
-        val now = System.currentTimeMillis() / 1000L
+        val now = System.currentTimeMillis()
         val cal = Calendar.getInstance()
-        cal.time = Date(now * 1000L)
+        cal.time = Date(now)
         val nowYear = cal[Calendar.YEAR]
         val nowDay = cal[Calendar.DAY_OF_MONTH]
-        cal.time = Date(timeInSec * 1000L)
-        val thenYear = cal[Calendar.YEAR]
-        val thenDay = cal[Calendar.DAY_OF_MONTH]
-        // within 24h
-        val ret: String
-        ret = if (now - timeInSec < hours24) {
+        cal.time = Date(timeInMillis)
+        return if (now - timeInMillis < hours24) {
+            val thenDay = cal[Calendar.DAY_OF_MONTH]
             if (thenDay < nowDay) {
-                "Yesterday @ " + yesterdayFormat.format(timeInSec * 1000L)
+                "Yesterday @ " + yesterdayFormat.format(timeInMillis)
             } else {
-                "Today @ " + todayFormat.format(timeInSec * 1000L)
+                "Today @ " + todayFormat.format(timeInMillis)
             }
-        } else if (now - timeInSec < hours24 * 2) {
-            previousDaysFormat.format(timeInSec * 1000L)
+        } else if (now - timeInMillis < hours24 * 2) {
+            previousDaysFormat.format(timeInMillis)
         } else {
+            val thenYear = cal[Calendar.YEAR]
             if (thenYear < nowYear) {
-                currentYearFormat.format(timeInSec * 1000L)
+                currentYearFormat.format(timeInMillis)
             } else {
-                pastYearsFormat.format(timeInSec * 1000L)
+                pastYearsFormat.format(timeInMillis)
             }
         }
-        return ret
     }
 
     companion object {

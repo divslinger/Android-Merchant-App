@@ -30,6 +30,7 @@ import kotlinx.coroutines.withContext
 import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 class TransactionsHistoryFragment : ToolbarAwareFragment() {
     private lateinit var adapter: TransactionAdapter
@@ -203,7 +204,7 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
 
         private fun setupView(view: View, bch: Long, fiat: String?, timeInSec: Long, confirmations: Int) {
             var confirmations = confirmations
-            val date: String = DateUtil.instance.format(timeInSec)
+            val date: String = DateUtil.instance.format(TimeUnit.SECONDS.toMillis(timeInSec))
             val ds = SpannableStringBuilder(date)
             val idx = date.indexOf("@")
             if (idx != -1) {
@@ -214,20 +215,20 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
             tvDate.text = ds
             tvDate.alpha = 0.7f
             // display coin amount
-            val amount = Math.abs(bch)
+            val amount = abs(bch)
             val coinSpan = SpannableStringBuilder("BCH")
             coinSpan.setSpan(RelativeSizeSpan(0.75.toFloat()), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             val coinView = view.findViewById<TextView>(R.id.tv_amount_coin)
-            val displayValue: String = MonetaryUtil.instance.getDisplayAmountWithFormatting(amount)
+            val displayValue = MonetaryUtil.instance.getDisplayAmountWithFormatting(amount)
             coinView.text = "$displayValue $coinSpan"
             // display fiat amount
             val fiatView = view.findViewById<TextView>(R.id.tv_amount_fiat)
-            if (fiat != null && fiat.length > 1) {
+            fiatView.text = if (fiat != null && fiat.length > 1) {
                 val fiatSpan = SpannableStringBuilder(fiat.subSequence(0, 1))
                 fiatSpan.setSpan(RelativeSizeSpan(0.75.toFloat()), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                fiatView.text = fiatSpan.toString() + " " + fiat.substring(1)
+                "$fiatSpan ${fiat.substring(1)}"
             } else {
-                fiatView.text = ""
+                ""
             }
             val secs = System.currentTimeMillis() / 1000f
             if (secs - timeInSec > TimeUnit.HOURS.toSeconds(3)) {
@@ -239,24 +240,18 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
         }
 
         private fun getIcon(bch: Long, confirmations: Int): Int {
-            return if (bch < 0L) { // under/over payment, legacy: can't happen anymore with BIP-70
-                R.drawable.ic_warning_black_18dp
-            } else if (confirmations <= 0) {
-                R.drawable.ic_done_white_24dp
-            } else if (confirmations == 1) {
-                R.drawable.ic_done_white_24dp
-            } else { // 2 or more confirmations
-                R.drawable.ic_doublecheck_white_24dp
+            return when {
+                bch < 0L -> R.drawable.ic_warning_black_18dp // under/over payment, legacy: can't happen anymore with BIP-70
+                confirmations <= 1 -> R.drawable.ic_done_white_24dp
+                else -> R.drawable.ic_doublecheck_white_24dp // 2 or more confirmations
             }
         }
 
         private fun getAlpha(bch: Long, confirmations: Int): Float {
-            return if (bch < 0L) { // under/over payment, legacy: can't happen anymore with BIP-70
-                1.0f
-            } else if (confirmations <= 0) {
-                0f
-            } else {
-                1.0f
+            return when {
+                bch < 0L -> 1.0f // under/over payment, legacy: can't happen anymore with BIP-70
+                confirmations <= 0 -> 0f
+                else -> 1.0f
             }
         }
     }

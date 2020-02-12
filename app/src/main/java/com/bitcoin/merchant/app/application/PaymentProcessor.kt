@@ -20,8 +20,8 @@ class PaymentProcessor(private val app: CashRegisterApplication, private val db:
             val message = ""
             val confirmations = 0
             val addr = i.firstAddress
-            val time = System.currentTimeMillis()
-            db.insertPayment(PaymentRecord(time, addr, bch, fiatFormatted, confirmations, message, i.txId))
+            val timeInSec = System.currentTimeMillis() / 1000
+            db.insertPayment(PaymentRecord(timeInSec, addr, bch, fiatFormatted, confirmations, message, i.txId))
         } catch (e: Exception) {
             Log.e(MainActivity.TAG, "recordInDatabase $i", e)
             Crashlytics.logException(e)
