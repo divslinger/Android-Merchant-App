@@ -60,10 +60,10 @@
     <string name="menu_terms_of_use">使用条款</string>
     <string name="menu_service_terms">服务条款</string>
     <string name="menu_privacy_policy">隐私条约</string>
-    <string name="contract_agreement_summary">By continuing, I agree to the
+    <string name="contract_agreement_summary">繼續使用，我同意以下條約：
         <xliff:g id="ref_terms_of_use">%s</xliff:g>
         , <xliff:g id="ref_service_terms">%s</xliff:g>
-        and <xliff:g id="ref_privacy_policy">%s</xliff:g>
+        以及 <xliff:g id="ref_privacy_policy">%s</xliff:g>
     </string>
     <string name="contract_button_ok">同意</string>
     <string name="error">错误</string>
