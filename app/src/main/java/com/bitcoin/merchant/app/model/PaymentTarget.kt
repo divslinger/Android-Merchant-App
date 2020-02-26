@@ -2,8 +2,8 @@ package com.bitcoin.merchant.app.model
 
 import android.util.Log
 import com.bitcoin.merchant.app.util.AddressUtil
-import info.blockchain.wallet.util.FormatsUtil
 import org.apache.commons.lang3.StringUtils
+import org.bitcoinj.core.Xpub
 
 data class PaymentTarget(val type: Type, val target: String) {
     val TAG = "PaymentTarget"
@@ -41,15 +41,11 @@ data class PaymentTarget(val type: Type, val target: String) {
                     && value.matches(Regex.fromLiteral("[a-z]{40}"))
         }
 
-        private fun isXPub(value: String): Boolean {
-            return FormatsUtil.getInstance().isValidXpub(value)
-        }
-
         @JvmStatic
         fun parse(value: String?): PaymentTarget {
             if (value == null || StringUtils.isEmpty(value))
                 return PaymentTarget(Type.INVALID, "")
-            if (isXPub(value))
+            if (Xpub.isValid(value))
                 return PaymentTarget(Type.XPUB, value)
             if (AddressUtil.isValidLegacy(value))
                 return PaymentTarget(Type.ADDRESS, value)

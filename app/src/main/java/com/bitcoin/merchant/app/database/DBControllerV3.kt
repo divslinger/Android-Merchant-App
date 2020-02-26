@@ -8,8 +8,9 @@ import android.os.Build
 import android.util.Log
 import com.bitcoin.merchant.app.application.CashRegisterApplication
 import com.crashlytics.android.Crashlytics
-import info.blockchain.wallet.crypto.AESUtil
-import info.blockchain.wallet.util.CharSequenceX
+import org.bitcoinj.crypto.AESUtil
+import org.bitcoinj.crypto.CharSequenceX
+import java.nio.charset.StandardCharsets
 import java.util.*
 
 fun ContentValues.toPaymentRecord(): PaymentRecord {
@@ -161,7 +162,7 @@ class DBControllerV3(app: CashRegisterApplication?) : SQLiteOpenHelper(app, DB, 
 
     private fun decryptValue(value: String): String {
         if (pw == null) {
-            pw = CharSequenceX("pin" + salt) // legacy code
+            pw = CharSequenceX("pin$salt") // legacy code
         }
         return AESUtil.decrypt(value, pw, AESUtil.PinPbkdf2Iterations)
     }

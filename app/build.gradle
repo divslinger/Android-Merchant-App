@@ -79,8 +79,7 @@ dependencies {
     implementation 'commons-codec:commons-codec:20041127.091804'
     implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'org.slf4j:slf4j-android:1.7.29'
-    implementation 'com.github.pokkst:bitcoincashj:0.17.0'
-    implementation files('libs/MyWalletHD.jar')
+    implementation 'com.github.pokkst:bitcoincashj:0.17.4.1'
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.5.2"
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.5.2"

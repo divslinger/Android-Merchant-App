@@ -29,7 +29,7 @@ class WalletUtil(private val urlRestBitcoinCom: String, private val xPub: String
     }
 
     private fun saveWallet(newIndex: Int) {
-        Settings.setXPubIndex(app, xPub, newIndex);
+        Settings.setXPubIndex(app, xPub, newIndex)
         Log.d(TAG, "Saving new xpub index $newIndex")
     }
 
