@@ -1,27 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white"
     android:minWidth="420dp"
     android:orientation="vertical"
     android:animateLayoutChanges="true">
 
     <ImageView
-        android:id="@+id/btn_cancel"
-        android:src="@drawable/disconnected"
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_gravity="start"
-        android:layout_width="32dp"
-        android:layout_height="32dp"/>
-
-    <ImageView
         android:id="@+id/tv_connection_status"
         android:src="@drawable/disconnected"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_gravity="end"/>
@@ -152,13 +142,12 @@
             android:layout_height="55dp"
             android:layout_margin="5dp"
             android:background="@drawable/button_rounded_green"
-            android:stateListAnimator="@null"
             android:text="@string/button_cancel"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:visibility="gone" />
+            android:stateListAnimator="@null"/>
 
         <Space
             android:layout_width="match_parent"
@@ -221,16 +210,4 @@
             android:minHeight="35dp" />
 
     </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_share"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="8dp"
-        android:backgroundTint="@color/bitcoindotcom_green"
-        android:tint="#fff"
-        app:fabCustomSize="60dp"
-        app:srcCompat="@drawable/connected" />
-
-</FrameLayout>
+</LinearLayout>
