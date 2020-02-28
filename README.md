@@ -1,3 +1,4 @@
+![Logo](screenshots/bcr_banner.png)
 Bitcoin Cash Merchant (BCH)
 
 This app allows you to accept Bitcoin Cash (BCH) payments at any retail location.
