@@ -27,6 +27,7 @@ import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AmountUtil
 import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.util.Settings
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.common.BitMatrix
@@ -45,6 +46,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     // Ensure that pressing 'BACK' button stays on the 'Payment REQUEST' screen to NOT lose the active invoice
     // unless we are exiting the screen
     private var backButtonAllowed: Boolean = false
+    private lateinit var fabShare: FloatingActionButton
     private lateinit var waitingLayout: LinearLayout
     private lateinit var receivedLayout: LinearLayout
     private lateinit var tvConnectionStatus: ImageView
@@ -53,7 +55,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private lateinit var tvExpiryTimer: TextView
     private lateinit var ivReceivingQr: ImageView
     private lateinit var progressLayout: LinearLayout
-    private lateinit var ivCancel: Button
+    private lateinit var ivCancel: ImageView
     private lateinit var ivDone: Button
     private lateinit var bip70Manager: Bip70Manager
     private lateinit var bip70PayService: Bip70PayService
@@ -212,11 +214,13 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         progressLayout = v.findViewById(R.id.progressLayout)
         waitingLayout = v.findViewById(R.id.layout_waiting)
         receivedLayout = v.findViewById(R.id.layout_complete)
-        ivCancel = v.findViewById(R.id.iv_cancel)
+        ivCancel = v.findViewById(R.id.btn_cancel)
         ivDone = v.findViewById(R.id.iv_done)
+        fabShare = v.findViewById(R.id.fab_share)
         setWorkInProgress(true)
         ivCancel.setOnClickListener { deleteActiveInvoiceAndExitScreen() }
         ivReceivingQr.setOnClickListener { copyQrCodeToClipboard() }
+        fabShare.setOnClickListener { startShareIntent(qrCodeUri!!) }
         waitingLayout.visibility = View.VISIBLE
         receivedLayout.visibility = View.GONE
     }
@@ -368,6 +372,19 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             AppUtil.setStatusBarColor(activity, R.color.gray)
             exitScreen()
         }
+    }
+
+    private fun startShareIntent(paymentUrl: String) {
+        val sendIntent: Intent = Intent().apply {
+            //TODO extract string resource
+            val urlWithoutPrefix = paymentUrl.replace("bitcoincash:?r=", "")
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, "Please pay your invoice here: $urlWithoutPrefix")
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(shareIntent)
     }
 
     override val isBackAllowed: Boolean
