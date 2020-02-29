@@ -76,7 +76,6 @@
                 android:layout_gravity="center_horizontal"
                 android:background="@drawable/button_rounded"
                 android:elevation="8dp"
-                android:padding="12dp"
                 android:visibility="gone" />
 
             <LinearLayout

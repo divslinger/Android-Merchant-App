@@ -5,5 +5,6 @@
     <dimen name="transaction_amount_coin_size">9sp</dimen>
     <dimen name="transaction_date_size">16sp</dimen>
 
-    <dimen name="qr_code_size">240dp</dimen>
+    <dimen name="qr_code_size">280dp</dimen>
+    <integer name="qr_code_width">280</integer>
 </resources>

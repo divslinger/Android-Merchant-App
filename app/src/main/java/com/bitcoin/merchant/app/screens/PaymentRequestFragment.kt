@@ -297,7 +297,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 bip70Manager.startWebsockets(invoice.paymentId)
                 qrCodeUri = invoice.walletUri
                 Log.d(MainActivity.TAG, "paymentUrl:${invoice.walletUri}")
-                getQrCodeAsBitmap(invoice.walletUri)
+                val width = activity.resources.getInteger(R.integer.qr_code_width)
+                getQrCodeAsBitmap(invoice.walletUri, width)
             } catch (e: Exception) {
                 DialogHelper.show(activity, activity.getString(R.string.error), e.message) { exitScreen() }
                 null
@@ -306,7 +307,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     }
 
     @Throws(Exception::class)
-    private fun getQrCodeAsBitmap(text: String, width: Int = 260): Bitmap {
+    private fun getQrCodeAsBitmap(text: String, width: Int): Bitmap {
         val result: BitMatrix = try {
             MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, width, null)
         } catch (e: Exception) {
