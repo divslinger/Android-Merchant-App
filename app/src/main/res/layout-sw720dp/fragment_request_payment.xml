@@ -9,8 +9,9 @@
     android:animateLayoutChanges="true">
 
     <ImageView
-        android:id="@+id/btn_cancel"
-        android:src="@drawable/disconnected"
+        android:id="@+id/iv_cancel"
+        android:src="@drawable/ic_cancel_48dp"
+        android:tint="#000"
         android:layout_marginTop="8dp"
         android:layout_marginStart="8dp"
         android:layout_gravity="start"
@@ -33,17 +34,6 @@
         android:gravity="center"
         android:orientation="vertical"
         android:padding="35dp">
-
-        <TextView
-            android:id="@+id/tv_merchant_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:padding="4dp"
-            android:text=""
-            android:textColor="@color/bitcoindotcom_darker_green"
-            android:textSize="22sp"
-            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_fiat_amount"
@@ -107,15 +97,6 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/tvAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="10dp"
-                android:text=""
-                android:visibility="gone" />
-
-            <TextView
                 android:id="@+id/bip70_timer_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -128,42 +109,6 @@
                 android:visibility="visible" />
 
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/tv_btc_amount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:alpha="0.7"
-            android:gravity="center_horizontal"
-            android:padding="4dp"
-            android:text="0.123 456 78 BCH"
-            android:textColor="@color/primary_text_default_material_light"
-            android:textSize="14sp"
-            android:visibility="gone" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="50dp" />
-
-        <Button
-            android:id="@+id/iv_cancel"
-            android:layout_width="330dp"
-            android:layout_height="55dp"
-            android:layout_margin="5dp"
-            android:background="@drawable/button_rounded_green"
-            android:stateListAnimator="@null"
-            android:text="@string/button_cancel"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="35dp" />
 
     </LinearLayout>
 
@@ -231,6 +176,6 @@
         android:backgroundTint="@color/bitcoindotcom_green"
         android:tint="#fff"
         app:fabCustomSize="60dp"
-        app:srcCompat="@drawable/connected" />
+        app:srcCompat="@android:drawable/ic_menu_share" />
 
 </FrameLayout>

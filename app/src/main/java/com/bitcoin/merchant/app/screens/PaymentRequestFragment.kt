@@ -51,7 +51,6 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private lateinit var receivedLayout: LinearLayout
     private lateinit var tvConnectionStatus: ImageView
     private lateinit var tvFiatAmount: TextView
-    private lateinit var tvBtcAmount: TextView
     private lateinit var tvExpiryTimer: TextView
     private lateinit var ivReceivingQr: ImageView
     private lateinit var progressLayout: LinearLayout
@@ -208,13 +207,12 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private fun initViews(v: View) {
         tvConnectionStatus = v.findViewById(R.id.tv_connection_status)
         tvFiatAmount = v.findViewById(R.id.tv_fiat_amount)
-        tvBtcAmount = v.findViewById(R.id.tv_btc_amount)
         tvExpiryTimer = v.findViewById(R.id.bip70_timer_tv)
         ivReceivingQr = v.findViewById(R.id.qr)
         progressLayout = v.findViewById(R.id.progressLayout)
         waitingLayout = v.findViewById(R.id.layout_waiting)
         receivedLayout = v.findViewById(R.id.layout_complete)
-        ivCancel = v.findViewById(R.id.btn_cancel)
+        ivCancel = v.findViewById(R.id.iv_cancel)
         ivDone = v.findViewById(R.id.iv_done)
         fabShare = v.findViewById(R.id.fab_share)
         setWorkInProgress(true)
@@ -332,7 +330,6 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         val f = AmountUtil(activity)
         tvFiatAmount.text = f.formatFiat(i.fiatTotal)
         tvFiatAmount.visibility = View.VISIBLE
-        tvBtcAmount.text = f.formatBch(i.totalBchAmount.toDouble())
         ivReceivingQr.setImageBitmap(bitmap)
         initiateCountdown(i)
     }
