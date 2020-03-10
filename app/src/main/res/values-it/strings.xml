@@ -4,7 +4,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Bitcoin Cash Register</string>
     <string name="action_settings">Impostazioni</string>
-    <string name="pin_code_create_error">"Inserisci i due codici PIN a 4 cifre corrispondenti "</string>
+    <string name="pin_code_create_error">Inserisci i due codici PIN a 4 cifre corrispondenti </string>
     <string name="pin_code_enter_error">Codice PIN errato</string>
     <string name="prompt_ok">OK</string>
     <string name="prompt_ko">Cancella</string>
@@ -12,7 +12,7 @@
     <string name="confirm_pin">Conferma Codice PIN</string>
     <string name="unrecognized_xpub">Formato della chiave pubblica non riconosciuto</string>
     <string name="payment_received">Il pagamento è stato completato. Grazie</string>
-    <string name="unable_to_generate_address">"Impossibile generare un indirizzo allo stato attuale.Controlla la procedura di installazione e riprova. "</string>
+    <string name="unable_to_generate_address">Impossibile generare un indirizzo allo stato attuale.Controlla la procedura di installazione e riprova. </string>
     <string name="invalid_amount">Importo non valido.</string>
     <string name="removed_by_bip70_insufficient_payment">Il pagamento ricevuto è insufficiente.</string>
     <string name="removed_by_bip70_re_payment_remainder">Promemoria:</string>
@@ -60,7 +60,7 @@
     <string name="menu_terms_of_use">Condizioni d\'uso</string>
     <string name="menu_service_terms">Termini del servizio</string>
     <string name="menu_privacy_policy">Informativa sulla privacy</string>
-    <string name="contract_agreement_summary">"nel continuare, acconsento a         <xliff:g id="ref_terms_of_use">%s</xliff:g>         , <xliff:g id="ref_service_terms">%s</xliff:g>         e <xliff:g id="ref_privacy_policy">%s</xliff:g>     "</string>
+    <string name="contract_agreement_summary">nel continuare, acconsento a         <xliff:g id="ref_terms_of_use">%s</xliff:g>         , <xliff:g id="ref_service_terms">%s</xliff:g>         e <xliff:g id="ref_privacy_policy">%s</xliff:g>     </string>
     <string name="contract_button_ok">Acconsento</string>
     <string name="error">Errore</string>
     <string name="notify_changes_have_been_saved">Le modifiche sono state salvate</string>

@@ -60,7 +60,7 @@
     <string name="menu_terms_of_use">Syarat penggunaan</string>
     <string name="menu_service_terms">Syarat layanan</string>
     <string name="menu_privacy_policy">Kebijakan privasi</string>
-    <string name="contract_agreement_summary">"Dengan melanjutkan, saya menyetujui         <xliff:g id="ref_syarat_penggunaan">%s</xliff:g>         , <xliff:g id="ref_syarat_layanan">%s</xliff:g>         and <xliff:g id="ref_kebijakan_privasi">%s</xliff:g>     "</string>
+    <string name="contract_agreement_summary">Dengan melanjutkan, saya menyetujui         <xliff:g id="ref_syarat_penggunaan">%s</xliff:g>         , <xliff:g id="ref_syarat_layanan">%s</xliff:g>         and <xliff:g id="ref_kebijakan_privasi">%s</xliff:g>     </string>
     <string name="contract_button_ok">Saya setuju</string>
     <string name="error">Eror</string>
     <string name="notify_changes_have_been_saved">Perubahan telah tersimpan</string>
