@@ -27,7 +27,7 @@ data class InvoiceStatus @JvmOverloads constructor(
     val firstAddress: String?
         get() = if (outputs.isNotEmpty()) outputs[0].address else null
 
-    val totalBchAmount: Long
+    val totalAmountInSatoshi : Long
         get() {
             var amount: Long = 0
             for (output in outputs) {

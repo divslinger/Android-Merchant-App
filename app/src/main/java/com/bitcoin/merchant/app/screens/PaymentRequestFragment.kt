@@ -26,6 +26,7 @@ import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AmountUtil
 import com.bitcoin.merchant.app.util.AppUtil
+import com.bitcoin.merchant.app.util.MonetaryUtil
 import com.bitcoin.merchant.app.util.Settings
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.zxing.BarcodeFormat
@@ -51,6 +52,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private lateinit var receivedLayout: LinearLayout
     private lateinit var tvConnectionStatus: ImageView
     private lateinit var tvFiatAmount: TextView
+    private lateinit var tvCoinAmount: TextView
     private lateinit var tvExpiryTimer: TextView
     private lateinit var ivReceivingQr: ImageView
     private lateinit var progressLayout: LinearLayout
@@ -157,6 +159,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 // when resuming from a crash on the PaymentRequest
                 Settings.deleteActiveInvoice(activity)
                 tvFiatAmount.text = AmountUtil(activity).formatFiat(amountFiat)
+                tvCoinAmount.visibility = View.INVISIBLE  // default values are incorrect
                 setWorkInProgress(true)
                 val invoice: InvoiceStatus? = downloadInvoice(invoiceRequest)
                 invoice?.let {
@@ -175,6 +178,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 setWorkInProgress(true)
                 tvFiatAmount.visibility = View.INVISIBLE  // default values are incorrect
+                tvCoinAmount.visibility = View.INVISIBLE  // default values are incorrect
                 connectToSocketAndGenerateQrCode(invoice)?.also { showQrCodeAndAmountFields(invoice, it) }
                 setWorkInProgress(false)
             }
@@ -207,6 +211,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private fun initViews(v: View) {
         tvConnectionStatus = v.findViewById(R.id.tv_connection_status)
         tvFiatAmount = v.findViewById(R.id.tv_fiat_amount)
+        tvCoinAmount = v.findViewById(R.id.tv_btc_amount)
         tvExpiryTimer = v.findViewById(R.id.bip70_timer_tv)
         ivReceivingQr = v.findViewById(R.id.qr)
         progressLayout = v.findViewById(R.id.progressLayout)
@@ -331,6 +336,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         val f = AmountUtil(activity)
         tvFiatAmount.text = f.formatFiat(i.fiatTotal)
         tvFiatAmount.visibility = View.VISIBLE
+        tvCoinAmount.text = MonetaryUtil.instance.getDisplayAmountWithFormatting(i.totalAmountInSatoshi) + " BCH"
+        tvCoinAmount.visibility = View.VISIBLE
         ivReceivingQr.setImageBitmap(bitmap)
         initiateCountdown(i)
     }

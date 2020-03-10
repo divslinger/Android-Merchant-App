@@ -109,6 +109,18 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/tv_btc_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="0.7"
+            android:gravity="center_horizontal"
+            android:padding="4dp"
+            android:text="99.123 456 78 BCH"
+            android:textColor="@color/primary_text_default_material_light"
+            android:textSize="14sp"
+            android:visibility="visible" />
+
     </LinearLayout>
 
     <LinearLayout
