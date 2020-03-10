@@ -73,7 +73,6 @@ open class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        setMerchantName()
         val fragment = visibleFragment
         // Note: The navigation starts the payment_input_screen due to config in navigation.xml
         if (fragment != null && !fragment.canFragmentBeDiscardedWhenInBackground()) {
@@ -89,6 +88,7 @@ open class MainActivity : AppCompatActivity() {
     }
 
     fun openMenuDrawer() {
+        setMerchantName()
         mDrawerLayout.openDrawer(GravityCompat.START)
     }
 
