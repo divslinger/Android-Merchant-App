@@ -1,6 +1,7 @@
 package com.bitcoin.merchant.app.screens
 
 import android.content.*
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color.BLACK
 import android.graphics.Color.WHITE
@@ -8,6 +9,7 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +18,9 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.MainActivity
@@ -42,6 +47,8 @@ import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceRequest
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 import retrofit2.Response
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 class PaymentRequestFragment : ToolbarAwareFragment() {
@@ -63,6 +70,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private lateinit var bip70PayService: Bip70PayService
     private var lastProcessedInvoicePaymentId: String? = null
     private var qrCodeUri: String? = null
+    private var invoiceReadyToShare: Boolean = false
+
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (Bip70Action.INVOICE_PAYMENT_ACKNOWLEDGED == intent.action) {
@@ -134,6 +143,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         val v = inflater.inflate(R.layout.fragment_request_payment, container, false)
         initViews(v)
+        setInvoiceReadyToShare(false)
         setToolbarVisible(false)
         registerReceiver()
         bip70PayService = Bip70PayService.create(resources.getString(R.string.bip70_bitcoin_com_host))
@@ -225,7 +235,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         setWorkInProgress(true)
         ivCancel.setOnClickListener { deleteActiveInvoiceAndExitScreen() }
         ivReceivingQr.setOnClickListener { copyQrCodeToClipboard() }
-        fabShare.setOnClickListener { startShareIntent(qrCodeUri!!) }
+        fabShare.setOnClickListener { startShareIntent(qrCodeUri) }
         waitingLayout.visibility = View.VISIBLE
         receivedLayout.visibility = View.GONE
     }
@@ -352,6 +362,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         tvCoinAmount.text = MonetaryUtil.instance.getDisplayAmountWithFormatting(i.totalAmountInSatoshi) + " BCH"
         tvCoinAmount.visibility = View.VISIBLE
         ivReceivingQr.setImageBitmap(bitmap)
+        setInvoiceReadyToShare(true)
         initiateCountdown(i)
     }
 
@@ -392,18 +403,43 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         }
     }
 
-    private fun startShareIntent(paymentUrl: String) {
-        Analytics.invoice_shared.send()
-        val sendIntent: Intent = Intent().apply {
-            //TODO extract string resource
-            val urlWithoutPrefix = paymentUrl.replace("bitcoincash:?r=", "")
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, "Please pay your invoice here: $urlWithoutPrefix")
-            type = "text/plain"
+    private fun setInvoiceReadyToShare(status: Boolean) {
+        invoiceReadyToShare = status
+        if(status) {
+            fabShare.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(app, R.color.bitcoindotcom_green))
+        } else {
+            fabShare.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(app, R.color.gray))
         }
+    }
 
-        val shareIntent = Intent.createChooser(sendIntent, null)
-        startActivity(shareIntent)
+    private fun isInvoiceReadyToShare(): Boolean {
+        return invoiceReadyToShare
+    }
+
+    private fun startShareIntent(paymentUrl: String?) {
+        if(isInvoiceReadyToShare()) {
+            try {
+                val urlWithoutPrefix = paymentUrl?.replace(getString(R.string.uri_bitcoincash_bip70), "")
+                val bitmap = ivReceivingQr.drawable.toBitmap(220, 220)
+                val file = File(app.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "invoice.png")
+                val out = FileOutputStream(file)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, out)
+                out.close()
+                val bitmapUri = FileProvider.getUriForFile(app, activity.packageName + ".provider", file)
+                val sendIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.share_invoice_msg, urlWithoutPrefix))
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    putExtra(Intent.EXTRA_STREAM, bitmapUri)
+                    type = "image/*"
+                }
+
+                val shareIntent = Intent.createChooser(sendIntent, null)
+                startActivity(shareIntent)
+            } catch (e: Exception) {
+
+            }
+        }
     }
 
     override val isBackAllowed: Boolean

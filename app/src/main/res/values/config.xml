@@ -4,9 +4,11 @@
     <bool name="production">true</bool>
     <string name="amplitude_api_key" translatable="false">a3ce0405ed32a51f19d1c5d622141815</string>
     <string name="bip70_bitcoin_com_host" translatable="false">https://pay.bitcoin.com</string>
+    <string name="uri_bitcoincash_bip70" translatable="false">bitcoincash:?r=</string>
     <string name="url_terms_of_use" translatable="false">https://www.bitcoin.com/legal/</string>
     <string name="url_service_terms" translatable="false">https://www.bitcoin.com/bitcoin-cash-register/service-terms/</string>
     <string name="url_privacy_policy" translatable="false">https://www.bitcoin.com/privacy-policy/</string>
+    <string name="url_wallet_bitcoin_com" translatable="false">https://wallet.bitcoin.com</string>
     <string name="url_local_bitcoin_com" translatable="false">https://local.bitcoin.com</string>
     <string name="url_exchange_bitcoin_com" translatable="false">https://exchange.bitcoin.com</string>
     <string name="url_rest_bitcoin_com" translatable="false">https://rest.bitcoin.com/v2</string>

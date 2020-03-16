@@ -34,6 +34,7 @@ class SettingsFragment : ToolbarAwareFragment() {
     private lateinit var lvPaymentAddress: LinearLayout
     private lateinit var lvLocalCurrency: LinearLayout
     private lateinit var lvPinCode: LinearLayout
+    private lateinit var btnWallet: RelativeLayout
     private lateinit var btnLocalBitcoin: RelativeLayout
     private lateinit var btnThePit: RelativeLayout
 
@@ -54,12 +55,17 @@ class SettingsFragment : ToolbarAwareFragment() {
         lvPaymentAddress = rootView.findViewById(R.id.lv_payment_address)
         lvLocalCurrency = rootView.findViewById(R.id.lv_fiat_currency)
         lvPinCode = rootView.findViewById(R.id.lv_pin_code)
+        btnWallet = rootView.findViewById(R.id.wallet_ad)
         btnLocalBitcoin = rootView.findViewById(R.id.localbch_ad)
         btnThePit = rootView.findViewById(R.id.bce_ad)
         addOptionName()
         addOptionCurrency()
         addOptionAddress()
         addOptionPin()
+        btnWallet.setOnClickListener {
+            Analytics.tap_link_wallet.send()
+            openUrl(activity.getString(R.string.url_wallet_bitcoin_com))
+        }
         btnLocalBitcoin.setOnClickListener {
             Analytics.tap_link_localbitcoin.send()
             openUrl(activity.getString(R.string.url_local_bitcoin_com))

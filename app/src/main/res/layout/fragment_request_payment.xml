@@ -184,9 +184,9 @@
         android:layout_height="60dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="8dp"
-        android:backgroundTint="@color/bitcoindotcom_green"
         android:tint="#fff"
         app:fabCustomSize="60dp"
-        app:srcCompat="@android:drawable/ic_menu_share" />
+        app:srcCompat="@android:drawable/ic_menu_share"
+        app:backgroundTint="@color/bitcoindotcom_green" />
 
 </FrameLayout>
