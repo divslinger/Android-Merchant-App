@@ -70,7 +70,6 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private lateinit var bip70PayService: Bip70PayService
     private var lastProcessedInvoicePaymentId: String? = null
     private var qrCodeUri: String? = null
-    private var invoiceReadyToShare: Boolean = false
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -235,7 +234,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         setWorkInProgress(true)
         ivCancel.setOnClickListener { deleteActiveInvoiceAndExitScreen() }
         ivReceivingQr.setOnClickListener { copyQrCodeToClipboard() }
-        fabShare.setOnClickListener { startShareIntent(qrCodeUri) }
+        fabShare.setOnClickListener { qrCodeUri?.let { startShareIntent(it) } }
         waitingLayout.visibility = View.VISIBLE
         receivedLayout.visibility = View.GONE
     }
@@ -349,7 +348,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
             bitmap.setPixels(pixels, 0, width, 0, 0, w, h)
             return bitmap
-        } catch (e:Exception) {
+        } catch (e: Exception) {
             Analytics.error_generate_qr_code.sendError(e)
             throw e
         }
@@ -403,42 +402,35 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         }
     }
 
-    private fun setInvoiceReadyToShare(status: Boolean) {
-        invoiceReadyToShare = status
-        if(status) {
+    private fun setInvoiceReadyToShare(ready: Boolean) {
+        if (ready) {
             fabShare.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(app, R.color.bitcoindotcom_green))
         } else {
+            qrCodeUri = null
             fabShare.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(app, R.color.gray))
         }
     }
 
-    private fun isInvoiceReadyToShare(): Boolean {
-        return invoiceReadyToShare
-    }
-
-    private fun startShareIntent(paymentUrl: String?) {
-        if(isInvoiceReadyToShare()) {
-            try {
-                val urlWithoutPrefix = paymentUrl?.replace(getString(R.string.uri_bitcoincash_bip70), "")
-                val bitmap = ivReceivingQr.drawable.toBitmap(220, 220)
-                val file = File(app.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "invoice.png")
-                val out = FileOutputStream(file)
-                bitmap.compress(Bitmap.CompressFormat.PNG, 80, out)
-                out.close()
-                val bitmapUri = FileProvider.getUriForFile(app, activity.packageName + ".provider", file)
-                val sendIntent: Intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.share_invoice_msg, urlWithoutPrefix))
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    putExtra(Intent.EXTRA_STREAM, bitmapUri)
-                    type = "image/*"
-                }
-
-                val shareIntent = Intent.createChooser(sendIntent, null)
-                startActivity(shareIntent)
-            } catch (e: Exception) {
-
+    private fun startShareIntent(paymentUrl: String) {
+        try {
+            val urlWithoutPrefix = paymentUrl.replace(getString(R.string.uri_bitcoincash_bip70), "")
+            val bitmap = ivReceivingQr.drawable.toBitmap(220, 220)
+            val file = File(app.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "invoice.png")
+            FileOutputStream(file).use {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, it)
             }
+            val bitmapUri = FileProvider.getUriForFile(app, activity.packageName + ".provider", file)
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.share_invoice_msg, urlWithoutPrefix))
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                putExtra(Intent.EXTRA_STREAM, bitmapUri)
+                type = "image/*"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            shareIntent?.let { startActivity(it) }
+        } catch (e: Exception) {
+            Log.e(MainActivity.TAG, "", e)
         }
     }
 
