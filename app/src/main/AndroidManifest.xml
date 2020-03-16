@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
     <uses-feature
@@ -63,5 +65,15 @@
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name=".application.GenericFileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
     </application>
 </manifest>

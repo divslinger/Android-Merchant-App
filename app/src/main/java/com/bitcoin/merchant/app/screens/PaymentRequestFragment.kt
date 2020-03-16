@@ -1,6 +1,7 @@
 package com.bitcoin.merchant.app.screens
 
 import android.content.*
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color.BLACK
 import android.graphics.Color.WHITE
@@ -17,6 +18,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
@@ -68,6 +70,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private lateinit var bip70PayService: Bip70PayService
     private var lastProcessedInvoicePaymentId: String? = null
     private var qrCodeUri: String? = null
+    private var invoiceReadyToShare: Boolean = false
+
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (Bip70Action.INVOICE_PAYMENT_ACKNOWLEDGED == intent.action) {
@@ -139,6 +143,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         val v = inflater.inflate(R.layout.fragment_request_payment, container, false)
         initViews(v)
+        setInvoiceReadyToShare(false)
         setToolbarVisible(false)
         registerReceiver()
         bip70PayService = Bip70PayService.create(resources.getString(R.string.bip70_bitcoin_com_host))
@@ -357,6 +362,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         tvCoinAmount.text = MonetaryUtil.instance.getDisplayAmountWithFormatting(i.totalAmountInSatoshi) + " BCH"
         tvCoinAmount.visibility = View.VISIBLE
         ivReceivingQr.setImageBitmap(bitmap)
+        setInvoiceReadyToShare(true)
         initiateCountdown(i)
     }
 
@@ -397,18 +403,31 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         }
     }
 
+    private fun setInvoiceReadyToShare(status: Boolean) {
+        invoiceReadyToShare = status
+        if(status) {
+            fabShare.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(app, R.color.bitcoindotcom_green))
+        } else {
+            fabShare.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(app, R.color.gray))
+        }
+    }
+
+    private fun isInvoiceReadyToShare(): Boolean {
+        return invoiceReadyToShare
+    }
+
     private fun startShareIntent(paymentUrl: String?) {
-        if(paymentUrl != null) {
+        if(isInvoiceReadyToShare()) {
             try {
                 //TODO remove hardcoded and put them in strings.xml
-                val urlWithoutPrefix = paymentUrl.replace("bitcoincash:?r=", "")
-                val invoiceId = urlWithoutPrefix.replace("https://pay.bitcoin.com/i/", "")
+                val urlWithoutPrefix = paymentUrl?.replace("bitcoincash:?r=", "")
+                val invoiceId = urlWithoutPrefix?.replace("https://pay.bitcoin.com/i/", "")
                 val bitmap = ivReceivingQr.drawable.toBitmap(220, 220)
                 val file = File(this@PaymentRequestFragment.app.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "invoice.png")
                 val out = FileOutputStream(file)
                 bitmap.compress(Bitmap.CompressFormat.PNG, 80, out)
                 out.close();
-                val bitmapUri = this@PaymentRequestFragment.context?.let { FileProvider.getUriForFile(it, context?.applicationContext?.packageName + ".provider", file) }
+                val bitmapUri = FileProvider.getUriForFile(this@PaymentRequestFragment.app, context?.applicationContext?.packageName + ".provider", file)
                 val sendIntent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
                     //TODO extract string resource
@@ -423,8 +442,6 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             } catch (e: Exception) {
 
             }
-        } else {
-            SnackHelper.show(activity, activity.getString(R.string.share_invoice_npe), error = true)
         }
     }
 
