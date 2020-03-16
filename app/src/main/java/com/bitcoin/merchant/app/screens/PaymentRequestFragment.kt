@@ -358,8 +358,9 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         val f = AmountUtil(activity)
         tvFiatAmount.text = f.formatFiat(i.fiatTotal)
         tvFiatAmount.visibility = View.VISIBLE
-        tvCoinAmount.text = MonetaryUtil.instance.getDisplayAmountWithFormatting(i.totalAmountInSatoshi) + " BCH"
-        tvCoinAmount.visibility = View.VISIBLE
+        // BCH amount is hidden as deemed non-necessary because it is shown on the customer wallet
+        // tvCoinAmount.text = MonetaryUtil.instance.getDisplayAmountWithFormatting(i.totalAmountInSatoshi) + " BCH"
+        // tvCoinAmount.visibility = View.VISIBLE
         ivReceivingQr.setImageBitmap(bitmap)
         setInvoiceReadyToShare(true)
         initiateCountdown(i)
