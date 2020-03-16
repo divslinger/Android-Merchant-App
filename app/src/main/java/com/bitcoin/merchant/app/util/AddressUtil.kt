@@ -1,17 +1,28 @@
 package com.bitcoin.merchant.app.util
 
 import org.bitcoinj.core.Address
+import org.bitcoinj.core.AddressFormatException
 import org.bitcoinj.core.CashAddressFactory
 import org.bitcoinj.core.SlpAddress
 import org.bitcoinj.params.MainNetParams
 
 object AddressUtil {
-    fun isValidCashAddr(address: String): Boolean {
-        return Address.isValidCashAddr(MainNetParams.get(), address)
+    fun isValidCashAddr(cashAddress: String): Boolean {
+        return try {
+            Address.fromCashAddr(MainNetParams.get(), cashAddress)
+            true
+        } catch (e: AddressFormatException) {
+            false
+        }
     }
 
-    fun isValidLegacy(address: String): Boolean {
-        return Address.isValidLegacyAddress(MainNetParams.get(), address)
+    fun isValidLegacy(legacyAddress: String): Boolean {
+        return try {
+            Address.fromBase58(MainNetParams.get(), legacyAddress)
+            true
+        } catch (e: AddressFormatException) {
+            false
+        }
     }
 
     fun toCashAddress(legacy: String): String {
