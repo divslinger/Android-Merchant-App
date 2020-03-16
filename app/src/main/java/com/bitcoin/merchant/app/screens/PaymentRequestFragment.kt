@@ -421,11 +421,11 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             try {
                 val urlWithoutPrefix = paymentUrl?.replace(getString(R.string.uri_bitcoincash_bip70), "")
                 val bitmap = ivReceivingQr.drawable.toBitmap(220, 220)
-                val file = File(this@PaymentRequestFragment.app.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "invoice.png")
+                val file = File(app.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "invoice.png")
                 val out = FileOutputStream(file)
                 bitmap.compress(Bitmap.CompressFormat.PNG, 80, out)
-                out.close();
-                val bitmapUri = FileProvider.getUriForFile(this@PaymentRequestFragment.app, context?.applicationContext?.packageName + ".provider", file)
+                out.close()
+                val bitmapUri = FileProvider.getUriForFile(app, activity.packageName + ".provider", file)
                 val sendIntent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
                     putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.share_invoice_msg, urlWithoutPrefix))
