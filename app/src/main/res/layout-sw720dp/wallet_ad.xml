@@ -2,20 +2,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/bce_ad"
+    android:id="@+id/wallet_ad"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="40dp"
-    android:paddingEnd="40dp"
+    android:paddingStart="128dp"
+    android:paddingEnd="128dp"
     android:paddingBottom="24dp">
 
     <ImageView
         android:id="@+id/flag"
         android:layout_width="fill_parent"
-        android:layout_height="100dp"
+        android:layout_height="145dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/bce_banner" />
+        android:src="@drawable/wallet_banner" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,18 +27,19 @@
 
         <ImageView
             android:id="@+id/local_logo"
-            android:layout_width="125dp"
-            android:layout_height="20dp"
-            app:srcCompat="@drawable/exchange_logo" />
+            android:layout_width="175dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="5dp"
+            app:srcCompat="@drawable/wallet_logo" />
 
         <TextView
             android:id="@+id/textview2"
-            android:layout_width="175dp"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/ad_content_bitcoincom_exchange"
+            android:layout_marginTop="5dp"
+            android:text="@string/ad_content_bitcoincom_wallet"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
 
