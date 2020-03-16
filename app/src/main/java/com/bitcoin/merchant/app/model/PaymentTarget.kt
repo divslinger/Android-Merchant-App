@@ -11,10 +11,12 @@ data class PaymentTarget(val type: Type, val target: String) {
     val isXPub = type == Type.XPUB
     val isApiKey = type == Type.API_KEY
     val isAddress = type == Type.ADDRESS
+
     /**
      * Get legacy format if it's an address, otherwise returns default target.
      */
     val legacyAddress: String = target
+
     /**
      * Converts legacy to BCH address, otherwise returns default target.
      */
@@ -34,11 +36,12 @@ data class PaymentTarget(val type: Type, val target: String) {
         INVALID, XPUB, ADDRESS, API_KEY
     }
 
-
     companion object {
+        private val REGEX_API_KEY = Regex("[a-z]{40}")
+
         private fun isApiKey(value: String): Boolean {
             return !StringUtils.isEmpty(value)
-                    && value.matches(Regex.fromLiteral("[a-z]{40}"))
+                    && REGEX_API_KEY.matches(value)
         }
 
         @JvmStatic
