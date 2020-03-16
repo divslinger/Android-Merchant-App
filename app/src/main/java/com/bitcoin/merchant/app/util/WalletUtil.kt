@@ -3,6 +3,7 @@ package com.bitcoin.merchant.app.util
 import android.util.Log
 import com.bitcoin.merchant.app.application.CashRegisterApplication
 import com.bitcoin.merchant.app.database.DBControllerV3
+import com.bitcoin.merchant.app.model.Analytics
 import org.bitcoinj.core.AddressFormatException
 import org.bitcoinj.core.Base58
 import org.bitcoinj.core.ECKey
@@ -48,6 +49,7 @@ class WalletUtil(private val urlRestBitcoinCom: String, private val xPub: String
             loopThroughXpubChildren()
             true
         } catch (e: Exception) {
+            Analytics.error_syncing_xpub.sendError(e)
             false
         }
     }
@@ -84,10 +86,12 @@ class WalletUtil(private val urlRestBitcoinCom: String, private val xPub: String
                 val json = JSONObject(URL("$urlRestBitcoinCom/address/details/$address").readText())
                 return json.getJSONArray("transactions").length() > 0
             } catch (e: Exception) {
+                Analytics.error_rest_bitcoin_com_scan_address_funds.sendError(e)
                 Log.e(TAG, "doesAddressHaveHistory", e)
                 try {
                     Thread.sleep(doubleBackOff)
-                } catch (ex: InterruptedException) { // fail silently
+                } catch (ex: InterruptedException) {
+                    // fail silently
                 }
                 2
             }
@@ -123,6 +127,7 @@ class WalletUtil(private val urlRestBitcoinCom: String, private val xPub: String
                 addresses = db.allAddresses
                 Log.d(TAG, "loaded ${addresses.size} addresses from TX history: $addresses")
             } catch (e: Exception) {
+                Analytics.error_db_read_address.sendError(e)
                 addresses = HashSet()
                 Log.e(TAG, "Unable to load addresses from TX history")
             }

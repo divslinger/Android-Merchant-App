@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.Action
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.model.CountryCurrencyLocale
 import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.screens.dialogs.AddNewAddressDialog
@@ -59,8 +60,14 @@ class SettingsFragment : ToolbarAwareFragment() {
         addOptionCurrency()
         addOptionAddress()
         addOptionPin()
-        btnLocalBitcoin.setOnClickListener { openUrl(activity.getString(R.string.url_local_bitcoin_com)) }
-        btnThePit.setOnClickListener { openUrl(activity.getString(R.string.url_exchange_bitcoin_com)) }
+        btnLocalBitcoin.setOnClickListener {
+            Analytics.tap_link_localbitcoin.send()
+            openUrl(activity.getString(R.string.url_local_bitcoin_com))
+        }
+        btnThePit.setOnClickListener {
+            Analytics.tap_link_exchange.send()
+            openUrl(activity.getString(R.string.url_exchange_bitcoin_com))
+        }
         setToolbarAsBackButton()
         setToolbarTitle(R.string.menu_settings)
         LocalBroadcastManager.getInstance(activity).registerReceiver(paymentTargetReceiver, IntentFilter(Action.SET_PAYMENT_TARGET))
@@ -80,12 +87,18 @@ class SettingsFragment : ToolbarAwareFragment() {
         val merchantName: String = Settings.getMerchantName(activity)
         val tvMerchantName = rootView.findViewById<TextView>(R.id.et_merchant_name)
         tvMerchantName.text = if (merchantName.isNotEmpty()) merchantName else "..."
-        lvMerchantName.setOnClickListener { MerchantNameEditorDialog(activity).show(tvMerchantName) }
+        lvMerchantName.setOnClickListener {
+            Analytics.settings_merchantname_edit.send()
+            MerchantNameEditorDialog(activity).show(tvMerchantName)
+        }
     }
 
     private fun addOptionCurrency() {
         setCurrencySummary(Settings.getCountryCurrencyLocale(activity))
-        lvLocalCurrency.setOnClickListener { CurrencySelectionDialog(this@SettingsFragment).show() }
+        lvLocalCurrency.setOnClickListener {
+            Analytics.settings_currency_edit.send()
+            CurrencySelectionDialog(this@SettingsFragment).show()
+        }
     }
 
     private fun addOptionAddress() {
@@ -95,13 +108,19 @@ class SettingsFragment : ToolbarAwareFragment() {
             "...\n\n" + getString(R.string.options_explain_payment_address)
         else paymentTarget.bchAddress
         tvPaymentAddress.text = summary
-        lvPaymentAddress.setOnClickListener { AddNewAddressDialog(this@SettingsFragment).show() }
+        lvPaymentAddress.setOnClickListener {
+            Analytics.settings_paymenttarget_edit.send()
+            AddNewAddressDialog(this@SettingsFragment).show()
+        }
     }
 
     private fun addOptionPin() {
         val tvPinCode = rootView.findViewById<TextView>(R.id.et_pin_code)
         tvPinCode.text = "####"
-        lvPinCode.setOnClickListener { changePin() }
+        lvPinCode.setOnClickListener {
+            Analytics.settings_pin_edit.send()
+            changePin()
+        }
     }
 
     private fun changePin() {
@@ -137,6 +156,16 @@ class SettingsFragment : ToolbarAwareFragment() {
         v.text = target.bchAddress
         if (Settings.getPaymentTarget(activity) != target) {
             Settings.setPaymentTarget(activity, target)
+            Analytics.settings_paymenttarget_changed.send()
+            when (target.type) {
+                PaymentTarget.Type.ADDRESS -> Analytics.settings_paymenttarget_pubkey_set.send()
+                PaymentTarget.Type.XPUB -> Analytics.settings_paymenttarget_xpub_set.send()
+                PaymentTarget.Type.API_KEY -> Analytics.settings_paymenttarget_apikey_set.send()
+                // PaymentTarget.Type.PAIRING_CODE -> Analytics.settings_paymenttarget_pairingcode_set.send()
+                PaymentTarget.Type.INVALID -> {
+                    // no action
+                }
+            }
             SnackHelper.show(activity, activity.getString(R.string.notify_changes_have_been_saved))
         }
     }
@@ -169,6 +198,7 @@ class SettingsFragment : ToolbarAwareFragment() {
                         SnackHelper.show(activity, errorMessage, error = true)
                     }
                 } catch (e: Exception) {
+                    // analytics already covered in callee
                     Log.e(TAG, "", e)
                 }
             }

@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AmountUtil
@@ -91,15 +92,17 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     }
 
     private fun initDecimalButton() {
-        strDecimal = MonetaryUtil.instance.decimalFormatSymbols.decimalSeparator.toString()
+        val ccl = Settings.getCountryCurrencyLocale(activity)
         try {
-            val currency = Currency.getInstance(Settings.getCountryCurrencyLocale(activity).currency)
+            strDecimal = MonetaryUtil.instance.decimalFormatSymbols.decimalSeparator.toString()
+            val currency = Currency.getInstance(ccl.currency)
             allowedDecimalPlaces = currency.defaultFractionDigits
             val enabled = allowedDecimalPlaces > 0
             val buttonView = rootView.findViewById<View>(R.id.buttonDecimal)
             buttonView.isEnabled = enabled
             buttonDecimal.text = if (enabled) strDecimal else ""
         } catch (e: Exception) {
+            Analytics.error_format_currency.sendError(e, ccl.locale.country, ccl.currency, ccl.locale.displayName)
             Log.e(TAG, "", e)
         }
     }
@@ -158,6 +161,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
             return
         }
         if (validateAmount()) {
+            Analytics.invoice_checkout.send()
             updateAmounts()
             val extras = Bundle()
             extras.putDouble(AMOUNT_PAYABLE_FIAT, amountPayableFiat)

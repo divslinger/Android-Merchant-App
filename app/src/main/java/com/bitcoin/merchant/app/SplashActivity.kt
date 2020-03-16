@@ -19,6 +19,7 @@ class SplashActivity : Activity() {
                 try {
                     sleep(300)
                 } catch (ie: InterruptedException) {
+                    // fail silently
                 }
                 val mainActivityIntent = Intent(this@SplashActivity, MainActivity::class.java)
                 mainActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)

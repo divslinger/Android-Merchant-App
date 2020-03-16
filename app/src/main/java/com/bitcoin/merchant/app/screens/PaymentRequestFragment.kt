@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
@@ -95,6 +96,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         if (markInvoiceAsProcessed(i)) {
             return
         }
+        Analytics.invoice_paid.send()
         Log.i(MainActivity.TAG, "record new Tx:$i")
         val fiatFormatted = AmountUtil(activity).formatFiat(i.fiatTotal)
         app.paymentProcessor.recordInDatabase(i, fiatFormatted)
@@ -234,6 +236,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     }
 
     private fun deleteActiveInvoiceAndExitScreen() {
+        Analytics.invoice_cancelled.send()
         Settings.deleteActiveInvoice(activity)
         exitScreen()
     }
@@ -250,9 +253,10 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             val clip = ClipData.newPlainText(qrCodeUri, qrCodeUri)
             clipboard.setPrimaryClip(clip)
             val emojiClipboard = String(Character.toChars(0x1F4CB))
-            SnackHelper.show(activity, emojiClipboard + " ${qrCodeUri}");
+            SnackHelper.show(activity, emojiClipboard + " ${qrCodeUri}")
             Log.i(MainActivity.TAG, "Copied to clipboard: $qrCodeUri")
         } catch (e: Exception) {
+            Analytics.error_copy_to_clipboard.sendError(e)
             Log.i(MainActivity.TAG, "Failed to copy to clipboard: $qrCodeUri")
         }
     }
@@ -273,6 +277,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 i.address = app.wallet.getAddressFromXPubAndMoveToNext()
                 Log.i(MainActivity.TAG, "BCH-address(xPub) to receive: " + i.address)
             } catch (e: Exception) {
+                Analytics.error_generate_address_from_xpub.sendError(e)
                 Log.e(MainActivity.TAG, "", e)
                 return null
             }
@@ -286,9 +291,11 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 val response: Response<InvoiceStatus?> = bip70PayService.createInvoice(request).execute()
                 val invoice = response.body()
                         ?: throw Exception("HTTP status:" + response.code() + " message:" + response.message())
+                Analytics.invoice_created.send()
                 Settings.setActiveInvoice(activity, invoice)
                 invoice
             } catch (e: Exception) {
+                Analytics.error_download_invoice.sendError(e)
                 DialogHelper.show(activity, activity.getString(R.string.error), e.message) { exitScreen() }
                 null
             }
@@ -305,6 +312,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 val width = activity.resources.getInteger(R.integer.qr_code_width)
                 getQrCodeAsBitmap(invoice.walletUri, width)
             } catch (e: Exception) {
+                // analytics already sent inside websockets & qr generation
                 DialogHelper.show(activity, activity.getString(R.string.error), e.message) { exitScreen() }
                 null
             }
@@ -313,23 +321,28 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
 
     @Throws(Exception::class)
     private fun getQrCodeAsBitmap(text: String, width: Int): Bitmap {
-        val result: BitMatrix = try {
-            MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, width, null)
-        } catch (e: Exception) {
-            throw Exception("Unsupported format", e)
-        }
-        val w = result.width
-        val h = result.height
-        val pixels = IntArray(w * h)
-        for (y in 0 until h) {
-            val offset = y * w
-            for (x in 0 until w) {
-                pixels[offset + x] = if (result.get(x, y)) BLACK else WHITE
+        try {
+            val result: BitMatrix = try {
+                MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, width, null)
+            } catch (e: Exception) {
+                throw Exception("Unsupported format", e)
             }
+            val w = result.width
+            val h = result.height
+            val pixels = IntArray(w * h)
+            for (y in 0 until h) {
+                val offset = y * w
+                for (x in 0 until w) {
+                    pixels[offset + x] = if (result.get(x, y)) BLACK else WHITE
+                }
+            }
+            val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            bitmap.setPixels(pixels, 0, width, 0, 0, w, h)
+            return bitmap
+        } catch (e:Exception) {
+            Analytics.error_generate_qr_code.sendError(e)
+            throw e
         }
-        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        bitmap.setPixels(pixels, 0, width, 0, 0, w, h)
-        return bitmap
     }
 
     private fun showQrCodeAndAmountFields(i: InvoiceStatus, bitmap: Bitmap) {
@@ -380,6 +393,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     }
 
     private fun startShareIntent(paymentUrl: String) {
+        Analytics.invoice_shared.send()
         val sendIntent: Intent = Intent().apply {
             //TODO extract string resource
             val urlWithoutPrefix = paymentUrl.replace("bitcoincash:?r=", "")

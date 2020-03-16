@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.bitcoin.merchant.app.model.Analytics
 import com.neovisionaries.ws.client.WebSocket
 import com.neovisionaries.ws.client.WebSocketAdapter
 import com.neovisionaries.ws.client.WebSocketFactory
@@ -29,6 +30,7 @@ abstract class WebSocketHandler {
             stop()
             ConnectionThread().start()
         } catch (e: Exception) {
+            Analytics.error_connect_to_socket.sendError(e)
             Log.e(TAG, "start", e)
         }
         return this
@@ -55,8 +57,7 @@ abstract class WebSocketHandler {
     @Throws(IOException::class)
     protected abstract fun createWebSocket(factory: WebSocketFactory): WebSocket
 
-    @Throws(Exception::class)
-    protected abstract fun parseTx(message: String?)
+    protected abstract fun parseInvoice(message: String?)
 
     private inner class ConnectionThread : Thread() {
         override fun run() {
@@ -121,11 +122,7 @@ abstract class WebSocketHandler {
         }
 
         override fun onTextMessage(websocket: WebSocket, message: String) {
-            try {
-                parseTx(message)
-            } catch (e: Exception) {
-                Log.e(TAG, message, e)
-            }
+            parseInvoice(message)
         }
 
         fun setAutoReconnect(autoReconnect: Boolean) {

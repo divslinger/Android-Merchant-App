@@ -21,14 +21,13 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.bitcoin.merchant.app.application.CashRegisterApplication
 import com.bitcoin.merchant.app.application.NetworkStateReceiver
+import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.util.ScanQRUtil
 import com.bitcoin.merchant.app.util.Settings
-import com.crashlytics.android.Crashlytics
 import com.google.android.material.navigation.NavigationView
-import io.fabric.sdk.android.Fabric
 
 open class MainActivity : AppCompatActivity() {
     private lateinit var mDrawerLayout: DrawerLayout
@@ -46,9 +45,7 @@ open class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!AppUtil.isEmulator) {
-            Fabric.with(this, Crashlytics())
-        }
+        Analytics.configure(application, this)
         setContentView(R.layout.activity_main)
         rootView = findViewById(R.id.content_frame)
         setToolbar()
@@ -165,6 +162,14 @@ open class MainActivity : AppCompatActivity() {
         mDrawerLayout.closeDrawer(GravityCompat.START)
         val mDrawerActionHandler = Handler()
         mDrawerActionHandler.postDelayed({
+            when (menuItem.itemId) {
+                R.id.action_transactions -> Analytics.tap_transactions.send()
+                R.id.action_settings -> Analytics.tap_settings.send()
+                R.id.action_about -> Analytics.tap_about.send()
+                R.id.action_terms_of_use -> Analytics.tap_termsofuse.send()
+                R.id.action_service_terms -> Analytics.tap_serviceterms.send()
+                R.id.action_privacy_policy -> Analytics.tap_privacypolicy.send()
+            }
             when (menuItem.itemId) {
                 R.id.action_transactions -> nav.navigate(R.id.nav_to_transactions_screen)
                 R.id.action_settings -> nav.navigate(R.id.nav_to_settings_screen)

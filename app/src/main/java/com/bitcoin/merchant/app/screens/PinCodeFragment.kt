@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.Settings
@@ -76,6 +77,7 @@ class PinCodeFragment : ToolbarAwareFragment() {
     private fun newPinHasBeenConfirmed() {
         if (Settings.getPinCode(activity) != userEnteredPIN) {
             Settings.setPinCode(activity, userEnteredPIN)
+            Analytics.settings_pin_changed.send()
             SnackHelper.show(activity, activity.getString(R.string.notify_changes_have_been_saved))
         }
         nav.navigate(R.id.nav_to_settings_screen)

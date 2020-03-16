@@ -68,4 +68,8 @@
     <string name="contract_button_ok">同意する</string>
     <string name="error">エラー</string>
     <string name="notify_changes_have_been_saved">変更箇所が保存されました。</string>
+    <string name="inspect_tx_link_view_transaction">View transaction</string>
+    <string name="inspect_tx_copy_transaction">Copy transaction</string>
+    <string name="inspect_tx_copy_address">Copy address</string>
+    <string name="inspect_tx_link_view_all_transactions_with_this_address">View all TX with this address</string>
 </resources>

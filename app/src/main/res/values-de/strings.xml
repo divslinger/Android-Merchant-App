@@ -64,4 +64,8 @@
     <string name="contract_button_ok">Ich stimme zu</string>
     <string name="error">Fehler</string>
     <string name="notify_changes_have_been_saved">Die Änderung wurde gespeichert</string>
+    <string name="inspect_tx_link_view_transaction">View transaction</string>
+    <string name="inspect_tx_copy_transaction">Copy transaction</string>
+    <string name="inspect_tx_copy_address">Copy address</string>
+    <string name="inspect_tx_link_view_all_transactions_with_this_address">View all TX with this address</string>
 </resources>

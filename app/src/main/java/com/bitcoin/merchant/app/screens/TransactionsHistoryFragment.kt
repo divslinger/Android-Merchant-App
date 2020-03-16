@@ -19,11 +19,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.database.toPaymentRecord
+import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.DateUtil
 import com.bitcoin.merchant.app.util.MonetaryUtil
 import com.bitcoin.merchant.app.util.Settings
-import com.crashlytics.android.Crashlytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -107,16 +107,23 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
         val address = tx.getAsString("iad")
         builder.setTitle(txId)
         builder.setIcon(R.mipmap.ic_launcher)
+        val emojiLink = String(Character.toChars(0x1F517))
         builder.setItems(arrayOf<CharSequence>(
-                "View transaction",
-                "View all TX with this address",
-                "Copy transaction",
-                "Copy address")
+                "$emojiLink ${getString(R.string.inspect_tx_link_view_transaction)}",
+                "$emojiLink ${getString(R.string.inspect_tx_link_view_all_transactions_with_this_address)}",
+                getString(R.string.inspect_tx_copy_transaction),
+                getString(R.string.inspect_tx_copy_address))
         ) { dialog: DialogInterface, which: Int ->
             dialog.dismiss()
             when (which) {
-                0 -> openExplorer(activity.getString(R.string.url_explorer_bitcoin_com) + "/bch/tx/$txId")
-                1 -> openExplorer(activity.getString(R.string.url_explorer_bitcoin_com) + "/bch/address/$address")
+                0 -> Analytics.tx_id_explorer_launched.send()
+                1 -> Analytics.tx_address_explorer_launched.send()
+                2 -> Analytics.tx_id_copied.send()
+                3 -> Analytics.tx_address_copied.send()
+            }
+            when (which) {
+                0 -> openExplorer(getString(R.string.url_explorer_bitcoin_com) + "/bch/tx/$txId")
+                1 -> openExplorer(getString(R.string.url_explorer_bitcoin_com) + "/bch/address/$address")
                 2 -> copyToClipboard(txId)
                 3 -> copyToClipboard(address)
             }
@@ -150,8 +157,8 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
                 try {
                     app.db.allPayments
                 } catch (e: Exception) {
+                    Analytics.error_db_read_tx.sendError(e)
                     Log.e(TAG, "getAllPayments", e)
-                    Crashlytics.logException(e)
                     null
                 }
             }
@@ -197,6 +204,7 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
                 val r = mListItems[position].toPaymentRecord()
                 setupView(view, r.bchAmount, r.fiatAmount, r.timeInSec, r.confirmations)
             } catch (e: Exception) {
+                Analytics.error_rendering.sendError(e)
                 Log.e(TAG, "getView", e)
             }
             return view

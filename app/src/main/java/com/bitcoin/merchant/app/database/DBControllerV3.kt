@@ -7,10 +7,9 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
 import android.util.Log
 import com.bitcoin.merchant.app.application.CashRegisterApplication
-import com.crashlytics.android.Crashlytics
+import com.bitcoin.merchant.app.model.Analytics
 import org.bitcoinj.crypto.AESUtil
 import org.bitcoinj.crypto.CharSequenceX
-import java.nio.charset.StandardCharsets
 import java.util.*
 
 fun ContentValues.toPaymentRecord(): PaymentRecord {
@@ -207,8 +206,8 @@ class DBControllerV3(app: CashRegisterApplication?) : SQLiteOpenHelper(app, DB, 
             database?.close()
             close()
         } catch (e: Exception) {
+            Analytics.error_db_unknown.sendError(e)
             Log.e(TAG, "closeAll", e)
-            Crashlytics.logException(e)
         }
     }
 

@@ -34,19 +34,20 @@ data class CountryCurrencyLocale(@SerializedName("name") var name: String = "",
          */
         fun getFromLocale(context: Context): CountryCurrencyLocale {
             val locale = Locale.getDefault()
-            var currencyCode: String? = ""
+            var currencyCode = ""
             var countryIso = ""
             try {
                 countryIso = locale.country
                 Log.i(TAG, "Currency Locale.country: $countryIso")
                 val currency = Currency.getInstance(locale)
-                currencyCode = currency.currencyCode
+                currencyCode = currency.currencyCode!!
                 Log.i(TAG, "Currency Code: " + currencyCode + " for locale: " + locale.displayName)
                 Log.i(TAG, "Currency Symbol: " + currency.symbol)
                 Log.i(TAG, "Currency Default Fraction Digits: " + currency.defaultFractionDigits)
                 if (isCurrencySupported(context, currencyCode) && isCountrySupported(context, countryIso))
-                    return get(context, currencyCode!!, countryIso, locale.toLanguageTag())
+                    return get(context, currencyCode, countryIso, locale.toLanguageTag())
             } catch (e: Exception) {
+                Analytics.error_format_currency.sendError(e, countryIso, currencyCode, locale.displayName)
                 Log.e(TAG, "Currency", e)
                 // check if currency can be determined from the country code
                 if (countryIso.length >= 2) {

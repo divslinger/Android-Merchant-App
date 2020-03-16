@@ -83,3 +83,5 @@
 -keep class com.google.apphosting.api.ApiProxy {
   static *** getCurrentEnvironment (...);
 }
+-keep class com.google.android.gms.ads.** { *; }
+    -dontwarn okio.**

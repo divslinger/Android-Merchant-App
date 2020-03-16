@@ -25,7 +25,8 @@ data class PaymentTarget(val type: Type, val target: String) {
             if (type == Type.ADDRESS) {
                 try {
                     return AddressUtil.toCashAddress(target)
-                } catch (e: java.lang.Exception) {
+                } catch (e: Exception) {
+                    Analytics.error_convert_address_to_bch.sendError(e)
                     Log.e(TAG, "", e)
                 }
             }

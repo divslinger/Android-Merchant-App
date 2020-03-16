@@ -12,6 +12,7 @@ import android.widget.ListAdapter
 import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.model.CountryCurrencyLocale
 import com.bitcoin.merchant.app.screens.PaymentInputFragment
 import com.bitcoin.merchant.app.screens.SettingsFragment
@@ -24,6 +25,7 @@ class CurrencySelectionDialog(private val settingsController: SettingsFragment) 
         val currencies: List<CountryCurrencyLocale> = CountryCurrencyLocale.getAll(ctx)
         val adapter: ListAdapter = ArrayAdapterWithIcon(ctx, currencies)
         builder.setAdapter(adapter) { dialog: DialogInterface, which: Int ->
+            Analytics.settings_currency_changed.send()
             save(currencies[which])
             dialog.dismiss()
         }

@@ -6,6 +6,7 @@ import android.widget.EditText
 import android.widget.TextView
 import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.util.Settings
 
 class MerchantNameEditorDialog(private val activity: MainActivity) {
@@ -23,6 +24,7 @@ class MerchantNameEditorDialog(private val activity: MainActivity) {
                     if (name.isNotEmpty()) {
                         if (Settings.getMerchantName(activity) != name) {
                             Settings.setMerchantName(activity, name)
+                            Analytics.settings_merchantname_changed.send()
                             SnackHelper.show(activity, activity.getString(R.string.notify_changes_have_been_saved))
                         }
                         namePref.text = name

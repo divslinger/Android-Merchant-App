@@ -2,6 +2,7 @@ package com.bitcoin.merchant.app.util
 
 import android.content.Context
 import android.util.Log
+import com.bitcoin.merchant.app.model.Analytics
 import java.text.NumberFormat
 import java.util.*
 
@@ -15,6 +16,7 @@ class AmountUtil(private val context: Context) {
             formatter.maximumFractionDigits = currency.defaultFractionDigits
             formatter.format(amountFiat).replace(CURRENCY_SIGN, ccl.currency)
         } catch (e: Exception) {
+            Analytics.error_format_currency.sendError(e, ccl.locale.country, ccl.currency, ccl.locale.displayName)
             Log.d(TAG, "Locale not supported for $ccl.currency failed to format to fiat: $amountFiat")
             ccl.currency + " " + MonetaryUtil.instance.fiatDecimalFormat.format(amountFiat)
         }

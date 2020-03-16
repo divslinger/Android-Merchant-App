@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.bitcoin.merchant.app.model.Analytics
 import com.neovisionaries.ws.client.WebSocket
 import com.neovisionaries.ws.client.WebSocketFactory
 import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
@@ -11,13 +12,14 @@ import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 import java.io.IOException
 
 class Bip70SocketHandler(private val context: Context, invoiceId: String) : WebSocketHandler() {
-    private val url: String
+    private val url = "wss://pay.bitcoin.com/s/$invoiceId"
+
     @Throws(IOException::class)
     override fun createWebSocket(factory: WebSocketFactory): WebSocket {
         return factory.createSocket(url)
     }
 
-    override fun parseTx(message: String?) {
+    override fun parseInvoice(message: String?) {
         try {
             val status = InvoiceStatus.fromJson(message)
             Log.i(TAG, status.toString())
@@ -34,15 +36,11 @@ class Bip70SocketHandler(private val context: Context, invoiceId: String) : WebS
                 // invoice has become invalid, useless to listen any further
                 setAutoReconnect(false)
             } else if (status.isOpen) {
-                WebSocketHandler.notifyConnectionStatus(context, true)
+                notifyConnectionStatus(context, true)
             }
         } catch (e: Exception) {
+            Analytics.error_parse_invoice.sendError(e, message)
             Log.e(TAG, "InvoiceStatus error:$e")
         }
-    }
-
-    init {
-        TAG = "BchProcessor-WebSocket"
-        url = "wss://pay.bitcoin.com/s/$invoiceId"
     }
 }
