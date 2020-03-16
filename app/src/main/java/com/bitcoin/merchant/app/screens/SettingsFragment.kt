@@ -63,7 +63,7 @@ class SettingsFragment : ToolbarAwareFragment() {
         addOptionAddress()
         addOptionPin()
         btnWallet.setOnClickListener {
-            Analytics.tap_link_localbitcoin.send()
+            Analytics.tap_link_wallet.send()
             openUrl(activity.getString(R.string.url_wallet_bitcoin_com))
         }
         btnLocalBitcoin.setOnClickListener {
