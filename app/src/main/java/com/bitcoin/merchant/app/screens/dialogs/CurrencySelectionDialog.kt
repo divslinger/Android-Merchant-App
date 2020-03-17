@@ -25,7 +25,6 @@ class CurrencySelectionDialog(private val settingsController: SettingsFragment) 
         val currencies: List<CountryCurrencyLocale> = CountryCurrencyLocale.getAll(ctx)
         val adapter: ListAdapter = ArrayAdapterWithIcon(ctx, currencies)
         builder.setAdapter(adapter) { dialog: DialogInterface, which: Int ->
-            Analytics.settings_currency_changed.send()
             save(currencies[which])
             dialog.dismiss()
         }
@@ -41,6 +40,7 @@ class CurrencySelectionDialog(private val settingsController: SettingsFragment) 
     private fun save(cc: CountryCurrencyLocale) {
         if (Settings.getCountryCurrencyLocale(ctx) != cc) {
             Settings.setCountryCurrencyLocale(ctx, cc)
+            Analytics.settings_currency_changed.send()
             SnackHelper.show(ctx, ctx.getString(R.string.notify_changes_have_been_saved))
         }
         val intent = Intent(PaymentInputFragment.ACTION_INTENT_RESET_AMOUNT)

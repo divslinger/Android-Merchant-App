@@ -11,7 +11,8 @@ import kotlin.math.min
 data class CountryCurrencyLocale(@SerializedName("name") var name: String = "",
                                  @SerializedName("iso") var iso: String = "",
                                  @SerializedName("currency") var currency: String = "",
-                                 @SerializedName("lang") var lang: String = "") {
+                                 @SerializedName("lang") var lang: String = "",
+                                 @SerializedName("decimals") var decimals: Int = 2) {
     class CountryCurrencyList : ArrayList<CountryCurrencyLocale>(256)
 
     val locale: Locale
@@ -26,9 +27,10 @@ data class CountryCurrencyLocale(@SerializedName("name") var name: String = "",
 
     companion object {
         const val TAG = "CountryCurrency"
-        const val DEFAULT_CURRENCY = "USD"
-        const val DEFAULT_COUNTRY = "US"
-        const val DEFAULT_LOCALE = "en_US"
+        private const val DEFAULT_CURRENCY = "USD"
+        private const val DEFAULT_COUNTRY = "US"
+        private const val DEFAULT_LOCALE = "en_US"
+
         /**
          * It will return an empty string when not found or when currency is unknown.
          */
@@ -38,12 +40,11 @@ data class CountryCurrencyLocale(@SerializedName("name") var name: String = "",
             var countryIso = ""
             try {
                 countryIso = locale.country
-                Log.i(TAG, "Currency Locale.country: $countryIso")
                 val currency = Currency.getInstance(locale)
                 currencyCode = currency.currencyCode!!
-                Log.i(TAG, "Currency Code: " + currencyCode + " for locale: " + locale.displayName)
-                Log.i(TAG, "Currency Symbol: " + currency.symbol)
-                Log.i(TAG, "Currency Default Fraction Digits: " + currency.defaultFractionDigits)
+                Log.i(TAG, "Currency locale.country:$countryIso code:$currencyCode" +
+                        " for locale:${locale.displayName} symbol:${currency.symbol}" +
+                        " decimals:${currency.defaultFractionDigits}")
                 if (isCurrencySupported(context, currencyCode) && isCountrySupported(context, countryIso))
                     return get(context, currencyCode, countryIso, locale.toLanguageTag())
             } catch (e: Exception) {
@@ -97,14 +98,14 @@ data class CountryCurrencyLocale(@SerializedName("name") var name: String = "",
             return iso.substring(0, min(2, iso.length)).toUpperCase()
         }
 
-        private var ALL: CountryCurrencyList? = null
         private fun loadAll(context: Context): CountryCurrencyList {
             return AppUtil.readFromJsonFile(context, "CountryCurrency.json", CountryCurrencyList::class.java)
         }
 
+        private lateinit var ALL: CountryCurrencyList
         fun getAll(context: Context): CountryCurrencyList {
-            if (ALL == null) ALL = loadAll(context)
-            return ALL!!
+            if (!::ALL.isInitialized) ALL = loadAll(context)
+            return ALL
         }
 
         fun get(context: Context, currency: String, countryIso: String, langLocale: String): CountryCurrencyLocale {
@@ -113,7 +114,7 @@ data class CountryCurrencyLocale(@SerializedName("name") var name: String = "",
             all.forEach {
                 if (it.iso == countryIso && it.currency == currency) {
                     cc = it
-                    if (!langLocale.isEmpty()) {
+                    if (langLocale.isNotEmpty()) {
                         it.lang = langLocale
                     }
                 }

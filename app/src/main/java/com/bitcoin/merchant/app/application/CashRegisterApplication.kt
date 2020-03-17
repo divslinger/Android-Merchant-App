@@ -8,7 +8,8 @@ import com.bitcoin.merchant.app.util.Settings
 import com.bitcoin.merchant.app.util.WalletUtil
 
 class CashRegisterApplication : Application() {
-    private var walletUtil: WalletUtil? = null
+    lateinit var walletUtil: WalletUtil
+        private set
     lateinit var paymentProcessor: PaymentProcessor
         private set
     lateinit var db: DBControllerV3
@@ -29,9 +30,9 @@ class CashRegisterApplication : Application() {
     val wallet: WalletUtil
         get() {
             val xPub = Settings.getPaymentTarget(this).target
-            if (walletUtil == null || !walletUtil!!.isSameXPub(xPub)) {
+            if (!::walletUtil.isInitialized || !walletUtil.isSameXPub(xPub)) {
                 walletUtil = WalletUtil(getString(R.string.url_rest_bitcoin_com), xPub, this)
             }
-            return walletUtil!!
+            return walletUtil
         }
 }
