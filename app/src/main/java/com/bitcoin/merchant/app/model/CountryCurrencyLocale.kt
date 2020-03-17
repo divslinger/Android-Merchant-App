@@ -97,14 +97,14 @@ data class CountryCurrencyLocale(@SerializedName("name") var name: String = "",
             return iso.substring(0, min(2, iso.length)).toUpperCase()
         }
 
-        private var ALL: CountryCurrencyList? = null
         private fun loadAll(context: Context): CountryCurrencyList {
             return AppUtil.readFromJsonFile(context, "CountryCurrency.json", CountryCurrencyList::class.java)
         }
 
+        private lateinit var ALL: CountryCurrencyList
         fun getAll(context: Context): CountryCurrencyList {
-            if (ALL == null) ALL = loadAll(context)
-            return ALL!!
+            if (!::ALL.isInitialized) ALL = loadAll(context)
+            return ALL
         }
 
         fun get(context: Context, currency: String, countryIso: String, langLocale: String): CountryCurrencyLocale {
@@ -113,7 +113,7 @@ data class CountryCurrencyLocale(@SerializedName("name") var name: String = "",
             all.forEach {
                 if (it.iso == countryIso && it.currency == currency) {
                     cc = it
-                    if (!langLocale.isEmpty()) {
+                    if (langLocale.isNotEmpty()) {
                         it.lang = langLocale
                     }
                 }
