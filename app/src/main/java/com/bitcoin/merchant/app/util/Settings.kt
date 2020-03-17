@@ -1,8 +1,8 @@
 package com.bitcoin.merchant.app.util
 
 import android.content.Context
-import android.preference.PreferenceManager
 import android.util.Log
+import androidx.preference.PreferenceManager
 import com.bitcoin.merchant.app.model.CountryCurrencyLocale
 import com.bitcoin.merchant.app.model.PaymentTarget
 import org.bitcoindotcom.bchprocessor.bip70.GsonHelper.gson
@@ -118,7 +118,6 @@ object Settings {
         }
 
         fun getValue(name: String, value: String): String {
-            // TODO fix deprecation
             val prefs = PreferenceManager.getDefaultSharedPreferences(context)
             return prefs.getString(name, value) ?: ""
         }
