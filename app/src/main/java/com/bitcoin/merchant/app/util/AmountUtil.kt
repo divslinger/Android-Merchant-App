@@ -11,9 +11,8 @@ class AmountUtil(private val context: Context) {
         val ccl = Settings.getCountryCurrencyLocale(context)
         return try {
             val formatter = NumberFormat.getCurrencyInstance(ccl.locale)
-            val currency = Currency.getInstance(ccl.currency)
-            formatter.currency = currency
-            formatter.maximumFractionDigits = currency.defaultFractionDigits
+            formatter.currency = Currency.getInstance(ccl.currency)
+            formatter.maximumFractionDigits = ccl.decimals
             formatter.format(amountFiat).replace(CURRENCY_SIGN, ccl.currency)
         } catch (e: Exception) {
             Analytics.error_format_currency.sendError(e, ccl.locale.country, ccl.currency, ccl.locale.displayName)

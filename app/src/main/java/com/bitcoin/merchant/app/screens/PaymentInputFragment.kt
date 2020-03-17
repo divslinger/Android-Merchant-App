@@ -95,8 +95,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         val ccl = Settings.getCountryCurrencyLocale(activity)
         try {
             strDecimal = MonetaryUtil.instance.decimalFormatSymbols.decimalSeparator.toString()
-            val currency = Currency.getInstance(ccl.currency)
-            allowedDecimalPlaces = currency.defaultFractionDigits
+            allowedDecimalPlaces = ccl.decimals
             val enabled = allowedDecimalPlaces > 0
             val buttonView = rootView.findViewById<View>(R.id.buttonDecimal)
             buttonView.isEnabled = enabled
