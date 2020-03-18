@@ -371,10 +371,10 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private fun getTimeLimit(invoiceStatus: InvoiceStatus): Long {
         // Do NOT use invoiceStatus.getTime() because it won't reflect the current time
         // when a persisted invoice is restored
-        val expireGmt = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        expireGmt.time = invoiceStatus.expires
-        val currentTimeInUtcMillis = System.currentTimeMillis() - TimeZone.getDefault().rawOffset
-        return expireGmt.timeInMillis - currentTimeInUtcMillis
+        val now = System.currentTimeMillis()
+        val nowInUtc = now - TimeZone.getDefault().getOffset(now)
+        val expInUtc = invoiceStatus.expires.time
+        return expInUtc - nowInUtc
     }
 
     private fun initiateCountdown(invoiceStatus: InvoiceStatus) {
