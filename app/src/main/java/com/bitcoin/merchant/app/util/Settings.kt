@@ -32,14 +32,6 @@ object Settings {
         PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_PERSIST_INVOICE, "")
     }
 
-    fun setEulaAccepted(context: Context, accepted: Boolean) {
-        PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_EULA, accepted)
-    }
-
-    fun isEulaAccepted(context: Context): Boolean {
-        return PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_EULA, false)
-    }
-
     // User Settings - visible & editable by the user
     fun getMerchantName(context: Context): String {
         return PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_NAME, "")
@@ -104,7 +96,6 @@ object Settings {
             const val MERCHANT_KEY_MERCHANT_NAME = "receiving_name"
             const val MERCHANT_KEY_MERCHANT_RECEIVER = "receiving_address"
             const val MERCHANT_KEY_XPUB_INDEX = "xpub_index"
-            const val MERCHANT_KEY_EULA = "eula"
             const val MERCHANT_KEY_PERSIST_INVOICE = "persist_invoice"
             private lateinit var context: Context
             private lateinit var instance: PrefsUtil

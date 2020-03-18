@@ -53,9 +53,6 @@ open class MainActivity : AppCompatActivity() {
         title = "" // clear "Bitcoin Cash Register" from toolBar when opens on Payment Input screen
         listenToConnectivityChanges()
         Log.d(TAG, "Stored " + Settings.getPaymentTarget(this))
-        if (!Settings.isEulaAccepted(this)) {
-            DialogHelper.showEndUserLegalAgreement(this)
-        }
     }
 
     private fun listenToConnectivityChanges() {
