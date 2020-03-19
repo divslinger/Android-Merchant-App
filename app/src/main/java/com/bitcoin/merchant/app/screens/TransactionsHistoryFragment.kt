@@ -101,31 +101,25 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
     }
 
     private fun showTransactionMenu(item: Long) {
-        val tx = adapter.mListItems[item.toInt()]
-        val builder = AlertDialog.Builder(activity)
-        val txId = tx.getAsString("tx")
-        val address = tx.getAsString("iad")
-        builder.setTitle(txId)
-        builder.setIcon(R.mipmap.ic_launcher)
+        val paymentRecord = adapter.mListItems[item.toInt()].toPaymentRecord()
+        val txId = paymentRecord.tx ?: ""
         val emojiLink = String(Character.toChars(0x1F517))
+        val emojiClipboard = String(Character.toChars(0x1F4CB))
+        val builder = AlertDialog.Builder(activity)
+        builder.setTitle("${paymentRecord.fiatAmount} - ${Date(paymentRecord.timeInSec*1000)}")
+        builder.setIcon(R.mipmap.ic_launcher)
         builder.setItems(arrayOf<CharSequence>(
                 "$emojiLink ${getString(R.string.inspect_tx_link_view_transaction)}",
-                "$emojiLink ${getString(R.string.inspect_tx_link_view_all_transactions_with_this_address)}",
-                getString(R.string.inspect_tx_copy_transaction),
-                getString(R.string.inspect_tx_copy_address))
+                "$emojiClipboard ${getString(R.string.inspect_tx_copy_transaction)}")
         ) { dialog: DialogInterface, which: Int ->
             dialog.dismiss()
             when (which) {
                 0 -> Analytics.tx_id_explorer_launched.send()
-                1 -> Analytics.tx_address_explorer_launched.send()
-                2 -> Analytics.tx_id_copied.send()
-                3 -> Analytics.tx_address_copied.send()
+                1 -> Analytics.tx_id_copied.send()
             }
             when (which) {
                 0 -> openExplorer(getString(R.string.url_explorer_bitcoin_com) + "/bch/tx/$txId")
-                1 -> openExplorer(getString(R.string.url_explorer_bitcoin_com) + "/bch/address/$address")
-                2 -> copyToClipboard(txId)
-                3 -> copyToClipboard(address)
+                1 -> copyToClipboard(txId)
             }
         }
         builder.create().show()

@@ -37,8 +37,6 @@ interface Analytics {
     object tap_transactions : Analytics
     object tx_id_explorer_launched : Analytics
     object tx_id_copied : Analytics
-    object tx_address_explorer_launched : Analytics
-    object tx_address_copied : Analytics
 
     // List of errors
     object error_db_write_tx : AnalyticsError

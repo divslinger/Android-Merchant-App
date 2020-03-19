@@ -70,8 +70,6 @@
     <string name="notify_changes_have_been_saved">Los cambios han sido guardados</string>
     <string name="inspect_tx_link_view_transaction">View transaction</string>
     <string name="inspect_tx_copy_transaction">Copy transaction</string>
-    <string name="inspect_tx_copy_address">Copy address</string>
-    <string name="inspect_tx_link_view_all_transactions_with_this_address">View all TX with this address</string>
     <string name="ad_content_bitcoincom_exchange">50+ trading pairs and SLP token support</string>
     <string name="ad_content_bitcoincom_wallet">Store, exchange, buy, and sell Bitcoin with the fastest wallet ever.</string>
     <string name="share_invoice_msg">Please pay your invoice here: %1$s</string>
