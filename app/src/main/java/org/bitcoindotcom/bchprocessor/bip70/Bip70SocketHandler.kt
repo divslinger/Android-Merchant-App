@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.model.Analytics
 import com.neovisionaries.ws.client.WebSocket
 import com.neovisionaries.ws.client.WebSocketFactory
@@ -11,8 +12,8 @@ import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 import java.io.IOException
 
-class Bip70SocketHandler(private val context: Context, invoiceId: String) : WebSocketHandler() {
-    private val url = "wss://pay.bitcoin.com/s/$invoiceId"
+class Bip70SocketHandler(private val context: Context, val invoiceId: String) : WebSocketHandler() {
+    private val url = "${context.getText(R.string.bip70_bitcoin_com_socket)}/s/$invoiceId"
 
     @Throws(IOException::class)
     override fun createWebSocket(factory: WebSocketFactory): WebSocket {

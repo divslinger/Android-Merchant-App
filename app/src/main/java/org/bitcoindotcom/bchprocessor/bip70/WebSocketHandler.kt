@@ -20,7 +20,6 @@ import java.util.*
  */
 abstract class WebSocketHandler {
     private val webSocketFactory = WebSocketFactory()
-    protected var TAG = "BCR-WebSocketHandler"
     @Volatile
     private var handler: ConnectionHandler? = null
 
@@ -89,6 +88,7 @@ abstract class WebSocketHandler {
         private val sentMessageSet: MutableSet<String> = HashSet()
         private val mConnection: WebSocket?
         private var timeLastAlive: Long
+
         @Volatile
         private var autoReconnect = true
 
@@ -178,6 +178,7 @@ abstract class WebSocketHandler {
     }
 
     companion object {
+        var TAG = "BCR-WebSocketHandler"
         private const val PING_INTERVAL = 20 * 1000L // ping every 20 seconds
         fun notifyConnectionStatus(context: Context, connected: Boolean) {
             val i = Intent(Bip70Action.UPDATE_CONNECTION_STATUS)

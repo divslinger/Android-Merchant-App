@@ -28,7 +28,7 @@ import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.Settings
 
 class SettingsFragment : ToolbarAwareFragment() {
-    private val TAG = "BCR-SettingsFragment"
+    private val TAG = "BCR-Settings"
     private lateinit var rootView: View
     private lateinit var lvMerchantName: LinearLayout
     private lateinit var lvPaymentAddress: LinearLayout
