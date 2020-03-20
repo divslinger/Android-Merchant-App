@@ -129,7 +129,7 @@ class WalletUtil(private val urlRestBitcoinCom: String, private val xPub: String
             } catch (e: Exception) {
                 Analytics.error_db_read_address.sendError(e)
                 addresses = HashSet()
-                Log.e(TAG, "Unable to load addresses from TX history")
+                Log.e(TAG, "Unable to load addresses from TX history", e)
             }
             usedAddresses = Collections.synchronizedSet(addresses)
         }
