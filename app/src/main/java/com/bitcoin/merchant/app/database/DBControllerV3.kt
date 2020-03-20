@@ -8,8 +8,6 @@ import android.os.Build
 import android.util.Log
 import com.bitcoin.merchant.app.application.CashRegisterApplication
 import com.bitcoin.merchant.app.model.Analytics
-import org.bitcoinj.crypto.AESUtil
-import org.bitcoinj.crypto.CharSequenceX
 import java.util.*
 
 fun ContentValues.toPaymentRecord(): PaymentRecord {
@@ -52,9 +50,7 @@ class DBControllerV3(app: CashRegisterApplication?) : SQLiteOpenHelper(app, DB, 
     }
 
     override fun onUpgrade(database: SQLiteDatabase, version_old: Int, current_version: Int) {
-        val query: String
-        query = "DROP TABLE IF EXISTS $TABLE"
-        database.execSQL(query)
+        database.execSQL("DROP TABLE IF EXISTS $TABLE")
         onCreate(database)
     }
 
@@ -83,7 +79,7 @@ class DBControllerV3(app: CashRegisterApplication?) : SQLiteOpenHelper(app, DB, 
             database = this.readableDatabase
             c = database.rawQuery(selectQuery, arrayOf(tx))
             if (c.moveToFirst()) {
-                vals = parseRecord(c)
+                vals = parseTx(c)
             }
         } finally {
             closeAll(database, c)
@@ -91,7 +87,6 @@ class DBControllerV3(app: CashRegisterApplication?) : SQLiteOpenHelper(app, DB, 
         return vals
     }
 
-    // decrypt and overwrite decrypted
     @get:Throws(Exception::class)
     val allPayments: ArrayList<ContentValues>
         get() {
@@ -104,78 +99,31 @@ class DBControllerV3(app: CashRegisterApplication?) : SQLiteOpenHelper(app, DB, 
                 c = database.rawQuery(selectQuery, null)
                 if (c.moveToFirst()) {
                     do {
-                        val vals = parseRecord(c)
-                        data.add(vals)
+                        parseTx(c)?.let { data.add(it) }
                     } while (c.moveToNext())
                 }
             } finally {
                 closeAll(database, c)
             }
-            // decrypt and overwrite decrypted
-            formatDecryptAndResave(data)
             return data
         }
 
-    private fun parseRecord(c: Cursor): ContentValues {
-        val vals = ContentValues()
-        vals.put("_id", c.getString(0))
-        vals.put("ts", c.getLong(1))
-        vals.put("iad", c.getString(2))
-        vals.put("amt", c.getString(3))
-        vals.put("famt", c.getString(4))
-        vals.put("cfm", c.getString(5))
-        vals.put("msg", c.getString(6))
-        vals.put("tx", c.getString(7))
-        return vals
-    }
-
-    private fun formatDecryptAndResave(data: ArrayList<ContentValues>) {
-        var database: SQLiteDatabase? = null
-        try {
-            for (i in data.indices) {
-                val vals = data[i]
-                try {
-                    formatValues(vals)
-                } catch (e: Exception) { // decrypt
-                    decrypt(vals, "iad")
-                    decrypt(vals, "amt")
-                    decrypt(vals, "famt")
-                    decrypt(vals, "cfm")
-                    decrypt(vals, "msg")
-                    decrypt(vals, "tx")
-                    Log.i(TAG, "decrypted record:" + vals["_id"])
-                    // resave
-                    if (database == null) {
-                        database = this.writableDatabase
-                    }
-                    val result = database!!.update(TABLE, vals, "_id=" + vals["_id"], null)
-                    Log.i(TAG, "resaved record:" + vals["_id"] + ", update:" + result)
-                    // format
-                    formatValues(vals)
-                }
-            }
-        } finally {
-            closeAll(database, null)
+    private fun parseTx(c: Cursor): ContentValues? {
+        val cv = ContentValues()
+        return try {
+            cv.put("_id", c.getString(0))
+            cv.put("ts", c.getLong(1))
+            cv.put("iad", c.getString(2))
+            cv.put("amt", c.getString(3).toLong())
+            cv.put("famt", c.getString(4))
+            cv.put("cfm", c.getString(5).toInt())
+            cv.put("msg", c.getString(6))
+            cv.put("tx", c.getString(7))
+            cv
+        } catch (e: Exception) {
+            Log.v(TAG, "invalid DB TX found, probably an obsolete encrypted record: $cv")
+            null
         }
-    }
-
-    private fun decryptValue(value: String): String {
-        if (pw == null) {
-            pw = CharSequenceX("pin$salt") // legacy code
-        }
-        return AESUtil.decrypt(value, pw, AESUtil.PinPbkdf2Iterations)
-    }
-
-    private fun decrypt(vals: ContentValues, name: String) {
-        val value = vals.getAsString(name)
-        if (value != null) {
-            vals.put(name, decryptValue(value))
-        }
-    }
-
-    private fun formatValues(vals: ContentValues) {
-        vals.put("amt", vals.getAsString("amt").toLong())
-        vals.put("cfm", vals.getAsString("cfm").toInt())
     }
 
     @get:Throws(Exception::class)
@@ -190,8 +138,7 @@ class DBControllerV3(app: CashRegisterApplication?) : SQLiteOpenHelper(app, DB, 
                 cursor = database.rawQuery(selectQuery, null)
                 if (cursor.moveToFirst()) {
                     do {
-                        val decrypt = decryptValue(cursor.getString(0))
-                        data.add(decrypt)
+                        data.add(cursor.getString(0))
                     } while (cursor.moveToNext())
                 }
             } finally {
@@ -215,7 +162,5 @@ class DBControllerV3(app: CashRegisterApplication?) : SQLiteOpenHelper(app, DB, 
         private const val TAG = "BCR-DBControllerV3"
         private const val DB = "paymentsV3.db"
         private const val TABLE = "payment"
-        private var pw: CharSequenceX? = null
     }
-
 }
