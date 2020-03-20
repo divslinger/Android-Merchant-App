@@ -21,7 +21,6 @@ import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.model.PaymentTarget
@@ -87,8 +86,12 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         exitScreen()
     }
 
+    private var lastConnectionStatusEnabled: Boolean = false
     private fun updateConnectionStatus(enabled: Boolean) {
-        Log.d(MainActivity.TAG, "Socket " + if (enabled) "connected" else "disconnected")
+        if (lastConnectionStatusEnabled != enabled) {
+            lastConnectionStatusEnabled = enabled
+            Log.d(TAG, "Socket " + if (enabled) "connected" else "disconnected")
+        }
         tvConnectionStatus.setImageResource(if (enabled) R.drawable.connected else R.drawable.disconnected)
     }
 
@@ -97,7 +100,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             return
         }
         Analytics.invoice_paid.send()
-        Log.i(MainActivity.TAG, "record new Tx:$i")
+        Log.i(TAG, "record new Tx:$i")
         val fiatFormatted = AmountUtil(activity).formatFiat(i.fiatTotal)
         app.paymentProcessor.recordInDatabase(i, fiatFormatted)
         showCheckMark()
@@ -111,7 +114,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         Settings.deleteActiveInvoice(activity)
         // Check that it has not yet been processed to avoid redundant processing
         if (lastProcessedInvoicePaymentId == invoiceStatus.paymentId) {
-            Log.i(MainActivity.TAG, "Already processed invoice:$invoiceStatus")
+            Log.i(TAG, "Already processed invoice:$invoiceStatus")
             return true
         }
         lastProcessedInvoicePaymentId = invoiceStatus.paymentId
@@ -151,22 +154,28 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
 
     private fun createNewInvoice(amountFiat: Double) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val invoiceRequest = withContext(Dispatchers.IO) {
-                createInvoice(amountFiat, Settings.getCountryCurrencyLocale(activity).currency)
-            }
+            // InvoiceRequest is the slowest when deriving a PubKey from an xPub
+            // but even in that situation, it is fast enough to be executed
+            // in the main thread instead of withContext(Dispatchers.IO)
+            val invoiceRequest = createInvoiceRequest(amountFiat, Settings.getCountryCurrencyLocale(activity).currency)
             if (invoiceRequest == null) {
                 unableToDisplayInvoice()
             } else {
                 // do NOT delete active invoice too early
-                // because this Fragment is always instantiated below the PaymentRequest
+                // because PaymentInput Fragment must always be instantiated below the PaymentRequest Fragment
                 // when resuming from a crash on the PaymentRequest
                 Settings.deleteActiveInvoice(activity)
                 tvFiatAmount.text = AmountUtil(activity).formatFiat(amountFiat)
-                if (BCH_AMOUNT_DISPLAYED) tvCoinAmount.visibility = View.INVISIBLE  // default values are incorrect
+                tvFiatAmount.visibility = View.VISIBLE
                 setWorkInProgress(true)
-                val invoice: InvoiceStatus? = downloadInvoice(invoiceRequest)
-                invoice?.let {
-                    connectToSocketAndGenerateQrCode(invoice)?.also { showQrCodeAndAmountFields(invoice, it) }
+                downloadInvoice(invoiceRequest)?.let { invoice ->
+                    generateQrCode(invoice)?.also {
+                        showQrCodeAndAmountFields(invoice, it)
+                        // only save invoice & send analytics after updating the UI to improve user experience
+                        Settings.setActiveInvoice(activity, invoice)
+                        Analytics.invoice_created.send()
+                        connectToSocket(invoice)
+                    }
                 }
                 setWorkInProgress(false)
             }
@@ -180,9 +189,11 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         } else {
             viewLifecycleOwner.lifecycleScope.launch {
                 setWorkInProgress(true)
-                tvFiatAmount.visibility = View.INVISIBLE  // default values are incorrect
-                if (BCH_AMOUNT_DISPLAYED) tvCoinAmount.visibility = View.INVISIBLE  // default values are incorrect
-                connectToSocketAndGenerateQrCode(invoice)?.also { showQrCodeAndAmountFields(invoice, it) }
+                generateQrCode(invoice)?.also {
+                    showQrCodeAndAmountFields(invoice, it)
+                    Log.i(TAG, "${System.currentTimeMillis() - startMs}")
+                    connectToSocket(invoice)
+                }
                 setWorkInProgress(false)
             }
         }
@@ -223,13 +234,14 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         ivCancel = v.findViewById(R.id.iv_cancel)
         ivDone = v.findViewById(R.id.iv_done)
         fabShare = v.findViewById(R.id.fab_share)
-        setWorkInProgress(true)
         ivCancel.setOnClickListener { deleteActiveInvoiceAndExitScreen() }
         ivReceivingQr.setOnClickListener { copyQrCodeToClipboard() }
         fabShare.setOnClickListener { qrCodeUri?.let { startShareIntent(it) } }
+        tvFiatAmount.visibility = View.INVISIBLE // hide invalid value
         waitingLayout.visibility = View.VISIBLE
         receivedLayout.visibility = View.GONE
         tvCoinAmount.visibility = if (BCH_AMOUNT_DISPLAYED) View.INVISIBLE else View.GONE
+        setWorkInProgress(true)
     }
 
     private fun setWorkInProgress(enabled: Boolean) {
@@ -256,14 +268,14 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             clipboard.setPrimaryClip(clip)
             val emojiClipboard = String(Character.toChars(0x1F4CB))
             SnackHelper.show(activity, emojiClipboard + " ${qrCodeUri}")
-            Log.i(MainActivity.TAG, "Copied to clipboard: $qrCodeUri")
+            Log.i(TAG, "Copied to clipboard: $qrCodeUri")
         } catch (e: Exception) {
             Analytics.error_copy_to_clipboard.sendError(e)
-            Log.i(MainActivity.TAG, "Failed to copy to clipboard: $qrCodeUri")
+            Log.i(TAG, "Failed to copy to clipboard: $qrCodeUri")
         }
     }
 
-    private fun createInvoice(amountFiat: Double, currency: String): InvoiceRequest? {
+    private fun createInvoiceRequest(amountFiat: Double, currency: String): InvoiceRequest? {
         val paymentTarget = Settings.getPaymentTarget(activity)
         val i = InvoiceRequest("" + amountFiat, currency)
         when (paymentTarget.type) {
@@ -277,10 +289,10 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 // because the BIP-70 server is the one only broadcasting the TX to that address
                 // and thus it is aware of which invoice is being paid without possible confusion
                 i.address = app.wallet.getAddressFromXPubAndMoveToNext()
-                Log.i(MainActivity.TAG, "BCH-address(xPub) to receive: " + i.address)
+                Log.i(TAG, "BCH-address(xPub) to receive: " + i.address)
             } catch (e: Exception) {
                 Analytics.error_generate_address_from_xpub.sendError(e)
-                Log.e(MainActivity.TAG, "", e)
+                Log.e(TAG, "", e)
                 return null
             }
         }
@@ -291,11 +303,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         return withContext(Dispatchers.IO) {
             try {
                 val response: Response<InvoiceStatus?> = bip70PayService.createInvoice(request).execute()
-                val invoice = response.body()
+                response.body()
                         ?: throw Exception("HTTP status:" + response.code() + " message:" + response.message())
-                Analytics.invoice_created.send()
-                Settings.setActiveInvoice(activity, invoice)
-                invoice
             } catch (e: Exception) {
                 Analytics.error_download_invoice.sendError(e)
                 DialogHelper.show(activity, activity.getString(R.string.error), e.message) { exitScreen() }
@@ -304,16 +313,20 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         }
     }
 
-    private suspend fun connectToSocketAndGenerateQrCode(invoice: InvoiceStatus): Bitmap? {
+    private suspend fun connectToSocket(invoice: InvoiceStatus) {
+        return withContext(Dispatchers.IO) {
+            // analytics already sent inside websockets
+            bip70Manager.startWebsockets(invoice.paymentId)
+        }
+    }
+
+    private suspend fun generateQrCode(invoice: InvoiceStatus): Bitmap? {
         return withContext(Dispatchers.IO) {
             try {
-                // connect the socket first before showing the bitmap as connection takes longer
-                bip70Manager.startWebsockets(invoice.paymentId)
                 qrCodeUri = invoice.walletUri
-                Log.d(MainActivity.TAG, "paymentUrl:${invoice.walletUri}")
                 QrCodeUtil.getBitmap(invoice.walletUri, activity.resources.getInteger(R.integer.qr_code_width))
             } catch (e: Exception) {
-                // analytics already sent inside websockets & qr generation
+                // analytics already sent inside qr generation
                 DialogHelper.show(activity, activity.getString(R.string.error), e.message) { exitScreen() }
                 null
             }
@@ -398,7 +411,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             val shareIntent = Intent.createChooser(sendIntent, null)
             shareIntent?.let { startActivity(it) }
         } catch (e: Exception) {
-            Log.e(MainActivity.TAG, "", e)
+            Log.e(TAG, "", e)
         }
     }
 
@@ -408,6 +421,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         }
 
     companion object {
+        private const val TAG = "BCR-PaymentRequest"
         var startMs: Long = 0
 
         // BCH amount is hidden as deemed non-necessary because it is shown on the customer wallet
