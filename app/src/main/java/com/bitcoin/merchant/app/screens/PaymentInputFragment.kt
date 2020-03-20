@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.model.Analytics
@@ -19,7 +20,13 @@ import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AmountUtil
 import com.bitcoin.merchant.app.util.MonetaryUtil
+import com.bitcoin.merchant.app.util.QrCodeUtil
 import com.bitcoin.merchant.app.util.Settings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.bitcoindotcom.bchprocessor.bip70.Bip70Manager
+import org.bitcoindotcom.bchprocessor.bip70.Bip70SocketHandler
 import java.text.NumberFormat
 import java.util.*
 
@@ -196,7 +203,17 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         }
     }
 
+    var warmedUp = false
+
     private fun digitPressed(digit: String) {
+        if (!warmedUp) {
+            warmedUp = true
+            // the 2 next methods have no effect except saving about 500 ms of time
+            // during the generation of the first invoice in PaymentRequestFragment
+            // this provides a better user experience on some phones
+            warmUpSocketConnection()
+            warmUpQrCodeImageGeneration()
+        }
         val amountText = tvAmount.text.toString()
         if (amountText == "0") {
             tvAmount.text = digit
@@ -215,6 +232,31 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         tvAmount.append(digit)
     }
 
+    private fun warmUpQrCodeImageGeneration() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    QrCodeUtil.getBitmap("Test", 32)
+                } catch (e: Exception) {
+                    Log.e(TAG, "", e)
+                }
+            }
+        }
+    }
+
+    private fun warmUpSocketConnection() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    Bip70Manager(app)
+                    Bip70SocketHandler(app, "")
+                } catch (e: Exception) {
+                    Log.e(TAG, "", e)
+                }
+            }
+        }
+    }
+
     private fun updateAmounts() {
         amountPayableFiat = try {
             getAmountFromUI()
@@ -230,7 +272,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     private fun getAmountFromUI() = (nf.parse(tvAmount.text.toString()) ?: 0.0).toDouble()
 
     companion object {
-        private const val TAG = "BCR-PaymentInputFragment"
+        private const val TAG = "BCR-PaymentInput"
         const val ACTION_INTENT_RESET_AMOUNT = "RESET_AMOUNT"
         var AMOUNT_PAYABLE_FIAT = "AMOUNT_PAYABLE_FIAT"
     }
