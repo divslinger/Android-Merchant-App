@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils
 import org.bitcoinj.core.Xpub
 
 data class PaymentTarget(val type: Type, val target: String) {
-    val TAG = "PaymentTarget"
+    val TAG = "BCR-PaymentTarget"
     val isValid = type != Type.INVALID
     val isXPub = type == Type.XPUB
     val isApiKey = type == Type.API_KEY

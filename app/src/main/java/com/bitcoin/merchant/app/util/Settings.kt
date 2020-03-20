@@ -9,7 +9,7 @@ import org.bitcoindotcom.bchprocessor.bip70.GsonHelper.gson
 import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 
 object Settings {
-    const val TAG = "Settings"
+    const val TAG = "BCR-Settings"
 
     // Internal Settings - non editable by the user
     fun getActiveInvoice(context: Context): InvoiceStatus? {

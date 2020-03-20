@@ -197,7 +197,7 @@ open class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val TAG = "MainActivity"
+        const val TAG = "BCR-MainActivity"
         const val APP_PACKAGE = "com.bitcoin.merchant.app"
         fun getNav(activity: Activity): NavController {
             return Navigation.findNavController(activity, R.id.main_nav_controller)

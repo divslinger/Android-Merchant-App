@@ -26,7 +26,7 @@ data class CountryCurrencyLocale(@SerializedName("name") var name: String = "",
         }
 
     companion object {
-        const val TAG = "CountryCurrency"
+        const val TAG = "BCR-CountryCurrency"
         private const val DEFAULT_CURRENCY = "USD"
         private const val DEFAULT_COUNTRY = "US"
         private const val DEFAULT_LOCALE = "en_US"

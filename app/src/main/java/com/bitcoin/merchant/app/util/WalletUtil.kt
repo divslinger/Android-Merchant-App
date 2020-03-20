@@ -136,7 +136,7 @@ class WalletUtil(private val urlRestBitcoinCom: String, private val xPub: String
     }
 
     companion object {
-        const val TAG = "WalletUtil"
+        const val TAG = "BCR-WalletUtil"
         @Throws(AddressFormatException::class)
         fun createMasterPubKeyFromXPub(xpubstr: String?): DeterministicKey {
             val xpubBytes = Base58.decodeChecked(xpubstr)

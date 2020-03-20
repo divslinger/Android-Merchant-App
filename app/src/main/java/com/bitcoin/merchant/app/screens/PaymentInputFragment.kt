@@ -230,7 +230,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     private fun getAmountFromUI() = (nf.parse(tvAmount.text.toString()) ?: 0.0).toDouble()
 
     companion object {
-        private const val TAG = "PaymentInputFragment"
+        private const val TAG = "BCR-PaymentInputFragment"
         const val ACTION_INTENT_RESET_AMOUNT = "RESET_AMOUNT"
         var AMOUNT_PAYABLE_FIAT = "AMOUNT_PAYABLE_FIAT"
     }

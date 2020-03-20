@@ -263,6 +263,6 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
     }
 
     companion object {
-        private const val TAG = "TransactionsHistory"
+        private const val TAG = "BCR-TransactionsHistory"
     }
 }

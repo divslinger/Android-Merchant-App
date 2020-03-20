@@ -26,7 +26,7 @@ class AmountUtil(private val context: Context) {
     }
 
     companion object {
-        const val TAG = "AmountUtil"
+        const val TAG = "BCR-AmountUtil"
         const val DEFAULT_CURRENCY_BCH = "BCH"
         const val CURRENCY_SIGN = "\u00a4"
     }

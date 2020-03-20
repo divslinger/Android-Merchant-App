@@ -20,7 +20,7 @@ import java.util.*
  */
 abstract class WebSocketHandler {
     private val webSocketFactory = WebSocketFactory()
-    protected var TAG = "WebSocketHandler"
+    protected var TAG = "BCR-WebSocketHandler"
     @Volatile
     private var handler: ConnectionHandler? = null
 

@@ -212,7 +212,7 @@ class DBControllerV3(app: CashRegisterApplication?) : SQLiteOpenHelper(app, DB, 
     }
 
     companion object {
-        private const val TAG = "DBControllerV3"
+        private const val TAG = "BCR-DBControllerV3"
         private const val DB = "paymentsV3.db"
         private const val TABLE = "payment"
         private var pw: CharSequenceX? = null
