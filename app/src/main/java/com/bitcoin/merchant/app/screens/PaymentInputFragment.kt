@@ -159,6 +159,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         if (!isAdded) {
             return
         }
+        PaymentRequestFragment.startMs = System.currentTimeMillis();
         if (validateAmount()) {
             Analytics.invoice_checkout.send()
             updateAmounts()

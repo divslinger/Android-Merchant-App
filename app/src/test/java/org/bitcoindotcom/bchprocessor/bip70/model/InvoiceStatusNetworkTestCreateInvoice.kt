@@ -2,7 +2,7 @@ package org.bitcoindotcom.bchprocessor.bip70.model
 
 import org.bitcoindotcom.bchprocessor.bip70.GsonHelper
 import org.bitcoindotcom.bchprocessor.bip70.Bip70PayService
-import org.junit.jupiter.api.Test
+import org.junit.Test
 
 internal class InvoiceStatusNetworkTestCreateInvoice {
     @Test

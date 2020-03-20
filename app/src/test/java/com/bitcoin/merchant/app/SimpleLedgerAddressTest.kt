@@ -1,10 +1,8 @@
 package com.bitcoin.merchant.app
 
 import com.bitcoin.merchant.app.util.AddressUtil
-import org.bitcoinj.core.SlpAddress
-import org.bitcoinj.params.MainNetParams
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 internal class SimpleLedgerAddressTest {
     @Test

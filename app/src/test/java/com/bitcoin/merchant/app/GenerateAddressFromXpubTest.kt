@@ -1,12 +1,12 @@
 package com.bitcoin.merchant.app
 
 import com.bitcoin.merchant.app.util.WalletUtil
+import org.junit.Assert.assertEquals
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.ChildNumber
 import org.bitcoinj.crypto.HDKeyDerivation
 import org.bitcoinj.params.MainNetParams
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import org.junit.Test
 
 internal class GenerateAddressFromXpubTest {
     @Test

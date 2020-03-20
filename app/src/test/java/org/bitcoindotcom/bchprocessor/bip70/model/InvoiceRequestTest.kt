@@ -1,8 +1,8 @@
 package org.bitcoindotcom.bchprocessor.bip70.model
 
 import org.bitcoindotcom.bchprocessor.bip70.GsonHelper
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 internal class InvoiceRequestTest {
     @Test

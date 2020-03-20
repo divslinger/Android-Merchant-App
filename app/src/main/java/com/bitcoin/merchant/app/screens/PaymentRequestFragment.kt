@@ -3,8 +3,6 @@ package com.bitcoin.merchant.app.screens
 import android.content.*
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
-import android.graphics.Color.BLACK
-import android.graphics.Color.WHITE
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -30,14 +28,8 @@ import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
-import com.bitcoin.merchant.app.util.AmountUtil
-import com.bitcoin.merchant.app.util.AppUtil
-import com.bitcoin.merchant.app.util.MonetaryUtil
-import com.bitcoin.merchant.app.util.Settings
+import com.bitcoin.merchant.app.util.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.MultiFormatWriter
-import com.google.zxing.common.BitMatrix
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -319,39 +311,12 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 bip70Manager.startWebsockets(invoice.paymentId)
                 qrCodeUri = invoice.walletUri
                 Log.d(MainActivity.TAG, "paymentUrl:${invoice.walletUri}")
-                val width = activity.resources.getInteger(R.integer.qr_code_width)
-                getQrCodeAsBitmap(invoice.walletUri, width)
+                QrCodeUtil.getBitmap(invoice.walletUri, activity.resources.getInteger(R.integer.qr_code_width))
             } catch (e: Exception) {
                 // analytics already sent inside websockets & qr generation
                 DialogHelper.show(activity, activity.getString(R.string.error), e.message) { exitScreen() }
                 null
             }
-        }
-    }
-
-    @Throws(Exception::class)
-    private fun getQrCodeAsBitmap(text: String, width: Int): Bitmap {
-        try {
-            val result: BitMatrix = try {
-                MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, width, null)
-            } catch (e: Exception) {
-                throw Exception("Unsupported format", e)
-            }
-            val w = result.width
-            val h = result.height
-            val pixels = IntArray(w * h)
-            for (y in 0 until h) {
-                val offset = y * w
-                for (x in 0 until w) {
-                    pixels[offset + x] = if (result.get(x, y)) BLACK else WHITE
-                }
-            }
-            val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-            bitmap.setPixels(pixels, 0, width, 0, 0, w, h)
-            return bitmap
-        } catch (e: Exception) {
-            Analytics.error_generate_qr_code.sendError(e)
-            throw e
         }
     }
 
@@ -443,6 +408,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         }
 
     companion object {
+        var startMs: Long = 0
+
         // BCH amount is hidden as deemed non-necessary because it is shown on the customer wallet
         private const val BCH_AMOUNT_DISPLAYED = false
     }

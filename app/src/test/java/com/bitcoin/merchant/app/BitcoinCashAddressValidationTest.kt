@@ -1,7 +1,7 @@
 package com.bitcoin.merchant.app
 
 import com.bitcoin.merchant.app.util.AddressUtil
-import org.junit.jupiter.api.Test
+import org.junit.Test
 
 internal class BitcoinCashAddressValidationTest {
     @Test
