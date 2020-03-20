@@ -20,7 +20,7 @@ class Bip70SocketHandler(private val context: Context, val invoiceId: String) : 
         return factory.createSocket(url)
     }
 
-    override fun parseInvoice(message: String?) {
+    override fun parseMessage(message: String?) {
         try {
             val status = InvoiceStatus.fromJson(message)
             Log.i(TAG, status.toString())

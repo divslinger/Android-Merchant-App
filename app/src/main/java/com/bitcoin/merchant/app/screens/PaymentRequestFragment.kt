@@ -316,7 +316,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private suspend fun connectToSocket(invoice: InvoiceStatus) {
         return withContext(Dispatchers.IO) {
             // analytics already sent inside websockets
-            bip70Manager.startWebsockets(invoice.paymentId)
+            bip70Manager.startSocket(invoice.paymentId)
         }
     }
 

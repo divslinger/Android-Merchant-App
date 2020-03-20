@@ -22,7 +22,7 @@ class Bip70Manager(val app: Application) {
         }
     }
 
-    fun startWebsockets(invoiceId: String) {
+    fun startSocket(invoiceId: String) {
         val ms = System.currentTimeMillis()
         socketHandler = Bip70SocketHandler(app, invoiceId)
         socketHandler?.start()

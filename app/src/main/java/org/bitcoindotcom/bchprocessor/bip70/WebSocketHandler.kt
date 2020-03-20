@@ -56,7 +56,7 @@ abstract class WebSocketHandler {
     @Throws(IOException::class)
     protected abstract fun createWebSocket(factory: WebSocketFactory): WebSocket
 
-    protected abstract fun parseInvoice(message: String?)
+    protected abstract fun parseMessage(message: String?)
 
     private inner class ConnectionThread : Thread() {
         override fun run() {
@@ -122,7 +122,7 @@ abstract class WebSocketHandler {
         }
 
         override fun onTextMessage(websocket: WebSocket, message: String) {
-            parseInvoice(message)
+            parseMessage(message)
         }
 
         fun setAutoReconnect(autoReconnect: Boolean) {
