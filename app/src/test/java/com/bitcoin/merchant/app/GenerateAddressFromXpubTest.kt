@@ -1,5 +1,6 @@
 package com.bitcoin.merchant.app
 
+import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.util.WalletUtil
 import org.junit.Assert.assertEquals
 import org.bitcoinj.core.ECKey
@@ -36,6 +37,18 @@ internal class GenerateAddressFromXpubTest {
         println(legacyAddress1)
         println(legacyAddress2)
         assert(legacyAddress1 != legacyAddress2)
+    }
+
+    @Test
+    fun validateXpub() {
+        val xpub = "xpub6CUGRUonZSQ4TWtTMmzXdrXDtypWKiKrhko4egpiMZbpiaQL2jkwSB1icqYh2cfDfVxdx4df189oLKnC5fSwqPfgyP3hooxujYzAu3fDVmz"
+        assert(PaymentTarget.parse(xpub).isValid)
+    }
+
+    @Test
+    fun validateInvalidXpub() {
+        val xpub = "xpub6CUGRUonZSQ4TWtTMmzXdrXDtyYh2cfDfVxdx4df189oLKnC5fSwqPfgyP3hooxujYzAu3fDVmz"
+        assert(!PaymentTarget.parse(xpub).isValid)
     }
 
     private fun generateAddress(xpub: String, index: Int): String {
