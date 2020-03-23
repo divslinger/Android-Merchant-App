@@ -367,7 +367,12 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 }
             }
 
-            override fun onFinish() {}
+            override fun onFinish() {
+                if (isAdded) {
+                    Settings.deleteActiveInvoice(activity)
+                    exitScreen()
+                }
+            }
         }.start()
     }
 
