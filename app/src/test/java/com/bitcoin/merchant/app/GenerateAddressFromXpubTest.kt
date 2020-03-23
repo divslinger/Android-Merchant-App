@@ -21,10 +21,7 @@ internal class GenerateAddressFromXpubTest {
     fun generateReceiveAddressFromXpub() {
         val xpub = "xpub6CUGRUonZSQ4TWtTMmzXdrXDtypWKiKrhko4egpiMZbpiaQL2jkwSB1icqYh2cfDfVxdx4df189oLKnC5fSwqPfgyP3hooxujYzAu3fDVmz"
         val index = 0
-        val accountKey = WalletUtil.createMasterPubKeyFromXPub(xpub)
-        val dk = HDKeyDerivation.deriveChildKey(accountKey, ChildNumber(index, false))
-        val ecKey = ECKey.fromPublicOnly(dk.pubKey)
-        val legacyAddress = ecKey.toAddress(MainNetParams.get()).toBase58()
+        val legacyAddress = generateAddress(xpub, index)
         println(legacyAddress)
         assertEquals(legacyAddress, "1HZhTawZTGXaphD2Ut1qhfC2Sij1WKQydE")
     }
@@ -32,17 +29,19 @@ internal class GenerateAddressFromXpubTest {
     @Test
     fun verifyDifferentIndexesAreDifferentAddresses() {
         val xpub = "xpub6CUGRUonZSQ4TWtTMmzXdrXDtypWKiKrhko4egpiMZbpiaQL2jkwSB1icqYh2cfDfVxdx4df189oLKnC5fSwqPfgyP3hooxujYzAu3fDVmz"
-        val index1 = 0
-        val index2 = 1
-        val accountKey = WalletUtil.createMasterPubKeyFromXPub(xpub)
-        val dk1 = HDKeyDerivation.deriveChildKey(accountKey, ChildNumber(index1, false))
-        val ecKey1 = ECKey.fromPublicOnly(dk1.pubKey)
-        val legacyAddress1 = ecKey1.toAddress(MainNetParams.get()).toBase58()
-        val dk2 = HDKeyDerivation.deriveChildKey(accountKey, ChildNumber(index2, false))
-        val ecKey2 = ECKey.fromPublicOnly(dk2.pubKey)
-        val legacyAddress2 = ecKey2.toAddress(MainNetParams.get()).toBase58()
+        val index0 = 0
+        val index1 = 1
+        val legacyAddress1 = generateAddress(xpub, index0)
+        val legacyAddress2 = generateAddress(xpub, index1)
         println(legacyAddress1)
         println(legacyAddress2)
         assert(legacyAddress1 != legacyAddress2)
+    }
+
+    private fun generateAddress(xpub: String, index: Int): String {
+        val accountKey = WalletUtil.createMasterPubKeyFromXPub(xpub)
+        val dk = HDKeyDerivation.deriveChildKey(accountKey, ChildNumber(index, false))
+        val ecKey = ECKey.fromPublicOnly(dk.pubKey)
+        return ecKey.toAddress(MainNetParams.get()).toBase58()
     }
 }
