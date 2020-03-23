@@ -73,4 +73,6 @@
     <string name="inspect_tx_link_view_transaction">View transaction</string>
     <string name="inspect_tx_copy_transaction">Copy transaction</string>
     <string name="share_invoice_msg">Please pay your invoice here: %1$s</string>
+    <string name="error_check_your_network_connection">Please check your network connection</string>
+    <string name="retry">Retry</string>
 </resources>

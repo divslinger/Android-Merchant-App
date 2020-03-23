@@ -153,32 +153,35 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     }
 
     private fun createNewInvoice(amountFiat: Double) {
+        // InvoiceRequest is the slowest when deriving a PubKey from an xPub
+        // but even in that situation, it is fast enough to be executed
+        // in the main thread instead of withContext(Dispatchers.IO)
+        val invoiceRequest = createInvoiceRequest(amountFiat, Settings.getCountryCurrencyLocale(activity).currency)
+        if (invoiceRequest == null) {
+            unableToDisplayInvoice()
+        } else {
+            // do NOT delete active invoice too early
+            // because PaymentInput Fragment must always be instantiated below the PaymentRequest Fragment
+            // when resuming from a crash on the PaymentRequest
+            Settings.deleteActiveInvoice(activity)
+            tvFiatAmount.text = AmountUtil(activity).formatFiat(amountFiat)
+            tvFiatAmount.visibility = View.VISIBLE
+            createNewInvoice(invoiceRequest)
+        }
+    }
+
+    private fun createNewInvoice(invoiceRequest: InvoiceRequest) {
         viewLifecycleOwner.lifecycleScope.launch {
-            // InvoiceRequest is the slowest when deriving a PubKey from an xPub
-            // but even in that situation, it is fast enough to be executed
-            // in the main thread instead of withContext(Dispatchers.IO)
-            val invoiceRequest = createInvoiceRequest(amountFiat, Settings.getCountryCurrencyLocale(activity).currency)
-            if (invoiceRequest == null) {
-                unableToDisplayInvoice()
-            } else {
-                // do NOT delete active invoice too early
-                // because PaymentInput Fragment must always be instantiated below the PaymentRequest Fragment
-                // when resuming from a crash on the PaymentRequest
-                Settings.deleteActiveInvoice(activity)
-                tvFiatAmount.text = AmountUtil(activity).formatFiat(amountFiat)
-                tvFiatAmount.visibility = View.VISIBLE
-                setWorkInProgress(true)
-                downloadInvoice(invoiceRequest)?.let { invoice ->
-                    generateQrCode(invoice)?.also {
-                        showQrCodeAndAmountFields(invoice, it)
-                        // only save invoice & send analytics after updating the UI to improve user experience
-                        Settings.setActiveInvoice(activity, invoice)
-                        Analytics.invoice_created.send()
-                        connectToSocket(invoice)
-                    }
+            setWorkInProgress(true)
+            downloadInvoice(invoiceRequest, { createNewInvoice(invoiceRequest)})?.let { invoice ->
+                generateQrCode(invoice)?.also {
+                    showQrCodeAndAmountFields(invoice, it)
+                    // only save invoice after updating the UI to improve user experience
+                    Settings.setActiveInvoice(activity, invoice)
+                    connectToSocket(invoice)
                 }
-                setWorkInProgress(false)
             }
+            setWorkInProgress(false)
         }
     }
 
@@ -191,7 +194,6 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 setWorkInProgress(true)
                 generateQrCode(invoice)?.also {
                     showQrCodeAndAmountFields(invoice, it)
-                    Log.i(TAG, "${System.currentTimeMillis() - startMs}")
                     connectToSocket(invoice)
                 }
                 setWorkInProgress(false)
@@ -299,15 +301,19 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         return i
     }
 
-    private suspend fun downloadInvoice(request: InvoiceRequest): InvoiceStatus? {
+    private suspend fun downloadInvoice(request: InvoiceRequest, retry: () -> Unit): InvoiceStatus? {
         return withContext(Dispatchers.IO) {
             try {
+                val startMs = System.currentTimeMillis();
                 val response: Response<InvoiceStatus?> = bip70PayService.createInvoice(request).execute()
-                response.body()
-                        ?: throw Exception("HTTP status:" + response.code() + " message:" + response.message())
+                val invoice = response.body() ?: throw Exception("HTTP status:" + response.code() + " message:" + response.message())
+                Analytics.invoice_created.sendDuration(System.currentTimeMillis() - startMs)
+                invoice
             } catch (e: Exception) {
                 Analytics.error_download_invoice.sendError(e)
-                DialogHelper.show(activity, activity.getString(R.string.error), e.message) { exitScreen() }
+                DialogHelper.showCancelOrRetry(activity, activity.getString(R.string.error),
+                        activity.getString(R.string.error_check_your_network_connection),
+                        { exitScreen() }, { retry() })
                 null
             }
         }
@@ -427,7 +433,6 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
 
     companion object {
         private const val TAG = "BCR-PaymentRequest"
-        var startMs: Long = 0
 
         // BCH amount is hidden as deemed non-necessary because it is shown on the customer wallet
         private const val BCH_AMOUNT_DISPLAYED = false
