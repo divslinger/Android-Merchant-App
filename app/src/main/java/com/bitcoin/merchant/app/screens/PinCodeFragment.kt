@@ -80,13 +80,13 @@ class PinCodeFragment : ToolbarAwareFragment() {
             Analytics.settings_pin_changed.send()
             SnackHelper.show(activity, activity.getString(R.string.notify_changes_have_been_saved))
         }
-        nav.navigate(R.id.nav_to_settings_screen)
+        nav.navigate(R.id.nav_to_settings_screen_from_pin)
     }
 
     private fun validatePin() {
         val stored: String = Settings.getPinCode(activity)
         if (stored == userEnteredPIN) {
-            nav.navigate(R.id.nav_to_settings_screen)
+            nav.navigate(R.id.nav_to_settings_screen_from_pin)
         } else {
             SnackHelper.show(activity, getString(R.string.pin_code_enter_error), error = true)
             delayAction(Runnable {
