@@ -7,18 +7,36 @@ import org.junit.Test
 
 internal class InvoiceAndQrCodeCreationPerformanceTest {
     @Test
-    fun measure() {
+    fun measureUSD() {
+        val fiat = "USD"
+        runTest(fiat)
+    }
+
+    @Test
+    fun measureJPY() {
+        val fiat = "JPY"
+        runTest(fiat)
+    }
+
+    @Test
+    fun measureEUR() {
+        val fiat = "EUR"
+        runTest(fiat)
+    }
+
+    private fun runTest(fiat: String) {
+        println("Generating $fiat invoice...")
         var startMs = System.currentTimeMillis()
-        val invoice = createInvoice() ?: throw Exception()
+        val invoice = createInvoice("1999", fiat) ?: throw Exception()
         val invoiceMs = System.currentTimeMillis() - startMs
         startMs = System.currentTimeMillis()
         val bitmap = QrCodeUtil.getBitmap(invoice.walletUri, 280)
         val bitmapMs = System.currentTimeMillis() - startMs
-        Log.i("BCR-JUNIT", "creation time invoice=$invoiceMs, qrCode=$bitmapMs")
+        Log.i("BCR-JUNIT", "$fiat creation time invoice=$invoiceMs, qrCode=$bitmapMs")
     }
 
-    private fun createInvoice(): InvoiceStatus? {
-        val ir = InvoiceRequest("1999", "USD")
+    private fun createInvoice(fiatAmount: String, fiat: String): InvoiceStatus? {
+        val ir = InvoiceRequest(fiatAmount, fiat)
         ir.address = "bitcoincash:qrjautd36xzp2gm9phrgthal4fjp7e6ckcmmajrkcc"
         val i = Bip70PayService.create("https://pay.bitcoin.com").createInvoice(ir).execute().body()
         return i

@@ -160,20 +160,31 @@ open class MainActivity : AppCompatActivity() {
         val mDrawerActionHandler = Handler()
         mDrawerActionHandler.postDelayed({
             when (menuItem.itemId) {
-                R.id.action_transactions -> Analytics.tap_transactions.send()
-                R.id.action_settings -> Analytics.tap_settings.send()
-                R.id.action_about -> Analytics.tap_about.send()
-                R.id.action_terms_of_use -> Analytics.tap_termsofuse.send()
-                R.id.action_service_terms -> Analytics.tap_serviceterms.send()
-                R.id.action_privacy_policy -> Analytics.tap_privacypolicy.send()
-            }
-            when (menuItem.itemId) {
-                R.id.action_transactions -> nav.navigate(R.id.nav_to_transactions_screen)
-                R.id.action_settings -> nav.navigate(R.id.nav_to_settings_screen)
-                R.id.action_about -> nav.navigate(R.id.nav_to_about_screen)
-                R.id.action_terms_of_use -> nav.navigate(R.id.nav_to_terms_of_use)
-                R.id.action_service_terms -> nav.navigate(R.id.nav_to_service_terms)
-                R.id.action_privacy_policy -> nav.navigate(R.id.nav_to_privacy_policy)
+                R.id.action_transactions -> {
+                    Analytics.tap_transactions.send()
+                    nav.navigate(R.id.nav_to_transactions_screen)
+                }
+                R.id.action_settings -> {
+                    Analytics.tap_settings.send()
+                    if(nav.currentDestination?.id != R.id.pin_code_screen)
+                        nav.navigate(R.id.nav_to_settings_screen)
+                }
+                R.id.action_about -> {
+                    Analytics.tap_about.send()
+                    nav.navigate(R.id.nav_to_about_screen)
+                }
+                R.id.action_terms_of_use -> {
+                    Analytics.tap_termsofuse.send()
+                    nav.navigate(R.id.nav_to_terms_of_use)
+                }
+                R.id.action_service_terms -> {
+                    Analytics.tap_serviceterms.send()
+                    nav.navigate(R.id.nav_to_service_terms)
+                }
+                R.id.action_privacy_policy -> {
+                    Analytics.tap_privacypolicy.send()
+                    nav.navigate(R.id.nav_to_privacy_policy)
+                }
             }
         }, 250)
     }
