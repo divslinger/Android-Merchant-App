@@ -5,12 +5,15 @@ import android.content.Context
 import android.util.Log
 import com.amplitude.api.Amplitude
 import com.bitcoin.merchant.app.R
-import com.bitcoin.merchant.app.util.AppUtil
 import org.json.JSONObject
 
 interface Analytics {
     object invoice_checkout : Analytics
-    object invoice_created : Analytics
+    object invoice_created : Analytics {
+        fun sendDuration(millis: Long) =
+                sendWithProperties("millis" to millis)
+    }
+
     object invoice_cancelled : Analytics
     object invoice_paid : Analytics
     object invoice_shared : Analytics
@@ -69,16 +72,16 @@ interface Analytics {
     fun sendWithProperties(vararg pairs: Pair<String, Any?>) {
         try {
             // if (!AppUtil.isEmulator) {
-                val a = Amplitude.getInstance()
-                val eventName = javaClass.simpleName.replace('_', ' ')
-                if (pairs.isEmpty()) {
-                    a.logEvent(eventName)
-                    Log.i(TAG, eventName)
-                } else {
-                    val properties = JSONObject()
-                    for (p in pairs) properties.put(p.first, p.second)
-                    a.logEvent(eventName, properties)
-                    Log.i(TAG, "$eventName $properties")
+            val a = Amplitude.getInstance()
+            val eventName = javaClass.simpleName.replace('_', ' ')
+            if (pairs.isEmpty()) {
+                a.logEvent(eventName)
+                Log.i(TAG, eventName)
+            } else {
+                val properties = JSONObject()
+                for (p in pairs) properties.put(p.first, p.second)
+                a.logEvent(eventName, properties)
+                Log.i(TAG, "$eventName $properties")
             }
             // }
         } catch (e: Exception) {
@@ -90,11 +93,11 @@ interface Analytics {
         val TAG = "BCR-Analytics"
         fun configure(app: Application, context: Context) {
             // if (!AppUtil.isEmulator)
-                Amplitude.getInstance()
-                        .trackSessionEvents(true)
-                        .setFlushEventsOnClose(false)
-                        .initialize(context, context.resources.getString(R.string.amplitude_api_key))
-                        .enableForegroundTracking(app)
+            Amplitude.getInstance()
+                    .trackSessionEvents(true)
+                    .setFlushEventsOnClose(false)
+                    .initialize(context, context.resources.getString(R.string.amplitude_api_key))
+                    .enableForegroundTracking(app)
 
         }
     }

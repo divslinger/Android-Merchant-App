@@ -69,4 +69,6 @@
     <string name="share_invoice_msg">Please pay your invoice here: %1$s</string>
     <string name="ad_content_bitcoincom_wallet">Store, exchange, buy, and sell Bitcoin with the fastest wallet ever.</string>
     <string name="ad_content_bitcoincom_exchange">50+ trading pairs and SLP token support</string>
+    <string name="error_check_your_network_connection">Please check your network connection</string>
+    <string name="retry">Retry</string>
 </resources>
