@@ -14,4 +14,6 @@
     <string name="url_exchange_bitcoin_com" translatable="false">https://exchange.bitcoin.com</string>
     <string name="url_rest_bitcoin_com" translatable="false">https://rest.bitcoin.com/v2</string>
     <string name="url_explorer_bitcoin_com" translatable="false">https://explorer.bitcoin.com</string>
+    <string name="url_bitcoin_com" translatable="false">https://www.bitcoin.com</string>
+    <string name="copyright_year" translatable="false">2020</string>
 </resources>
