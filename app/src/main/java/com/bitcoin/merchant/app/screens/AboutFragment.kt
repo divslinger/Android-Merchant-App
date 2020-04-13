@@ -16,8 +16,8 @@ class AboutFragment : ToolbarAwareFragment() {
         super.onCreateView(inflater, container, savedInstanceState)
         val view = inflater.inflate(R.layout.fragment_about, container, false)
         val about = view.findViewById<TextView>(R.id.about_screen)
-        about.text = BuildConfig.VERSION_NAME + " - 2020"
-        view.findViewById<View>(R.id.about_logo).setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.bitcoin.com/"))) }
+        about.text = "${BuildConfig.VERSION_NAME} - ${resources.getString(R.string.copyright_year)}"
+        view.findViewById<View>(R.id.about_logo).setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(resources.getString(R.string.url_bitcoin_com)))) }
         setToolbarAsBackButton()
         setToolbarTitle(R.string.menu_about)
         return view
