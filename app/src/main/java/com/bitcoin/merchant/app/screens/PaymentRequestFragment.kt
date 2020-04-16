@@ -22,6 +22,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.currency.CurrencyExchange
 import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.model.PaymentTarget
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
@@ -40,6 +41,8 @@ import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.*
 
 class PaymentRequestFragment : ToolbarAwareFragment() {
@@ -310,7 +313,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 Analytics.invoice_created.sendDuration(System.currentTimeMillis() - startMs)
                 invoice
             } catch (e: Exception) {
-
+                val address = request.address
+                println("Amount in invoice request " + toBch(request.amount.toDouble()))
                 //TODO Fallback to BIP21 system.
                 Analytics.error_download_invoice.sendError(e)
                 DialogHelper.showCancelOrRetry(activity, activity.getString(R.string.error),
@@ -426,6 +430,19 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         } catch (e: Exception) {
             Log.e(TAG, "", e)
         }
+    }
+
+    private fun toBch(amount: Double): Double {
+        val currencyPrice: Double = getCurrencyPrice()
+        return if (currencyPrice == 0.0) 0.0 else BigDecimal(amount).divide(BigDecimal(currencyPrice), 8, RoundingMode.HALF_EVEN).toDouble();
+    }
+
+    private fun getCurrencyPrice(): Double {
+        return CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
+    }
+
+    private fun getCurrency(): String {
+        return Settings.getCountryCurrencyLocale(activity).currency
     }
 
     override val isBackAllowed: Boolean

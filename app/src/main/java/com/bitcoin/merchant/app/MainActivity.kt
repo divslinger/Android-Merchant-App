@@ -22,7 +22,6 @@ import androidx.navigation.Navigation
 import com.bitcoin.merchant.app.application.CashRegisterApplication
 import com.bitcoin.merchant.app.application.NetworkStateReceiver
 import com.bitcoin.merchant.app.model.Analytics
-import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.util.ScanQRUtil
