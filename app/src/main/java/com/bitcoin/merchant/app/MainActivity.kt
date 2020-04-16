@@ -250,7 +250,7 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
 
     override fun onIncomingPayment(payment: PaymentReceived?) {
         if(payment != null) {
-            if(ExpectedPayments.getInstance().getExpectedAmounts(payment.addr) != null) {
+            if(payment.bchExpected != 0L && payment.fiatExpected != null) {
                 if (!payment.isUnderpayment && !payment.isOverpayment) {
                     Log.d(TAG, "${payment.txHash} has been received.")
                     //TODO show checkmark
@@ -269,8 +269,6 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
                 } else {
                     Log.d(TAG, "${payment.txHash} has already been recorded.")
                 }
-            } else {
-                Log.d(TAG, "Payment not found in expected amounts.")
             }
         }
     }
