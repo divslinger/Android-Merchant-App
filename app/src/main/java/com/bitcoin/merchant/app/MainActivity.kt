@@ -30,6 +30,7 @@ import com.bitcoin.merchant.app.network.websocket.WebSocketListener
 import com.bitcoin.merchant.app.network.websocket.impl.bitcoincom.BitcoinComSocketHandler
 import com.bitcoin.merchant.app.network.websocket.impl.blockchaininfo.BlockchainInfoSocketSocketHandler
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
+import com.bitcoin.merchant.app.util.AmountUtil
 import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.util.ScanQRUtil
 import com.bitcoin.merchant.app.util.Settings
@@ -247,6 +248,8 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
 
     override fun onIncomingPayment(payment: PaymentReceived?) {
         if(payment != null) {
+            val fiatFormatted = AmountUtil(this).formatFiat(payment.fiatExpected.toDouble())
+            app.paymentProcessor.recordInDatabase(payment, fiatFormatted)
             println("Payment received! $payment")
         }
     }
