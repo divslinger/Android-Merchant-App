@@ -83,6 +83,10 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             if (Bip70Action.NETWORK_RECONNECT == intent.action) {
                 bip70Manager.reconnectIfNecessary()
             }
+            if (Action.ACKNOWLEDGE_BIP21_PAYMENT == intent.action) {
+                showCheckMark()
+                soundAlert()
+            }
         }
     }
 
@@ -235,6 +239,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         filter.addAction(Bip70Action.INVOICE_PAYMENT_EXPIRED)
         filter.addAction(Bip70Action.UPDATE_CONNECTION_STATUS)
         filter.addAction(Bip70Action.NETWORK_RECONNECT)
+        filter.addAction(Action.ACKNOWLEDGE_BIP21_PAYMENT)
         LocalBroadcastManager.getInstance(activity).registerReceiver(receiver, filter)
     }
 
@@ -439,6 +444,9 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         receivedLayout.visibility = View.VISIBLE
         AppUtil.setStatusBarColor(activity, R.color.bitcoindotcom_green)
         Settings.deleteActiveInvoice(activity)
+        if(bip21Address != null) {
+            ExpectedPayments.getInstance().removePayment(bip21Address)
+        }
         ivDone.setOnClickListener {
             AppUtil.setStatusBarColor(activity, R.color.gray)
             exitScreen()

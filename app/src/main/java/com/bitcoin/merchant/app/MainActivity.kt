@@ -253,7 +253,8 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
             if(payment.bchExpected != 0L && payment.fiatExpected != null) {
                 if (!payment.isUnderpayment && !payment.isOverpayment) {
                     Log.d(TAG, "${payment.txHash} has been received.")
-                    //TODO show checkmark
+                    val i = Intent(Action.ACKNOWLEDGE_BIP21_PAYMENT)
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(i)
                 } else {
                     if (payment.isUnderpayment) {
                         DialogHelper.show(this, this.getString(R.string.removed_by_bip70_insufficient_payment), "") {}
