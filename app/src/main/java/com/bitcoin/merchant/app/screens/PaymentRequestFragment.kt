@@ -176,13 +176,20 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private fun createNewInvoice(invoiceRequest: InvoiceRequest) {
         viewLifecycleOwner.lifecycleScope.launch {
             setWorkInProgress(true)
-            downloadInvoice(invoiceRequest, { createNewInvoice(invoiceRequest)})?.let { invoice ->
+            val invoiceStatus = downloadInvoice(invoiceRequest, { createNewInvoice(invoiceRequest)})?.let { invoice ->
                 generateQrCode(invoice)?.also {
                     showQrCodeAndAmountFields(invoice, it)
                     // only save invoice after updating the UI to improve user experience
                     Settings.setActiveInvoice(activity, invoice)
                     connectToSocket(invoice)
                 }
+            }
+
+            if(invoiceStatus == null) {
+                val address = invoiceRequest.address
+                val bchAmount = toBch(invoiceRequest.amount.toDouble())
+                println("Amount to receive: " + bchAmount)
+                //TODO Fallback to BIP21 system.
             }
             setWorkInProgress(false)
         }
@@ -313,9 +320,6 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 Analytics.invoice_created.sendDuration(System.currentTimeMillis() - startMs)
                 invoice
             } catch (e: Exception) {
-                val address = request.address
-                println("Amount in invoice request " + toBch(request.amount.toDouble()))
-                //TODO Fallback to BIP21 system.
                 Analytics.error_download_invoice.sendError(e)
                 DialogHelper.showCancelOrRetry(activity, activity.getString(R.string.error),
                         activity.getString(R.string.error_check_your_network_connection),
