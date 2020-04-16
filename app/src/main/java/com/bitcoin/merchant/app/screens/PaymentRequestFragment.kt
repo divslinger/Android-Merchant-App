@@ -193,7 +193,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 val address = invoiceRequest.address
                 val bchAmount = toBch(invoiceRequest.amount.toDouble())
                 val bchSatoshis = getLongAmount(bchAmount)
-                ExpectedPayments.getInstance().addExpectedPayment(address, bchSatoshis, invoiceRequest.fiat)
+                ExpectedPayments.getInstance().addExpectedPayment(address, bchSatoshis, invoiceRequest.amount)
                 val intent = Intent(Action.SUBSCRIBE_TO_ADDRESS)
                 intent.putExtra("address", address);
                 LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
