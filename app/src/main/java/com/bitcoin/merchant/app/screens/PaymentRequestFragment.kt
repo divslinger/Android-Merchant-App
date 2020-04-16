@@ -310,6 +310,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 Analytics.invoice_created.sendDuration(System.currentTimeMillis() - startMs)
                 invoice
             } catch (e: Exception) {
+
+                //TODO Fallback to BIP21 system.
                 Analytics.error_download_invoice.sendError(e)
                 DialogHelper.showCancelOrRetry(activity, activity.getString(R.string.error),
                         activity.getString(R.string.error_check_your_network_connection),
