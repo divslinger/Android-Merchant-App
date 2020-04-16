@@ -1,6 +1,8 @@
 package com.bitcoin.merchant.app
 
 import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
@@ -22,13 +24,20 @@ import androidx.navigation.Navigation
 import com.bitcoin.merchant.app.application.CashRegisterApplication
 import com.bitcoin.merchant.app.application.NetworkStateReceiver
 import com.bitcoin.merchant.app.model.Analytics
+import com.bitcoin.merchant.app.network.PaymentReceived
+import com.bitcoin.merchant.app.network.websocket.TxWebSocketHandler
+import com.bitcoin.merchant.app.network.websocket.WebSocketListener
+import com.bitcoin.merchant.app.network.websocket.impl.bitcoincom.BitcoinComSocketHandler
+import com.bitcoin.merchant.app.network.websocket.impl.blockchaininfo.BlockchainInfoSocketSocketHandler
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.util.ScanQRUtil
 import com.bitcoin.merchant.app.util.Settings
 import com.google.android.material.navigation.NavigationView
+import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
+import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 
-open class MainActivity : AppCompatActivity() {
+open class MainActivity : AppCompatActivity(), WebSocketListener {
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var networkStateReceiver: NetworkStateReceiver
     lateinit var toolbar: Toolbar
@@ -42,6 +51,19 @@ open class MainActivity : AppCompatActivity() {
     val app: CashRegisterApplication
         get() = application as CashRegisterApplication
 
+    private lateinit var bitcoinDotComSocket: TxWebSocketHandler
+    private lateinit var blockchainDotInfoSocket: TxWebSocketHandler
+
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (Action.SUBSCRIBE_TO_ADDRESS == intent.action) {
+                println("Subscribed to address!")
+                bitcoinDotComSocket.subscribeToAddress(intent.getStringExtra("address"));
+                blockchainDotInfoSocket.subscribeToAddress(intent.getStringExtra("address"));
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Analytics.configure(application, this)
@@ -52,6 +74,15 @@ open class MainActivity : AppCompatActivity() {
         title = "" // clear "Bitcoin Cash Register" from toolBar when opens on Payment Input screen
         listenToConnectivityChanges()
         Log.d(TAG, "Stored " + Settings.getPaymentTarget(this))
+        val filter = IntentFilter()
+        filter.addAction(Action.SUBSCRIBE_TO_ADDRESS)
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter)
+        bitcoinDotComSocket = BitcoinComSocketHandler()
+        (bitcoinDotComSocket as BitcoinComSocketHandler).setListener(this)
+        bitcoinDotComSocket.start()
+        blockchainDotInfoSocket = BlockchainInfoSocketSocketHandler()
+        (blockchainDotInfoSocket as BlockchainInfoSocketSocketHandler).setListener(this)
+        blockchainDotInfoSocket.start()
     }
 
     private fun listenToConnectivityChanges() {
@@ -211,6 +242,12 @@ open class MainActivity : AppCompatActivity() {
         const val APP_PACKAGE = "com.bitcoin.merchant.app"
         fun getNav(activity: Activity): NavController {
             return Navigation.findNavController(activity, R.id.main_nav_controller)
+        }
+    }
+
+    override fun onIncomingPayment(payment: PaymentReceived?) {
+        if(payment != null) {
+            println("Payment received! $payment")
         }
     }
 }

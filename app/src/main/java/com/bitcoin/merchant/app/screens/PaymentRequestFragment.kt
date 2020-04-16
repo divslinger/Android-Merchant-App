@@ -21,10 +21,12 @@ import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.bitcoin.merchant.app.Action
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.currency.CurrencyExchange
 import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.model.PaymentTarget
+import com.bitcoin.merchant.app.network.ExpectedPayments
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
@@ -44,6 +46,7 @@ import java.io.FileOutputStream
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+import kotlin.math.roundToLong
 
 class PaymentRequestFragment : ToolbarAwareFragment() {
     // Ensure that pressing 'BACK' button stays on the 'Payment REQUEST' screen to NOT lose the active invoice
@@ -152,6 +155,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         } else {
             resumeExistingInvoice()
         }
+
         return v
     }
 
@@ -176,7 +180,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private fun createNewInvoice(invoiceRequest: InvoiceRequest) {
         viewLifecycleOwner.lifecycleScope.launch {
             setWorkInProgress(true)
-            val invoiceStatus = downloadInvoice(invoiceRequest, { createNewInvoice(invoiceRequest)})?.let { invoice ->
+            val invoiceStatus = downloadInvoice(invoiceRequest) { createNewInvoice(invoiceRequest)}?.let { invoice ->
                 generateQrCode(invoice)?.also {
                     showQrCodeAndAmountFields(invoice, it)
                     // only save invoice after updating the UI to improve user experience
@@ -188,6 +192,11 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             if(invoiceStatus == null) {
                 val address = invoiceRequest.address
                 val bchAmount = toBch(invoiceRequest.amount.toDouble())
+                val bchSatoshis = getLongAmount(bchAmount)
+                ExpectedPayments.getInstance().addExpectedPayment(address, bchSatoshis, invoiceRequest.fiat)
+                val intent = Intent(Action.SUBSCRIBE_TO_ADDRESS)
+                intent.putExtra("address", address);
+                LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
                 println("Amount to receive: " + bchAmount)
                 //TODO Fallback to BIP21 system.
             }
@@ -320,10 +329,10 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 Analytics.invoice_created.sendDuration(System.currentTimeMillis() - startMs)
                 invoice
             } catch (e: Exception) {
-                Analytics.error_download_invoice.sendError(e)
+                /*Analytics.error_download_invoice.sendError(e)
                 DialogHelper.showCancelOrRetry(activity, activity.getString(R.string.error),
                         activity.getString(R.string.error_check_your_network_connection),
-                        { exitScreen() }, { retry() })
+                        { exitScreen() }, { retry() })*/
                 null
             }
         }
@@ -443,6 +452,11 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
 
     private fun getCurrencyPrice(): Double {
         return CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
+    }
+
+    private fun getLongAmount(amountPayable: Double): Long {
+        val value = (amountPayable * 100000000.0).roundToLong();
+        return value;
     }
 
     private fun getCurrency(): String {
