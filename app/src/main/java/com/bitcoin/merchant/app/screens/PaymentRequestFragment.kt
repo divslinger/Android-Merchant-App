@@ -198,6 +198,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 intent.putExtra("address", address);
                 LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
                 println("Amount to receive: " + bchAmount)
+                showQrCodeAndAmountFields(address!!, invoiceRequest.amount, bchAmount.toString())
                 //TODO Fallback to BIP21 system.
             }
             setWorkInProgress(false)
@@ -343,6 +344,32 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             // analytics already sent inside websockets
             bip70Manager.startSocket(invoice.paymentId)
         }
+    }
+
+    private fun generateQrCode(address: String, bchAmount: String): Bitmap? {
+        return try {
+            val cashAddr = AddressUtil.toCashAddress(address)
+            qrCodeUri = "$cashAddr?amount=$bchAmount"
+            println(qrCodeUri!!)
+            QrCodeUtil.getBitmap(qrCodeUri!!, activity.resources.getInteger(R.integer.qr_code_width))
+        } catch (e: Exception) {
+            // analytics already sent inside qr generation
+            DialogHelper.show(activity, activity.getString(R.string.error), e.message) { exitScreen() }
+            null
+        }
+    }
+
+    private fun showQrCodeAndAmountFields(address: String, fiat: String, bchAmount: String) {
+        val f = AmountUtil(activity)
+        tvFiatAmount.text = f.formatFiat(fiat.toDouble())
+        tvFiatAmount.visibility = View.VISIBLE
+        if (BCH_AMOUNT_DISPLAYED) {
+            tvCoinAmount.text = "$bchAmount BCH"
+            tvCoinAmount.visibility = View.VISIBLE
+        }
+        val bitmap = generateQrCode(address, bchAmount)
+        ivReceivingQr.setImageBitmap(bitmap)
+        setInvoiceReadyToShare(true)
     }
 
     private suspend fun generateQrCode(invoice: InvoiceStatus): Bitmap? {
