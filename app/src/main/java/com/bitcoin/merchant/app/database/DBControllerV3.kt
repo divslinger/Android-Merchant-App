@@ -54,6 +54,10 @@ class DBControllerV3(app: CashRegisterApplication?) : SQLiteOpenHelper(app, DB, 
         onCreate(database)
     }
 
+    fun paymentAlreadyRecorded(tx: String): Boolean {
+        return getPaymentFromTx(tx) != null
+    }
+
     @Throws(Exception::class)
     fun insertPayment(record: PaymentRecord) {
         insertPayment(record.toContentValues())

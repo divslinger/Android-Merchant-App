@@ -243,16 +243,16 @@ class TransactionsHistoryFragment : ToolbarAwareFragment() {
 
         private fun getIcon(bch: Long, confirmations: Int): Int {
             return when {
-                bch < 0L -> R.drawable.ic_warning_black_18dp // under/over payment, legacy: can't happen anymore with BIP-70
-                confirmations <= 1 -> R.drawable.ic_done_white_24dp
+                confirmations < 0 -> R.drawable.ic_warning_black_18dp // under/over payment, legacy: can't happen anymore with BIP-70
+                confirmations in 0..1 -> R.drawable.ic_done_white_24dp
                 else -> R.drawable.ic_doublecheck_white_24dp // 2 or more confirmations
             }
         }
 
         private fun getAlpha(bch: Long, confirmations: Int): Float {
             return when {
-                bch < 0L -> 1.0f // under/over payment, legacy: can't happen anymore with BIP-70
-                confirmations <= 0 -> 0f
+                confirmations < 0 -> 1.0f // under/over payment, legacy: can't happen anymore with BIP-70
+                confirmations in 0..1 -> 0f
                 else -> 1.0f
             }
         }

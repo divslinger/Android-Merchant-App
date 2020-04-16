@@ -67,6 +67,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private lateinit var bip70PayService: Bip70PayService
     private var lastProcessedInvoicePaymentId: String? = null
     private var qrCodeUri: String? = null
+    private var bip21Address: String? = null
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -195,8 +196,9 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 val bchSatoshis = getLongAmount(bchAmount)
                 ExpectedPayments.getInstance().addExpectedPayment(address, bchSatoshis, invoiceRequest.amount)
                 val intent = Intent(Action.SUBSCRIBE_TO_ADDRESS)
-                intent.putExtra("address", address);
-                LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
+                intent.putExtra("address", address)
+                LocalBroadcastManager.getInstance(activity).sendBroadcast(intent)
+                bip21Address = address
                 println("Amount to receive: " + bchAmount)
                 showQrCodeAndAmountFields(address!!, invoiceRequest.amount, bchAmount.toString())
                 //TODO Fallback to BIP21 system.
@@ -274,6 +276,9 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private fun deleteActiveInvoiceAndExitScreen() {
         Analytics.invoice_cancelled.send()
         Settings.deleteActiveInvoice(activity)
+        if(bip21Address != null) {
+            ExpectedPayments.getInstance().removePayment(bip21Address)
+        }
         exitScreen()
     }
 

@@ -24,11 +24,13 @@ import androidx.navigation.Navigation
 import com.bitcoin.merchant.app.application.CashRegisterApplication
 import com.bitcoin.merchant.app.application.NetworkStateReceiver
 import com.bitcoin.merchant.app.model.Analytics
+import com.bitcoin.merchant.app.network.ExpectedPayments
 import com.bitcoin.merchant.app.network.PaymentReceived
 import com.bitcoin.merchant.app.network.websocket.TxWebSocketHandler
 import com.bitcoin.merchant.app.network.websocket.WebSocketListener
 import com.bitcoin.merchant.app.network.websocket.impl.bitcoincom.BitcoinComSocketHandler
 import com.bitcoin.merchant.app.network.websocket.impl.blockchaininfo.BlockchainInfoSocketSocketHandler
+import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AmountUtil
 import com.bitcoin.merchant.app.util.AppUtil
@@ -248,9 +250,28 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
 
     override fun onIncomingPayment(payment: PaymentReceived?) {
         if(payment != null) {
-            val fiatFormatted = AmountUtil(this).formatFiat(payment.fiatExpected.toDouble())
-            app.paymentProcessor.recordInDatabase(payment, fiatFormatted)
-            println("Payment received! $payment")
+            if(ExpectedPayments.getInstance().getExpectedAmounts(payment.addr) != null) {
+                if (!payment.isUnderpayment && !payment.isOverpayment) {
+                    Log.d(TAG, "${payment.txHash} has been received.")
+                    //TODO show checkmark
+                } else {
+                    if (payment.isUnderpayment) {
+                        DialogHelper.show(this, this.getString(R.string.removed_by_bip70_insufficient_payment), "") {}
+                    } else {
+                        DialogHelper.show(this, this.getString(R.string.removed_by_bip70_overpaid_amount), "") {}
+                    }
+                }
+
+                val fiatFormatted = AmountUtil(this).formatFiat(payment.fiatExpected.toDouble())
+
+                if (!app.paymentProcessor.paymentAlreadyRecorded(payment.txHash)) {
+                    app.paymentProcessor.recordInDatabase(payment, fiatFormatted)
+                } else {
+                    Log.d(TAG, "${payment.txHash} has already been recorded.")
+                }
+            } else {
+                Log.d(TAG, "Payment not found in expected amounts.")
+            }
         }
     }
 }
