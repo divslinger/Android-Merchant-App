@@ -441,6 +441,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         tvConnectionStatus.visibility = View.GONE // hide it white top bar on green background
         waitingLayout.visibility = View.GONE
         receivedLayout.visibility = View.VISIBLE
+        fabShare.visibility = View.GONE
         AppUtil.setStatusBarColor(activity, R.color.bitcoindotcom_green)
         Settings.deleteActiveInvoice(activity)
         if(bip21Address != null) {
