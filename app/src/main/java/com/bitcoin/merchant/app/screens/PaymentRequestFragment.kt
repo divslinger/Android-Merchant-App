@@ -203,9 +203,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 intent.putExtra("address", address)
                 LocalBroadcastManager.getInstance(activity).sendBroadcast(intent)
                 bip21Address = address
-                println("Amount to receive: " + bchAmount)
                 showQrCodeAndAmountFields(address!!, invoiceRequest.amount, bchAmount.toString())
-                //TODO Fallback to BIP21 system.
             }
             setWorkInProgress(false)
         }
@@ -373,6 +371,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         val f = AmountUtil(activity)
         tvFiatAmount.text = f.formatFiat(fiat.toDouble())
         tvFiatAmount.visibility = View.VISIBLE
+        tvExpiryTimer.visibility = View.INVISIBLE
         if (BCH_AMOUNT_DISPLAYED) {
             tvCoinAmount.text = "$bchAmount BCH"
             tvCoinAmount.visibility = View.VISIBLE
