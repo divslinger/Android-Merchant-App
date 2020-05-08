@@ -22,6 +22,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.Action
+import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.currency.CurrencyExchange
 import com.bitcoin.merchant.app.model.Analytics
@@ -379,6 +380,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         val bitmap = generateQrCode(address, bchAmount)
         ivReceivingQr.setImageBitmap(bitmap)
         setInvoiceReadyToShare(true)
+        initiateBip21ConnectionStatus()
     }
 
     private suspend fun generateQrCode(invoice: InvoiceStatus): Bitmap? {
@@ -432,6 +434,22 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 if (isAdded) {
                     Settings.deleteActiveInvoice(activity)
                     exitScreen()
+                }
+            }
+        }.start()
+    }
+
+    private fun initiateBip21ConnectionStatus() {
+        object : CountDownTimer(1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                if (isAdded) {
+                    updateConnectionStatus(MainActivity.bitcoinDotComSocket.isConnected)
+                }
+            }
+
+            override fun onFinish() {
+                if (isAdded) {
+                    initiateBip21ConnectionStatus()
                 }
             }
         }.start()

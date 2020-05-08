@@ -54,9 +54,6 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
     val app: CashRegisterApplication
         get() = application as CashRegisterApplication
 
-    private lateinit var bitcoinDotComSocket: TxWebSocketHandler
-    private lateinit var blockchainDotInfoSocket: TxWebSocketHandler
-
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (Action.SUBSCRIBE_TO_ADDRESS == intent.action) {
@@ -243,6 +240,8 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
     companion object {
         const val TAG = "BCR-MainActivity"
         const val APP_PACKAGE = "com.bitcoin.merchant.app"
+        lateinit var bitcoinDotComSocket: TxWebSocketHandler
+        lateinit var blockchainDotInfoSocket: TxWebSocketHandler
         fun getNav(activity: Activity): NavController {
             return Navigation.findNavController(activity, R.id.main_nav_controller)
         }
