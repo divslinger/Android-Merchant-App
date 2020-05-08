@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.currency.CurrencyExchange
 import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
@@ -66,6 +67,9 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         tvCurrencySymbol.text = currencySymbol
         setToolbarAsMenuButton()
         clearToolbarTitle()
+
+        //Initialize rates upon launch.
+        getCurrencyPrice()
         return rootView
     }
 
@@ -96,6 +100,10 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         if (Settings.getActiveInvoice(activity) != null) {
             nav.navigate(R.id.nav_to_payment_request_screen)
         }
+    }
+
+    private fun getCurrencyPrice(): Double {
+        return CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(Settings.getCountryCurrencyLocale(activity).currency);
     }
 
     private fun initDecimalButton() {

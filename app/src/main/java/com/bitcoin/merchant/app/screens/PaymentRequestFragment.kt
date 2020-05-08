@@ -21,9 +21,13 @@ import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.bitcoin.merchant.app.Action
+import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
+import com.bitcoin.merchant.app.currency.CurrencyExchange
 import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.model.PaymentTarget
+import com.bitcoin.merchant.app.network.ExpectedPayments
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
@@ -40,7 +44,10 @@ import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.*
+import kotlin.math.roundToLong
 
 class PaymentRequestFragment : ToolbarAwareFragment() {
     // Ensure that pressing 'BACK' button stays on the 'Payment REQUEST' screen to NOT lose the active invoice
@@ -61,6 +68,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private lateinit var bip70PayService: Bip70PayService
     private var lastProcessedInvoicePaymentId: String? = null
     private var qrCodeUri: String? = null
+    private var bip21Address: String? = null
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -75,6 +83,10 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             }
             if (Bip70Action.NETWORK_RECONNECT == intent.action) {
                 bip70Manager.reconnectIfNecessary()
+            }
+            if (Action.ACKNOWLEDGE_BIP21_PAYMENT == intent.action) {
+                showCheckMark()
+                soundAlert()
             }
         }
     }
@@ -149,6 +161,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         } else {
             resumeExistingInvoice()
         }
+
         return v
     }
 
@@ -173,13 +186,25 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private fun createNewInvoice(invoiceRequest: InvoiceRequest) {
         viewLifecycleOwner.lifecycleScope.launch {
             setWorkInProgress(true)
-            downloadInvoice(invoiceRequest, { createNewInvoice(invoiceRequest)})?.let { invoice ->
+            val invoiceStatus = downloadInvoice(invoiceRequest) { createNewInvoice(invoiceRequest)}?.let { invoice ->
                 generateQrCode(invoice)?.also {
                     showQrCodeAndAmountFields(invoice, it)
                     // only save invoice after updating the UI to improve user experience
                     Settings.setActiveInvoice(activity, invoice)
                     connectToSocket(invoice)
                 }
+            }
+
+            if(invoiceStatus == null) {
+                val address = invoiceRequest.address
+                val bchAmount = toBch(invoiceRequest.amount.toDouble())
+                val bchSatoshis = getLongAmount(bchAmount)
+                ExpectedPayments.getInstance().addExpectedPayment(address, bchSatoshis, invoiceRequest.amount)
+                val intent = Intent(Action.SUBSCRIBE_TO_ADDRESS)
+                intent.putExtra("address", address)
+                LocalBroadcastManager.getInstance(activity).sendBroadcast(intent)
+                bip21Address = address
+                showQrCodeAndAmountFields(address!!, invoiceRequest.amount, bchAmount.toString())
             }
             setWorkInProgress(false)
         }
@@ -213,6 +238,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         filter.addAction(Bip70Action.INVOICE_PAYMENT_EXPIRED)
         filter.addAction(Bip70Action.UPDATE_CONNECTION_STATUS)
         filter.addAction(Bip70Action.NETWORK_RECONNECT)
+        filter.addAction(Action.ACKNOWLEDGE_BIP21_PAYMENT)
         LocalBroadcastManager.getInstance(activity).registerReceiver(receiver, filter)
     }
 
@@ -254,6 +280,9 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private fun deleteActiveInvoiceAndExitScreen() {
         Analytics.invoice_cancelled.send()
         Settings.deleteActiveInvoice(activity)
+        if(bip21Address != null) {
+            ExpectedPayments.getInstance().removePayment(bip21Address)
+        }
         exitScreen()
     }
 
@@ -310,10 +339,10 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
                 Analytics.invoice_created.sendDuration(System.currentTimeMillis() - startMs)
                 invoice
             } catch (e: Exception) {
-                Analytics.error_download_invoice.sendError(e)
+                /*Analytics.error_download_invoice.sendError(e)
                 DialogHelper.showCancelOrRetry(activity, activity.getString(R.string.error),
                         activity.getString(R.string.error_check_your_network_connection),
-                        { exitScreen() }, { retry() })
+                        { exitScreen() }, { retry() })*/
                 null
             }
         }
@@ -324,6 +353,34 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             // analytics already sent inside websockets
             bip70Manager.startSocket(invoice.paymentId)
         }
+    }
+
+    private fun generateQrCode(address: String, bchAmount: String): Bitmap? {
+        return try {
+            val cashAddr = AddressUtil.toCashAddress(address)
+            qrCodeUri = "$cashAddr?amount=$bchAmount"
+            println(qrCodeUri!!)
+            QrCodeUtil.getBitmap(qrCodeUri!!, activity.resources.getInteger(R.integer.qr_code_width))
+        } catch (e: Exception) {
+            // analytics already sent inside qr generation
+            DialogHelper.show(activity, activity.getString(R.string.error), e.message) { exitScreen() }
+            null
+        }
+    }
+
+    private fun showQrCodeAndAmountFields(address: String, fiat: String, bchAmount: String) {
+        val f = AmountUtil(activity)
+        tvFiatAmount.text = f.formatFiat(fiat.toDouble())
+        tvFiatAmount.visibility = View.VISIBLE
+        tvExpiryTimer.visibility = View.INVISIBLE
+        if (BCH_AMOUNT_DISPLAYED) {
+            tvCoinAmount.text = "$bchAmount BCH"
+            tvCoinAmount.visibility = View.VISIBLE
+        }
+        val bitmap = generateQrCode(address, bchAmount)
+        ivReceivingQr.setImageBitmap(bitmap)
+        setInvoiceReadyToShare(true)
+        initiateBip21ConnectionStatus()
     }
 
     private suspend fun generateQrCode(invoice: InvoiceStatus): Bitmap? {
@@ -382,12 +439,32 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         }.start()
     }
 
+    private fun initiateBip21ConnectionStatus() {
+        object : CountDownTimer(1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                if (isAdded) {
+                    updateConnectionStatus(MainActivity.bitcoinDotComSocket.isConnected)
+                }
+            }
+
+            override fun onFinish() {
+                if (isAdded) {
+                    initiateBip21ConnectionStatus()
+                }
+            }
+        }.start()
+    }
+
     private fun showCheckMark() {
         tvConnectionStatus.visibility = View.GONE // hide it white top bar on green background
         waitingLayout.visibility = View.GONE
         receivedLayout.visibility = View.VISIBLE
+        fabShare.visibility = View.GONE
         AppUtil.setStatusBarColor(activity, R.color.bitcoindotcom_green)
         Settings.deleteActiveInvoice(activity)
+        if(bip21Address != null) {
+            ExpectedPayments.getInstance().removePayment(bip21Address)
+        }
         ivDone.setOnClickListener {
             AppUtil.setStatusBarColor(activity, R.color.gray)
             exitScreen()
@@ -424,6 +501,24 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         } catch (e: Exception) {
             Log.e(TAG, "", e)
         }
+    }
+
+    private fun toBch(amount: Double): Double {
+        val currencyPrice: Double = getCurrencyPrice()
+        return if (currencyPrice == 0.0) 0.0 else BigDecimal(amount).divide(BigDecimal(currencyPrice), 8, RoundingMode.HALF_EVEN).toDouble();
+    }
+
+    private fun getCurrencyPrice(): Double {
+        return CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
+    }
+
+    private fun getLongAmount(amountPayable: Double): Long {
+        val value = (amountPayable * 100000000.0).roundToLong();
+        return value;
+    }
+
+    private fun getCurrency(): String {
+        return Settings.getCountryCurrencyLocale(activity).currency
     }
 
     override val isBackAllowed: Boolean
