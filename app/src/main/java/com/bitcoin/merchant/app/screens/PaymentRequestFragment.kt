@@ -157,7 +157,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         val args = arguments
         val amountFiat = args?.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0) ?: 0.0
         if (amountFiat > 0.0) {
-            if(Settings.USE_BIP70) {
+            if(Settings.getMultiterminal(requireContext())) {
                 createNewInvoice(amountFiat)
             } else {
                 //Using BIP21

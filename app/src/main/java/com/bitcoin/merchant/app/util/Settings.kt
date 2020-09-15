@@ -10,7 +10,6 @@ import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 
 object Settings {
     const val TAG = "BCR-Settings"
-    const val USE_BIP70 = false
 
     // Internal Settings - non editable by the user
     fun getActiveInvoice(context: Context): InvoiceStatus? {
@@ -87,6 +86,14 @@ object Settings {
     }
 
     private fun getXPubKey(xPub: String) = PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + xPub
+
+    fun getMultiterminal(context: Context): Boolean {
+        return PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MULTI_TERMINAL, false)
+    }
+
+    fun setMultiterminal(context: Context, multiTerminal: Boolean) {
+        PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_MULTI_TERMINAL, multiTerminal)
+    }
 
     private class PrefsUtil private constructor() {
         companion object {
