@@ -157,7 +157,13 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         val args = arguments
         val amountFiat = args?.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0) ?: 0.0
         if (amountFiat > 0.0) {
-            createNewInvoice(amountFiat)
+            if(Settings.USE_BIP70) {
+                createNewInvoice(amountFiat)
+            } else {
+                //Using BIP21
+                val invoiceRequest = createInvoiceRequest(amountFiat, Settings.getCountryCurrencyLocale(activity).currency)
+                createNewBip21Invoice(invoiceRequest?.address, amountFiat.toString())
+            }
         } else {
             resumeExistingInvoice()
         }
@@ -196,18 +202,23 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             }
 
             if(invoiceStatus == null) {
-                val address = invoiceRequest.address
-                val bchAmount = toBch(invoiceRequest.amount.toDouble())
-                val bchSatoshis = getLongAmount(bchAmount)
-                ExpectedPayments.getInstance().addExpectedPayment(address, bchSatoshis, invoiceRequest.amount)
-                val intent = Intent(Action.SUBSCRIBE_TO_ADDRESS)
-                intent.putExtra("address", address)
-                LocalBroadcastManager.getInstance(activity).sendBroadcast(intent)
-                bip21Address = address
-                showQrCodeAndAmountFields(address!!, invoiceRequest.amount, bchAmount.toString())
+                createNewBip21Invoice(invoiceRequest.address, invoiceRequest.amount)
             }
+
             setWorkInProgress(false)
         }
+    }
+
+    private fun createNewBip21Invoice(address: String?, amount: String) {
+        val bchAmount = toBch(amount.toDouble())
+        val bchSatoshis = getLongAmount(bchAmount)
+        ExpectedPayments.getInstance().addExpectedPayment(address, bchSatoshis, amount)
+        val intent = Intent(Action.SUBSCRIBE_TO_ADDRESS)
+        intent.putExtra("address", address)
+        LocalBroadcastManager.getInstance(activity).sendBroadcast(intent)
+        bip21Address = address
+        showQrCodeAndAmountFields(address!!, amount, bchAmount.toString())
+        setWorkInProgress(false)
     }
 
     private fun resumeExistingInvoice() {

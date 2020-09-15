@@ -10,6 +10,7 @@ import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 
 object Settings {
     const val TAG = "BCR-Settings"
+    const val USE_BIP70 = false
 
     // Internal Settings - non editable by the user
     fun getActiveInvoice(context: Context): InvoiceStatus? {
@@ -97,6 +98,7 @@ object Settings {
             const val MERCHANT_KEY_MERCHANT_RECEIVER = "receiving_address"
             const val MERCHANT_KEY_XPUB_INDEX = "xpub_index"
             const val MERCHANT_KEY_PERSIST_INVOICE = "persist_invoice"
+            const val MERCHANT_KEY_MULTI_TERMINAL = "multi_terminal"
             private lateinit var context: Context
             private lateinit var instance: PrefsUtil
             fun getInstance(ctx: Context): PrefsUtil {
