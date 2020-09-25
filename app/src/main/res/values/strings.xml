@@ -37,6 +37,8 @@
     <string name="no_history_text">There is no transaction history.</string>
     <string name="options_explain_payment_address">A destination address can either be a Bitcoin Cash address, or an Extended Public Key (xpub) or a merchant API key or pairing code</string>
     <string name="options_add_payment_address">Add destination address</string>
+    <string name="options_explain_multiterminal">For merchants using the same address across multiple terminals</string>
+    <string name="options_multiterminal">Enable/disable Multi-terminal</string>
     <string name="button_save">Save</string>
     <string name="payment_enter_an_amount">Enter an amount</string>
     <string name="menu_profile">Profile</string>
@@ -49,6 +51,11 @@
     <string name="settings_destination_address">Destination Address</string>
     <string name="settings_local_currency">Local Currency</string>
     <string name="settings_pin_code">PIN Code</string>
+    <string name="settings_bip70">Multi-terminal</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+    <string name="enable">Enable</string>
+    <string name="disable">Disable</string>
     <string name="ad_title_local_bitcoin_cash">Local Bitcoin Cash</string>
     <string name="ad_content_local_bitcoin_cash">Sell your Bitcoin Cash for Cash</string>
     <string name="ad_content_bitcoincom_exchange">50+ trading pairs and SLP token support</string>
