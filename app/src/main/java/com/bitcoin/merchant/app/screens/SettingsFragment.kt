@@ -20,10 +20,7 @@ import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.model.CountryCurrencyLocale
 import com.bitcoin.merchant.app.model.PaymentTarget
-import com.bitcoin.merchant.app.screens.dialogs.AddNewAddressDialog
-import com.bitcoin.merchant.app.screens.dialogs.CurrencySelectionDialog
-import com.bitcoin.merchant.app.screens.dialogs.MerchantNameEditorDialog
-import com.bitcoin.merchant.app.screens.dialogs.SnackHelper
+import com.bitcoin.merchant.app.screens.dialogs.*
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.Settings
 
@@ -34,6 +31,7 @@ class SettingsFragment : ToolbarAwareFragment() {
     private lateinit var lvPaymentAddress: LinearLayout
     private lateinit var lvLocalCurrency: LinearLayout
     private lateinit var lvPinCode: LinearLayout
+    private lateinit var lvBip70: LinearLayout
     private lateinit var btnWallet: RelativeLayout
     private lateinit var btnLocalBitcoin: RelativeLayout
     private lateinit var btnThePit: RelativeLayout
@@ -55,6 +53,7 @@ class SettingsFragment : ToolbarAwareFragment() {
         lvPaymentAddress = rootView.findViewById(R.id.lv_payment_address)
         lvLocalCurrency = rootView.findViewById(R.id.lv_fiat_currency)
         lvPinCode = rootView.findViewById(R.id.lv_pin_code)
+        lvBip70 = rootView.findViewById(R.id.lv_bip70)
         btnWallet = rootView.findViewById(R.id.wallet_ad)
         btnLocalBitcoin = rootView.findViewById(R.id.localbch_ad)
         btnThePit = rootView.findViewById(R.id.bce_ad)
@@ -62,6 +61,7 @@ class SettingsFragment : ToolbarAwareFragment() {
         addOptionCurrency()
         addOptionAddress()
         addOptionPin()
+        addOptionMultiterminal()
         btnWallet.setOnClickListener {
             Analytics.tap_link_wallet.send()
             openUrl(activity.getString(R.string.url_wallet_bitcoin_com))
@@ -129,6 +129,18 @@ class SettingsFragment : ToolbarAwareFragment() {
         }
     }
 
+    private fun addOptionMultiterminal() {
+        val tvMultiterminal = rootView.findViewById<TextView>(R.id.tv_bip70)
+        val multiterminal = Settings.getMultiterminal(activity)
+        val summary = if (multiterminal)
+            getString(R.string.enabled)
+        else getString(R.string.disabled)
+        tvMultiterminal.text = summary
+        lvBip70.setOnClickListener {
+            ToggleMultiterminalDialog(this@SettingsFragment).show()
+        }
+    }
+
     private fun changePin() {
         val args = Bundle()
         args.putBoolean(PinCodeFragment.EXTRA_DO_CREATE, true)
@@ -174,6 +186,12 @@ class SettingsFragment : ToolbarAwareFragment() {
             }
             SnackHelper.show(activity, activity.getString(R.string.notify_changes_have_been_saved))
         }
+    }
+
+    fun setMultiterminal(enabled: Boolean) {
+        val v = rootView.findViewById<TextView>(R.id.tv_bip70)
+        v.text = if(enabled) getString(R.string.enabled) else getString(R.string.disabled)
+        SnackHelper.show(activity, activity.getString(R.string.notify_changes_have_been_saved))
     }
 
     fun validateThenSetPaymentTarget(address: String?) {

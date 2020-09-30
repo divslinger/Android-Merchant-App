@@ -87,6 +87,14 @@ object Settings {
 
     private fun getXPubKey(xPub: String) = PrefsUtil.MERCHANT_KEY_XPUB_INDEX + "_" + xPub
 
+    fun getMultiterminal(context: Context): Boolean {
+        return PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MULTI_TERMINAL, false)
+    }
+
+    fun setMultiterminal(context: Context, multiTerminal: Boolean) {
+        PrefsUtil.getInstance(context).setValue(PrefsUtil.MERCHANT_KEY_MULTI_TERMINAL, multiTerminal)
+    }
+
     private class PrefsUtil private constructor() {
         companion object {
             const val MERCHANT_KEY_PIN = "pin"
@@ -97,6 +105,7 @@ object Settings {
             const val MERCHANT_KEY_MERCHANT_RECEIVER = "receiving_address"
             const val MERCHANT_KEY_XPUB_INDEX = "xpub_index"
             const val MERCHANT_KEY_PERSIST_INVOICE = "persist_invoice"
+            const val MERCHANT_KEY_MULTI_TERMINAL = "multi_terminal"
             private lateinit var context: Context
             private lateinit var instance: PrefsUtil
             fun getInstance(ctx: Context): PrefsUtil {
