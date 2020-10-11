@@ -217,7 +217,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         intent.putExtra("address", address)
         LocalBroadcastManager.getInstance(activity).sendBroadcast(intent)
         bip21Address = address
-        showQrCodeAndAmountFields(address!!, amount, bchAmount.toString())
+        showQrCodeAndAmountFields(address!!, amount, bchSatoshis)
         setWorkInProgress(false)
     }
 
@@ -366,10 +366,10 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         }
     }
 
-    private fun generateQrCode(address: String, bchAmount: String): Bitmap? {
+    private fun generateQrCode(address: String, satoshiAmount: Long): Bitmap? {
         return try {
             val cashAddr = AddressUtil.toCashAddress(address)
-            qrCodeUri = "$cashAddr?amount=$bchAmount"
+            qrCodeUri = "$cashAddr?amount=${AmountUtil(requireContext()).satsToBch(satoshiAmount)}"
             println(qrCodeUri!!)
             QrCodeUtil.getBitmap(qrCodeUri!!, activity.resources.getInteger(R.integer.qr_code_width))
         } catch (e: Exception) {
@@ -379,16 +379,16 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         }
     }
 
-    private fun showQrCodeAndAmountFields(address: String, fiat: String, bchAmount: String) {
+    private fun showQrCodeAndAmountFields(address: String, fiat: String, satoshiAmount: Long) {
         val f = AmountUtil(activity)
         tvFiatAmount.text = f.formatFiat(fiat.toDouble())
         tvFiatAmount.visibility = View.VISIBLE
         tvExpiryTimer.visibility = View.INVISIBLE
         if (BCH_AMOUNT_DISPLAYED) {
-            tvCoinAmount.text = "$bchAmount BCH"
+            tvCoinAmount.text = "${f.satsToBch(satoshiAmount)} BCH"
             tvCoinAmount.visibility = View.VISIBLE
         }
-        val bitmap = generateQrCode(address, bchAmount)
+        val bitmap = generateQrCode(address, satoshiAmount)
         ivReceivingQr.setImageBitmap(bitmap)
         setInvoiceReadyToShare(true)
         initiateBip21ConnectionStatus()

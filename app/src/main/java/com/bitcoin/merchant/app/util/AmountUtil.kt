@@ -21,8 +21,18 @@ class AmountUtil(private val context: Context) {
         }
     }
 
+    fun satsToBch(satoshis: Long): String {
+        return formatBch(satoshis / 100000000.0, false)
+    }
+
     fun formatBch(amountBch: Double): String {
-        return MonetaryUtil.instance.bchDecimalFormat.format(amountBch) + " " + DEFAULT_CURRENCY_BCH
+        return formatBch(amountBch, false)
+    }
+
+    fun formatBch(amountBch: Double, unit: Boolean): String {
+        var string = MonetaryUtil.instance.bchDecimalFormat.format(amountBch)
+        if(unit) string += " $DEFAULT_CURRENCY_BCH"
+        return string
     }
 
     companion object {
