@@ -3,6 +3,7 @@ package com.bitcoin.merchant.app.util
 import android.content.Context
 import android.util.Log
 import com.bitcoin.merchant.app.model.Analytics
+import org.bitcoinj.core.Coin
 import java.text.NumberFormat
 import java.util.*
 
@@ -22,7 +23,7 @@ class AmountUtil(private val context: Context) {
     }
 
     fun satsToBch(satoshis: Long): String {
-        return formatBch(satoshis / 100000000.0, false)
+        return Coin.valueOf(satoshis).toPlainString()
     }
 
     fun formatBch(amountBch: Double): String {
