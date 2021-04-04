@@ -203,6 +203,7 @@
  { "currency":"CHF", "decimals":2, "iso":"CH", "lang":"de-CH", "name":"Switzerland" },
  { "currency":"SYP", "decimals":0, "iso":"SY", "lang":"ar-SY", "name":"Syria" },
  { "currency":"STD", "decimals":0, "iso":"ST", "lang":"pt-ST", "name":"São Tomé & Príncipe" },
+ { "currency":"TWD", "decimals":2, "iso":"TW", "lang":"zh-TW", "name":"Taiwan" },
  { "currency":"TJS", "decimals":2, "iso":"TJ", "lang":"tg", "name":"Tajikistan" },
  { "currency":"TZS", "decimals":2, "iso":"TZ", "lang":"sw-TZ", "name":"Tanzania" },
  { "currency":"THB", "decimals":2, "iso":"TH", "lang":"th", "name":"Thailand" },
@@ -227,6 +228,5 @@
  { "currency":"VUV", "decimals":0, "iso":"VU", "lang":"bi", "name":"Vanuatu" },
  { "currency":"EUR", "decimals":2, "iso":"VA", "lang":"la", "name":"Vatican City" },
  { "currency":"VEF", "decimals":2, "iso":"VE", "lang":"es-VE", "name":"Venezuela" },
- { "currency":"VND", "decimals":0, "iso":"VN", "lang":"vi", "name":"Vietnam" },
- { "currency":"TWD", "decimals":2, "iso":"TW", "lang":"zh-TW", "name":"Taiwan" }
+ { "currency":"VND", "decimals":0, "iso":"VN", "lang":"vi", "name":"Vietnam" }
 ]
