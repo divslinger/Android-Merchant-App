@@ -227,5 +227,6 @@
  { "currency":"VUV", "decimals":0, "iso":"VU", "lang":"bi", "name":"Vanuatu" },
  { "currency":"EUR", "decimals":2, "iso":"VA", "lang":"la", "name":"Vatican City" },
  { "currency":"VEF", "decimals":2, "iso":"VE", "lang":"es-VE", "name":"Venezuela" },
- { "currency":"VND", "decimals":0, "iso":"VN", "lang":"vi", "name":"Vietnam" } 
+ { "currency":"VND", "decimals":0, "iso":"VN", "lang":"vi", "name":"Vietnam" },
+ { "currency":"TWD", "decimals":2, "iso":"TW", "lang":"zh-TW", "name":"Taiwan" }
 ]
