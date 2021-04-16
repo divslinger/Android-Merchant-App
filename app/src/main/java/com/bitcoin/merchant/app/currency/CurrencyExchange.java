@@ -139,7 +139,7 @@ public class CurrencyExchange {
             return;
         }
         try {
-            CurrencyRate[] rates = getUrlAsJson("https://www.bitcoin.com/special/rates.json", CurrencyRate[].class);
+            CurrencyRate[] rates = getUrlAsJson("https://markets.api.bitcoin.com/rates?c=BTC", CurrencyRate[].class);
             tickerToRate.putAll(CurrencyRate.convertFromBtcToBch(rates, tickerToSymbol));
             lastUpdate = System.currentTimeMillis();
             saveToStore();

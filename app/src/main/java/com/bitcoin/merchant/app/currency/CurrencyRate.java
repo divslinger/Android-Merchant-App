@@ -33,7 +33,7 @@ public class CurrencyRate {
         double bchRate = findBchRate(btcRates);
         for (CurrencyRate cr : btcRates) {
             if (!cr.name.toLowerCase().contains("coin")) {
-                BigDecimal bchValue = new BigDecimal(cr.rate * bchRate).setScale(2, BigDecimal.ROUND_CEILING);
+                BigDecimal bchValue = new BigDecimal(cr.rate / bchRate).setScale(2, BigDecimal.ROUND_CEILING);
                 double price = bchValue.doubleValue();
                 String ticker = cr.code;
                 String symbol = tickerToSymbol.get(ticker);
