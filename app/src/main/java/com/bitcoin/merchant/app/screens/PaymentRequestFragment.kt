@@ -167,10 +167,10 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         bip70PayService = Bip70PayService.create(resources.getString(R.string.bip70_bitcoin_com_host))
         bip70Manager = Bip70Manager(app)
         currencyExchange = CurrencyExchange.getInstance(context)
-        runBlocking { currencyExchange?.forceExchangeRateUpdates() }
 
         val outOfDateRates = currencyExchange?.isSeverelyOutOfDate
         if(outOfDateRates == true) {
+            runBlocking { currencyExchange?.forceExchangeRateUpdates() }
             SnackHelper.show(activity, activity.getString(R.string.out_of_date_fiat_rates), error = true)
             deleteActiveInvoiceAndExitScreen()
         }
