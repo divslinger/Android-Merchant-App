@@ -19,6 +19,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.Action
@@ -35,6 +36,7 @@ import com.bitcoin.merchant.app.util.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.bitcoindotcom.bchprocessor.bip70.Bip70Manager
 import org.bitcoindotcom.bchprocessor.bip70.Bip70PayService
@@ -57,6 +59,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private lateinit var waitingLayout: LinearLayout
     private lateinit var receivedLayout: LinearLayout
     private lateinit var tvConnectionStatus: ImageView
+    private lateinit var disconnectedBar: TextView
     private lateinit var tvFiatAmount: TextView
     private lateinit var tvCoinAmount: TextView
     private lateinit var tvExpiryTimer: TextView
@@ -69,6 +72,8 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private var lastProcessedInvoicePaymentId: String? = null
     private var qrCodeUri: String? = null
     private var bip21Address: String? = null
+    private var currencyExchange: CurrencyExchange? = null
+    private val connected: MutableLiveData<Boolean> = MutableLiveData(true)
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -99,12 +104,19 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     }
 
     private var lastConnectionStatusEnabled: Boolean = false
+    private var firstTimeConnectionStatusCheck = true
     private fun updateConnectionStatus(enabled: Boolean) {
         if (lastConnectionStatusEnabled != enabled) {
             lastConnectionStatusEnabled = enabled
+            if(firstTimeConnectionStatusCheck) {
+                firstTimeConnectionStatusCheck = false
+            }
             Log.d(TAG, "Socket " + if (enabled) "connected" else "disconnected")
         }
         tvConnectionStatus.setImageResource(if (enabled) R.drawable.connected else R.drawable.disconnected)
+        if(!firstTimeConnectionStatusCheck) {
+            connected.value = enabled
+        }
     }
 
     private fun acknowledgePayment(i: InvoiceStatus) {
@@ -154,6 +166,14 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         registerReceiver()
         bip70PayService = Bip70PayService.create(resources.getString(R.string.bip70_bitcoin_com_host))
         bip70Manager = Bip70Manager(app)
+        currencyExchange = CurrencyExchange.getInstance(context)
+        runBlocking { currencyExchange?.forceExchangeRateUpdates() }
+
+        val outOfDateRates = currencyExchange?.isSeverelyOutOfDate
+        if(outOfDateRates == true) {
+            SnackHelper.show(activity, activity.getString(R.string.out_of_date_fiat_rates), error = true)
+            deleteActiveInvoiceAndExitScreen()
+        }
         val args = arguments
         val amountFiat = args?.getDouble(PaymentInputFragment.AMOUNT_PAYABLE_FIAT, 0.0) ?: 0.0
         if (amountFiat > 0.0) {
@@ -167,6 +187,14 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         } else {
             resumeExistingInvoice()
         }
+
+        connected.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            if(it == false) {
+                disconnectedBar.visibility = View.VISIBLE
+            } else {
+                disconnectedBar.visibility = View.GONE
+            }
+        })
 
         return v
     }
@@ -267,6 +295,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         tvCoinAmount = v.findViewById(R.id.tv_btc_amount)
         tvExpiryTimer = v.findViewById(R.id.bip70_timer_tv)
         ivReceivingQr = v.findViewById(R.id.qr)
+        disconnectedBar = v.findViewById(R.id.disconnected_text)
         progressLayout = v.findViewById(R.id.progressLayout)
         waitingLayout = v.findViewById(R.id.layout_waiting)
         receivedLayout = v.findViewById(R.id.layout_complete)
