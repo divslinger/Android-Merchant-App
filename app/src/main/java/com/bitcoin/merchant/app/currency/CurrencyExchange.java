@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class CurrencyExchange {
-    public static final int MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS = 1 * 60 * 1000;
-    public static final int RATE_WARNING_THRESHOLD_IN_MS = 3 * 60 * 1000;
+    public static final int MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS = 3 * 60 * 1000;
+    public static final int RATE_WARNING_THRESHOLD_IN_MS = 120 * 60 * 1000;
     public static final String TAG = "CurrencyExchange";
     private static CurrencyExchange instance;
     private final Context context;
