@@ -21,6 +21,7 @@ import java.util.TreeMap;
 
 public class CurrencyExchange {
     public static final int MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS = 3 * 60 * 1000;
+    public static final int RATE_WARNING_THRESHOLD_IN_MS = 120 * 60 * 1000;
     public static final String TAG = "CurrencyExchange";
     private static CurrencyExchange instance;
     private final Context context;
@@ -129,9 +130,18 @@ public class CurrencyExchange {
         t.start();
     }
 
+    public void forceExchangeRateUpdates() {
+        checkCurrencyUpdate();
+    }
+
     private boolean isUpToDate() {
         long now = System.currentTimeMillis();
         return (now - lastUpdate) < MINIMUM_INTERVAL_BETWEEN_UPDATE_IN_MS;
+    }
+
+    public boolean isSeverelyOutOfDate() {
+        long now = System.currentTimeMillis();
+        return (now - lastUpdate) >= RATE_WARNING_THRESHOLD_IN_MS;
     }
 
     private void checkCurrencyUpdate() {

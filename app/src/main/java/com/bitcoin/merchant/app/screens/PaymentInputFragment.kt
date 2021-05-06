@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.R
@@ -23,9 +24,7 @@ import com.bitcoin.merchant.app.util.AmountUtil
 import com.bitcoin.merchant.app.util.MonetaryUtil
 import com.bitcoin.merchant.app.util.QrCodeUtil
 import com.bitcoin.merchant.app.util.Settings
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.bitcoindotcom.bchprocessor.bip70.Bip70Manager
 import org.bitcoindotcom.bchprocessor.bip70.Bip70SocketHandler
 import java.text.NumberFormat
@@ -49,6 +48,8 @@ class PaymentInputFragment : ToolbarAwareFragment() {
             }
         }
     }
+    private var currencyExchange: CurrencyExchange? = null
+    private val outOfDateRates: MutableLiveData<Boolean> = MutableLiveData(false)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -67,9 +68,17 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         tvCurrencySymbol.text = currencySymbol
         setToolbarAsMenuButton()
         clearToolbarTitle()
-
+        currencyExchange = CurrencyExchange.getInstance(context)
+        runBlocking { currencyExchange?.forceExchangeRateUpdates() }
         //Initialize rates upon launch.
         getCurrencyPrice()
+
+        outOfDateRates.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            if(it == true) {
+                GlobalScope.launch { currencyExchange?.forceExchangeRateUpdates() }
+                SnackHelper.show(activity, activity.getString(R.string.out_of_date_fiat_rates), error = true)
+            }
+        })
         return rootView
     }
 
@@ -136,6 +145,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     private fun initializeButtons() {
         val digitListener = View.OnClickListener {
             digitPressed((it as Button).text.toString())
+            outOfDateRates.value = currencyExchange?.isSeverelyOutOfDate
             updateAmounts()
         }
         rootView.findViewById<View>(R.id.button0).setOnClickListener(digitListener)
@@ -173,6 +183,14 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     private fun chargeClicked() {
         if (!isAdded) {
             return
+        }
+        val outOfDate = currencyExchange?.isSeverelyOutOfDate
+        if(outOfDate == true) {
+            outOfDateRates.value = outOfDate
+            return
+        }
+        runBlocking {
+            currencyExchange?.forceExchangeRateUpdates()
         }
         if (validateAmount()) {
             Analytics.invoice_checkout.send()

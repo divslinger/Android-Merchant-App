@@ -82,4 +82,5 @@
     <string name="share_invoice_msg">Please pay your invoice here: %1$s</string>
     <string name="error_check_your_network_connection">Please check your network connection</string>
     <string name="retry">Retry</string>
+    <string name="out_of_date_fiat_rates">Exchange rates are out of date. Updating…</string>
 </resources>
