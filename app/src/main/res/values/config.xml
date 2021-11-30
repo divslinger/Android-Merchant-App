@@ -10,10 +10,9 @@
     <string name="url_service_terms" translatable="false">https://www.bitcoin.com/bitcoin-cash-register/service-terms/</string>
     <string name="url_privacy_policy" translatable="false">https://www.bitcoin.com/privacy-policy/</string>
     <string name="url_wallet_bitcoin_com" translatable="false">https://wallet.bitcoin.com</string>
-    <string name="url_local_bitcoin_com" translatable="false">https://local.bitcoin.com</string>
-    <string name="url_exchange_bitcoin_com" translatable="false">https://exchange.bitcoin.com</string>
+    <string name="url_local_bitcoin_com" translatable="false">https://localcryptos.com/?campaign=bl</string>
     <string name="url_rest_bitcoin_com" translatable="false">https://rest.bitcoin.com/v2</string>
     <string name="url_explorer_bitcoin_com" translatable="false">https://explorer.bitcoin.com</string>
     <string name="url_bitcoin_com" translatable="false">https://www.bitcoin.com</string>
-    <string name="copyright_year" translatable="false">2020</string>
+    <string name="copyright_year" translatable="false">2021</string>
 </resources>

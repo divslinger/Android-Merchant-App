@@ -35,7 +35,7 @@
     <string name="syncing_xpub">Syncing xpub…</string>
     <string name="synced_xpub">xpub synced!</string>
     <string name="no_history_text">There is no transaction history.</string>
-    <string name="options_explain_payment_address">A destination address can either be a Bitcoin Cash address, or an Extended Public Key (xpub) or a merchant API key or pairing code</string>
+    <string name="options_explain_payment_address">A destination address can either be a Bitcoin Cash address, or an Extended Public Key (xpub)</string>
     <string name="options_add_payment_address">Add destination address</string>
     <string name="options_explain_multiterminal">For merchants using the same address across multiple terminals</string>
     <string name="options_multiterminal">Enable/disable Multi-terminal</string>

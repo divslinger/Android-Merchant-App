@@ -34,7 +34,6 @@ class SettingsFragment : ToolbarAwareFragment() {
     private lateinit var lvBip70: LinearLayout
     private lateinit var btnWallet: RelativeLayout
     private lateinit var btnLocalBitcoin: RelativeLayout
-    private lateinit var btnThePit: RelativeLayout
 
     private val paymentTargetReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -56,7 +55,6 @@ class SettingsFragment : ToolbarAwareFragment() {
         lvBip70 = rootView.findViewById(R.id.lv_bip70)
         btnWallet = rootView.findViewById(R.id.wallet_ad)
         btnLocalBitcoin = rootView.findViewById(R.id.localbch_ad)
-        btnThePit = rootView.findViewById(R.id.bce_ad)
         addOptionName()
         addOptionCurrency()
         addOptionAddress()
@@ -69,10 +67,6 @@ class SettingsFragment : ToolbarAwareFragment() {
         btnLocalBitcoin.setOnClickListener {
             Analytics.tap_link_localbitcoin.send()
             openUrl(activity.getString(R.string.url_local_bitcoin_com))
-        }
-        btnThePit.setOnClickListener {
-            Analytics.tap_link_exchange.send()
-            openUrl(activity.getString(R.string.url_exchange_bitcoin_com))
         }
         setToolbarAsBackButton()
         setToolbarTitle(R.string.menu_settings)

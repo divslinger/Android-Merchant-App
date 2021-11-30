@@ -256,8 +256,6 @@
 
             <include layout="@layout/localbch_ad" />
 
-            <include layout="@layout/bce_ad" />
-
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
