@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.currency.CurrencyExchange
 import com.bitcoin.merchant.app.model.Analytics
@@ -144,6 +145,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
 
     private fun initializeButtons() {
         val digitListener = View.OnClickListener {
+            checkConnectivity()
             digitPressed((it as Button).text.toString())
             outOfDateRates.value = currencyExchange?.isSeverelyOutOfDate
             updateAmounts()
@@ -160,15 +162,24 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         rootView.findViewById<View>(R.id.button9).setOnClickListener(digitListener)
         buttonDecimal = rootView.findViewById(R.id.buttonDecimal)
         buttonDecimal.setOnClickListener {
+            checkConnectivity()
             decimalPressed()
             updateAmounts()
         }
         val buttonDeleteBack = rootView.findViewById<Button>(R.id.buttonDeleteBack)
         buttonDeleteBack.setOnClickListener {
+            checkConnectivity()
             backspacePressed()
             updateAmounts()
         }
         updateAmounts()
+    }
+
+    private fun checkConnectivity() {
+        val connected = MainActivity.bitcoinDotComSocket.isConnected && MainActivity.blockchainDotInfoSocket.isConnected
+        if(!connected) {
+            activity.restartSockets()
+        }
     }
 
     private fun validateAmount(): Boolean {
@@ -188,9 +199,6 @@ class PaymentInputFragment : ToolbarAwareFragment() {
         if(outOfDate == true) {
             outOfDateRates.value = outOfDate
             return
-        }
-        runBlocking {
-            currencyExchange?.forceExchangeRateUpdates()
         }
         if (validateAmount()) {
             Analytics.invoice_checkout.send()

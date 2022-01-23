@@ -77,6 +77,10 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
         val filter = IntentFilter()
         filter.addAction(Action.SUBSCRIBE_TO_ADDRESS)
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter)
+        restartSockets()
+    }
+
+    fun restartSockets() {
         bitcoinDotComSocket = BitcoinComSocketHandler()
         (bitcoinDotComSocket as BitcoinComSocketHandler).setListener(this)
         bitcoinDotComSocket.start()
