@@ -24,7 +24,6 @@ import androidx.navigation.Navigation
 import com.bitcoin.merchant.app.application.CashRegisterApplication
 import com.bitcoin.merchant.app.application.NetworkStateReceiver
 import com.bitcoin.merchant.app.model.Analytics
-import com.bitcoin.merchant.app.network.ExpectedPayments
 import com.bitcoin.merchant.app.network.PaymentReceived
 import com.bitcoin.merchant.app.network.websocket.TxWebSocketHandler
 import com.bitcoin.merchant.app.network.websocket.WebSocketListener
@@ -37,8 +36,6 @@ import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.util.ScanQRUtil
 import com.bitcoin.merchant.app.util.Settings
 import com.google.android.material.navigation.NavigationView
-import org.bitcoindotcom.bchprocessor.bip70.model.Bip70Action
-import org.bitcoindotcom.bchprocessor.bip70.model.InvoiceStatus
 
 open class MainActivity : AppCompatActivity(), WebSocketListener {
     private lateinit var mDrawerLayout: DrawerLayout
@@ -54,12 +51,15 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
     val app: CashRegisterApplication
         get() = application as CashRegisterApplication
 
+    lateinit var bitcoinDotComSocket: TxWebSocketHandler
+    lateinit var blockchainDotInfoSocket: TxWebSocketHandler
+
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (Action.SUBSCRIBE_TO_ADDRESS == intent.action) {
                 println("Subscribed to address!")
-                bitcoinDotComSocket.subscribeToAddress(intent.getStringExtra("address"));
-                blockchainDotInfoSocket.subscribeToAddress(intent.getStringExtra("address"));
+                bitcoinDotComSocket.subscribeToAddress(intent.getStringExtra("address"))
+                blockchainDotInfoSocket.subscribeToAddress(intent.getStringExtra("address"))
             }
         }
     }
@@ -77,16 +77,24 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
         val filter = IntentFilter()
         filter.addAction(Action.SUBSCRIBE_TO_ADDRESS)
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter)
-        restartSockets()
+        restartSocketsWhenNeeded()
     }
 
-    fun restartSockets() {
-        bitcoinDotComSocket = BitcoinComSocketHandler()
-        (bitcoinDotComSocket as BitcoinComSocketHandler).setListener(this)
-        bitcoinDotComSocket.start()
-        blockchainDotInfoSocket = BlockchainInfoSocketSocketHandler()
-        (blockchainDotInfoSocket as BlockchainInfoSocketSocketHandler).setListener(this)
-        blockchainDotInfoSocket.start()
+    fun restartSocketsWhenNeeded() {
+        if (!this::bitcoinDotComSocket.isInitialized || !bitcoinDotComSocket.isConnected) {
+            if (this::bitcoinDotComSocket.isInitialized)
+                bitcoinDotComSocket.stop()
+            bitcoinDotComSocket = BitcoinComSocketHandler()
+            bitcoinDotComSocket.setListener(this)
+            bitcoinDotComSocket.start()
+        }
+        if (!this::blockchainDotInfoSocket.isInitialized || !blockchainDotInfoSocket.isConnected) {
+            if (this::blockchainDotInfoSocket.isInitialized)
+                blockchainDotInfoSocket.stop()
+            blockchainDotInfoSocket = BlockchainInfoSocketSocketHandler()
+            blockchainDotInfoSocket.setListener(this)
+            blockchainDotInfoSocket.start()
+        }
     }
 
     private fun listenToConnectivityChanges() {
@@ -200,7 +208,7 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
                 }
                 R.id.action_settings -> {
                     Analytics.tap_settings.send()
-                    if(nav.currentDestination?.id != R.id.pin_code_screen)
+                    if (nav.currentDestination?.id != R.id.pin_code_screen)
                         nav.navigate(R.id.nav_to_settings_screen)
                 }
                 R.id.action_about -> {
@@ -244,16 +252,14 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
     companion object {
         const val TAG = "BCR-MainActivity"
         const val APP_PACKAGE = "com.bitcoin.merchant.app"
-        lateinit var bitcoinDotComSocket: TxWebSocketHandler
-        lateinit var blockchainDotInfoSocket: TxWebSocketHandler
         fun getNav(activity: Activity): NavController {
             return Navigation.findNavController(activity, R.id.main_nav_controller)
         }
     }
 
     override fun onIncomingPayment(payment: PaymentReceived?) {
-        if(payment != null) {
-            if(payment.bchExpected != 0L && payment.fiatExpected != null) {
+        if (payment != null) {
+            if (payment.bchExpected != 0L && payment.fiatExpected != null) {
                 if (!payment.isUnderpayment && !payment.isOverpayment) {
                     Log.d(TAG, "${payment.txHash} has been received.")
                     val i = Intent(Action.ACKNOWLEDGE_BIP21_PAYMENT)

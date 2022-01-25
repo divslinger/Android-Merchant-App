@@ -15,7 +15,6 @@ import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.currency.CurrencyExchange
 import com.bitcoin.merchant.app.model.Analytics
@@ -113,7 +112,7 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     }
 
     private fun getCurrencyPrice(): Double {
-        return CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(Settings.getCountryCurrencyLocale(activity).currency);
+        return CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(Settings.getCountryCurrencyLocale(activity).currency)
     }
 
     private fun initDecimalButton() {
@@ -176,9 +175,8 @@ class PaymentInputFragment : ToolbarAwareFragment() {
     }
 
     private fun checkConnectivity() {
-        val connected = MainActivity.bitcoinDotComSocket.isConnected && MainActivity.blockchainDotInfoSocket.isConnected
-        if(!connected) {
-            activity.restartSockets()
+        if (isActivityInitialized) {
+            activity.restartSocketsWhenNeeded()
         }
     }
 

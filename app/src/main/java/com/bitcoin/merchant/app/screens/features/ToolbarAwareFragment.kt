@@ -16,6 +16,7 @@ import com.bitcoin.merchant.app.util.AppUtil
 
 abstract class ToolbarAwareFragment : Fragment() {
     lateinit var activity: MainActivity
+    val isActivityInitialized get() = this::activity.isInitialized
     private lateinit var toolbar: Toolbar
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         activity = getActivity() as MainActivity
