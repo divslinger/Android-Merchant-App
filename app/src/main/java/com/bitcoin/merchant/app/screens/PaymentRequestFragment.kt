@@ -23,7 +23,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bitcoin.merchant.app.Action
-import com.bitcoin.merchant.app.MainActivity
 import com.bitcoin.merchant.app.R
 import com.bitcoin.merchant.app.currency.CurrencyExchange
 import com.bitcoin.merchant.app.model.Analytics
@@ -373,7 +372,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
     private suspend fun downloadInvoice(request: InvoiceRequest, retry: () -> Unit): InvoiceStatus? {
         return withContext(Dispatchers.IO) {
             try {
-                val startMs = System.currentTimeMillis();
+                val startMs = System.currentTimeMillis()
                 val response: Response<InvoiceStatus?> = bip70PayService.createInvoice(request).execute()
                 val invoice = response.body() ?: throw Exception("HTTP status:" + response.code() + " message:" + response.message())
                 Analytics.invoice_created.sendDuration(System.currentTimeMillis() - startMs)
@@ -483,7 +482,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         object : CountDownTimer(1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 if (isAdded) {
-                    updateConnectionStatus(MainActivity.bitcoinDotComSocket.isConnected)
+                    updateConnectionStatus(activity.bitcoinDotComSocket.isConnected)
                 }
             }
 
@@ -532,7 +531,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
             val sendIntent = Intent().apply {
                 action = Intent.ACTION_SEND
                 putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.share_invoice_msg, urlWithoutPrefix))
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 putExtra(Intent.EXTRA_STREAM, bitmapUri)
                 type = "image/*"
             }
@@ -545,16 +544,15 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
 
     private fun toBch(amount: Double): Double {
         val currencyPrice: Double = getCurrencyPrice()
-        return if (currencyPrice == 0.0) 0.0 else BigDecimal(amount).divide(BigDecimal(currencyPrice), 8, RoundingMode.HALF_EVEN).toDouble();
+        return if (currencyPrice == 0.0) 0.0 else BigDecimal(amount).divide(BigDecimal(currencyPrice), 8, RoundingMode.HALF_EVEN).toDouble()
     }
 
     private fun getCurrencyPrice(): Double {
-        return CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency());
+        return CurrencyExchange.getInstance(getActivity()).getCurrencyPrice(getCurrency())
     }
 
     private fun getLongAmount(amountPayable: Double): Long {
-        val value = (amountPayable * 100000000.0).roundToLong();
-        return value;
+        return (amountPayable * 100000000.0).roundToLong()
     }
 
     private fun getCurrency(): String {

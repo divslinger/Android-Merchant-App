@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Socket will reconnect even without calling again webSocketHandler.start()
@@ -23,10 +24,13 @@ import java.util.Set;
  */
 public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
     private static final long PING_INTERVAL = 20 * 1000L; // ping every 20 seconds
+    private static AtomicInteger socketThreadCount = new AtomicInteger();
     private final WebSocketFactory webSocketFactory;
     protected WebSocketListener webSocketListener;
     protected String TAG = "WebSocketHandler";
     private volatile ConnectionHandler handler;
+    // A stopped Socket is not reusable, as it will exit its connection thread
+    private volatile boolean stopped;
 
     public TxWebSocketHandlerImpl() {
         this.webSocketFactory = new WebSocketFactory();
@@ -44,8 +48,7 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
     @Override
     public void start() {
         try {
-            Log.i(TAG, "start threads:" + Thread.activeCount());
-            stop();
+            Log.i(TAG, "start threads:" + getSocketThreadCount());
             new ConnectionThread().start();
         } catch (Exception e) {
             Log.e(TAG, "start", e);
@@ -54,6 +57,7 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
 
     @Override
     public void stop() {
+        stopped = true;
         if (handler != null) {
             handler.stop();
         }
@@ -87,8 +91,14 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
 
         @Override
         public void run() {
+            socketThreadCount.addAndGet(1);
+            Log.i(TAG, "entering ConnectionThread.run() threads:" + getSocketThreadCount());
             long doubleBackOff = 1000;
-            while (true) {
+            // This while loop should be removed once a cleaner implementation
+            // automatically detects connections & disconnections
+            // This can be done by registering a network callback which requires the API 24 (OS 7).
+            // https://developer.android.com/reference/android/net/ConnectivityManager#registerDefaultNetworkCallback(android.net.ConnectivityManager.NetworkCallback)
+            while (!stopped) {
                 try {
                     handler = new ConnectionHandler();
                     break;
@@ -99,9 +109,12 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
                     } catch (InterruptedException ex) {
                         // fail silently
                     }
-                    doubleBackOff *= 2;
+                    // Allow a maximum delay of 10 seconds between retry
+                    doubleBackOff = Math.min(doubleBackOff * 2, 10_000);
                 }
             }
+            socketThreadCount.addAndGet(-1);
+            Log.i(TAG, "exiting ConnectionThread.run() threads:" + getSocketThreadCount());
         }
     }
 
@@ -129,26 +142,26 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
         public void onPongFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
             super.onPongFrame(websocket, frame);
             timeLastAlive = System.currentTimeMillis();
-            Log.d(TAG, "PongSuccess threads:" + Thread.activeCount());
+            Log.d(TAG, "PongSuccess threads:" + getSocketThreadCount());
         }
 
         @Override
         public void onPingFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
             super.onPingFrame(websocket, frame);
             timeLastAlive = System.currentTimeMillis();
-            Log.d(TAG, "PingSuccess threads:" + Thread.activeCount());
+            Log.d(TAG, "PingSuccess threads:" + getSocketThreadCount());
         }
 
         @Override
         public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
             super.onConnected(websocket, headers);
-            Log.i(TAG, "onConnected threads:" + Thread.activeCount());
+            Log.i(TAG, "onConnected threads:" + getSocketThreadCount());
         }
 
         @Override
         public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
             super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer);
-            Log.e(TAG, "onDisconnected threads:" + Thread.activeCount());
+            Log.e(TAG, "onDisconnected threads:" + getSocketThreadCount());
             if (autoReconnect) {
                 // reconnect on involuntary disconnection
                 start();
@@ -169,10 +182,26 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
         }
 
         public void stop() {
-            if (isConnected()) {
+            if (mConnection != null) {
                 autoReconnect = false;
                 mConnection.clearListeners();
-                mConnection.disconnect();
+                if (mConnection.isOpen()) {
+                    // Use a daemon thread otherwise it can lock the UI for up to 10 seconds
+                    Thread t = new Thread(() -> {
+                        socketThreadCount.addAndGet(1);
+                        Log.i(TAG, "entering DisconnectionThread.run() threads:" + getSocketThreadCount());
+                        try {
+                            mConnection.disconnect();
+                        } catch (Exception e) {
+                            Log.e(TAG, "disconnect", e);
+                        }
+                        socketThreadCount.addAndGet(-1);
+                        Log.i(TAG, "exiting DisconnectionThread.run() threads:" + getSocketThreadCount());
+                    });
+                    t.setName("DisconnectionThread");
+                    t.setDaemon(true);
+                    t.start();
+                }
             }
         }
 
@@ -198,5 +227,9 @@ public abstract class TxWebSocketHandlerImpl implements TxWebSocketHandler {
             // considered broken when older than 1 minute and with no ping or pong during that time
             return (timeLastAlive + MINUTE_IN_MS) < System.currentTimeMillis();
         }
+    }
+
+    private String getSocketThreadCount() {
+        return "Sockets:#" + socketThreadCount.get() + ", TotalThreads:#" + Thread.activeCount();
     }
 }
