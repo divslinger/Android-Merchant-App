@@ -42,7 +42,10 @@ object Settings {
     }
 
     fun getPaymentTarget(context: Context): PaymentTarget {
-        val value = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "")
+        var value = PrefsUtil.getInstance(context).getValue(PrefsUtil.MERCHANT_KEY_MERCHANT_RECEIVER, "")
+        if(AddressUtil.isValidLegacy(value)) {
+            value = AddressUtil.toCashAddress(value)
+        }
         return PaymentTarget.parse(value)
     }
 

@@ -27,7 +27,6 @@ import com.bitcoin.merchant.app.model.Analytics
 import com.bitcoin.merchant.app.network.PaymentReceived
 import com.bitcoin.merchant.app.network.websocket.TxWebSocketHandler
 import com.bitcoin.merchant.app.network.websocket.WebSocketListener
-import com.bitcoin.merchant.app.network.websocket.impl.bitcoincom.BitcoinComSocketHandler
 import com.bitcoin.merchant.app.network.websocket.impl.blockchaininfo.BlockchainInfoSocketSocketHandler
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
@@ -51,14 +50,12 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
     val app: CashRegisterApplication
         get() = application as CashRegisterApplication
 
-    lateinit var bitcoinDotComSocket: TxWebSocketHandler
     lateinit var blockchainDotInfoSocket: TxWebSocketHandler
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (Action.SUBSCRIBE_TO_ADDRESS == intent.action) {
                 println("Subscribed to address!")
-                bitcoinDotComSocket.subscribeToAddress(intent.getStringExtra("address"))
                 blockchainDotInfoSocket.subscribeToAddress(intent.getStringExtra("address"))
             }
         }
@@ -81,13 +78,6 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
     }
 
     fun restartSocketsWhenNeeded() {
-        if (!this::bitcoinDotComSocket.isInitialized || !bitcoinDotComSocket.isConnected) {
-            if (this::bitcoinDotComSocket.isInitialized)
-                bitcoinDotComSocket.stop()
-            bitcoinDotComSocket = BitcoinComSocketHandler()
-            bitcoinDotComSocket.setListener(this)
-            bitcoinDotComSocket.start()
-        }
         if (!this::blockchainDotInfoSocket.isInitialized || !blockchainDotInfoSocket.isConnected) {
             if (this::blockchainDotInfoSocket.isInitialized)
                 blockchainDotInfoSocket.stop()

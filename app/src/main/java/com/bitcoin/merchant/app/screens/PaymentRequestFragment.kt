@@ -482,7 +482,7 @@ class PaymentRequestFragment : ToolbarAwareFragment() {
         object : CountDownTimer(1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 if (isAdded) {
-                    updateConnectionStatus(activity.bitcoinDotComSocket.isConnected)
+                    updateConnectionStatus(activity.blockchainDotInfoSocket.isConnected)
                 }
             }
 

@@ -25,12 +25,20 @@ object AddressUtil {
         }
     }
 
-    fun toCashAddress(legacy: String): String {
-        return CashAddressFactory.create().getFromBase58(MainNetParams.get(), legacy).toString()
+    fun toCashAddress(address: String): String {
+        return if(isValidLegacy(address)) {
+            CashAddressFactory.create().getFromBase58(MainNetParams.get(), address).toString()
+        } else {
+            CashAddressFactory.create().getFromFormattedAddress(MainNetParams.get(), address).toString()
+        }
     }
 
     fun toLegacyAddress(address: String): String {
-        return CashAddressFactory.create().getFromFormattedAddress(MainNetParams.get(), address).toBase58()
+        return if(isValidCashAddr(address)) {
+            CashAddressFactory.create().getFromFormattedAddress(MainNetParams.get(), address).toBase58()
+        } else {
+            CashAddressFactory.create().getFromBase58(MainNetParams.get(), address).toBase58()
+        }
     }
 
     fun toSimpleLedgerAddress(address: String): String {
