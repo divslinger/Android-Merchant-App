@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ActivityInfo
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Handler
@@ -63,6 +64,11 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (resources.getBoolean(R.bool.portrait_only)) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
         Analytics.configure(application, this)
         setContentView(R.layout.activity_main)
         rootView = findViewById(R.id.content_frame)
