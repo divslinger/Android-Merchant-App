@@ -1,0 +1,31 @@
+{
+  "network": "main",
+  "currency": "BCH",
+  "outputs": [
+    {
+      "script": "76a91434caf2ed1f3dc31530ccd216a2a11d99697949bb88ac",
+      "amount": 44910,
+      "address": "15p9G7cpWwsvZTjWvsT74F9szU2cbaiCFM",
+      "type": "P2PKH"
+    },
+    {
+      "script": "AABBCCDDEEFF",
+      "amount": 5090,
+      "address": "333333333333333333333333333333CFM",
+      "type": "P2SH"
+    }
+
+  ],
+  "time": "2019-10-05T23:24:27.911Z",
+  "expires": "2019-10-05T23:39:27.911Z",
+  "status": "paid",
+  "merchantId": "24826146-2b90-48c5-9fd2-6e94cf40f2b0",
+  "memo": "Payment request for invoice C9kVtnhDYdiGig5Q2rXJ44",
+  "fiatSymbol": "USD",
+  "fiatRate": 222.67,
+  "fiatTotal": 0.1,
+  "paymentAsset": "BCH",
+  "paymentUrl": "https://pay.bitcoin.com/i/C9kVtnhDYdiGig5Q2rXJ44",
+  "paymentId": "C9kVtnhDYdiGig5Q2rXJ44",
+  "txId": "a71a8c008ff5dba3d5cc5929485d2860b836f559c782effeef0daec666db7ea7"
+}

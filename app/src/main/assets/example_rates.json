@@ -1,0 +1,1022 @@
+[
+  {
+    "code": "AED",
+    "name": "UAE Dirham",
+    "time": 1620267894,
+    "rate": 209631.417
+  },
+  {
+    "code": "AFN",
+    "name": "Afghan Afghani",
+    "time": 1620267894,
+    "rate": 4433066.9091
+  },
+  {
+    "code": "ALL",
+    "name": "Albanian Lek",
+    "time": 1620267894,
+    "rate": 5847280.7725
+  },
+  {
+    "code": "AMD",
+    "name": "Armenian Dram",
+    "time": 1620267894,
+    "rate": 29729396.967
+  },
+  {
+    "code": "ANG",
+    "name": "Netherlands Antillean Guilder",
+    "time": 1620267894,
+    "rate": 102438.6645
+  },
+  {
+    "code": "AOA",
+    "name": "Angolan Kwanza",
+    "time": 1620267894,
+    "rate": 37339754.146
+  },
+  {
+    "code": "ARS",
+    "name": "Argentine Peso",
+    "time": 1620267894,
+    "rate": 9366517.9318
+  },
+  {
+    "code": "AUD",
+    "name": "Australian Dollar",
+    "time": 1620267894,
+    "rate": 73713.419
+  },
+  {
+    "code": "AWG",
+    "name": "Aruban Florin",
+    "time": 1620267894,
+    "rate": 102726.9236
+  },
+  {
+    "code": "AZN",
+    "name": "Azerbaijani Manat",
+    "time": 1620267894,
+    "rate": 97065.8179
+  },
+  {
+    "code": "BAM",
+    "name": "Bosnia-Herzegovina Convertible Mark",
+    "time": 1620267894,
+    "rate": 92899.1535
+  },
+  {
+    "code": "BBD",
+    "name": "Barbadian Dollar",
+    "time": 1620267894,
+    "rate": 114141.0307
+  },
+  {
+    "code": "BCH",
+    "name": "Bitcoin Cash",
+    "time": 1620267894,
+    "rate": 42.1984
+  },
+  {
+    "code": "BDT",
+    "name": "Bangladeshi Taka",
+    "time": 1620267894,
+    "rate": 4839657.8002
+  },
+  {
+    "code": "BGN",
+    "name": "Bulgarian Lev",
+    "time": 1620267894,
+    "rate": 92974.4341
+  },
+  {
+    "code": "BHD",
+    "name": "Bahraini Dinar",
+    "time": 1620267894,
+    "rate": 21513.4198
+  },
+  {
+    "code": "BIF",
+    "name": "Burundian Franc",
+    "time": 1620267894,
+    "rate": 111858209.4346
+  },
+  {
+    "code": "BMD",
+    "name": "Bermudan Dollar",
+    "time": 1620267894,
+    "rate": 57070.5153
+  },
+  {
+    "code": "BND",
+    "name": "Brunei Dollar",
+    "time": 1620267894,
+    "rate": 76198.2105
+  },
+  {
+    "code": "BOB",
+    "name": "Bolivian Boliviano",
+    "time": 1620267894,
+    "rate": 394108.6619
+  },
+  {
+    "code": "BRL",
+    "name": "Brazilian Real",
+    "time": 1620267894,
+    "rate": 305549.8321
+  },
+  {
+    "code": "BSD",
+    "name": "Bahamian Dollar",
+    "time": 1620267894,
+    "rate": 57070.5153
+  },
+  {
+    "code": "BTC",
+    "name": "Bitcoin",
+    "time": 1609959010,
+    "rate": 1
+  },
+  {
+    "code": "BTN",
+    "name": "Bhutanese Ngultrum",
+    "time": 1620267894,
+    "rate": 4216147.1299
+  },
+  {
+    "code": "BUSD",
+    "name": "Binance USD",
+    "time": 1620267894,
+    "rate": 57070.5153
+  },
+  {
+    "code": "BWP",
+    "name": "Botswanan Pula",
+    "time": 1620267894,
+    "rate": 620725.9172
+  },
+  {
+    "code": "BYN",
+    "name": "Belarusian Ruble",
+    "time": 1620267894,
+    "rate": 145972.6805
+  },
+  {
+    "code": "BZD",
+    "name": "Belize Dollar",
+    "time": 1620267894,
+    "rate": 115033.9012
+  },
+  {
+    "code": "CAD",
+    "name": "Canadian Dollar",
+    "time": 1620267894,
+    "rate": 70063.8737
+  },
+  {
+    "code": "CDF",
+    "name": "Congolese Franc",
+    "time": 1620267894,
+    "rate": 113857530.0879
+  },
+  {
+    "code": "CHF",
+    "name": "Swiss Franc",
+    "time": 1620267894,
+    "rate": 52154.4612
+  },
+  {
+    "code": "CLF",
+    "name": "Chilean Unit of Account (UF)",
+    "time": 1620267894,
+    "rate": 1458.3809
+  },
+  {
+    "code": "CLP",
+    "name": "Chilean Peso",
+    "time": 1620267894,
+    "rate": 40240394.7483
+  },
+  {
+    "code": "CNY",
+    "name": "Chinese Yuan",
+    "time": 1620267894,
+    "rate": 369445.9811
+  },
+  {
+    "code": "COP",
+    "name": "Colombian Peso",
+    "time": 1620267894,
+    "rate": 218837647.0638
+  },
+  {
+    "code": "CRC",
+    "name": "Costa Rican Colón",
+    "time": 1620267894,
+    "rate": 35111935.2838
+  },
+  {
+    "code": "CUP",
+    "name": "Cuban Peso",
+    "time": 1620267894,
+    "rate": 1469565.7627
+  },
+  {
+    "code": "CVE",
+    "name": "Cape Verdean Escudo",
+    "time": 1620267894,
+    "rate": 5253340.9114
+  },
+  {
+    "code": "CZK",
+    "name": "Czech Koruna",
+    "time": 1620267894,
+    "rate": 1226879.1108
+  },
+  {
+    "code": "DAI",
+    "name": "Dai",
+    "time": 1620267894,
+    "rate": 57011.5157
+  },
+  {
+    "code": "DJF",
+    "name": "Djiboutian Franc",
+    "time": 1620267894,
+    "rate": 10160430.7761
+  },
+  {
+    "code": "DKK",
+    "name": "Danish Krone",
+    "time": 1620267894,
+    "rate": 353639.4458
+  },
+  {
+    "code": "DOGE",
+    "name": "Dogecoin",
+    "time": 1620267894,
+    "rate": 87728.856
+  },
+  {
+    "code": "DOP",
+    "name": "Dominican Peso",
+    "time": 1620267894,
+    "rate": 3247146.4194
+  },
+  {
+    "code": "DZD",
+    "name": "Algerian Dinar",
+    "time": 1620267894,
+    "rate": 7616263.6817
+  },
+  {
+    "code": "EGP",
+    "name": "Egyptian Pound",
+    "time": 1620267894,
+    "rate": 894123.7633
+  },
+  {
+    "code": "ETB",
+    "name": "Ethiopian Birr",
+    "time": 1620267894,
+    "rate": 2417134.1126
+  },
+  {
+    "code": "ETH",
+    "name": "Ether",
+    "time": 1620267894,
+    "rate": 16.341
+  },
+  {
+    "code": "EUR",
+    "name": "Eurozone Euro",
+    "time": 1620267894,
+    "rate": 47557.6024
+  },
+  {
+    "code": "FJD",
+    "name": "Fijian Dollar",
+    "time": 1620267894,
+    "rate": 116024.3574
+  },
+  {
+    "code": "FKP",
+    "name": "Falkland Islands Pound",
+    "time": 1620267894,
+    "rate": 41030.3368
+  },
+  {
+    "code": "GBP",
+    "name": "Pound Sterling",
+    "time": 1620267894,
+    "rate": 41058.5833
+  },
+  {
+    "code": "GEL",
+    "name": "Georgian Lari",
+    "time": 1620267894,
+    "rate": 196322.5756
+  },
+  {
+    "code": "GHS",
+    "name": "Ghanaian Cedi",
+    "time": 1620267894,
+    "rate": 329611.7887
+  },
+  {
+    "code": "GIP",
+    "name": "Gibraltar Pound",
+    "time": 1620267894,
+    "rate": 41030.3368
+  },
+  {
+    "code": "GMD",
+    "name": "Gambian Dalasi",
+    "time": 1620267894,
+    "rate": 2923151.7776
+  },
+  {
+    "code": "GNF",
+    "name": "Guinean Franc",
+    "time": 1620267894,
+    "rate": 564768713.1745
+  },
+  {
+    "code": "GTQ",
+    "name": "Guatemalan Quetzal",
+    "time": 1620267894,
+    "rate": 440430.5735
+  },
+  {
+    "code": "GUSD",
+    "name": "Gemini US Dollar",
+    "time": 1620267894,
+    "rate": 57070.5153
+  },
+  {
+    "code": "GYD",
+    "name": "Guyanaese Dollar",
+    "time": 1620267894,
+    "rate": 11939852.6865
+  },
+  {
+    "code": "HKD",
+    "name": "Hong Kong Dollar",
+    "time": 1620267894,
+    "rate": 443409.369
+  },
+  {
+    "code": "HNL",
+    "name": "Honduran Lempira",
+    "time": 1620267894,
+    "rate": 1375498.2534
+  },
+  {
+    "code": "HRK",
+    "name": "Croatian Kuna",
+    "time": 1620267894,
+    "rate": 358009.0451
+  },
+  {
+    "code": "HTG",
+    "name": "Haitian Gourde",
+    "time": 1620267894,
+    "rate": 4887979.1209
+  },
+  {
+    "code": "HUF",
+    "name": "Hungarian Forint",
+    "time": 1620267894,
+    "rate": 17058072.5862
+  },
+  {
+    "code": "IDR",
+    "name": "Indonesian Rupiah",
+    "time": 1620267894,
+    "rate": 822400393.8155
+  },
+  {
+    "code": "ILS",
+    "name": "Israeli Shekel",
+    "time": 1620267894,
+    "rate": 186479.0503
+  },
+  {
+    "code": "INR",
+    "name": "Indian Rupee",
+    "time": 1620267894,
+    "rate": 4211807.1146
+  },
+  {
+    "code": "IQD",
+    "name": "Iraqi Dinar",
+    "time": 1620267894,
+    "rate": 83349642.8922
+  },
+  {
+    "code": "IRR",
+    "name": "Iranian Rial",
+    "time": 1620267894,
+    "rate": 2402954034.8925
+  },
+  {
+    "code": "ISK",
+    "name": "Icelandic Króna",
+    "time": 1620267894,
+    "rate": 7188031.3647
+  },
+  {
+    "code": "JEP",
+    "name": "Jersey Pound",
+    "time": 1620267894,
+    "rate": 41030.3368
+  },
+  {
+    "code": "JMD",
+    "name": "Jamaican Dollar",
+    "time": 1620267894,
+    "rate": 8704744.9689
+  },
+  {
+    "code": "JOD",
+    "name": "Jordanian Dinar",
+    "time": 1620267894,
+    "rate": 40462.9952
+  },
+  {
+    "code": "JPY",
+    "name": "Japanese Yen",
+    "time": 1620267894,
+    "rate": 6237954.6067
+  },
+  {
+    "code": "KES",
+    "name": "Kenyan Shilling",
+    "time": 1620267894,
+    "rate": 6100838.0909
+  },
+  {
+    "code": "KGS",
+    "name": "Kyrgystani Som",
+    "time": 1620267894,
+    "rate": 4839334.4427
+  },
+  {
+    "code": "KHR",
+    "name": "Cambodian Riel",
+    "time": 1620267894,
+    "rate": 231148939.3562
+  },
+  {
+    "code": "KMF",
+    "name": "Comorian Franc",
+    "time": 1620267894,
+    "rate": 23416027.4055
+  },
+  {
+    "code": "KPW",
+    "name": "North Korean Won",
+    "time": 1620267894,
+    "rate": 51363463.5144
+  },
+  {
+    "code": "KRW",
+    "name": "South Korean Won",
+    "time": 1620267894,
+    "rate": 64232388.2588
+  },
+  {
+    "code": "KWD",
+    "name": "Kuwaiti Dinar",
+    "time": 1620267894,
+    "rate": 17202.8806
+  },
+  {
+    "code": "KYD",
+    "name": "Cayman Islands Dollar",
+    "time": 1620267894,
+    "rate": 47555.2054
+  },
+  {
+    "code": "KZT",
+    "name": "Kazakhstani Tenge",
+    "time": 1620267894,
+    "rate": 24345882.1012
+  },
+  {
+    "code": "LAK",
+    "name": "Laotian Kip",
+    "time": 1620267894,
+    "rate": 537869961.1255
+  },
+  {
+    "code": "LBP",
+    "name": "Lebanese Pound",
+    "time": 1620267894,
+    "rate": 86882393.6631
+  },
+  {
+    "code": "LKR",
+    "name": "Sri Lankan Rupee",
+    "time": 1620267894,
+    "rate": 11243970.3194
+  },
+  {
+    "code": "LRD",
+    "name": "Liberian Dollar",
+    "time": 1620267894,
+    "rate": 9816128.5801
+  },
+  {
+    "code": "LSL",
+    "name": "Lesotho Loti",
+    "time": 1620267894,
+    "rate": 820856.8043
+  },
+  {
+    "code": "LYD",
+    "name": "Libyan Dinar",
+    "time": 1620267894,
+    "rate": 256391.5177
+  },
+  {
+    "code": "MAD",
+    "name": "Moroccan Dirham",
+    "time": 1620267894,
+    "rate": 508873.5258
+  },
+  {
+    "code": "MDL",
+    "name": "Moldovan Leu",
+    "time": 1620267894,
+    "rate": 1012432.4771
+  },
+  {
+    "code": "MGA",
+    "name": "Malagasy Ariary",
+    "time": 1620267894,
+    "rate": 215706650.168
+  },
+  {
+    "code": "MKD",
+    "name": "Macedonian Denar",
+    "time": 1620267894,
+    "rate": 2928436.0518
+  },
+  {
+    "code": "MMK",
+    "name": "Myanma Kyat",
+    "time": 1620267894,
+    "rate": 88895970.3549
+  },
+  {
+    "code": "MNT",
+    "name": "Mongolian Tugrik",
+    "time": 1620267894,
+    "rate": 162698119.0092
+  },
+  {
+    "code": "MOP",
+    "name": "Macanese Pataca",
+    "time": 1620267894,
+    "rate": 456733.2165
+  },
+  {
+    "code": "MRU",
+    "name": "Mauritanian Ouguiya",
+    "time": 1620267894,
+    "rate": 2052826.421
+  },
+  {
+    "code": "MUR",
+    "name": "Mauritian Rupee",
+    "time": 1620267894,
+    "rate": 2330759.9477
+  },
+  {
+    "code": "MVR",
+    "name": "Maldivian Rufiyaa",
+    "time": 1620267894,
+    "rate": 876032.4051
+  },
+  {
+    "code": "MWK",
+    "name": "Malawian Kwacha",
+    "time": 1620267894,
+    "rate": 45216270.9627
+  },
+  {
+    "code": "MXN",
+    "name": "Mexican Peso",
+    "time": 1620267894,
+    "rate": 1156748.807
+  },
+  {
+    "code": "MYR",
+    "name": "Malaysian Ringgit",
+    "time": 1620267894,
+    "rate": 235101.9884
+  },
+  {
+    "code": "MZN",
+    "name": "Mozambican Metical",
+    "time": 1620267894,
+    "rate": 3296563.9928
+  },
+  {
+    "code": "NAD",
+    "name": "Namibian Dollar",
+    "time": 1620267894,
+    "rate": 818961.8898
+  },
+  {
+    "code": "NGN",
+    "name": "Nigerian Naira",
+    "time": 1620267894,
+    "rate": 27593970.6657
+  },
+  {
+    "code": "NIO",
+    "name": "Nicaraguan Córdoba",
+    "time": 1620267894,
+    "rate": 1998762.8381
+  },
+  {
+    "code": "NOK",
+    "name": "Norwegian Krone",
+    "time": 1620267894,
+    "rate": 476722.399
+  },
+  {
+    "code": "NPR",
+    "name": "Nepalese Rupee",
+    "time": 1620267894,
+    "rate": 6745834.5253
+  },
+  {
+    "code": "NZD",
+    "name": "New Zealand Dollar",
+    "time": 1620267894,
+    "rate": 79118.8529
+  },
+  {
+    "code": "OMR",
+    "name": "Omani Rial",
+    "time": 1620267894,
+    "rate": 21972.0883
+  },
+  {
+    "code": "PAB",
+    "name": "Panamanian Balboa",
+    "time": 1620267894,
+    "rate": 57070.5153
+  },
+  {
+    "code": "PAX",
+    "name": "Paxos Standard USD",
+    "time": 1620267894,
+    "rate": 57070.5153
+  },
+  {
+    "code": "PEN",
+    "name": "Peruvian Nuevo Sol",
+    "time": 1620267894,
+    "rate": 218624.9883
+  },
+  {
+    "code": "PGK",
+    "name": "Papua New Guinean Kina",
+    "time": 1620267894,
+    "rate": 201398.7098
+  },
+  {
+    "code": "PHP",
+    "name": "Philippine Peso",
+    "time": 1620267894,
+    "rate": 2738875.0971
+  },
+  {
+    "code": "PKR",
+    "name": "Pakistani Rupee",
+    "time": 1620267894,
+    "rate": 8724871.0556
+  },
+  {
+    "code": "PLN",
+    "name": "Polish Zloty",
+    "time": 1620267894,
+    "rate": 217519.5895
+  },
+  {
+    "code": "PYG",
+    "name": "Paraguayan Guarani",
+    "time": 1620267894,
+    "rate": 381457304.1288
+  },
+  {
+    "code": "QAR",
+    "name": "Qatari Rial",
+    "time": 1620267894,
+    "rate": 207793.7464
+  },
+  {
+    "code": "RON",
+    "name": "Romanian Leu",
+    "time": 1620267894,
+    "rate": 234091.839
+  },
+  {
+    "code": "RSD",
+    "name": "Serbian Dinar",
+    "time": 1620267894,
+    "rate": 5587022.1638
+  },
+  {
+    "code": "RUB",
+    "name": "Russian Ruble",
+    "time": 1620267894,
+    "rate": 4272150.3957
+  },
+  {
+    "code": "RWF",
+    "name": "Rwandan Franc",
+    "time": 1620267894,
+    "rate": 56809931.1619
+  },
+  {
+    "code": "SAR",
+    "name": "Saudi Riyal",
+    "time": 1620267894,
+    "rate": 214026.5886
+  },
+  {
+    "code": "SBD",
+    "name": "Solomon Islands Dollar",
+    "time": 1620267894,
+    "rate": 454204.0854
+  },
+  {
+    "code": "SCR",
+    "name": "Seychellois Rupee",
+    "time": 1620267894,
+    "rate": 854353.7742
+  },
+  {
+    "code": "SDG",
+    "name": "Sudanese Pound",
+    "time": 1620267894,
+    "rate": 22371641.8869
+  },
+  {
+    "code": "SEK",
+    "name": "Swedish Krona",
+    "time": 1620267894,
+    "rate": 484534.3824
+  },
+  {
+    "code": "SGD",
+    "name": "Singapore Dollar",
+    "time": 1620267894,
+    "rate": 76247.3499
+  },
+  {
+    "code": "SHP",
+    "name": "Saint Helena Pound",
+    "time": 1620267894,
+    "rate": 41030.3368
+  },
+  {
+    "code": "SLL",
+    "name": "Sierra Leonean Leone",
+    "time": 1620267894,
+    "rate": 583474676.9043
+  },
+  {
+    "code": "SOS",
+    "name": "Somali Shilling",
+    "time": 1620267894,
+    "rate": 33141437.6089
+  },
+  {
+    "code": "SRD",
+    "name": "Surinamese Dollar",
+    "time": 1620267894,
+    "rate": 807776.0662
+  },
+  {
+    "code": "STN",
+    "name": "São Tomé and Príncipe Dobra",
+    "time": 1620267894,
+    "rate": 1173369.7928
+  },
+  {
+    "code": "SVC",
+    "name": "Salvadoran Colón",
+    "time": 1620267894,
+    "rate": 499346.2278
+  },
+  {
+    "code": "SYP",
+    "name": "Syrian Pound",
+    "time": 1620267894,
+    "rate": 71778488.6204
+  },
+  {
+    "code": "SZL",
+    "name": "Swazi Lilangeni",
+    "time": 1620267894,
+    "rate": 821012.3789
+  },
+  {
+    "code": "THB",
+    "name": "Thai Baht",
+    "time": 1620267894,
+    "rate": 1778370.043
+  },
+  {
+    "code": "TJS",
+    "name": "Tajikistani Somoni",
+    "time": 1620267894,
+    "rate": 650944.5221
+  },
+  {
+    "code": "TMT",
+    "name": "Turkmenistani Manat",
+    "time": 1620267894,
+    "rate": 200317.5126
+  },
+  {
+    "code": "TND",
+    "name": "Tunisian Dinar",
+    "time": 1620267894,
+    "rate": 156886.8413
+  },
+  {
+    "code": "TOP",
+    "name": "Tongan Paʻanga",
+    "time": 1620267894,
+    "rate": 129636.7631
+  },
+  {
+    "code": "TRY",
+    "name": "Turkish Lira",
+    "time": 1620267894,
+    "rate": 475281.2544
+  },
+  {
+    "code": "TTD",
+    "name": "Trinidad and Tobago Dollar",
+    "time": 1620267894,
+    "rate": 387408.8688
+  },
+  {
+    "code": "TWD",
+    "name": "New Taiwan Dollar",
+    "time": 1620267894,
+    "rate": 1594681.4549
+  },
+  {
+    "code": "TZS",
+    "name": "Tanzanian Shilling",
+    "time": 1620267894,
+    "rate": 132346524.325
+  },
+  {
+    "code": "UAH",
+    "name": "Ukrainian Hryvnia",
+    "time": 1620267894,
+    "rate": 1581983.4944
+  },
+  {
+    "code": "UGX",
+    "name": "Ugandan Shilling",
+    "time": 1620267894,
+    "rate": 203302357.2312
+  },
+  {
+    "code": "USD",
+    "name": "US Dollar",
+    "time": 1620267894,
+    "rate": 57070.5153
+  },
+  {
+    "code": "USDC",
+    "name": "Circle USD Coin",
+    "time": 1620267894,
+    "rate": 57070.5153
+  },
+  {
+    "code": "UYU",
+    "name": "Uruguayan Peso",
+    "time": 1620267894,
+    "rate": 2513883.0367
+  },
+  {
+    "code": "UZS",
+    "name": "Uzbekistan Som",
+    "time": 1620267894,
+    "rate": 599654108.5609
+  },
+  {
+    "code": "VEF",
+    "name": "Venezuelan Bolívar Fuerte",
+    "time": 1609794220,
+    "rate": 7776471041.1114
+  },
+  {
+    "code": "VES",
+    "name": "Venezuelan Bolívar Soberano",
+    "time": 1620267894,
+    "rate": 154159907252.4485
+  },
+  {
+    "code": "VND",
+    "name": "Vietnamese Dong",
+    "time": 1620267894,
+    "rate": 1317843702.5808
+  },
+  {
+    "code": "VUV",
+    "name": "Vanuatu Vatu",
+    "time": 1620267894,
+    "rate": 6251757.1513
+  },
+  {
+    "code": "WBTC",
+    "name": "Wrapped BTC",
+    "time": 1620267894,
+    "rate": 1.0007
+  },
+  {
+    "code": "WST",
+    "name": "Samoan Tala",
+    "time": 1620267894,
+    "rate": 144494.7865
+  },
+  {
+    "code": "XAF",
+    "name": "CFA Franc BEAC",
+    "time": 1620267894,
+    "rate": 31172793.8487
+  },
+  {
+    "code": "XAG",
+    "name": "Silver (troy ounce)",
+    "time": 1620267894,
+    "rate": 2163.9764
+  },
+  {
+    "code": "XAU",
+    "name": "Gold (troy ounce)",
+    "time": 1620267894,
+    "rate": 31.9989
+  },
+  {
+    "code": "XCD",
+    "name": "East Caribbean Dollar",
+    "time": 1620267894,
+    "rate": 154235.9183
+  },
+  {
+    "code": "XOF",
+    "name": "CFA Franc BCEAO",
+    "time": 1620267894,
+    "rate": 31172793.8487
+  },
+  {
+    "code": "XPF",
+    "name": "CFP Franc",
+    "time": 1620267894,
+    "rate": 5670956.7978
+  },
+  {
+    "code": "XRP",
+    "name": "Ripple",
+    "time": 1620267894,
+    "rate": 33665.7534
+  },
+  {
+    "code": "YER",
+    "name": "Yemeni Rial",
+    "time": 1620267894,
+    "rate": 14290459.0128
+  },
+  {
+    "code": "ZAR",
+    "name": "South African Rand",
+    "time": 1620267894,
+    "rate": 819810.9904
+  },
+  {
+    "code": "ZMW",
+    "name": "Zambian Kwacha",
+    "time": 1620267894,
+    "rate": 1275916.8254
+  },
+  {
+    "code": "ZWL",
+    "name": "Zimbabwean Dollar",
+    "time": 1620267894,
+    "rate": 18376705.8325
+  }
+]

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="blockchain_navigation_bar">#FF000000</color>
+    <color name="textColorPrimary">#FF000000</color>
+    <color name="textColorSecondary">#FF222222</color>
+
+    <color name="white">#fff</color>
+    <color name="gray">#A0A0A0</color>
+    <color name="white_50">#80ffffff</color>
+
+    <color name="red">#f00</color>
+
+    <color name="dropshadow_grey">#CCCCCC</color>
+
+    <color name="snack_error_background">#C00000</color>
+    <color name="snack_error_text">#fff</color>
+    <color name="snack_info_background">#009B6C</color>
+    <color name="snack_info_text">#fff</color>
+    <color name="bitcoindotcom_light_green">#00D897</color>
+    <color name="bitcoindotcom_green">#00c58a</color>
+    <color name="bitcoindotcom_darker_green">#009B6C</color>
+    <color name="bitcoindotcom_darkest_green">#00704E</color>
+
+</resources>
