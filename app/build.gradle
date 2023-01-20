@@ -11,13 +11,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "com.bitcoin.merchant.app"
         minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 50315
-        versionName "5.3.15"
+        targetSdkVersion 31
+        versionCode 50316
+        versionName "5.3.16"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
