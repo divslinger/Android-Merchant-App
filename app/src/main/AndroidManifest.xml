@@ -63,7 +63,8 @@
             tools:replace="android:screenOrientation"
             android:stateNotNeeded="true"/>
 
-        <receiver android:name="com.bitcoin.merchant.app.application.NetworkStateReceiver">
+        <receiver android:name="com.bitcoin.merchant.app.application.NetworkStateReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
