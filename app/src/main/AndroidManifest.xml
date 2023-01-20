@@ -25,6 +25,7 @@
         <activity
             android:name="com.bitcoin.merchant.app.SplashActivity"
             android:label="@string/app_name"
+            android:exported="true"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="fullSensor">
             <intent-filter>
@@ -35,6 +36,7 @@
         <activity
             android:name="com.bitcoin.merchant.app.MainActivity"
             android:label="@string/app_name"
+            android:exported="true"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="fullSensor">
             <intent-filter>
@@ -56,6 +58,7 @@
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
+            android:exported="false"
             android:configChanges="orientation|screenSize"
             tools:replace="android:screenOrientation"
             android:stateNotNeeded="true"/>
