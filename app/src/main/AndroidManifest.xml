@@ -64,7 +64,7 @@
             android:stateNotNeeded="true"/>
 
         <receiver android:name="com.bitcoin.merchant.app.application.NetworkStateReceiver"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
@@ -74,7 +74,7 @@
         <provider
             android:name=".application.GenericFileProvider"
             android:authorities="${applicationId}.provider"
-            android:exported="false"
+            android:exported="true"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
