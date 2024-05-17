@@ -61,6 +61,9 @@ public class PollerSocket implements TxWebSocketHandler {
 
     @Override
     public void start() {
+        if (executorService != null && !executorService.isShutdown()) {
+            return;
+        }
         Log.i("Poller Task", "Starting poller task");
         executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.scheduleAtFixedRate(createPollerTask(), 0, 5, TimeUnit.SECONDS);
