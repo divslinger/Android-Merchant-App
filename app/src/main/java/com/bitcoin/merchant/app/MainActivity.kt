@@ -97,7 +97,13 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
             blockchainDotInfoSocket.setListener(this)
             blockchainDotInfoSocket.start()
         }
-        pollerSocket = PollerSocket(this, OkHttpClient())
+        if (!this::pollerSocket.isInitialized || !pollerSocket.isConnected) {
+            if (this::pollerSocket.isInitialized)
+                pollerSocket.stop()
+            pollerSocket = PollerSocket(this, OkHttpClient())
+            pollerSocket.start()
+        }
+
     }
 
     private fun listenToConnectivityChanges() {
@@ -262,6 +268,9 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
 
     override fun onIncomingPayment(payment: PaymentReceived?) {
         if (payment != null) {
+            if (app.paymentProcessor.paymentAlreadyRecorded(payment.txHash))  {
+                return;
+            }
             if (payment.bchExpected != 0L && payment.fiatExpected != null) {
                 if (!payment.isUnderpayment && !payment.isOverpayment) {
                     Log.d(TAG, "${payment.txHash} has been received.")

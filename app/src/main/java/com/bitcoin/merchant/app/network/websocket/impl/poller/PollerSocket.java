@@ -38,14 +38,15 @@ public class PollerSocket implements TxWebSocketHandler {
 
     private String BASE_URL = "https://rest.bch.actorforth.org/v2/address/utxo/";
 
-    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService executorService;
 
     private final Set<String> subscribedAddresses = new HashSet<>();
+
+    private final Set<String> alreadyHandled = new HashSet<>();
 
     public PollerSocket(WebSocketListener webSocketListener, OkHttpClient okHttpClient) {
         this.webSocketListener = webSocketListener;
         this.okHttpClient = okHttpClient;
-        executorService.scheduleAtFixedRate(createPollerTask(), 0, 10, TimeUnit.SECONDS);
     }
 
     @Override
@@ -60,12 +61,18 @@ public class PollerSocket implements TxWebSocketHandler {
 
     @Override
     public void start() {
-
+        Log.i("Poller Task", "Starting poller task");
+        executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(createPollerTask(), 0, 5, TimeUnit.SECONDS);
     }
 
     @Override
     public void stop() {
-
+        if (executorService == null) {
+            return;
+        }
+        Log.i("Poller Task", "Stopping poller task");
+        executorService.shutdownNow();
     }
 
     @Override
@@ -112,7 +119,7 @@ public class PollerSocket implements TxWebSocketHandler {
             String txid = utxo.getString("txid");
             int confirmations = utxo.getInt("confirmations");
             if (confirmations == 0) {
-                Log.i("Poller Task", "Found unconfirmed transaction for address " + subscribedAddress);
+                Log.i("Poller Task", "Found unconfirmed transaction for address " + subscribedAddress + " with txid " + txid + " and amount " + satoshis + " satoshis");
                 triggerPaymentReceived(subscribedAddress, satoshis, txid);
             }
         }
@@ -120,6 +127,9 @@ public class PollerSocket implements TxWebSocketHandler {
 
     private void triggerPaymentReceived(String subscribedAddress, long satoshis, String txid) {
         ExpectedAmounts expected = ExpectedPayments.getInstance().getExpectedAmounts(subscribedAddress);
+        if (alreadyHandled.contains(txid)) {
+            return;
+        }
 
         webSocketListener.onIncomingPayment(new PaymentReceived(
                 subscribedAddress,
@@ -128,5 +138,6 @@ public class PollerSocket implements TxWebSocketHandler {
                 System.currentTimeMillis() / 1000, 0,
                 expected
         ));
+        alreadyHandled.add(txid);
     }
 }
