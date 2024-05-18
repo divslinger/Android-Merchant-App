@@ -29,6 +29,7 @@ import com.bitcoin.merchant.app.network.PaymentReceived
 import com.bitcoin.merchant.app.network.websocket.TxWebSocketHandler
 import com.bitcoin.merchant.app.network.websocket.WebSocketListener
 import com.bitcoin.merchant.app.network.websocket.impl.blockchaininfo.BlockchainInfoSocketSocketHandler
+import com.bitcoin.merchant.app.network.websocket.impl.poller.PollerSocket
 import com.bitcoin.merchant.app.screens.dialogs.DialogHelper
 import com.bitcoin.merchant.app.screens.features.ToolbarAwareFragment
 import com.bitcoin.merchant.app.util.AmountUtil
@@ -36,6 +37,7 @@ import com.bitcoin.merchant.app.util.AppUtil
 import com.bitcoin.merchant.app.util.ScanQRUtil
 import com.bitcoin.merchant.app.util.Settings
 import com.google.android.material.navigation.NavigationView
+import okhttp3.OkHttpClient
 
 open class MainActivity : AppCompatActivity(), WebSocketListener {
     private lateinit var mDrawerLayout: DrawerLayout
@@ -53,11 +55,15 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
 
     lateinit var blockchainDotInfoSocket: TxWebSocketHandler
 
+    lateinit var pollerSocket: PollerSocket
+
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (Action.SUBSCRIBE_TO_ADDRESS == intent.action) {
                 println("Subscribed to address!")
-                blockchainDotInfoSocket.subscribeToAddress(intent.getStringExtra("address"))
+                val address = intent.getStringExtra("address")
+                blockchainDotInfoSocket.subscribeToAddress(address)
+                pollerSocket.subscribeToAddress(address)
             }
         }
     }
@@ -91,6 +97,13 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
             blockchainDotInfoSocket.setListener(this)
             blockchainDotInfoSocket.start()
         }
+        if (!this::pollerSocket.isInitialized || !pollerSocket.isConnected) {
+            if (this::pollerSocket.isInitialized)
+                pollerSocket.stop()
+            pollerSocket = PollerSocket(this, OkHttpClient())
+            pollerSocket.start()
+        }
+
     }
 
     private fun listenToConnectivityChanges() {
@@ -255,6 +268,9 @@ open class MainActivity : AppCompatActivity(), WebSocketListener {
 
     override fun onIncomingPayment(payment: PaymentReceived?) {
         if (payment != null) {
+            if (app.paymentProcessor.paymentAlreadyRecorded(payment.txHash))  {
+                return;
+            }
             if (payment.bchExpected != 0L && payment.fiatExpected != null) {
                 if (!payment.isUnderpayment && !payment.isOverpayment) {
                     Log.d(TAG, "${payment.txHash} has been received.")
