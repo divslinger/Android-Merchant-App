@@ -1,9 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
 }
 
 repositories {
@@ -11,15 +10,20 @@ repositories {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 34
     defaultConfig {
         applicationId "com.bitcoin.merchant.app"
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 50317
-        versionName "5.3.17"
+        targetSdkVersion 34
+        versionCode 50400
+        versionName "5.4.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -31,9 +35,10 @@ android {
         }
     }
     android {
+        namespace "com.bitcoin.merchant.app"
         compileOptions {
-            sourceCompatibility 1.8
-            targetCompatibility 1.8
+            sourceCompatibility JavaVersion.VERSION_17
+            targetCompatibility JavaVersion.VERSION_17
         }
         lintOptions {
             checkReleaseBuilds false
