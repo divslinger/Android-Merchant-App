@@ -2,6 +2,7 @@ package com.bitcoin.merchant.app.network.websocket.impl.poller;
 
 import android.util.Log;
 
+import com.bitcoin.merchant.app.BuildConfig;
 import com.bitcoin.merchant.app.network.ExpectedAmounts;
 import com.bitcoin.merchant.app.network.ExpectedPayments;
 import com.bitcoin.merchant.app.network.PaymentReceived;
@@ -36,7 +37,7 @@ public class PollerSocket implements TxWebSocketHandler {
     private WebSocketListener webSocketListener;
     private final OkHttpClient okHttpClient;
 
-    private String BASE_URL = "https://rest.bch.actorforth.org/v2/address/utxo/";
+    private String BASE_URL = "https://bchrest.api.wombat.systems/v2/address/utxo/";
 
     private ScheduledExecutorService executorService;
 
@@ -66,7 +67,7 @@ public class PollerSocket implements TxWebSocketHandler {
         }
         Log.i("Poller Task", "Starting poller task");
         executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(createPollerTask(), 0, 5, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(createPollerTask(), 0, 2, TimeUnit.SECONDS);
     }
 
     @Override
@@ -102,6 +103,7 @@ public class PollerSocket implements TxWebSocketHandler {
                     Request request = new Request.Builder()
                             .get()
                             .url(query)
+                            .header("Authorization", BuildConfig.API_KEY)
                             .build();
                     Response execute = okHttpClient.newCall(request).execute();
                     JSONObject jsonObject = new JSONObject(execute.body().string());
